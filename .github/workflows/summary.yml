@@ -1,0 +1,20 @@
+---
+name: "GH Metrics"
+
+on:
+  repository_dispatch:
+    types: [test_trigger]
+  schedule:
+    - cron: '30 10 * * *'
+
+jobs:
+  github-metrics:
+    name: ♻️ Update Metrics
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: vn7n24fzkq/github-profile-summary-cards@release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        with:
+          USERNAME: z-shell
