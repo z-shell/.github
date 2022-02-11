@@ -1,7 +1,7 @@
 <div align="center">
 <p>
   <a href="https://github.com/z-shell/zi">
-  <img src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="70%" /></a>
+  <img src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="85%" /></a>
 </p>
   <p>
 
@@ -12,15 +12,14 @@
 
   </p><p>
     
-  [![ZI](https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=blue-green&layout=compact)](
+  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zi)
-  [![ZI](https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=blue-green&layout=compact)](
+  [![ZI](https://gh-stats-wheat.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zw)
-  [![ZI](https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=blue-green&layout=compact)](
+  [![ZI](https://gh-stats-wheat.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zannexes)
-  [![ZI](https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=blue-green&layout=compact)](
+  [![ZI](https://gh-stats-wheat.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zpackages)
   
   
 </p></div>
-
