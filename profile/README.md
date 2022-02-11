@@ -1,7 +1,7 @@
 <div align="center">
 <p>
   <a href="https://github.com/z-shell/zi">
-  <img src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="Logo" width="80%" height="165px" /></a>
+  <img src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="70%" /></a>
 </p>
   <p>
 
