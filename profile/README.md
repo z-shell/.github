@@ -14,11 +14,11 @@
     
   [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zi)
-  [![ZI](https://gh-stats-wheat.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark&layout=compact)](
+  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zw)
-  [![ZI](https://gh-stats-wheat.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark&layout=compact)](
+  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zannexes)
-  [![ZI](https://gh-stats-wheat.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark&layout=compact)](
+  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark&layout=compact)](
 https://github.com/z-shell/zpackages)
   
   
