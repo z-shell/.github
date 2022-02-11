@@ -10,16 +10,17 @@
   -->
   [![ZI Wiki](https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg "Repobeats analytics image")](https://github.com/z-shell/zw)
 
-  </p><p>
-    
-  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark&layout=compact)](
-https://github.com/z-shell/zi)
-  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark&layout=compact)](
-https://github.com/z-shell/zw)
-  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark&layout=compact)](
-https://github.com/z-shell/zannexes)
-  [![ZI](https://gh-stats-digital-clouds.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark&layout=compact)](
-https://github.com/z-shell/zpackages)
-  
-  
+</p><p>
+<a href="https://github.com/z-shell/zi">
+  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
+</a>
+<a href="https://github.com/z-shell/zw">
+  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
+</a>
+  <a href="https://github.com/z-shell/zannexes">
+  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark" />
+</a>
+<a href="https://github.com/z-shell/zpackages">
+  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark" />
+</a>  
 </p></div>
