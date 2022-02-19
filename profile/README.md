@@ -12,15 +12,15 @@
 
 </p><p>
 <a href="https://github.com/z-shell/zi">
-  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
 </a>
 <a href="https://github.com/z-shell/zw">
-  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
 </a>
   <a href="https://github.com/z-shell/zannexes">
-  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark" />
 </a>
 <a href="https://github.com/z-shell/zpackages">
-  <img align="center" src="https://gh-stats-digital.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark" />
-</a>  
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark" />
+</a>
 </p></div>
