@@ -20,8 +20,8 @@
 <a href="https://github.com/z-shell/community">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
 </a>
-<a href="https://github.com/z-shell/wiki">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=wiki&card_width=150&theme=github_dark" />
+<a href="https://github.com/z-shell/status">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" />
 </a>
 <a href="https://github.com/z-shell/zannexes">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark" />
