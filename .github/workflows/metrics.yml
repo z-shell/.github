@@ -16,9 +16,24 @@ jobs:
           filename: metrics.repository.svg
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
-          repo: .github
           plugin_lines: yes
           plugin_followup: yes
           plugin_projects: yes
-          plugin_projects_repositories: z-shell/.github/projects/1
+          plugin_projects_repositories: z-shell/projects/4
           plugin_support: yes
+      - name: Indepth analysis
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.followup.indepth.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_followup: yes
+          plugin_followup_indepth: yes
+      - name: GitHub Discussions
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.discussions.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_discussions: yes
+          plugin_discussions_categories_limit: 8
