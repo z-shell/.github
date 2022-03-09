@@ -1,34 +1,33 @@
-<div align="center">
+<div align="center" width="100%">
   <a href="https://github.com/z-shell/zi">
     <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="85%" />
   </a>
   <p>
   <a href="https://github.com/z-shell">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" hight="90%" />
-    <img align="center" src="https://github.com/z-shell/.github/raw/main/metrics.plugin.followup.indepth.svg" hight="90%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="90%" />
+    <img align="center" src="https://github.com/z-shell/.github/raw/main/metrics.plugin.followup.indepth.svg" width="90%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" width="90%" />
   </a>
   </p>
 </div>
-<div align="center">
-  <p>
+<div align="center" width="100%">
   <a href="https://github.com/z-shell/community">
-    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics.plugin.discussions.svg" hight="90%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" hight="90%" />
-  <a href="https://twitter.com/zshell_zi">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.tweets.svg" hight="90%" />
+    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics.plugin.discussions.svg" width="80%" />
   </a>
   <a href="https://twitter.com/zshell_zi">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.pagespeed.detailed.svg" hight="90%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.tweets.svg" width="80%" />
   </a>
-  <!--
+  <a href="https://github.com/z-shell/zw">
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.pagespeed.detailed.svg" width="90%" />
+  </a>
   <a href="https://github.com/z-shell/zw">
     <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
   </a>
+  <!--
   <a href="https://github.com/z-shell/zi">
     <img align="center" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" />
   </a>
   -->
-  </p>
 </div> 
 <div align="center" width="100%">
 <a href="https://github.com/z-shell/zi">
