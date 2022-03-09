@@ -1,25 +1,28 @@
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zi">
-    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="75%" />
+    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="90%" />
   </a>
-  <p>
   <a href="https://github.com/z-shell">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="70%" hight="70%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" width="70%" hight="70%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="80%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" width="80%" />
   </a>
-  <a href="https://github.com/z-shell/community">
-    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics.plugin.discussions.svg" width="70%" hight="70%" />
-  </a>
-  </p>
 </div>
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.pagespeed.detailed.svg" width="70%" hight="70%" />
-  </a>
-  <a href="https://twitter.com/zshell_zi">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.tweets.svg" width="70%" hight="70%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.pagespeed.detailed.svg" width="80%" />
   </a>
 </div> 
+<div align="center" width="100%">
+  <a href="https://github.com/z-shell/community">
+    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics.plugin.discussions.svg" width="80%" />
+  </a>
+  <a href="https://twitter.com/zshell_zi">
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.tweets.svg" width="80%" />
+  </a>
+  <a href="https://dev.to/tag/zsh">
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.dev.tag.zsh.rss.svg" width="80%" />
+  </a>
+</div>
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zw">
     <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
@@ -50,7 +53,9 @@
 </a>
 -->
 </div>
-  
+
+---
+
 <div align="center" width="100%">
 <a href="https://digitalclouds.crowdin.com/z-shell/es">
   <img align="center" alt="es proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
