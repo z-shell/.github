@@ -1,8 +1,6 @@
 name: Metrics CI
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
   schedule:
     - cron: '03 03 * * *'
