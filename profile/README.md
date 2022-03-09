@@ -22,7 +22,7 @@
 </div> 
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" hight="80%" />
+    <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
   </a>
   <!--
   <a href="https://github.com/z-shell/zi">
