@@ -14,13 +14,6 @@ jobs:
         with:
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
-      - name: Example
-        uses: lowlighter/metrics@latest
-        with:
-          filename: metrics.classic.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          base: header, repositories
-          plugin_lines: yes
       - name: Latest tweets
         uses: lowlighter/metrics@latest
         with:
@@ -57,13 +50,3 @@ jobs:
           repo: zi
           plugin_contributors: yes
           plugin_contributors_contributions: yes
-      - name: Contributors and sponsors
-        uses: lowlighter/metrics@latest
-        with:
-          filename: metrics.plugin.people.repository.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          template: repository
-          repo: zi
-          plugin_people: yes
-          plugin_people_types: stargazers, watchers
