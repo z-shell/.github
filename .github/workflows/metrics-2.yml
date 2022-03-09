@@ -1,0 +1,30 @@
+name: Metrics CI-2
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '07 07 * * *'
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Detailed report
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.pagespeed.detailed.svg
+          token: NOT_NEEDED
+          base: ""
+          plugin_pagespeed: yes
+          plugin_pagespeed_detailed: yes
+          plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
+          plugin_pagespeed_url: https://z.digitalclouds.dev
+      - name: Project from a repository
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.projects.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_projects: yes
+          plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2
