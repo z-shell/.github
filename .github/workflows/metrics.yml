@@ -40,6 +40,26 @@ jobs:
           base: ""
           plugin_discussions: yes
           plugin_discussions_categories_limit: 8
+      - name: Contributors with contributions count
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.zi.contributors.contributions.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          repo: zi
+          plugin_contributors: yes
+          plugin_contributors_contributions: yes
+      - name: Contributors with contributions count
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.zw.contributors.contributions.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          repo: zw
+          plugin_contributors: yes
+          plugin_contributors_contributions: yes
       - name: Detailed report
         uses: lowlighter/metrics@latest
         with:
