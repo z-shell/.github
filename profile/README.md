@@ -5,6 +5,7 @@
   <a href="https://github.com/z-shell">
     <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="80%" />
     <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" width="80%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.followup.indepth.svg" width="80%" />
   </a>
 </div>
 <div align="center" width="100%">
