@@ -4,6 +4,8 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+  schedule:
+    - cron: '03 03 * * *'
 
 jobs:
   metrics:
@@ -29,6 +31,7 @@ jobs:
           filename: metrics.plugin.followup.indepth.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
+          user: z-shell
           plugin_followup: yes
           plugin_followup_indepth: yes
       - name: GitHub Discussions
@@ -39,3 +42,22 @@ jobs:
           base: ""
           plugin_discussions: yes
           plugin_discussions_categories_limit: 8
+      - name: Detailed report
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.pagespeed.detailed.svg
+          token: NOT_NEEDED
+          base: ""
+          plugin_pagespeed: yes
+          plugin_pagespeed_detailed: yes
+          plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
+          plugin_pagespeed_url: https://z.digitalclouds.dev
+      - name: Project from a repository
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.projects.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_projects: yes
+          plugin_projects_repositories: z-shell/zi/projects/2
+          plugin_projects_descriptions: yes
