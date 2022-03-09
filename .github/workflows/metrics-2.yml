@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Detailed report
+      - name: Detailed PageSpeed report
         uses: lowlighter/metrics@latest
         with:
           filename: metrics.plugin.pagespeed.detailed.svg
@@ -20,11 +20,11 @@ jobs:
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: https://z.digitalclouds.dev
-      - name: Project from a repository
+      - name: Projects
         uses: lowlighter/metrics@latest
         with:
           filename: metrics.plugin.projects.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_projects: yes
-          plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2, orgs/z-shell/projects/4
+          plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2
