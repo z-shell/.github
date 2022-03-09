@@ -14,10 +14,11 @@ jobs:
         with:
           template: repository
           filename: metrics.repository.svg
-          token: ${{ secrets.secrets.ORG_TOKEN }}
+          token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
           repo: .github
           plugin_lines: yes
           plugin_followup: yes
           plugin_projects: yes
           plugin_projects_repositories: z-shell/.github/projects/1
+          plugin_support: yes
