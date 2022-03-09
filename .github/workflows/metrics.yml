@@ -18,6 +18,7 @@ jobs:
         uses: lowlighter/metrics@latest
         with:
           filename: metrics.plugin.tweets.svg
+          token: NOT_NEEDED
           base: ""
           plugin_tweets: yes
           plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
