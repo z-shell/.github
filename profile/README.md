@@ -1,28 +1,28 @@
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zi">
-    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />
+    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="75%" />
   </a>
   <p>
   <a href="https://github.com/z-shell">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="80%" hight="70%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" width="80%" hight="70%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="70%" hight="70%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.projects.svg" width="70%" hight="70%" />
   </a>
   <a href="https://github.com/z-shell/community">
-    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics.plugin.discussions.svg" width="80%" hight="70%" />
+    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics.plugin.discussions.svg" width="70%" hight="70%" />
   </a>
   </p>
 </div>
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.pagespeed.detailed.svg" width="80%" hight="70%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.pagespeed.detailed.svg" width="70%" hight="70%" />
   </a>
   <a href="https://twitter.com/zshell_zi">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.tweets.svg" width="80%" hight="70%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics.plugin.tweets.svg" width="70%" hight="70%" />
   </a>
 </div> 
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
+    <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" hight="80%" />
   </a>
   <!--
   <a href="https://github.com/z-shell/zi">
