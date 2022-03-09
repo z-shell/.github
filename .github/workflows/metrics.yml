@@ -57,5 +57,4 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_projects: yes
-          plugin_projects_repositories: z-shell/zi/projects/2
-          plugin_projects_descriptions: yes
+          plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2
