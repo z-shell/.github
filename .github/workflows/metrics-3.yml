@@ -1,4 +1,4 @@
-name: Metrics CI-3
+name: MSG-CI
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
       - name: Latest tweets
         uses: lowlighter/metrics@latest
         with:
-          filename: metrics.plugin.tweets.svg
+          filename: metrics/plugin.tweets.svg
           token: NOT_NEEDED
           base: ""
           plugin_tweets: yes
@@ -26,16 +26,16 @@ jobs:
       - name: RSS dev.to/z-shell
         uses: lowlighter/metrics@latest
         with:
-          filename: metrics.plugin.dev.zshell.rss.svg
+          filename: metrics/plugin.dev.zshell.rss.svg
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/z-shell
-          plugin_rss_limit: 2
+          plugin_rss_limit: 4
       - name: RSS dev.to/tag/zsh
         uses: lowlighter/metrics@latest
         with:
-          filename: metrics.plugin.dev.tag.zsh.rss.svg
+          filename: metrics/plugin.dev.tag.zsh.rss.svg
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
