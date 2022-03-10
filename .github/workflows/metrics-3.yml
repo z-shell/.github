@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@latest
+      - uses: ss-o/metrics@latest
         with:
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
       - name: Latest tweets
-        uses: lowlighter/metrics@latest
+        uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.tweets.svg
           token: NOT_NEEDED
@@ -24,7 +24,7 @@ jobs:
           plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
           plugin_tweets_user: zshell_zi
       - name: RSS dev.to/z-shell
-        uses: lowlighter/metrics@latest
+        uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.dev.zshell.rss.svg
           token: NOT_NEEDED
@@ -33,7 +33,7 @@ jobs:
           plugin_rss_source: https://dev.to/feed/z-shell
           plugin_rss_limit: 4
       - name: RSS dev.to/tag/zsh
-        uses: lowlighter/metrics@latest
+        uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.dev.tag.zsh.rss.svg
           token: NOT_NEEDED
@@ -42,7 +42,7 @@ jobs:
           plugin_rss_source: https://dev.to/feed/tag/zsh
           plugin_rss_limit: 4
       - name: Top answers from stackoverflow
-        uses: lowlighter/metrics@latest
+        uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.stackoverflow.svg
           token: NOT_NEEDED
