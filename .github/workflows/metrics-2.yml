@@ -1,4 +1,4 @@
-name: Metrics CI-2
+name: ORG-CI-2
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
       - name: Detailed PageSpeed report
         uses: lowlighter/metrics@latest
         with:
-          filename: metrics.plugin.pagespeed.detailed.svg
+          filename: metrics/plugin.pagespeed.detailed.svg
           token: NOT_NEEDED
           base: ""
           plugin_pagespeed: yes
@@ -23,7 +23,7 @@ jobs:
       - name: Projects
         uses: lowlighter/metrics@latest
         with:
-          filename: metrics.plugin.projects.svg
+          filename: metrics/plugin.projects.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_projects: yes
