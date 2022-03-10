@@ -41,13 +41,13 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/tag/zsh
           plugin_rss_limit: 4
-      - name: Top answers from stackoverflow
-        uses: ss-o/metrics@latest
-        with:
-          filename: metrics/plugin.stackoverflow.svg
-          token: NOT_NEEDED
-          base: ""
-          plugin_stackoverflow: yes
-          plugin_stackoverflow_user: digitalclouds
-          plugin_stackoverflow_sections: answers-top
-          plugin_stackoverflow_limit: 2
+#      - name: Top answers from stackoverflow
+#        uses: ss-o/metrics@latest
+#        with:
+#          filename: metrics/plugin.stackoverflow.svg
+#          token: NOT_NEEDED
+#          base: ""
+#          plugin_stackoverflow: yes
+#          plugin_stackoverflow_user: digitalclouds
+#          plugin_stackoverflow_sections: answers-top
+#          plugin_stackoverflow_limit: 2
