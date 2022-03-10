@@ -41,6 +41,24 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/tag/zsh
           plugin_rss_limit: 4
+      - name: Serverless
+        uses: ss-o/metrics@latest
+        with:
+          filename: metrics//serverless/plugin.dev.tag.zsh.rss.svg
+          token: NOT_NEEDED
+          base: ""
+          plugin_rss: yes
+          plugin_rss_source: https://blog.cloudflare.com/tag/serverless/rss/
+          plugin_rss_limit: 2
+#      - name: RSS dev.to/tag/zsh
+#        uses: ss-o/metrics@latest
+#        with:
+#          filename: metrics/plugin.dev.tag.zsh.rss.svg
+#          token: NOT_NEEDED
+#          base: ""
+#          plugin_rss: yes
+#          plugin_rss_source: https://dev.to/feed/tag/zsh
+#          plugin_rss_limit: 4
 #      - name: Top answers from stackoverflow
 #        uses: ss-o/metrics@latest
 #        with:
