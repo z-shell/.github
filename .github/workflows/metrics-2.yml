@@ -1,4 +1,4 @@
-name: ORG-CI-2
+name: ORG-CI
 
 on:
   workflow_dispatch:
@@ -29,3 +29,12 @@ jobs:
           plugin_projects: yes
           plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2, z-shell/community/projects/1
           plugin_projects_descriptions: yes
+      - name: Indepth analysis
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics/plugin.followup.indepth.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          user: z-shell
+          plugin_followup: yes
+          plugin_followup_indepth: yes
