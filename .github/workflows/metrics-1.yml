@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ss-o/metrics@latest
         with:
+          filename: metrics/plugin.svg
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
       - name: GitHub Discussions
@@ -30,15 +31,5 @@ jobs:
           base: ""
           template: repository
           repo: zi
-          plugin_contributors: yes
-          plugin_contributors_contributions: yes
-      - name: Contributors with contributions count
-        uses: ss-o/metrics@latest
-        with:
-          filename: metrics/zw.contributors.contributions.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          template: repository
-          repo: zw
           plugin_contributors: yes
           plugin_contributors_contributions: yes
