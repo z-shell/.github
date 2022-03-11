@@ -3,7 +3,7 @@ name: COMMUNITY-CI
 on:
   workflow_dispatch:
   schedule:
-    - cron: '01 01 * * *'
+    - cron: '0 1/6 * * *'
 
 jobs:
   metrics:
