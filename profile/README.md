@@ -1,6 +1,6 @@
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zi">
-    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />
+    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="90%" />
   </a>
   <a href="https://github.com/z-shell">
     <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="90%" />
@@ -13,6 +13,9 @@
     <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="90%" />
   </a>
 </div> 
+
+---
+
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/community">
     <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="90%" />
