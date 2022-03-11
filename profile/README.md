@@ -3,25 +3,27 @@
     <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />
   </a>
   <a href="https://github.com/z-shell">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="75%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="75%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="75%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/github-metrics.svg" width="90%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="90%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="90%" />
   </a>
 </div>
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="75%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="90%" />
   </a>
 </div> 
 <div align="center" width="100%">
   <a href="https://github.com/z-shell/community">
-    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="75%" />
+    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="90%" />
   </a>
+<kbd><a href="https://github.com/z-shell/community/issues/new?assignees=&labels=%F0%9F%91%A5+member&template=membership.yml&title=team%3A+">JOIN COMMUNITY</a></kbd> 
+<kbd><a href="https://github.com/z-shell/community/new/main/?filename=tweets/new/%3Cfile-name%3E.tweet">CREATE NEW TWEET</a></kbd>
   <a href="https://twitter.com/zshell_zi">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg" width="75%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg" width="90%" />
   </a>
   <a href="https://dev.to/tag/zsh">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg" width="75%" />
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg" width="90%" />
   </a>
 </div>
 <div align="center" width="100%">
@@ -34,16 +36,16 @@
   </a>
   -->
 <a href="https://github.com/z-shell/zi">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" hight="75%" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" hight="90%" />
 </a>
 <a href="https://github.com/z-shell/zw">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" hight="75%" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" hight="90%" />
 </a>
 <a href="https://github.com/z-shell/community">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" hight="75%" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" hight="90%" />
 </a>
 <a href="https://github.com/z-shell/status">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" hight="75%" />
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" hight="90%" />
 </a>
 <!--
 <a href="https://github.com/z-shell/zannexes">
