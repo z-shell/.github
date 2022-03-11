@@ -49,7 +49,7 @@ jobs:
           base: ""
           plugin_rss: yes
           plugin_rss_source: https://blog.cloudflare.com/tag/serverless/rss/
-          plugin_rss_limit: 2
+          plugin_rss_limit: 4
 #      - name: RSS dev.to/tag/zsh
 #        uses: ss-o/metrics@latest
 #        with:
