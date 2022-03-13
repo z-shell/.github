@@ -3,7 +3,7 @@ name: MSG-CI
 on:
   workflow_dispatch:
   schedule:
-    - cron: '03 03 * * *'
+    - cron: '12 0/12 * * *'
 
 jobs:
   metrics:
@@ -31,7 +31,7 @@ jobs:
           base: ""
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/z-shell
-          plugin_rss_limit: 4
+          plugin_rss_limit: 2
       - name: RSS dev.to/tag/zsh
         uses: ss-o/metrics@latest
         with:
@@ -40,16 +40,16 @@ jobs:
           base: ""
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/tag/zsh
-          plugin_rss_limit: 4
+          plugin_rss_limit: 2
       - name: Serverless
         uses: ss-o/metrics@latest
         with:
-          filename: metrics//serverless/plugin.dev.tag.zsh.rss.svg
+          filename: metrics/serverless/plugin.dev.tag.zsh.rss.svg
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
           plugin_rss_source: https://blog.cloudflare.com/tag/serverless/rss/
-          plugin_rss_limit: 4
+          plugin_rss_limit: 2
 #      - name: RSS dev.to/tag/zsh
 #        uses: ss-o/metrics@latest
 #        with:
