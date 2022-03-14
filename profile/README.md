@@ -1,86 +1,57 @@
-<div align="center" width="100%">
-  <a href="https://github.com/z-shell/zi">
-    <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="90%" />
-  </a>
-  <a href="https://github.com/z-shell">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="90%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="90%" />
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="90%" />
-  </a>
-</div>
-<div align="center" width="100%">
-  <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="90%" />
-  </a>
-</div> 
-<div align="center" width="100%">
-  <a href="https://github.com/z-shell/community/discussions">
-    <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="90%" />
-  </a>
-  
-<kbd><a href="https://github.com/z-shell/community/issues/new?assignees=&labels=%F0%9F%91%A5+member&template=membership.yml&title=team%3A+">JOIN COMMUNITY</a></kbd> 
-<kbd><a href="https://github.com/z-shell/community/new/main/?filename=tweets/new/%3Cfile-name%3E.tweet">CREATE NEW TWEET</a></kbd>
-
-  <a href="https://twitter.com/zshell_zi">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg" width="90%" />
-  </a>
-  <a href="https://dev.to/tag/zsh">
-    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg" width="90%" />
-  </a>
-</div>
-<div align="center" width="100%">
-  <a href="https://github.com/z-shell/zw">
-    <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
-  </a>
+<div align="center">
+<table style="width: 100%"><tr><td><a href="https://github.com/z-shell/zi">
+  <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="70%" />
+</a><a href="https://github.com/z-shell">
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" />
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="80%" />
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="80%" />
+</a></td></tr><tr><td><a href="https://github.com/z-shell/zw">
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="80%" />
+</a></tr></div>
+<div align="center"><tr><td>
+<a href="https://github.com/z-shell/community/discussions">
+  <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="80%" />
+<a href="https://twitter.com/zshell_zi">
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg" width="80%" />
+</a><a href="https://dev.to/tag/zsh">
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg" width="80%" />
+</a></td></tr><td><a href="https://github.com/z-shell/zw">
+  <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
+</a></td></div>
   <!--
   <a href="https://github.com/z-shell/zi">
     <img align="center" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" />
   </a>
   -->
-<a href="https://github.com/z-shell/zi">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" hight="90%" />
-</a>
-<a href="https://github.com/z-shell/zw">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" hight="90%" />
-</a>
-<a href="https://github.com/z-shell/community">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" hight="90%" />
-</a>
-<a href="https://github.com/z-shell/status">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" hight="90%" />
-</a>
+</div><div align="center"><tr><td><a href="https://github.com/z-shell/zi">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
+</a><a href="https://github.com/z-shell/zw">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
+</a><a href="https://github.com/z-shell/community">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
+</a><a href="https://github.com/z-shell/status">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" />
+</a></td></tr></div>
 <!--
 <a href="https://github.com/z-shell/zannexes">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark" />
-</a>
-<a href="https://github.com/z-shell/zpackages">
+</a><a href="https://github.com/z-shell/zpackages">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark" />
 </a>
 -->
-</div>
-
----
-
-<div align="center" width="100%">
+<div align="center"><tr><td>
 <a href="https://digitalclouds.crowdin.com/z-shell/es">
   <img align="center" alt="es proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-<a href="https://digitalclouds.crowdin.com/z-shell/ja">
+</a><a href="https://digitalclouds.crowdin.com/z-shell/ja">
   <img align="center" alt="ja proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ja&style=plastic&query=%24.progress.1.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-<a href="https://digitalclouds.crowdin.com/z-shell/ko">
+</a><a href="https://digitalclouds.crowdin.com/z-shell/ko">
   <img align="center" alt="ko proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ko&style=plastic&query=%24.progress.2.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-<a href="https://digitalclouds.crowdin.com/z-shell/ru">
+</a><a href="https://digitalclouds.crowdin.com/z-shell/ru">
   <img align="center" alt="ru proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ru&style=plastic&query=%24.progress.3.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-<a href="https://digitalclouds.crowdin.com/z-shell/tr">
+</a><a href="https://digitalclouds.crowdin.com/z-shell/tr">
   <img align="center" alt="tr proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=tr&style=plastic&query=%24.progress.4.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-<a href="https://digitalclouds.crowdin.com/z-shell/zh-CN">
+</a><a href="https://digitalclouds.crowdin.com/z-shell/zh-CN">
   <img align="center" alt="zh-CN proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=zh-CN&style=plastic&query=%24.progress.5.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-<a href="https://digitalclouds.crowdin.com/z-shell/zh-TW">
+</a><a href="https://digitalclouds.crowdin.com/z-shell/zh-TW">
   <img align="center" alt="zh-TW proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=zh-TW&style=plastic&query=%24.progress.6.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
-</a>
-</div>
+</a></td></tr></div></table>
