@@ -1,43 +1,42 @@
 <div align="center">
-<table style="width: 100%"><tr><td><a href="https://github.com/z-shell/zi">
-  <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="70%" />
-</a><a href="https://github.com/z-shell">
-  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" />
-  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="80%" />
-  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="80%" />
-</a></td></tr><tr><td><a href="https://github.com/z-shell/zw">
-  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="80%" />
-</a></tr></div>
+<table style="width: 100%; margin-left: auto; margin-right: auto;">
+<tr><td><a href="https://github.com/z-shell/zi">
+  <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" height="auto" /></a>
+<a href="https://github.com/z-shell">
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" height="auto" />
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="80%" height="auto" />
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="80%" height="auto" />
+</a></td></tr><tr><td>
+<a href="https://github.com/z-shell/zw">
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="80%" height="auto" /></a></tr></div>
 <div align="center"><tr><td>
 <a href="https://github.com/z-shell/community/discussions">
-  <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="80%" />
+  <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="80%" height="auto" />
 <a href="https://twitter.com/zshell_zi">
-  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg" width="80%" />
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg" width="80%" height="auto" />
 </a><a href="https://dev.to/tag/zsh">
-  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg" width="80%" />
+  <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg" width="80%" height="auto" />
 </a></td></tr><td><a href="https://github.com/z-shell/zw">
-  <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
-</a></td></div>
-  <!--
-  <a href="https://github.com/z-shell/zi">
-    <img align="center" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" />
-  </a>
-  -->
-</div><div align="center"><tr><td><a href="https://github.com/z-shell/zi">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
-</a><a href="https://github.com/z-shell/zw">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
-</a><a href="https://github.com/z-shell/community">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
-</a><a href="https://github.com/z-shell/status">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" />
-</a></td></tr></div>
+  <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" height="auto" /></a>
 <!--
-<a href="https://github.com/z-shell/zannexes">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zannexes&card_width=150&theme=github_dark" />
-</a><a href="https://github.com/z-shell/zpackages">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zpackages&card_width=150&theme=github_dark" />
-</a>
+<a href="https://github.com/z-shell/zi">
+  <img align="center" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" width="80%" height="auto" /></a>
+-->
+</td></div></div><div align="center"><tr><td>
+<a href="https://github.com/z-shell/zi">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" width="40%" height="auto" /></a>
+<a href="https://github.com/z-shell/zw">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" width="40%" height="auto" /></a>
+<a href="https://github.com/z-shell/community">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" width="40%" height="auto" /></a>
+<a href="https://github.com/z-shell/status">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" width="40%" height="auto" /></a>
+</td></tr></div>
+<!--
+<a href="https://github.com/z-shell/F-Sy-H">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=f-sy-h&card_width=150&theme=github_dark" /></a>
+<a href="https://github.com/z-shell/H-S-MW">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=h-s-mw&card_width=150&theme=github_dark" /></a>
 -->
 <div align="center">
 <tr><td><a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img align="center" alt="es proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
