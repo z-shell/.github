@@ -1,5 +1,5 @@
-<div align="center">
-<table style="width: 100%; margin-left: auto; margin-right: auto;">
+<div align="center" align="justify">
+<table width="100%" margin-left="auto" margin-right="auto">
 <tr><td><a href="https://github.com/z-shell/zi">
   <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" height="auto" /></a>
 <a href="https://github.com/z-shell">
@@ -9,7 +9,7 @@
 </a></td></tr><tr><td>
 <a href="https://github.com/z-shell/zw">
   <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg" width="80%" height="auto" /></a></tr></div>
-<div align="center"><tr><td>
+<div align="center" align="justify"><tr><td>
 <a href="https://github.com/z-shell/community/discussions">
   <img align="center" src="https://github.com/z-shell/.github/blob/main/metrics/plugin.discussions.svg" width="80%" height="auto" />
 <a href="https://twitter.com/zshell_zi">
@@ -22,7 +22,7 @@
 <a href="https://github.com/z-shell/zi">
   <img align="center" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" width="80%" height="auto" /></a>
 -->
-</td></div></div><div align="center"><tr><td>
+</td></div></div><div align="center" align="justify"><tr><td>
 <a href="https://github.com/z-shell/zi">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" width="40%" height="auto" /></a>
 <a href="https://github.com/z-shell/zw">
@@ -38,7 +38,7 @@
 <a href="https://github.com/z-shell/H-S-MW">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=h-s-mw&card_width=150&theme=github_dark" /></a>
 -->
-<div align="center">
+<div align="center" align="justify">
 <tr><td><a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img align="center" alt="es proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
   <a href="https://digitalclouds.crowdin.com/z-shell/ja"><img align="center" alt="ja proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ja&style=plastic&query=%24.progress.1.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img align="center" alt="ja translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=ja&style=plastic&query=%24.progress.3.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
   <a href="https://digitalclouds.crowdin.com/z-shell/ko"><img align="center" alt="ko proofreading" src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ko&style=plastic&query=%24.progress.2.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img align="center" alt="ko translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=ko&style=plastic&query=%24.progress.4.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
