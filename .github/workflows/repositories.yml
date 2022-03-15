@@ -16,23 +16,23 @@ jobs:
         prj: ['2']
     steps:
       - uses: actions/checkout@v3
-      - name: Featured repositories
-        uses: ss-o/metrics@latest
         env:
           ORG: z-shell
           REPO: ${{ matrix.rep }}
           PROJ: ${{ matrix.PRJ }}
+      - name: Featured repositories
+        uses: ss-o/metrics@latest
         with:
           filename: metrics/$REPO/plugin.repositories.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
           plugin_repositories_featured: $ORG/$REPO
-      - uses: ss-o/metrics@latest
         env:
           ORG: z-shell
           REPO: ${{ matrix.rep }}
           PROJ: ${{ matrix.PRJ }}
+      - uses: ss-o/metrics@latest
         with:
           template: repository
           filename: metrics.repository.svg
