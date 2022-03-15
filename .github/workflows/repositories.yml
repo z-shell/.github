@@ -1,10 +1,10 @@
 ---
-name: 'Repository Metrics'
+name: REPO-READER
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '02 02 * * *'
+    - cron: "02 02 * * *"
 
 jobs:
   metrics:
@@ -12,26 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rep: ['zi', 'zw']
-        prj: ['2']
+        rep: ["zi", "zw"]
+        prj: ["2"]
     steps:
       - uses: actions/checkout@v3
         env:
           ORG: z-shell
           REPO: ${{ matrix.rep }}
-          PROJ: ${{ matrix.PRJ }}
-      - name: Featured repositories
-        uses: ss-o/metrics@latest
+          PROJ: ${{ matrix.prj }}
+      - uses: ss-o/metrics@latest
         with:
           filename: metrics/$REPO/plugin.repositories.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
           plugin_repositories_featured: $ORG/$REPO
-        env:
-          ORG: z-shell
-          REPO: ${{ matrix.rep }}
-          PROJ: ${{ matrix.PRJ }}
       - uses: ss-o/metrics@latest
         with:
           template: repository

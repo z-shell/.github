@@ -1,17 +1,21 @@
-name: ORG-CI
+name: STATISTICS
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '02 02 * * *'
+    - cron: "02 02 * * *"
 
 jobs:
   metrics:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Detailed PageSpeed report
-        uses: ss-o/metrics@latest
+      - uses: ss-o/metrics@latest
+        with:
+          filename: metrics/plugin.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          user: z-shell
+      - uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.pagespeed.detailed.svg
           token: NOT_NEEDED
@@ -20,8 +24,7 @@ jobs:
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: https://z.digitalclouds.dev
-      - name: Projects
-        uses: ss-o/metrics@latest
+      - uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.projects.svg
           token: ${{ secrets.ORG_TOKEN }}
@@ -29,8 +32,7 @@ jobs:
           plugin_projects: yes
           plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2, z-shell/community/projects/1
           plugin_projects_descriptions: yes
-      - name: Indepth analysis
-        uses: ss-o/metrics@latest
+      - uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.followup.indepth.svg
           token: ${{ secrets.ORG_TOKEN }}
@@ -38,18 +40,3 @@ jobs:
           user: z-shell
           plugin_followup: yes
           plugin_followup_indepth: yes
-      - name: action-git-diff-suggestions
-        uses: getsentry/action-git-diff-suggestions@v1
-        with:
-          github-token: ${{ secrets.ORG_TOKEN }}
-      - name: Recent activity
-        uses: ss-o/metrics@latest
-        with:
-          filename: metrics/plugin.activity.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_activity: yes
-          plugin_activity_limit: 5
-          plugin_activity_days: 0
-          plugin_activity_filter: issue, pr, release, fork, review, ref/create, wiki, member

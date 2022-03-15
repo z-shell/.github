@@ -1,20 +1,15 @@
-name: COMMUNITY-CI
+name: COMMUNITY
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1/6 * * *'
+    - cron: "0 1/6 * * *"
 
 jobs:
   metrics:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
-        with:
-          filename: metrics/plugin.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          user: z-shell
       - name: GitHub Discussions
         uses: ss-o/metrics@latest
         with:
@@ -23,8 +18,17 @@ jobs:
           base: ""
           plugin_discussions: yes
           plugin_discussions_categories_limit: 10
-      - name: Contributors with contributions count
-        uses: ss-o/metrics@latest
+      - uses: ss-o/metrics@latest
+        with:
+          filename: metrics/plugin.activity.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          user: z-shell
+          plugin_activity: yes
+          plugin_activity_limit: 5
+          plugin_activity_days: 0
+          plugin_activity_filter: issue, pr, release, fork, review, ref/create, wiki, member
+      - uses: ss-o/metrics@latest
         with:
           filename: metrics/zi.contributors.contributions.svg
           token: ${{ secrets.ORG_TOKEN }}
