@@ -1,0 +1,43 @@
+---
+name: 'Repository Metrics'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '02 02 * * *'
+
+jobs:
+  metrics:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rep: ['zi', 'zw']
+        prj: ['2']
+    steps:
+        env:
+          ORG: z-shell
+          REPO: ${{ matrix.rep }}
+          PROJ: ${{ matrix.PRJ }}
+      - uses: actions/checkout@v3
+      - uses: ss-o/metrics@latest
+        with:
+      - name: Featured repositories
+        uses: ss-o/metrics@latest
+        with:
+          filename: metrics/$REPO/plugin.repositories.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_repositories: yes
+          plugin_repositories_featured: $ORG/$REPO
+      - uses: ss-o/metrics@latest
+        with:
+          template: repository
+          filename: metrics.repository.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          user: $ORG
+          repo: $REPO
+          plugin_lines: yes
+          plugin_followup: yes
+          plugin_projects: yes
+          plugin_projects_repositories: lowlighter/metrics/projects/$PROJ
