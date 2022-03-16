@@ -23,7 +23,7 @@ jobs:
           plugin_repositories: yes
           plugin_repositories_featured: ${{ matrix.rep }}
           
-  metrics-2:
+  metrics-indepth:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
@@ -41,4 +41,3 @@ jobs:
           plugin_lines: yes
           plugin_followup: yes
           plugin_projects: yes
-          plugin_projects_repositories: z-shell/${{ matrix.rep }}/projects/2
