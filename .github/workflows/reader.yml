@@ -3,7 +3,7 @@ name: READER
 on:
   workflow_dispatch:
   schedule:
-    - cron: "12 0/12 * * *"
+    - cron: "12 * * * 0/2"
 
 jobs:
   metrics-tweet:
