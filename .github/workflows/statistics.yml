@@ -40,3 +40,12 @@ jobs:
           user: z-shell
           plugin_followup: yes
           plugin_followup_indepth: yes
+      - uses: ss-o/metrics@latest
+        with:
+          filename: metrics/plugin.activity.svg
+          token: ${{ secrets.SSO_TOKEN }}
+          base: ""
+          plugin_activity: yes
+          plugin_activity_limit: 4
+          plugin_activity_days: 0
+          plugin_activity_filter: issue, pr, release, review, ref/create
