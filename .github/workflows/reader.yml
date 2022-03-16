@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/plugin.tweets.svg
           token: NOT_NEEDED
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/rrs/plugin.dev.zshell.rss.svg
           token: NOT_NEEDED
@@ -30,7 +30,7 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/z-shell
           plugin_rss_limit: 3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/rss/plugin.dev.tag.zsh.rss.svg
           token: NOT_NEEDED
