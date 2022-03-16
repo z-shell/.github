@@ -3,7 +3,7 @@ name: COMMUNITY
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 1/6 * * *"
+    - cron: "06 6 * * *"
 
 jobs:
   metrics-discussions:
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
-          filename: metrics/zi/contributors.contributions.svg
+          filename: metrics/zi/contributors/contributions.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           template: repository
