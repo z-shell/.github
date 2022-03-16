@@ -15,7 +15,7 @@ jobs:
         rep: ["zi", "zw"]
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: "metrics/${{ matrix.rep }}/repository.svg"
           token: ${{ secrets.ORG_TOKEN }}
@@ -31,7 +31,7 @@ jobs:
         rep: ["zi", "zw"]
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           template: repository
           filename: "metrics/${{ matrix.rep }}/indepth.repository.svg"
