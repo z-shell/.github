@@ -55,8 +55,9 @@ jobs:
       - uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.activity.svg
-          token: ${{ secrets.SSO_TOKEN }}
+          token: ${{ secrets.ORG_TOKEN }}
           base: ""
+          user: z-shell
           plugin_activity: yes
           plugin_activity_limit: 4
           plugin_activity_days: 0
