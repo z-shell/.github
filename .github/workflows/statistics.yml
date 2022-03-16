@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/plugin.svg
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/plugin.pagespeed.detailed.svg
           token: NOT_NEEDED
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/plugin.projects.svg
           token: ${{ secrets.ORG_TOKEN }}
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/plugin.followup.indepth.svg
           token: ${{ secrets.ORG_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ss-o/metrics@latest
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           filename: metrics/plugin.activity.svg
           token: ${{ secrets.ORG_TOKEN }}
