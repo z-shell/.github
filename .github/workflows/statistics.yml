@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_projects: yes
-          plugin_projects_repositories: "z-shell/${{ matrix.rep }"
+          plugin_projects_repositories: "z-shell/${{ matrix.rep }}"
           plugin_projects_descriptions: yes
 
   metrics-indepth:
