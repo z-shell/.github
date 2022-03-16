@@ -6,18 +6,21 @@ on:
     - cron: "0 1/6 * * *"
 
 jobs:
-  metrics:
+  metrics-discussions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: GitHub Discussions
-        uses: ss-o/metrics@latest
+      - uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.discussions.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_discussions: yes
           plugin_discussions_categories_limit: 10
+  metrics-activity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
       - uses: ss-o/metrics@latest
         with:
           filename: metrics/plugin.activity.svg
@@ -28,9 +31,13 @@ jobs:
           plugin_activity_limit: 5
           plugin_activity_days: 0
           plugin_activity_filter: issue, pr, release, fork, review, ref/create, wiki, member
+  metrics-contributors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
       - uses: ss-o/metrics@latest
         with:
-          filename: metrics/zi.contributors.contributions.svg
+          filename: metrics/zi/contributors.contributions.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           template: repository
