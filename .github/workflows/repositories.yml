@@ -7,7 +7,31 @@ on:
     - cron: "02 02 * * *"
 
 jobs:
+  metrics:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rep: ["zi", "zw"]
+    outputs:
+      output: ${{ matrix.rep.outputs.out }}        
+    steps:
+      - run: echo "::set-output name=out::metrics"
+      - uses: ss-o/metrics@latest
+        with:
+          filename: "metrics/${{ matrix.rep }}/plugin.repositories.svg"
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_repositories: yes
+          plugin_repositories_featured: ${{ matrix.rep }}
+
   metrics-1:
+    runs-on: ununtu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo ${{outputs.output}}
+
+  metrics-2:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
@@ -17,28 +41,12 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ss-o/metrics@latest
         with:
-          filename: "metrics/${{ matrix.rep }}/plugin.repositories.svg"
+          template: repository
+          filename: "metrics/${{ matrix.rep }}/repository.svg"
           token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          plugin_repositories: yes
-          plugin_repositories_featured: ${{ matrix.rep }}
-
-#  metrics-2:
-#    timeout-minutes: 30
-#    runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        rep: ["zi", "zw"]
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: ss-o/metrics@latest
-#        with:
-#          template: repository
-#          filename: "metrics/${{ matrix.rep }}/repository.svg"
-#          token: ${{ secrets.ORG_TOKEN }}
-#          user: z-shell
-#          repo: ${{ matrix.rep }}
-#          plugin_lines: yes
-#          plugin_followup: yes
-#          plugin_projects: yes
-#          plugin_projects_repositories: lowlighter/metrics/projects/2
+          user: z-shell
+          repo: ${{ matrix.rep }}
+          plugin_lines: yes
+          plugin_followup: yes
+          plugin_projects: yes
+          plugin_projects_repositories: lowlighter/metrics/projects/2
