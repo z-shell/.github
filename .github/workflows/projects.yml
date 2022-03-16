@@ -1,0 +1,22 @@
+name: PROJECTS
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 20 * * *"
+
+jobs:
+  metrics-projecs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
+        with:
+          filename: metrics/plugin.projects.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_projects: yes
+          plugin_projects_repositories: >
+            z-shellzi/projects/2, zw/projects/2, community/projects/1, zpackages/projects/1
+          plugin_projects_descriptions: yes
+
