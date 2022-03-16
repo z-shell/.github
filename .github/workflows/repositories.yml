@@ -13,23 +13,16 @@ jobs:
     strategy:
       matrix:
         rep: ["zi", "zw"]
-    outputs:
-      output: ${{ matrix.rep.outputs.out }}        
     steps:
-      - run: echo "::set-output name=out::metrics"
       - uses: ss-o/metrics@latest
+      - uses: actions/checkout@v3
         with:
-          filename: "metrics/${{ matrix.rep }}/plugin.repositories.svg"
+          filename: "metrics/${{ matrix.rep }}/repository.svg"
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
           plugin_repositories_featured: ${{ matrix.rep }}
-  metrics-1:
-    runs-on: ununtu-latest
-    needs: metrics
-    steps:
-      - uses: actions/checkout@v3
-      - run: echo ${{needs.metrics.outputs.output}}
+          
   metrics-2:
     timeout-minutes: 30
     runs-on: ubuntu-latest
@@ -48,4 +41,4 @@ jobs:
           plugin_lines: yes
           plugin_followup: yes
           plugin_projects: yes
-          plugin_projects_repositories: lowlighter/metrics/projects/2
+          plugin_projects_repositories: z-shell/${{ matrix.rep }}/projects/2
