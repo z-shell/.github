@@ -24,8 +24,12 @@ jobs:
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: https://z.digitalclouds.dev
-  metrics-projects:
+
+  metrics-projecs:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rep: ["zi/projects/2", "zw/projects/2", "community/projects/1", "zpackages/projects/1"]
     steps:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
@@ -34,8 +38,9 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_projects: yes
-          plugin_projects_repositories: z-shell/zi/projects/2, z-shell/zw/projects/2, z-shell/community/projects/1
+          plugin_projects_repositories: "z-shell/${{ matrix.rep }"
           plugin_projects_descriptions: yes
+
   metrics-indepth:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +53,7 @@ jobs:
           user: z-shell
           plugin_followup: yes
           plugin_followup_indepth: yes
+
   metrics-activity:
     runs-on: ubuntu-latest
     steps:
