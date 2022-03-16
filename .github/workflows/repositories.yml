@@ -24,13 +24,12 @@ jobs:
           base: ""
           plugin_repositories: yes
           plugin_repositories_featured: ${{ matrix.rep }}
-
   metrics-1:
     runs-on: ununtu-latest
+    needs: metrics
     steps:
       - uses: actions/checkout@v3
-      - run: echo ${{outputs.output}}
-
+      - run: echo ${{needs.metrics.outputs.output}}
   metrics-2:
     timeout-minutes: 30
     runs-on: ubuntu-latest
