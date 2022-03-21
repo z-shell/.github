@@ -10,14 +10,14 @@
     <tr>
       <td align="center">
         <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
-          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />
+          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="90%" />
         </a>
         <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
-          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" height="auto" />
+          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="90%" height="auto" />
         </a>
         <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
-          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="80%" height="auto" />
-          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="80%" height="auto" />
+          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="90%" height="auto" />
+          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="90%" height="auto" />
         </a>
       </td>
     </tr>
@@ -25,28 +25,28 @@
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
           <img align="center"
             src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg"
-            width="80%" height="auto" /></a>
+            width="90%" height="auto" /></a>
       </td>
     </tr>
     <tr><td align="center">
         <a title="Community" target="_self" href="https://github.com/z-shell/community/discussions/">
           <img align="center"
-            src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.discussions.svg" width="80%"
+            src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.discussions.svg" width="90%"
             height="auto" />
           <a title="Twitter" target="_self" href="https://twitter.com/zshell_zi/">
             <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.tweets.svg"
-              width="80%" height="auto" />
+              width="90%" height="auto" />
           </a>
           <a title="DEV" target="_self" href="https://dev.to/tag/zsh">
             <img align="center"
               src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.dev.tag.zsh.rss.svg"
-              width="80%" height="auto" />
+              width="90%" height="auto" />
           </a>
       </td>
     </tr>
     <tr><td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-          <img src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" height="auto" /></a>
+          <img src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="90%" height="auto" /></a>
       </td>
     </tr>
     <tr><td align="center">
