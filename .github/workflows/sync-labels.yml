@@ -2,7 +2,6 @@
 name: ♻️ Sync Labels
 
 on:
-  workflow_call:
   push:
     branches: [$default-branch]
     paths:
@@ -17,7 +16,8 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
         with:
-          repository: z-shell/zw
+          repository: z-shell/.github
+          path: ./.github
       - name: ♻️ Fetch Labels
         run: |
           mkdir -p ./.github/lib
