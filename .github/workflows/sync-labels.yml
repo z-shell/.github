@@ -2,8 +2,8 @@
 name: ♻️ Sync Labels
 
 on:
+  workflow_call:
   push:
-    branches: [$default-branch]
     paths:
       - .github/lib/labels.yml
   workflow_dispatch:
