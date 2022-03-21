@@ -10,8 +10,7 @@
     <tr>
       <td align="center">
         <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
-          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo"
-            width="80%" height="auto" /></a>
+          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" /></a>
         <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
           <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg"
             width="80%" height="auto" />
@@ -51,28 +50,23 @@
     <tr>
       <td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-          <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg"
-            width="80%" height="auto" /></a>
+          <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" /></a>
       <td>
     </tr>
     <tr>
       <td align="center">
         <a href="https://github.com/z-shell/zi/">
           <img align="center"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark"
-            width="40%" height="auto" /></a>
+            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" /></a>
         <a href="https://github.com/z-shell/zw/">
           <img align="center"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark"
-            width="40%" height="auto" /></a>
+            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" /></a>
         <a href="https://github.com/z-shell/community">
           <img align="center"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark"
-            width="40%" height="auto" /></a>
+            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" /></a>
         <a href="https://github.com/z-shell/status/">
           <img align="center"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark"
-            width="40%" height="auto" /></a>
+            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" /></a>
       </td>
     </tr>
     <!--
