@@ -10,18 +10,15 @@ jobs:
   metrics:
     timeout-minutes: 30
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rep: ["zi", "zw"]
     steps:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
-          filename: "metrics/${{ matrix.rep }}/repository.svg"
+          filename: "metrics/featured.repositories.svg"
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
-          plugin_repositories_featured: ${{ matrix.rep }}
+          plugin_repositories_featured: zi, zw
           
   metrics-indepth:
     timeout-minutes: 30
