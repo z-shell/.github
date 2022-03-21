@@ -16,7 +16,9 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - name: Fetch Labels
+        with:
+          repository: z-shell/zw
+      - name: ♻️ Fetch Labels
         run: |
           mkdir -p ./.github/lib
           curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labels.yml -o ./.github/labels.yml
