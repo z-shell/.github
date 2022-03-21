@@ -15,16 +15,6 @@ jobs:
           filename: metrics/plugin.projects.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
-          plugin_projects: yes
-          plugin_projects_repositories: >
-            z-shell/zi/projects/2, z-shell/zw/projects/2, z-shell/community/projects/1, z-shell/zpackages/projects/1
-          plugin_projects_descriptions: yes
-
-      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
-        with:
-          filename: metrics/z-shell/plugin.projects.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
           user: z-shell
           plugin_projects: yes
           plugin_projects_descriptions: yes
