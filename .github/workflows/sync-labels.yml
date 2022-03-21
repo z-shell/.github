@@ -15,13 +15,14 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
+        with:
+          path: .github
       - name: ♻️ Fetch Labels
         run: |
-          mkdir .github
-          curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labels.yml -o ./.github/labels.yml
+          curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labels.yml -o labels.yml
       - name: 🚀 Run Label Syncer
         uses: micnncim/action-label-syncer@3abd5ab72fda571e69fffd97bd4e0033dd5f495c
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          manifest: .github/labels.yml
+          manifest: labels.yml
