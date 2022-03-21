@@ -1,5 +1,4 @@
-<div align="justify" width="100%">
-  <table align="justify" width="100%" margin-left="auto" margin-right="auto">
+<table>
     <!--  === === === === -->
     <!-- <tr align="center" width="100%"><td> -->
     <!-- Announments -->
@@ -8,8 +7,8 @@
     <!-- <h3></h3> -->
     <!-- </td></tr> -->
     <!--  === === === === -->
-    <tr align="center" width="100%">
-      <td>
+    <tr>
+      <td align="center">
         <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
           <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo"
             width="80%" height="auto" /></a>
@@ -24,16 +23,17 @@
         </a>
       </td>
     </tr>
-    <tr align="center" width="100%">
-      <td>
+    <tr>
+      <td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
           <img align="center"
             src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg"
             width="80%" height="auto" /></a>
       </td>
     </tr>
-    <tr align="center" width="100%">
-      <td><a title="Community" target="_self" href="https://github.com/z-shell/community/discussions/">
+    <tr>
+      <td align="center">
+        <a title="Community" target="_self" href="https://github.com/z-shell/community/discussions/">
           <img align="center"
             src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.discussions.svg" width="80%"
             height="auto" />
@@ -48,15 +48,15 @@
           </a>
       </td>
     </tr>
-    <tr align="center" width="100%">
-      <td>
+    <tr>
+      <td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
           <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg"
             width="80%" height="auto" /></a>
       <td>
     </tr>
-    <tr align="center" width="100%">
-      <td>
+    <tr>
+      <td align="center">
         <a href="https://github.com/z-shell/zi/">
           <img align="center"
             src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark"
@@ -81,8 +81,8 @@
 <a href="https://github.com/z-shell/H-S-MW">
   <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=h-s-mw&card_width=150&theme=github_dark" /></a>
 -->
-    <tr align="center" width="100%">
-      <td>
+    <tr>
+      <td align="center">
         <a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation"
             src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
             align="center" alt="es proofreading"
@@ -113,5 +113,4 @@
             src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-TW&style=plastic&query=%24.progress.10.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
       </td>
     </tr>
-</div>
 </table>
