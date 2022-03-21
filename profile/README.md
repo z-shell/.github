@@ -10,7 +10,7 @@
     <tr>
       <td align="center">
         <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
-          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />\
+          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />
         </a>
         <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
           <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" height="auto" />
