@@ -18,7 +18,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
-          plugin_repositories_featured: zi, zw
+          plugin_repositories_featured: z-shell/zi, z-shell/zw
           
   metrics-indepth:
     timeout-minutes: 30
