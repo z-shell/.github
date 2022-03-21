@@ -1,4 +1,4 @@
-<table>
+<table align="center" width="100%">
     <!--  === === === === -->
     <!-- <tr align="center" width="100%"><td> -->
     <!-- Announments -->
@@ -22,16 +22,14 @@
         </a>
       </td>
     </tr>
-    <tr>
-      <td align="center">
+    <tr><td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
           <img align="center"
             src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg"
             width="80%" height="auto" /></a>
       </td>
     </tr>
-    <tr>
-      <td align="center">
+    <tr><td align="center">
         <a title="Community" target="_self" href="https://github.com/z-shell/community/discussions/">
           <img align="center"
             src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.discussions.svg" width="80%"
@@ -47,14 +45,12 @@
           </a>
       </td>
     </tr>
-    <tr>
-      <td align="center">
+    <tr><td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-          <img align="center" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" /></a>
-      <td>
+          <img src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" height="auto" /></a>
+      </td>
     </tr>
-    <tr>
-      <td align="center">
+    <tr><td align="center">
         <a href="https://github.com/z-shell/zi/">
           <img align="center"
             src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" /></a>
@@ -69,14 +65,7 @@
             src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" /></a>
       </td>
     </tr>
-    <!--
-<a href="https://github.com/z-shell/F-Sy-H">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=f-sy-h&card_width=150&theme=github_dark" /></a>
-<a href="https://github.com/z-shell/H-S-MW">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=h-s-mw&card_width=150&theme=github_dark" /></a>
--->
-    <tr>
-      <td align="center">
+    <tr><td align="center">
         <a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation"
             src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
             align="center" alt="es proofreading"
