@@ -17,11 +17,12 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
-          filename: "metrics/featured.repositories.svg"
+          filename: metrics/featured.repositories.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
+          user: z-shell
           plugin_repositories: yes
-          plugin_repositories_featured: "z-shell/${{ matrix.rep }}"
+          plugin_repositories_featured: z-shell/zi z-shell/zw
       - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
         with:
           template: repository
@@ -31,3 +32,4 @@ jobs:
           repo: ${{ matrix.rep }}
           plugin_lines: yes
           plugin_followup: yes
+          plugin_repositories: yes
