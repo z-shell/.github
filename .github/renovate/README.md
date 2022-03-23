@@ -1,7 +1,7 @@
 # Renovate preset
 
-Global:preset https://docs.renovatebot.com/getting-started/running/#global-config
-Org:preset: https://docs.renovatebot.com/config-presets/#organization-level-presets
+- Global:preset: https://docs.renovatebot.com/getting-started/running/#global-config
+- Org:preset: https://docs.renovatebot.com/config-presets/#organization-level-presets
 
 ```json
 {
