@@ -1,5 +1,6 @@
 # Renovate preset
 
+Org:preset: https://docs.renovatebot.com/config-presets/#organization-level-presets
 
 ```json
 {
