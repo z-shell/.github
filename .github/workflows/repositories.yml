@@ -15,7 +15,7 @@ jobs:
         rep: ["zi", "zw"]
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: metrics/featured.repositories.svg
           token: ${{ secrets.ORG_TOKEN }}
@@ -23,7 +23,7 @@ jobs:
           user: z-shell
           plugin_repositories: yes
           plugin_repositories_featured: z-shell/zi z-shell/zw
-      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           template: repository
           filename: "metrics/${{ matrix.rep }}/indepth.repository.svg"
