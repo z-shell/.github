@@ -1,34 +1,30 @@
-<table align="center" width="100%">
-    <!--  === === === === -->
-    <!-- <tr align="center" width="100%"><td> -->
-    <!-- Announments -->
-    <!-- <h1></h1> -->
-    <!-- <h2></h2> -->
-    <!-- <h3></h3> -->
-    <!-- </td></tr> -->
-    <!--  === === === === -->
-    <tr>
-      <td align="center">
-        <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
-          <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" />
-        </a>
-        <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
-          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" height="auto" />
-        </a>
-        <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
-          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="80%" height="auto" />
-          <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="80%" height="auto" />
-        </a>
+<table align="justify" width="100%">
+<!--  === === === === --><!-- <tr align="center" width="100%"><td> -->
+<!-- Announments --> <!-- [ Unlocked: 2, Left: 15 ] -->
+<!-- <h1></h1> --> <!-- FIND THE SECRET -->
+<!-- <h2></h2> --> <!-- RECEIVE THE KEY -->
+<!-- <h3></h3> --> <!-- UNLOCK THE PRICE -->
+<!--  === === === === --><!-- </td></tr> -->
+<tr><td align="center">
+<a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
+  <img align="center" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" width="80%" /</a>
+    <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
+        <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.svg" width="80%" height="auto" />
+    </a>
+    <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
+      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.projects.svg" width="80%" height="auto" />
+      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.followup.indepth.svg" width="80%" height="auto" />
+    </a>
       </td>
     </tr>
     <tr><td align="center">
-        <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-          <img align="center"
-            src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg"
-            width="90%" height="auto" /></a>
-      </td>
-    </tr>
-    <tr><td align="center">
+      <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
+        <img align="center"
+          src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.pagespeed.detailed.svg"
+          width="90%" height="auto" /></a>
+    </td>
+  </tr>
+  <tr><td align="center">
         <a title="Community" target="_self" href="https://github.com/z-shell/community/discussions/">
           <img align="center"
             src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin.discussions.svg" width="80%" height="auto" />
@@ -41,12 +37,12 @@
           </a>
       </td>
     </tr>
-    <tr><td align="center">
+<!--    <tr><td align="center">
         <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
           <img src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" height="auto" />
         </a>
       </td>
-    </tr>
+    </tr> -->
     <tr><td align="center">
         <a href="https://github.com/z-shell/zi/">
           <img align="center"
@@ -67,7 +63,7 @@
       </td>
     </tr>
     <tr><td align="center">
-        <a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation"
+        <p><a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation"
             src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
             align="center" alt="es proofreading"
             src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
@@ -83,6 +79,7 @@
             src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ru&style=plastic&query=%24.progress.3.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
             align="center" alt="ru translation"
             src="https://img.shields.io/badge/dynamic/json?color=blue&label=ru&style=plastic&query=%24.progress.7.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
+            </p>
         <a href="https://digitalclouds.crowdin.com/z-shell/tr"><img align="center" alt="tr proofreading"
             src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=tr&style=plastic&query=%24.progress.4.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
             align="center" alt="tr translation"
