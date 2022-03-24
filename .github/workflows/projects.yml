@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@3553137563208ff64cb470b8f23fd8c503627f32
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: metrics/plugin.projects.svg
           token: ${{ secrets.ORG_TOKEN }}
