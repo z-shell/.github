@@ -62,8 +62,12 @@
         </a>
       </td>
     </tr>
-    <tr><td align="center">
-        <p><a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation"
+  <tr><td align="center">
+<h2 align="left">Internationalization and localization<h2>
+    <a href="https://digitalclouds.crowdin.com/z-shell#languages">
+      <img align="center" src="https://badges.awesome-crowdin.com/translation-200015146-2.png" width="60%" height="auto" />
+    </a>
+      <p><a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" img alt="es translation"
             src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
             align="center" alt="es proofreading"
             src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
