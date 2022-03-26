@@ -1,0 +1,8 @@
+group:
+  - files:
+      - source: .github/sync/project_docs
+        dest: .github
+    repos: |
+      z-shell/zw
+      z-shell/zd
+      
