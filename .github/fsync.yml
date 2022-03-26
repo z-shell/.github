@@ -1,0 +1,6 @@
+replace:
+  - before: project_name
+    after: zw
+files:
+  - path: .github/CONTRIBUTING.md
+    source: https://github.com/z-shell/.github/blob/main/.github/sync/project_docs/CONTRIBUTING.md
