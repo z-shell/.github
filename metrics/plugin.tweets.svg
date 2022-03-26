@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="212" class="">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="244" class="">
     <defs>
         <style/>
     </defs>
@@ -22,6 +22,11 @@
                             zshell_zi
                         </div>
                         <div class="tweet">
+                            It has come to our attention that US President Biden is advising US companies to be aware of possible cyber attacks as retaliatory actions for sanctions imposed due to the invasion of Ukraine. Stay woke and get in touch if need support.
+                            <a href="https://t.co/w9Cjxq9QM6" class="link">edition.cnn.com/2022/03/21/pol…</a>
+                            <div class="date">18:49:01 on 25 Mar 2022</div>
+                        </div>
+                        <div class="tweet">
                             It's time to stop hardcoding secrets in Git Repos
                             <span class="hashtag">#github</span>
                             <span class="mention">@GithubProjects</span>
@@ -29,16 +34,6 @@
                             <span class="mention">@GitGuardian</span>
                             <a href="https://t.co/4tP2SJSuge" class="link">pic.twitter.com/4tP2SJSuge</a>
                             <div class="date">17:40:12 on 24 Mar 2022</div>
-                        </div>
-                        <div class="tweet">
-                            "⚙️ ❮ Zsh Diff-so-Fancy ❯" by
-                            <span class="mention">@zshell_zi</span>
-                            <span class="hashtag">#DEVCommunity</span>
-                            <a href="https://t.co/EoARKx2fTS" class="link">dev.to/z-shell/zsh-di…</a>
-                            <span class="hashtag">#github</span>
-                            <span class="hashtag">#zsh</span>
-                            <span class="hashtag">#zi</span>
-                            <div class="date">16:18:57 on 21 Mar 2022</div>
                         </div>
                     </section>
                 </div>
