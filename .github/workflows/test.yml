@@ -1,0 +1,20 @@
+name: fsync
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '*/30 * * * *' # Runs every 30 minutes
+  
+jobs:
+  file_sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_PAT }}
+      - name: gh_fsync
+        uses: gleich/gh_fsync@bfe207a969fe07a3b785c22d2bcfd15888edabcf
