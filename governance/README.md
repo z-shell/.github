@@ -12,4 +12,4 @@ Having this governance in place early helps avoid disputes among participants do
 
 1. Organization's mission described in Section 1 of the [CHARTER.md](organization/CHARTER.md) file.
 2. The TSC memebers are listed in [STEERING-COMMITTEE.md](organization/STEERING-COMMITTEE.md).
-3. Each project under organization's governance, has a repository where maintainers are listed in the [MAINTAINERS.md[project/MAINTAINERS.md] file.
+3. Each project under organization's governance, has a repository where maintainers are listed in the [MAINTAINERS.md](project/MAINTAINERS.md) file.
