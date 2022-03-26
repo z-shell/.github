@@ -3,6 +3,6 @@ group:
       - source: .github/sync/project_docs
         dest: .github
     repos: |
-      z-shell/zw
-      z-shell/zd
+      z-shell/zw@main
+      z-shell/zd@main
       
