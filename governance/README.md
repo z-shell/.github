@@ -1,6 +1,6 @@
 # Governance
 
-1. [organization](organization) directory contain a top-level organizational governance and polices for a technical steering committee (TSC).
+1. [organization](organization) directory for a top-level organizational governance and polices for a technical steering committee (TSC).
 2. [project](project) directory is for an individual project governance, subject to the polices and oversight of the larger organization.
 
 ## Why would we want to use this?
@@ -11,5 +11,5 @@ Having this governance in place early helps avoid disputes among participants do
 ## How do we use this?
 
 1. Organization's mission described in Section 1 of the [CHARTER.md](organization/CHARTER.md) file.
-2. The TSC memebers are listed in [STEERING-COMMITTEE.md](organization/STEERING-COMMITTEE.md).
+2. The [TSC members](https://github.com/orgs/z-shell/teams/tsc) are listed in [STEERING-COMMITTEE.md](organization/STEERING-COMMITTEE.md).
 3. Each project under organization's governance, has a repository where maintainers are listed in the [MAINTAINERS.md](project/MAINTAINERS.md) file.
