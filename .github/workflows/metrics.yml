@@ -89,3 +89,25 @@ jobs:
           user: z-shell
           plugin_projects: yes
           plugin_projects_descriptions: yes
+      - uses: actions/checkout@v3
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: metrics/plugin/starlists.svg
+          token: NOT_NEEDED
+          base: ""
+          user: z-shell
+          plugin_starlists: yes
+          plugin_starlists_limit_repositories: 2
+          plugin_starlists_only: TC39
+      - uses: actions/checkout@v3
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: metrics/plugin/starlists/languages.svg
+          token: NOT_NEEDED
+          base: ""
+          user: z-shell
+          plugin_starlists: yes
+          plugin_starlists_languages: yes
+          plugin_starlists_limit_languages: 8
+          plugin_starlists_limit_repositories: 0
+          plugin_starlists_only: Awesome
