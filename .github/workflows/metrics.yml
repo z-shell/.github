@@ -6,6 +6,32 @@ on:
     - cron: "02 02 * * *"
 
 jobs:
+  metrics:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rep: ["zi", "zw"]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: metrics/featured.repositories.svg
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          user: z-shell
+          plugin_repositories: yes
+          plugin_repositories_featured: z-shell/zi z-shell/zw z-shell/community
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          template: repository
+          filename: "metrics/${{ matrix.rep }}/indepth.repository.svg"
+          token: ${{ secrets.ORG_TOKEN }}
+          user: z-shell
+          repo: ${{ matrix.rep }}
+          plugin_lines: yes
+          plugin_followup: yes
+          plugin_repositories: yes
   metrics-pagespeed:
     runs-on: ubuntu-latest
     steps:
