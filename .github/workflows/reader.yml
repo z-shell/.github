@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "12 12 * * *"
+  push:
+    paths: [.github/workflows/reader.yml]
 
 jobs:
   metrics-tweet:
@@ -17,7 +19,7 @@ jobs:
           base: ""
           plugin_tweets: yes
           plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
-          plugin_tweets_attachments: yes
+          plugin_tweets_attachments: no
           plugin_tweets_user: zshell_zi
   metrics-rss:
     runs-on: ubuntu-latest
