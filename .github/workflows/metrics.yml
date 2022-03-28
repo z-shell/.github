@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "02 02 * * *"
+  push:
+    paths: ['.github/workflows/metrics.yml']
 
 jobs:
   metrics:
