@@ -2,12 +2,12 @@ name: '🌀 Z Activity Metrics'
 
 on:
   schedule:
-    - cron: "0 */2 * * *"
+    - cron: "0 0/3 * * *"
   workflow_dispatch:
   push:
-    paths: ['.github/workflows/metrics.yml']
+    paths: ['.github/workflows/activity_metics.yml']
   pull_request:
-    paths: ['.github/workflows/metrics.yml']
+    paths: ['.github/workflows/activity_metics.yml']
  
 jobs:
   metrics-activity:
@@ -21,9 +21,9 @@ jobs:
           base: ""
           user: z-shell
           plugin_activity: yes
-          plugin_activity_limit: 4
+          plugin_activity_limit: 6
           plugin_activity_days: 0
-          plugin_activity_filter: issue, pr, release, review, ref/create
+          plugin_activity_filter: issue, pr, release, review, ref/create, member 
           plugin_activity_ignored: renovate-bot, renovate, crowdin-bot, allcontributors, allcontributors-bot, ImgBotApp
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
