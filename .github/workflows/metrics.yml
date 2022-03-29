@@ -40,17 +40,5 @@ jobs:
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: https://z.digitalclouds.dev
-  metrics-indepth:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: 'metrics/plugin/followup/indepth.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_followup: yes
-          plugin_followup_indepth: yes
 
 
