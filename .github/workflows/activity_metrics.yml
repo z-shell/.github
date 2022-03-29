@@ -19,11 +19,10 @@ jobs:
           filename: 'metrics/plugin/activity/activity.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
-          user: z-shell
           plugin_activity: yes
           plugin_activity_limit: 4
           plugin_activity_days: 0
-          plugin_activity_ignored: renovate-bot, renovate, crowdin-bot, allcontributors, allcontributors-bot, ImgBotApp
+          plugin_activity_ignored: renovate[bot], renovate, crowdin[bot], allcontributors, allcontributors[bot], ImgBotApp, github-actions, github-actions[bot] 
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: 'metrics/plugin/projects/projects.svg'
