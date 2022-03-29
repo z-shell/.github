@@ -1,9 +1,13 @@
-name: COMMUNITY
+name: '🌀 Z Community Metrics' 
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "06 6 * * *"
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/community.yml']
+  pull_request:
+    paths: ['.github/workflows/community.yml']
 
 jobs:
   metrics-discussions:
@@ -12,7 +16,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin.discussions.svg
+          filename: 'metrics/plugin.discussions.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell
@@ -24,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin.activity.svg
+          filename: 'metrics/plugin.activity.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell
@@ -34,14 +38,17 @@ jobs:
           plugin_activity_filter: issue, pr, release, fork, review, ref/create, wiki, member
   metrics-contributors:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rep: ["zi", "zw"]
     steps:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/zi/contributors/contributions.svg
+          template: repository
+          filename: 'metrics/${{ matrix.rep }}/contributors/contributions.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
-          template: repository
-          repo: zi
+          repo: ${{ matrix.rep }}
           plugin_contributors: yes
           plugin_contributors_contributions: yes
