@@ -23,7 +23,7 @@ jobs:
           base: ""
           user: z-shell
           plugin_repositories: yes
-          plugin_repositories_featured: z-shell/zi z-shell/zw z-shell/f-sy-h z-shell/community
+          plugin_repositories_featured: zi zw f-sy-h community
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           template: repository
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin/starlists.svg
+          filename: metrics/plugin.starlists.svg
           token: NOT_NEEDED
           base: ""
           user: z-shell
@@ -104,7 +104,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin/starlists/languages.svg
+          filename: metrics/plugin.starlists.languages.svg
           token: NOT_NEEDED
           base: ""
           user: z-shell
