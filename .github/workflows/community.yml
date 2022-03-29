@@ -10,32 +10,7 @@ on:
     paths: ['.github/workflows/community.yml']
 
 jobs:
-  metrics-discussions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: 'metrics/plugin/discussions/discussions.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          plugin_discussions: yes
-          plugin_discussions_categories_limit: 10
-  metrics-activity:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: 'metrics/plugin/activity/activity.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_activity: yes
-          plugin_activity_limit: 5
-          plugin_activity_days: 0
-          plugin_activity_filter: issue, pr, release, fork, review, ref/create, wiki, member
-  metrics-contributors:
+  contributors:
     runs-on: ubuntu-latest
     strategy:
       matrix:
