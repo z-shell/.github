@@ -12,17 +12,35 @@ on:
 jobs:
   contributors:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rep: ['zi', 'zw']
     steps:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/plugin/contributors/${{ matrix.rep }}/contributors.svg'
+          filename: 'metrics/plugin/contributors/zi/contributors.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           template: repository
-          repo: ${{ matrix.rep }}
+          user: z-shel
+          repo: zi
+          plugin_contributors: yes
+          plugin_contributors_contributions: yes
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: 'metrics/plugin/contributors/zw/contributors.svg'
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          user: z-shel
+          repo: zw
+          plugin_contributors: yes
+          plugin_contributors_contributions: yes
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: 'metrics/plugin/contributors/f-sy-h/contributors.svg'
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          user: z-shel
+          repo: f-sy-h
           plugin_contributors: yes
           plugin_contributors_contributions: yes
