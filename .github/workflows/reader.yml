@@ -1,11 +1,13 @@
-name: READER
+name: '🌀 Z Reader'
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "12 12 * * *"
+  workflow_dispatch:
   push:
-    paths: [.github/workflows/reader.yml]
+    paths: ['.github/workflows/reader.yml']
+  pull_request:
+    paths: ['.github/workflows/reader.yml']
 
 jobs:
   metrics-tweet:
@@ -14,7 +16,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin.tweets.svg
+          filename: metrics/plugin/tweets/tweets.svg
           token: NOT_NEEDED
           base: ""
           plugin_tweets: yes
@@ -27,7 +29,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin.dev.zshell.rss.svg
+          filename: metrics/plugin/rss/dev.zshell.rss.svg
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
@@ -35,7 +37,7 @@ jobs:
           plugin_rss_limit: 2
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:       
-          filename: metrics/plugin.dev.tag.zsh.rss.svg
+          filename: metrics/plugin/rss/dev.tag.zsh.rss.svg
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
