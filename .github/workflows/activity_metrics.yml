@@ -47,25 +47,12 @@ jobs:
           plugin_followup_indepth: yes
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/plugin/followup/zw/indepth.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: zw
-          plugin_followup: yes
-          plugin_followup_indepth: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
           filename: 'metrics/plugin/followup/zi/indepth.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          repo: zi
-          plugin_followup: yes
-          plugin_followup_indepth: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:         
-          filename: metrics/plugin/introduction/zi_repository.svg
-          token: ${{ secrets.ORG_TOKEN }}
           template: repository
+          token: ${{ secrets.ORG_TOKEN }}
+          user: z-shell
           repo: zi
-          base: header
-          plugin_introduction: yes
+          plugin_lines: yes
+          plugin_followup: yes
+          plugin_projects: yes
+          plugin_projects_repositories: z-shell/zi/projects/8
