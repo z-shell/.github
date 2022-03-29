@@ -1,10 +1,12 @@
 name: '🌀 Z Metrics'
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "02 02 * * *"
+  workflow_dispatch:
   push:
+    paths: ['.github/workflows/metrics.yml']
+  pull_request:
     paths: ['.github/workflows/metrics.yml']
 
 jobs:
