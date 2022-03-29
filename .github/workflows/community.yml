@@ -16,10 +16,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/plugin.discussions.svg'
+          filename: 'metrics/plugin/discussions/discussions.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
-          user: z-shell
           plugin_discussions: yes
           plugin_discussions_categories_limit: 10
   metrics-activity:
@@ -28,7 +27,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/plugin.activity.svg'
+          filename: 'metrics/plugin/activity/activity.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell
@@ -45,10 +44,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          template: repository
-          filename: "metrics/${{ matrix.rep }}/contributors/contributions.svg"
+          filename: 'metrics/plugin/contributors/${{ matrix.rep }}/contributors.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
+          template: repository
           repo: ${{ matrix.rep }}
           plugin_contributors: yes
           plugin_contributors_contributions: yes
