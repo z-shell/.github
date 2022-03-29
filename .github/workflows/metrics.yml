@@ -22,30 +22,6 @@ jobs:
           user: z-shell
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: metrics/plugin/introduction/zw.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          template: repository
-          repo: zw
-          base: header
-          plugin_introduction: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: metrics/plugin/introduction/zi.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          template: repository
-          repo: zi
-          base: header
-          plugin_introduction: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: metrics/plugin/introduction/f-sy-h.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          template: repository
-          repo: F-Sy-H
-          base: header
-          plugin_introduction: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
           filename: 'metrics/plugin/repositories/repositories.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
