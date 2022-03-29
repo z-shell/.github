@@ -15,6 +15,7 @@ jobs:
           filename: metrics/plugin.discussions.svg
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
+          user: z-shell
           plugin_discussions: yes
           plugin_discussions_categories_limit: 10
   metrics-activity:
