@@ -21,7 +21,7 @@ jobs:
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           template: repository
-          filename: 'metrics/${{ matrix.rep }}/indepth.repository.svg'
+          filename: 'metrics/plugin/followup/${{ matrix.rep }}/indepth.svg'
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
           repo: ${{ matrix.rep }}
@@ -30,7 +30,7 @@ jobs:
           plugin_repositories: yes
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/featured.repositories.svg'
+          filename: 'metrics/plugin/repositories/repositories.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
@@ -46,7 +46,7 @@ jobs:
           user: z-shell
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/plugin.pagespeed.detailed.svg'
+          filename: 'metrics/plugin/pagespeed/detailed.svg'
           token: NOT_NEEDED
           base: ""
           plugin_pagespeed: yes
@@ -59,37 +59,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
-          filename: 'metrics/plugin.followup.indepth.svg'
+          filename: 'metrics/plugin/followup/indepth.svg'
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell
           plugin_followup: yes
           plugin_followup_indepth: yes
-  metrics-activity:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: 'metrics/plugin.activity.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_activity: yes
-          plugin_activity_limit: 4
-          plugin_activity_days: 0
-          plugin_activity_filter: issue, pr, release, review, ref/create
-          plugin_activity_ignored: renovate-bot, renovate, crowdin-bot, allcontributors, allcontributors-bot, ImgBotApp
-  metrics-projecs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
-        with:
-          filename: 'metrics/plugin.projects.svg'
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_projects: yes
-          plugin_projects_descriptions: yes
+
 
