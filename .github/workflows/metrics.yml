@@ -55,13 +55,12 @@ jobs:
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: 'metrics/plugin/followup/zi_followup.svg'
-          template: repository
+          base: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
           repo: zi
           plugin_lines: yes
           plugin_followup: yes
-          plugin_projects: yes
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: 'metrics/plugin/followup/zw_followup.svg'
