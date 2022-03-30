@@ -11,7 +11,7 @@ on:
 
 jobs:
   metrics:
-    timeout-minutes: 30
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,6 +20,11 @@ jobs:
           filename: 'metrics/metrics.svg'
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: 'metrics/zi_metrics.svg'
+          token: ${{ secrets.ORG_TOKEN }}
+          repo: zi
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: 'metrics/plugin/repositories/repositories.svg'
@@ -55,7 +60,7 @@ jobs:
       - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
         with:
           filename: 'metrics/plugin/followup/zi_followup.svg'
-          base: repository
+          template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
           repo: zi
