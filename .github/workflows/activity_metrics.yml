@@ -33,3 +33,4 @@ jobs:
           user: z-shell
           plugin_projects: yes
           plugin_projects_descriptions: yes
+          plugin_projects_limit: 5
