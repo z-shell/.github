@@ -12,7 +12,7 @@
   <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
     <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg" />
   </a>
-  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/indepth.svg" />
+  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg" />
   <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
     <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg" />
   </a>
