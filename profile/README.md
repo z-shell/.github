@@ -18,7 +18,7 @@
   </a>
   </td></tr><tr><td align="center">
   <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/blob/main/metrics/plugin/pagespeed/detailed.svg" />
+    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/pagespeed/detailed.svg" />
   </a>
   </td></tr><tr><td align="center">
     <a title="Twitter" target="_self" href="https://twitter.com/zshell_zi/">
