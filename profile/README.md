@@ -61,35 +61,33 @@
         <img align="center" src="https://badges.awesome-crowdin.com/translation-200015146-2.png" alt="i18n" width="60%" height="auto" />
       </a>
   -->
-      <p><a href="https://digitalclouds.crowdin.com/z-shell/es"><img align="center" alt="es translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="es proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-        <a href="https://digitalclouds.crowdin.com/z-shell/ja"><img align="center" alt="ja proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ja&style=plastic&query=%24.progress.1.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="ja translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=ja&style=plastic&query=%24.progress.3.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-        <a href="https://digitalclouds.crowdin.com/z-shell/ko"><img align="center" alt="ko proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ko&style=plastic&query=%24.progress.2.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="ko translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=ko&style=plastic&query=%24.progress.4.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-        <a href="https://digitalclouds.crowdin.com/z-shell/ru"><img align="center" alt="ru proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=ru&style=plastic&query=%24.progress.3.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="ru translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=ru&style=plastic&query=%24.progress.7.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-            </p>
-        <a href="https://digitalclouds.crowdin.com/z-shell/tr"><img align="center" alt="tr proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=tr&style=plastic&query=%24.progress.4.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="tr translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=tr&style=plastic&query=%24.progress.8.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-        <a href="https://digitalclouds.crowdin.com/z-shell/zh-CN"><img align="center" alt="zh-CN proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=zh-CN&style=plastic&query=%24.progress.5.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="zh-CN translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-CN&style=plastic&query=%24.progress.9.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-        <a href="https://digitalclouds.crowdin.com/z-shell/zh-TW"><img align="center" alt="zh-TW proofreading"
-            src="https://img.shields.io/badge/dynamic/json?color=blueviolet&label=zh-TW&style=plastic&query=%24.progress.6.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /><img
-            align="center" alt="zh-TW translation"
-            src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-TW&style=plastic&query=%24.progress.10.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" /></a>
-      </td>
-    </tr>
+<div align="center">
+<img alt="es translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=plastic&query=%24.progress.0.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="es proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=es&style=plastic&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="ja translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=ja&style=plastic&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="ja proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=ja&style=plastic&query=%24.progress.1.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="ko translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=ko&style=plastic&query=%24.progress.2.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="ko proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=ko&style=plastic&query=%24.progress.2.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="ru translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=ru&style=plastic&query=%24.progress.3.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="ru proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=ru&style=plastic&query=%24.progress.3.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+<br />
+<img alt="tr translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=tr&style=plastic&query=%24.progress.4.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="tr proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=tr&style=plastic&query=%24.progress.4.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="zh-CN translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-CN&style=plastic&query=%24.progress.5.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="zh-CN proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=zh-CN&style=plastic&query=%24.progress.5.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="zh-TW translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-TW&style=plastic&query=%24.progress.6.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+
+<img alt="zh-TW proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=zh-TW&style=plastic&query=%24.progress.6.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200015146-2.json" />
+</div></td></tr>
 </table>
