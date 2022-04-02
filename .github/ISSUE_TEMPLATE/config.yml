@@ -1,0 +1,12 @@
+---
+blank_issues_enabled: true
+contact_links:
+  - name: Community Discussions
+    url: https://github.com/z-shell/cummunity/discussions
+    about: Please ask and answer questions here.
+  - name: Wiki
+    url: https://z.digitalclouds.dev
+    about: Knowledge Base
+  - name: Translations
+    url: https://digitalclouds.crowdin.com/z-shell
+    about: Internationalization and localization.
