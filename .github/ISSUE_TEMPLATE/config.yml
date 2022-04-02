@@ -2,7 +2,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Community Discussions
-    url: https://github.com/z-shell/cummunity/discussions
+    url: https://github.com/org/z-shell/discussions
     about: Please ask and answer questions here.
   - name: Wiki
     url: https://z.digitalclouds.dev
