@@ -68,3 +68,11 @@ jobs:
           user: z-shell
           repo: zw
           plugin_followup: yes
+      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+        with:
+          filename: 'metrics/plugin/followup/f-sy-h_followup.svg'
+          template: repository
+          token: ${{ secrets.ORG_TOKEN }}
+          user: z-shell
+          repo: f-sy-h
+          plugin_followup: yes
