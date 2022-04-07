@@ -1,0 +1,24 @@
+---
+name: 👋 Welcome message
+on:
+  fork:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: EddieHubCommunity/gh-action-community/src/welcome@main
+        with:
+          github-token: ${{ secrets.REPO_TOKEN }}
+          issue-message: "<h3>Thank you for your feedback on this project! </h3> We will endeavour to get back to you soon."
+          pr-message: "<h3>Thank you for contributing to this project! </h3> Your support is much appreciated. We will endeavour to get back to you soon."
+          footer: "Community Discussions: https://github.com/orgs/z-shell/discussions"
