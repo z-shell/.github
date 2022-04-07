@@ -1,0 +1,27 @@
+---
+name: "🚀 Deploy GH Pages"
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: 
+      - '🌀 Z Activity'
+      - '🌀 Z Metrics'
+      - '🌀 Z Reader'
+    types:
+      - completed
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v3
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: metrics
+          keep_files: true
