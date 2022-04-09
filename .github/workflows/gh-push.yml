@@ -25,3 +25,5 @@ jobs:
           publish_branch: gh-pages
           publish_dir: metrics
           keep_files: true
+          user_name: digital-teams[bot]
+          user_email: digital-teams@pm.me
