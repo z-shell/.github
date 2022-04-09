@@ -4,7 +4,7 @@ This Project welcomes contributions, suggestions, and feedback. All contribution
 
 [Should be further filled in by the project - including defining the requirements to reach maintainer status]
 
-The Project abides by the Organization's [code of conduct](https://github.com/z-shell/.github/blob/main/docs/CODE-OF-CONDUCT.md) and [trademark policy](https://github.com/z-shell/.github/blob/main/docs/TRADEMARKS.md).
+The Project abides by the Organization's [code of conduct](CODE-OF-CONDUCT.md) and [trademark policy](TRADEMARKS.md).
 
 ## Community membership
 
