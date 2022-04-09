@@ -1,0 +1,11 @@
+---
+name: '🏷️ Verify PR Labels'
+
+on:
+  pull_request_target:
+    types: ["opened", "labeled", "unlabeled", "synchronize"]
+
+jobs:
+  labels:
+    name: '🏷️ Verify PR Labels'
+    uses: z-shell/.github/.github/workflows/pr-labels.yml@main
