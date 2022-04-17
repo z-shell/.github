@@ -44,8 +44,8 @@
 - name: "submodules ⚙️"
   color: fbca04
   description: "Change in project dependencies."
-- name: "github-actions :ocotcat:"
-  color: fbcA04
+- name: "github-actions :octocat:"
+  color: 5319E7
   description: "GitHub Actions"
 
 - name: "fix ⚡"
