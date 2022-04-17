@@ -44,6 +44,9 @@
 - name: "submodules ⚙️"
   color: fbca04
   description: "Change in project dependencies."
+- name: "github-actions :ocotcat:"
+  color: fbcA04
+  description: "GitHub Actions"
 
 - name: "fix ⚡"
   color: f510f4
@@ -61,6 +64,9 @@
 - name: "Q&A ✍️"
   color: fef2c0
   description: "Questions and answers."
+- name: "Poll 💌"
+  color: fef2c0
+  description: "Community vote"
 - name: "invalid ⚠️"
   color: 0b467f
   description: "This is off-topic or incorrect."
@@ -85,9 +91,6 @@
 #- name: "Breaking Changes 🔥"
 #  color: ee0701
 #  description: "Must be addressed as soon as possible."
-#- name: "priority-medium 📌"
-#  color: fbcA04
-#  description: "This issue may be useful, and needs some attention."
 - name: "priority-low 🔖"
   color: ffffff
   description: "This issue currently can't be resolved."
