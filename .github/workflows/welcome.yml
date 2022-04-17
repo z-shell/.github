@@ -21,4 +21,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: "<h3>Thank you for your feedback on this project! </h3> We will endeavour to get back to you soon."
           pr-message: "<h3>Thank you for contributing to this project! </h3> Your support is much appreciated. We will endeavour to get back to you soon."
-          footer: "Community Discussions: https://github.com/orgs/z-shell/discussions"
+          footer: "[Community Discussions](https://github.com/orgs/z-shell/discussions)"
