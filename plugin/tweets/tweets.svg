@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="154" class="">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="194" class="">
     <defs>
         <style/>
     </defs>
@@ -22,20 +22,21 @@
                             zshell_zi
                         </div>
                         <div class="tweet">
-                            "🥷 A tool-chain that works for you and not against you" by
+                            <span class="mention">@DevinRhode2</span>
+                            <a href="https://t.co/JUuNhZscYC" class="link">youtube.com/watch?v=7qbEt_…</a>
+                            <div class="date">11:59:21 on 18 Apr 2022</div>
+                        </div>
+                        <div class="tweet">
+                            "🚀 Valgrind automatic test suite" by
                             <span class="mention">@zshell_zi</span>
                             <span class="hashtag">#DEVCommunity</span>
-                            <a href="https://t.co/Li3xA6WzVD" class="link">dev.to/zsh/a-tool-cha…</a>
+                            <a href="https://t.co/3dt1es6WL0" class="link">dev.to/zsh/valgrind-a…</a>
                             <span class="hashtag">#zsh</span>
                             <span class="hashtag">#zi</span>
-                            <span class="hashtag">#ohmyzsh</span>
-                            <span class="hashtag">#prezto</span>
-                            <span class="hashtag">#macos</span>
-                            <span class="hashtag">#linux</span>
-                            <span class="hashtag">#github</span>
+                            <span class="hashtag">#testing</span>
                             <span class="hashtag">#developers</span>
-                            <span class="hashtag">#devops</span>
-                            <div class="date">07:56:46 on 17 Apr 2022</div>
+                            <span class="hashtag">#opensource</span>
+                            <div class="date">11:56:36 on 18 Apr 2022</div>
                         </div>
                     </section>
                 </div>
