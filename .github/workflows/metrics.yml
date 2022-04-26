@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/metrics.svg'
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/plugin/repositories/repositories.svg'
           token: ${{ secrets.ORG_TOKEN }}
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/plugin/pagespeed/detailed.svg'
           token: NOT_NEEDED
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/plugin/followup/followup.svg'
           token: ${{ secrets.ORG_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
           user: z-shell
           plugin_followup: yes
           plugin_followup_indepth: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/plugin/followup/zi_followup.svg'
           template: repository
@@ -60,7 +60,7 @@ jobs:
           user: z-shell
           repo: zi
           plugin_followup: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/plugin/followup/zw_followup.svg'
           template: repository
@@ -68,7 +68,7 @@ jobs:
           user: z-shell
           repo: zw
           plugin_followup: yes
-      - uses: lowlighter/metrics@eea0e216b8b9daa748417a2e53ca32d3eee0a1da
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: 'metrics/plugin/followup/f-sy-h_followup.svg'
           template: repository
