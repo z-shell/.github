@@ -7,7 +7,7 @@ repo:
     owner: z-shell
     name: .github
 lint:
- linters:
+  linters:
     - name: zsh-n
       files: [zsh]
       type: pass_fail
