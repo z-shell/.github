@@ -12,10 +12,10 @@ on:
 
 jobs:
   trunk:
-    runs-on: ubuntu-latest
+    runs-on: self-host
     steps:
       - uses: actions/checkout@v3
       - uses: trunk-io/trunk-action@v1.0.1
         with:
           check-mode: all
-          trunk-token: ${{ secrets.TRUNK_TOKEN }}
+#          trunk-token: ${{ secrets.TRUNK_TOKEN }}
