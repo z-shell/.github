@@ -1,14 +1,14 @@
-name: '🌀 Z Activity'
+name: "🌀 Z Activity"
 
 on:
   schedule:
     - cron: "0 0/6 * * *"
   workflow_dispatch:
   push:
-    paths: ['.github/workflows/activity_metrics.yml']
+    paths: [".github/workflows/activity_metrics.yml"]
   pull_request:
-    paths: ['.github/workflows/activity_metrics.yml']
- 
+    paths: [".github/workflows/activity_metrics.yml"]
+
 jobs:
   metrics-activity:
     timeout-minutes: 15
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/projects/projects.svg'
+          filename: "metrics/plugin/projects/projects.svg"
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell

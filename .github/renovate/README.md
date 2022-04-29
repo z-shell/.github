@@ -26,9 +26,7 @@
   "groupSlug": "all",
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "*"
-      ],
+      "matchPackagePatterns": ["*"],
       "groupName": "all dependencies",
       "groupSlug": "all"
     }

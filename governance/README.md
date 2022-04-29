@@ -9,4 +9,4 @@ Organization and sub-projects governance - including legal terms, licensing and 
 
 1. Organization's mission is described in Section 1 of the [CHARTER.md](https://github.com/z-shell/.github/tree/main/governance/organization/CHARTER.md) file.
 2. The [TSC members](https://github.com/orgs/z-shell/teams/tsc) are listed in [STEERING-COMMITTEE.md](https://github.com/z-shell/.github/tree/main/governance/organization/STEERING-COMMITTEE.md).
-4. Each project under the organization's governance, has a repository where maintainers are listed in the [MAINTAINERS.md](https://github.com/z-shell/.github/tree/main/governance/project/MAINTAINERS.md) file.
+3. Each project under the organization's governance, has a repository where maintainers are listed in the [MAINTAINERS.md](https://github.com/z-shell/.github/tree/main/governance/project/MAINTAINERS.md) file.

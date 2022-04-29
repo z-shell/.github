@@ -4,10 +4,10 @@ name: "🚀 Deploy GH Pages"
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: 
-      - '🌀 Z Activity'
-      - '🌀 Z Metrics'
-      - '🌀 Z Reader'
+    workflows:
+      - "🌀 Z Activity"
+      - "🌀 Z Metrics"
+      - "🌀 Z Reader"
     types:
       - completed
 jobs:

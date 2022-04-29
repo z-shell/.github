@@ -1,13 +1,13 @@
-name: '🌀 Z Metrics'
+name: "🌀 Z Metrics"
 
 on:
   schedule:
     - cron: "02 02 * * *"
   workflow_dispatch:
   push:
-    paths: ['.github/workflows/metrics.yml']
+    paths: [".github/workflows/metrics.yml"]
   pull_request:
-    paths: ['.github/workflows/metrics.yml']
+    paths: [".github/workflows/metrics.yml"]
 
 jobs:
   metrics:
@@ -17,12 +17,12 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/metrics.svg'
+          filename: "metrics/metrics.svg"
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/repositories/repositories.svg'
+          filename: "metrics/plugin/repositories/repositories.svg"
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           plugin_repositories: yes
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/pagespeed/detailed.svg'
+          filename: "metrics/plugin/pagespeed/detailed.svg"
           token: NOT_NEEDED
           base: ""
           plugin_pagespeed: yes
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/followup/followup.svg'
+          filename: "metrics/plugin/followup/followup.svg"
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell
@@ -54,7 +54,7 @@ jobs:
           plugin_followup_indepth: yes
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/followup/zi_followup.svg'
+          filename: "metrics/plugin/followup/zi_followup.svg"
           template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
@@ -62,7 +62,7 @@ jobs:
           plugin_followup: yes
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/followup/zw_followup.svg'
+          filename: "metrics/plugin/followup/zw_followup.svg"
           template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
@@ -70,7 +70,7 @@ jobs:
           plugin_followup: yes
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: 'metrics/plugin/followup/f-sy-h_followup.svg'
+          filename: "metrics/plugin/followup/f-sy-h_followup.svg"
           template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
