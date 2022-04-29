@@ -7,7 +7,17 @@ repo:
     owner: z-shell
     name: .github
 lint:
+ linters:
+    - name: zsh-n
+      files: [zsh]
+      type: pass_fail
+      command: [zsh, -c, "zsh -n ${target} 2>&1"]
+      success_codes: [0, 1]
+      environment:
+        - name: PATH
+          list: ["${env.PATH}"]
   enabled:
+    - zsh-n@system
     - actionlint@1.6.12
     - gitleaks@8.8.4
     - hadolint@2.10.0
