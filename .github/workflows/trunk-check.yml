@@ -6,21 +6,12 @@ on:
       TRUNK_TOKEN:
         description: 'A Trunk token passed from the caller workflow'
         required: false
-  workflow_dispatch:
-#  push:
-#    branches: ['main']
-#  pull_request:
-#    types: [opened, synchronize]
-#  schedule:
-#    - cron: 0 04 * * 1-5
-
 jobs:
   trunk:
-#    if: github. == ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: trunk-io/trunk-action@v1.0.1
         with:
           trunk-token: ${{ secrets.TRUNK_TOKEN }}
-#          check-mode: all
+          check-mode: all
