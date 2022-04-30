@@ -1,5 +1,5 @@
+---
 name: "🌀 Z Metrics"
-
 on:
   schedule:
     - cron: "02 02 * * *"
@@ -8,7 +8,6 @@ on:
     paths: [".github/workflows/metrics.yml"]
   pull_request:
     paths: [".github/workflows/metrics.yml"]
-
 jobs:
   metrics:
     timeout-minutes: 15
@@ -27,7 +26,7 @@ jobs:
           base: ""
           plugin_repositories: yes
           plugin_repositories_featured: z-shell/zi, z-shell/zw, z-shell/f-sy-h, z-shell/community
-  metrics-pagespeed:
+  pagespeed:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -79,7 +78,7 @@ jobs:
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
           filename: metrics/plugin/achievements.svg
-          token: ${{ secrets.SSO_TOKEN }}
+          token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: z-shell
           plugin_achievements: yes
