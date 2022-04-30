@@ -28,7 +28,7 @@ lint:
   ignore:
     - linters: [ALL]
       paths:
-        - '.*/**'
+        - '.*'
     - linters: [actionlint]
       paths:
         - .github/workflows/sync-labels.yml
