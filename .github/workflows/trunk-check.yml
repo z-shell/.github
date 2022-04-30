@@ -2,20 +2,25 @@
 name: '♻️ Trunk Check'
 on:
   workflow_call:
+    secrets:
+      TRUNK_TOKEN:
+        description: 'A Trunk token passed from the caller workflow'
+        required: false
   workflow_dispatch:
-  push:
-    branches: ['main']
-  pull_request:
-    types: [opened, synchronize]
+#  push:
+#    branches: ['main']
+#  pull_request:
+#    types: [opened, synchronize]
 #  schedule:
 #    - cron: 0 04 * * 1-5
 
 jobs:
-  trunk:
+  trunk-check-z-shell:
+    if: github.org == 'z-shell'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: trunk-io/trunk-action@v1.0.1
         with:
-          check-mode: all
-#          trunk-token: ${{ secrets.TRUNK_TOKEN }}
+          trunk-token: ${{ secrets.TRUNK_TOKEN }}
+#          check-mode: all
