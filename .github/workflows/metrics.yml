@@ -82,4 +82,7 @@ jobs:
           base: ""
           user: z-shell
           plugin_achievements: yes
-#          plugin_achievements_only: sponsor, maintainer, octonaut
+          plugin_achievements_only: >-
+            polyglot, developer, infographile, manager
+          plugin_achievements_display: detailed
+          plugin_achievements_threshold: C
