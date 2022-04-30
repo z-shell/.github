@@ -15,7 +15,7 @@ on:
 #    - cron: 0 04 * * 1-5
 
 jobs:
-  trunk-check-z-shell:
+  trunk:
 #    if: github. == ''
     runs-on: ubuntu-latest
     steps:
