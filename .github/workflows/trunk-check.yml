@@ -16,7 +16,7 @@ on:
 
 jobs:
   trunk-check-z-shell:
-    if: github.organization == 'z-shell'
+#    if: github. == ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
