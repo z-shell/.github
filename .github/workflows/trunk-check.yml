@@ -14,7 +14,7 @@ on:
         type: string
       trunk-path:
         description: 'The path is the full path to the trunk launcher'
-        default: '.trunk'
+        default: '.trunk/trunk'
         required: false
         type: string   
 
