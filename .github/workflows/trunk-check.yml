@@ -6,9 +6,17 @@ on:
       TRUNK_TOKEN:
         description: 'A Trunk token passed from the caller workflow'
         required: false
+    inputs:
+      username:
+        description: 'A username passed from the caller workflow'
+        default: 'z-shell'
+        required: false
+        type: string
+
 jobs:
   trunk:
     runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == inputs.username }}
     steps:
       - uses: actions/checkout@v3
       - run: |
