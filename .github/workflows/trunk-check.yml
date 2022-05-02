@@ -14,9 +14,19 @@ on:
         type: string
       trunk-path:
         description: 'The path is the full path to the trunk launcher'
-        default: '.trunk/trunk'
         required: false
         type: string   
+#  env:
+#    TRUNK_PATH:
+#    TRUNK_CHECK_MODE: all
+#    GITHUB_REF_NAME: main
+#    GITHUB_REPOSITORY: z-shell
+#    GITHUB_SHA: 
+#    GITHUB_TOKEN:
+#    INPUT_ARGUMENTS: 
+#    INPUT_LABEL: 
+#    INPUT_TRUNK_TOKEN: 
+#    INPUT_UPLOAD_SERIES: 
 
 jobs:
   trunk:
