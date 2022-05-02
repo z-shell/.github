@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+#        if: ${{ github.repository_owner == inputs.username }}
       - run: |
           sudo apt update
           sudo apt install -yq zsh
-      - uses: trunk-io/trunk-action@v1.0.1
+      - uses: trunk-io/trunk-action@v1.0.1     
         with:
-          trunk-path: ${{ inputs.trunk-path }}
           check-mode: all
-          if: ${{ github.repository_owner == inputs.username }}
+          trunk-path: ${{ inputs.trunk-path }}
           trunk-token: ${{ secrets.TRUNK_TOKEN }}
