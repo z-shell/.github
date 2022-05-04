@@ -10,25 +10,25 @@
   <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" />
   </a>
   <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg" />
+    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-light-mode-only" />
   </a>
-  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg" />
+  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg?sanitize=true#gh-light-mode-only" />
   <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg" />
+    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg?sanitize=true#gh-light-mode-only" />
   </a>
   </td></tr><tr><td align="center">
   <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/pagespeed/detailed.svg" />
+    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/pagespeed/detailed.svg?sanitize=true#gh-light-mode-only" />
   </a>
   </td></tr><tr><td align="center">
     <a title="Twitter" target="_self" href="https://twitter.com/zshell_zi/">
-      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/tweets/tweets.svg" />
+      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/tweets/tweets.svg?sanitize=true#gh-light-mode-only" />
     </a>
     <a title="DEV" target="_self" href="https://dev.to/z-shell">
-      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.zshell.rss.svg" />
+      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.zshell.rss.svg?sanitize=true#gh-light-mode-only" />
     </a>
     <a title="DEV" target="_self" href="https://dev.to/tag/zsh">
-      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg" />
+      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg?sanitize=true#gh-light-mode-only" />
     </a>
     </td></tr>
 <!--    <tr><td align="center">
