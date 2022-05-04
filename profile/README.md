@@ -9,26 +9,25 @@
 <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
   <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" />
   </a>
-  <a title="Z-Shell" target="_self" href="https://github.com/z-shell/">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-dark-mode-only" /><img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-light-mode-only" />
-  </a>
-  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg?sanitize=true#gh-light-mode-only" />
-  <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg?sanitize=true#gh-light-mode-only" />
-  </a>
+  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-dark-mode-only" /><img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-light-mode-only" />
+<img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg?sanitize=true#gh-dark-mode-only" /><img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg?sanitize=true#gh-light-mode-only" />
+<!--  
+<a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">-->
+<img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg?sanitize=true#gh-dark-mode-only" /><img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg?sanitize=true#gh-light-mode-only" />
+<!--</a>-->
   </td></tr><tr><td align="center">
   <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/pagespeed/detailed.svg?sanitize=true#gh-light-mode-only" />
+    <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/pagespeed/detailed.svg?sanitize=true#gh-dark-mode-only" />
   </a>
   </td></tr><tr><td align="center">
     <a title="Twitter" target="_self" href="https://twitter.com/zshell_zi/">
-      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/tweets/tweets.svg?sanitize=true#gh-light-mode-only" />
+      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/tweets/tweets.svg?sanitize=true#gh-dark-mode-only" />
     </a>
     <a title="DEV" target="_self" href="https://dev.to/z-shell">
-      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.zshell.rss.svg?sanitize=true#gh-light-mode-only" />
+      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.zshell.rss.svg?sanitize=true#gh-dark-mode-only" />
     </a>
     <a title="DEV" target="_self" href="https://dev.to/tag/zsh">
-      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg?sanitize=true#gh-light-mode-only" />
+      <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg?sanitize=true#gh-dark-mode-only" />
     </a>
     </td></tr>
 <!--    <tr><td align="center">
@@ -37,16 +36,16 @@
         </a>
       </td>
     </tr> -->
-    <tr><td align="center">
-      <a href="https://github.com/z-shell/zi/">
-        <img align="center" style="width:40%;height:auto" 
-             src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
-      </a>
+<tr><td align="center">
+<a href="https://github.com/z-shell/zi/">
+<img align="center" style="width:40%;height:auto" 
+     src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
+</a>
       <a href="https://github.com/z-shell/zw/">
         <img align="center" style="width:40%;height:auto"
             src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
         </a>
-        <a href="https://github.com/z-shell/community">
+        <a href="https://github.com/z-shell/community/">
           <img align="center" style="width:40%;height:auto"
             src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
         </a>
