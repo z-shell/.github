@@ -26,19 +26,6 @@ jobs:
 #          base: ""
 #          plugin_repositories: yes
 #          plugin_repositories_featured: z-shell/zi, z-shell/zw, z-shell/f-sy-h, z-shell/community
-  pagespeed:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
-        with:
-          filename: "metrics/plugin/pagespeed/detailed.svg"
-          token: NOT_NEEDED
-          base: ""
-          plugin_pagespeed: yes
-          plugin_pagespeed_detailed: yes
-          plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
-          plugin_pagespeed_url: https://z.digitalclouds.dev
   metrics-indepth:
     runs-on: ubuntu-latest
     steps:
