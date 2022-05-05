@@ -43,14 +43,12 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/tag/zsh
           plugin_rss_limit: 2
-      - uses: actions/checkout@v3
-    # Uncomment the next 2 lines to select a branch for on schedule or dispatch.
-    #   with:
-    #     ref: main
+#     - uses: actions/checkout@v3
+#         with:
+#         ref: main
       - uses: ericcornelissen/svgo-action@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-
 #      - name: Top answers from stackoverflow
 #        uses: ss-o/metrics@latest
 #        with:
