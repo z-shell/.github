@@ -37,7 +37,7 @@ jobs:
       - run: |
           sudo apt update
           sudo apt install -yq zsh
-      - uses: trunk-io/trunk-action@v1.0.1     
+      - uses: trunk-io/trunk-action@v1.0.2     
         with:
           check-mode: all
           trunk-path: ${{ inputs.trunk-path }}
