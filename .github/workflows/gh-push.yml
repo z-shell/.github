@@ -7,6 +7,7 @@ on:
     workflows:
       - "🌀 Z Activity"
       - "🌀 Z Metrics"
+      - "🌀 Z Metrics 2"
       - "🌀 Z Reader"
     types:
       - completed
@@ -18,6 +19,15 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
+      - uses: ericcornelissen/svgo-action@v3
+        id: svgo  # <-- You need to give the SVGO Action's step a unique id
+      - name: Did any SVGs get optimized?
+        run: echo ${{ steps.svgo.outputs.DID_OPTIMIZE }}
+        #                   ^^^^         ^^^^^^^^^^^^
+        #                   |            |
+        #                   |            | The name of the output you want to use
+        #                   |
+        #                   | The id of the SVGO Action's step
       - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
