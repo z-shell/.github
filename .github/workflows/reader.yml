@@ -2,7 +2,7 @@ name: "🌀 Z Reader"
 
 on:
   schedule:
-    - cron: "12 12 * * *"
+    - cron: "02 02 * * */2"
   workflow_dispatch:
   push:
     paths: [".github/workflows/reader.yml"]
