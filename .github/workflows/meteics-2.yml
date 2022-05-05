@@ -5,9 +5,9 @@ on:
     - cron: "* 3 * * */3"
   workflow_dispatch:
   push:
-    paths: [".github/workflows/metrics.yml"]
+    paths: [".github/workflows/metrics-2.yml"]
   pull_request:
-    paths: [".github/workflows/metrics.yml"]
+    paths: [".github/workflows/metrics-2.yml"]
 jobs:
   pagespeed:
     timeout-minutes: 15
@@ -16,11 +16,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
         with:
-          filename: "metrics/plugin/pagespeed/detailed.png"
+          filename: "metrics/plugin/pagespeed/detailed.svg"
           token: NOT_NEEDED
           base: ""
           plugin_pagespeed: yes
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: https://z.digitalclouds.dev
-          
