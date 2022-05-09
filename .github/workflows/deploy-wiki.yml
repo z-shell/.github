@@ -20,7 +20,7 @@ jobs:
           ref: main
           fetch-depth: 0
       - name: '🚀 Deploy to Wiki'
-        run: 'command git remote add dot-wiki git@github.com:z-shell/.github.wiki.git'
+        run: 'command git remote add dot-wiki git@github.com:z-shell/zi.wiki.git'
       - run: |
           command mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
@@ -38,11 +38,11 @@ jobs:
 #          # The chunk size used to split up large files during upload, in bytes
 #          upload-chunk-size: # optional
 #      - name: 🚀 Deploy to Wiki
-      - uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: wiki
-          publish_dir: dot-wiki
-          keep_files: false
-          user_name: digital-teams[bot]
-          user_email: digital-teams@pm.me
+#      - uses: peaceiris/actions-gh-pages@v3
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          publish_branch: wiki
+#          publish_dir: dot-wiki
+#          keep_files: false
+#          user_name: digital-teams[bot]
+#          user_email: digital-teams@pm.me
