@@ -1,12 +1,12 @@
 # Contributing
 
-This Project welcomes contributions, suggestions, and feedback. All contributions, suggestions, and feedback you submitted are accepted under the [Project's license](../../LICENSE).
+This Project welcomes contributions, suggestions, and feedback. All contributions, suggestions, and feedback you submitted are accepted under the [Project's license](../LICENSE).
 
-You represent that if you do not own copyright in the code that you have the authority to submit it under the [Project's license](../LICENSE.md). All feedback, suggestions, or contributions are not confidential.
+You represent that if you do not own copyright in the code that you have the authority to submit it under the [Project's license](../LICENSE). All feedback, suggestions, or contributions are not confidential.
 
 [Should be further filled in by the project - including defining the requirements to reach maintainer status]
 
-The Project abides by the Organization's [code of conduct](CODE_OF_CONDUCT.md) and [trademark policy](TRADEMARKS.md).
+The Project abides by the Organization's [code of conduct](CODE_OF_CONDUCT.md) and [trademark policy](../TRADEMARKS.md).
 
 ## Community membership
 
