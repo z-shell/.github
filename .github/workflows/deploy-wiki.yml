@@ -4,6 +4,7 @@ name: "🚀 Deploy Wiki"
 on:
   push:
     branches: [ main ]
+    tags: ['v*.*.*']
   workflow_dispatch:
 
 concurrency:
@@ -19,13 +20,34 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: '🚀 Deploy to Wiki'
-        run: 'command git remote add dot-wiki git@github.com:z-shell/zi.wiki.git'
+        id: prepare_tag
+        if: startsWith(github.ref, 'refs/tags/')
       - run: |
-          command mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
-          command chmod 600 ~/.ssh/id_ed25519
-      - run: 'command git push --force dot-wiki HEAD:master'
+          TAG_NAME="${GITHUB_REF##refs/tags/}"
+          echo "::set-output name=tag_name::${TAG_NAME}"
+          echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"
+#      - name: '🚀 Deploy Wiki'
+#        run: 'command git remote add dot-wiki git@github.com:z-shell/wiki.wiki.git'
+      - name: '🚀 Deploy Wiki Branch'
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          external_repository: z-shell/wiki.wiki.git
+          publish_branch: wiki
+          publish_dir: ./dot-wiki
+          cname: wiki.zshell.dev
+          keep_files: false
+          allow_empty_commit: true
+          user_name: digital-teams[bot]
+          user_email: digital-teams@pm.me
+          full_commit_message: ${{ github.event.head_commit.message }}
+          tag_name: ${{ steps.prepare_tag.outputs.deploy_tag_name }}
+          tag_message: 'Deployment ${{ steps.prepare_tag.outputs.tag_name }}'
+#      - run: |
+#          command mkdir -p ~/.ssh
+#          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+#          command chmod 600 ~/.ssh/id_ed25519
+#      - run: 'command git push --force dot-wiki HEAD:master'
 #      - name: Cache
 #        uses: actions/cache@v3.0.2
 #        with:
@@ -37,12 +59,3 @@ jobs:
 #          restore-keys: # optional
 #          # The chunk size used to split up large files during upload, in bytes
 #          upload-chunk-size: # optional
-#      - name: 🚀 Deploy to Wiki
-#      - uses: peaceiris/actions-gh-pages@v3
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          publish_branch: wiki
-#          publish_dir: dot-wiki
-#          keep_files: false
-#          user_name: digital-teams[bot]
-#          user_email: digital-teams@pm.me
