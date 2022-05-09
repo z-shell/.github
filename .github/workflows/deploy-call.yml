@@ -69,13 +69,6 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - name: Prepare tag
-        id: prepare_tag
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          TAG_NAME="${GITHUB_REF##refs/tags/}"
-          echo "::set-output name=tag_name::${TAG_NAME}"
-          echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
         with:
@@ -113,6 +106,13 @@ jobs:
           # config --global --add safe.directory <path>`
           # Default: true
           set-safe-directory: 'true'
+      - name: Prepare tag
+        id: prepare_tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG_NAME="${GITHUB_REF##refs/tags/}"
+          echo "::set-output name=tag_name::${TAG_NAME}"
+          echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"          
       - name: '🚀 Deploy'
         uses: peaceiris/actions-gh-pages@v3
         with:
