@@ -11,20 +11,20 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
       cancel-in-progress: true
-    strategy:
-      matrix:
-        repo: [z-a-meta-plugins]
+#    strategy:
+#      matrix:
+#        repo: [z-a-meta-plugins]
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
         with:
           # Repository name with owner. For example, actions/checkout
           # Default: ${{ github.repository }}
-          repository: 'z-shell/${{ matrix.repo }}'
+          #repository: 'z-shell/${{ matrix.repo }}'
           # The branch, tag or SHA to checkout. When checking out the repository that
           # triggered a workflow, this defaults to the reference or SHA for that event.
           # Otherwise, uses the default branch.
-          #ref: 'main'
+          ref: 'main'
           # Personal access token (PAT) used to fetch the repository. The PAT is configured
           # with the local git config, which enables your scripts to run authenticated git
           # commands. The post-job step removes the PAT.
@@ -90,7 +90,7 @@ jobs:
         with:
           personal_token: '${{ secrets.GH_PAT }}'
           #deploy_key: ${{ secrets.DEPLOY_KEY }}
-          external_repository: 'z-shell/${{ matrix.repo }}'
+          #external_repository: 'z-shell/${{ matrix.repo }}'
           publish_branch: 'gh-pages'
           publish_dir: './docs'
           #cname: wiki.zshell.dev
