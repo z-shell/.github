@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   workflow_call:
     secrets:
-      access-token:
+      personal_token:
         description: 'A token passed from the caller workflow'
         required: false
       deploy_key:
