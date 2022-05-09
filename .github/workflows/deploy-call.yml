@@ -116,7 +116,6 @@ jobs:
       - name: '🚀 Deploy'
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           personal_token: ${{ secrets.personal_token }}
           deploy_key: ${{ secrets.deploy_key }}
           external_repository: ${{ inputs.external_repository }}'
