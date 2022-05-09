@@ -8,9 +8,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-      cancel-in-progress: true
+#    concurrency:
+#      group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+#      cancel-in-progress: true
 #    strategy:
 #      matrix:
 #        repo: [z-a-meta-plugins]
@@ -57,7 +57,7 @@ jobs:
           # Default: true
           #persist-credentials: ''
           # Relative path under $GITHUB_WORKSPACE to place the repository
-          path: 'docs'
+          #path: 'docs'
           # Whether to execute `git clean -ffdx && git reset --hard HEAD` before fetching
           # Default: true
           clean: 'true'
