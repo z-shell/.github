@@ -1,0 +1,4 @@
+{
+  "name": "Organization Deployments & Publishing",
+  "description": "Workflow deploys wiki, gh-pages and related assets for organization repositories"
+}
