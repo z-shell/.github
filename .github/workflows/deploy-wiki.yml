@@ -28,12 +28,12 @@ jobs:
           echo "::set-output name=tag_name::${TAG_NAME}"
           echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"
 #      - name: '🚀 Deploy Wiki'
-#        run: 'command git remote add dot-wiki git@github.com:z-shell/wiki.wiki'
+#        run: 'command git remote add dot-wiki git@github.com:z-shell/wiki.wiki.git'
       - name: '🚀 Deploy Wiki Branch'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.DEPLOY_KEY }}
-          external_repository: z-shell/wiki.wiki.git
+          external_repository: z-shell/wiki.wiki
           publish_branch: wiki
           publish_dir: ./dot-wiki
           cname: wiki.zshell.dev
