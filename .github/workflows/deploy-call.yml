@@ -127,7 +127,7 @@ jobs:
           keep_files: ${{ inputs.keep_files }}
           allow_empty_commit: ${{ inputs.allow_empty_commit }}
           user_name: ${{ inputs.user_name }}
-          user_email: ${{ inputs.full_commit_message }}
+          user_email: ${{ inputs.user_email }}
           full_commit_message: ${{ github.event.head_commit.message }}
           tag_name: ${{ steps.prepare_tag.outputs.deploy_tag_name }}
           tag_message: 'Deployment ${{ steps.prepare_tag.outputs.tag_name }}'
