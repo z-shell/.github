@@ -46,6 +46,11 @@ on:
 #    INPUT_TRUNK_TOKEN: 
 #    INPUT_UPLOAD_SERIES: 
 
+defaults:
+  run:
+    shell: bash
+    working-directory: .
+
 jobs:
   trunk:
     runs-on: ubuntu-latest
