@@ -1,14 +1,11 @@
 ---
-name: '♻️ Trunk Check'
+name: '♻️ Trunk Check Call'
 on:
   workflow_call:
     secrets:
       TRUNK_TOKEN:
         description: 'A Trunk token passed from the caller workflow'
         required: false
-#      PASS_GITHUB_TOKEN:
-#        description: 'A GitHub token passed from the caller workflow'
-#        required: false
     inputs:
       username:
         description: 'A username passed from the caller workflow'
@@ -45,8 +42,23 @@ on:
         description: 'Run in shell specified from the caller workflow'
         default: 'bash'
         required: false
-        type: string  
-
+        type: string
+      RUN_NODE:
+        description: 'Enable Node Action'
+        default: 'false'
+        required: false
+        type: string   
+      RUN_NODE_VERSION:
+        description: 'Set Node versions'
+        default: '16'
+        required: false
+        type: string   
+      RUN_NODE_ARGS:
+        description: 'Pass arguments to Node'
+        default: 'npm --version'
+        required: false
+        type: string
+      
 #  env:
 #    GITHUB_REPOSITORY: z-shell
 #    GITHUB_SHA: 
@@ -68,17 +80,18 @@ jobs:
           sudo apt update
           sudo apt install -yq zsh
       - run: ${{ inputs.RUN_ARGS }}
-      - uses: trunk-io/trunk-action@v1.0.2     
+        if: ${{ inputs.RUN_NODE == true }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '${{ inputs.RUN_NODE_VERSION }}'
+      - run: ${{ inputs.RUN_NODE_ARGS }}
+      - uses: trunk-io/trunk-action@v1.0.2   
         with:
           trunk-path: ${{ inputs.TRUNK_PATH }}
           trunk-token: ${{ secrets.TRUNK_TOKEN }}
           check-mode: ${{ inputs.TRUNK_CHECK_MODE }}
           arguments: ${{ inputs.TRUNK_ARGUMENTS }}
-#        if: ${{ inputs.RUN_NODE }}
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: '16'
-#      - run: npm install -g bats          
+
 #      - name: My backup step
 #        if: ${{ failure() }}
 #        uses: actions/WhereIsBunny@1.0.0
