@@ -35,7 +35,7 @@ jobs:
           # [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
           #
           # Default: ${{ github.token }}
-          token: '${{ secrets.GH_PAT }}'
+          #token: '${{ secrets.GH_PAT }}'
           # SSH key used to fetch the repository. The SSH key is configured with the local
           # git config, which enables your scripts to run authenticated git commands. The
           # post-job step removes the SSH key.
@@ -88,7 +88,8 @@ jobs:
       - name: '🚀 Deploy'
         uses: peaceiris/actions-gh-pages@v3
         with:
-          personal_token: '${{ secrets.GH_PAT }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          #personal_token: '${{ secrets.GH_PAT }}'
           #deploy_key: ${{ secrets.DEPLOY_KEY }}
           #external_repository: 'z-shell/${{ matrix.repo }}'
           publish_branch: 'gh-pages'
