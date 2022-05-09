@@ -6,9 +6,9 @@ on:
       TRUNK_TOKEN:
         description: 'A Trunk token passed from the caller workflow'
         required: false
-      GITHUB_TOKEN:
-        description: 'A GitHub token passed from the caller workflow'
-        required: false
+#      PASS_GITHUB_TOKEN:
+#        description: 'A GitHub token passed from the caller workflow'
+#        required: false
     inputs:
       username:
         description: 'A username passed from the caller workflow'
