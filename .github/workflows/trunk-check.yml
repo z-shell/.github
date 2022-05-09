@@ -28,6 +28,10 @@ on:
         default: 'all'
         required: false
         type: string  
+      TRUNK_ARGUMENTS:
+        description: 'Pass arguments to trunk from the caller workflow'
+        required: false
+        type: string  
       INPUT_LABEL:
         description: 'Run multiple Trunk Check jobs on different platforms at the same time, value from the caller workflow'
         required: false
@@ -37,23 +41,26 @@ on:
         default: 'echo FunnyBunnyWithSomeMoney'
         required: false
         type: string  
+      RUN_SHELL:
+        description: 'Run in shell specified from the caller workflow'
+        default: 'bash'
+        required: false
+        type: string  
 
 #  env:
 #    GITHUB_REPOSITORY: z-shell
 #    GITHUB_SHA: 
-#    INPUT_ARGUMENTS: 
 #    INPUT_LABEL: 
 #    INPUT_TRUNK_TOKEN: 
 #    INPUT_UPLOAD_SERIES: 
 
-defaults:
-  run:
-    shell: bash
-    working-directory: .
-
 jobs:
   trunk:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: ${{ inputs.RUN_SHELL }}
+        working-directory: .
     steps:
       - uses: actions/checkout@v3
 #        if: ${{ github.repository_owner == inputs.username }}
@@ -66,3 +73,12 @@ jobs:
           trunk-path: ${{ inputs.TRUNK_PATH }}
           trunk-token: ${{ secrets.TRUNK_TOKEN }}
           check-mode: ${{ inputs.TRUNK_CHECK_MODE }}
+          arguments: ${{ inputs.TRUNK_ARGUMENTS }}
+#        if: ${{ inputs.RUN_NODE }}
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: '16'
+#      - run: npm install -g bats          
+#      - name: My backup step
+#        if: ${{ failure() }}
+#        uses: actions/WhereIsBunny@1.0.0
