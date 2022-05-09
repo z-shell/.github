@@ -4,13 +4,84 @@ name: "🚀 Deploy"
 on:
   workflow_dispatch:
   workflow_call:
-
+    secrets:
+      access-token:
+        description: 'A token passed from the caller workflow'
+        required: false
+      deploy_key:
+        description: 'A token passed from the caller workflow'
+        required: false
+    inputs:
+      username:
+        description: '⭐️ Repository owner username'
+        required: false
+        type: string
+      external_repository:
+        description: '⭐️ Deploy to external repository'
+        required: false
+        type: string
+      publish_branch:
+        default: 'gh-pages'
+        description: '⭐️ Set Another GitHub Pages Branch `publish_branch`'
+        required: false
+        type: string          
+      publish_dir:
+        default: 'docs'
+        description: '⭐️ Source Directory `publish_dir`'
+        required: false
+        type: string  
+      destination_dir:
+        description: '⭐️ Deploy to Subdirectory `destination_dir`'
+        required: false
+        type: string
+      exclude_assets:
+        description: '⭐️ Filter publishing assets `exclude_assets`'
+        required: false
+        type: string
+      cname:
+        description: '⭐️ Add CNAME file `cname`'
+        required: false
+        type: string  
+      keep_files:
+        default: 'true'
+        description: '⭐️ Keeping existing files `keep_files`'
+        required: false
+        type: string
+      allow_empty_commit:
+        default: 'true'
+        description: '⭐️ Allow empty commits `allow_empty_commit`'
+        required: false
+        type: string
+      user_name: 
+        default: 'digital-teams[bot]'
+        description: '⭐️ Set Git username'
+        required: false
+        type: string
+      user_email:
+        default: 'digital-teams@pm.me'
+        description: '⭐️ Set Git email'
+        required: false
+        type: string
+      full_commit_message:
+        description: 'To set a full custom commit message without a triggered commit hash, use the `full_commit_message` option instead of the `commit_message` option.'
+        required: false
+        type: string
+      tag_name:
+        description: '⭐️ Create Git tag name'
+        required: false
+        type: string
+      tag_message:
+        description: '⭐️ Create Git tag message'
+        required: false
+        type: string
+   
 jobs:
   publish:
+    if: ${{ github.repository_owner == inputs.username }}
     runs-on: ubuntu-latest
-#    concurrency:
-#      group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-#      cancel-in-progress: true
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+      cancel-in-progress: true
 #    strategy:
 #      matrix:
 #        repo: [z-a-meta-plugins]
@@ -18,42 +89,18 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
         with:
-          # Repository name with owner. For example, actions/checkout
           # Default: ${{ github.repository }}
           #repository: 'z-shell/${{ matrix.repo }}'
-          # The branch, tag or SHA to checkout. When checking out the repository that
-          # triggered a workflow, this defaults to the reference or SHA for that event.
-          # Otherwise, uses the default branch.
           ref: 'main'
-          # Personal access token (PAT) used to fetch the repository. The PAT is configured
-          # with the local git config, which enables your scripts to run authenticated git
-          # commands. The post-job step removes the PAT.
-          #
-          # We recommend using a service account with the least permissions necessary. Also
-          # when generating a new PAT, select the least scopes necessary.
-          #
-          # [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
-          #
           # Default: ${{ github.token }}
           #token: '${{ secrets.GH_PAT }}'
-          # SSH key used to fetch the repository. The SSH key is configured with the local
-          # git config, which enables your scripts to run authenticated git commands. The
-          # post-job step removes the SSH key.
-          #
-          # We recommend using a service account with the least permissions necessary.
-          #
-          # [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
           #ssh-key: ''
-          # Known hosts in addition to the user and global host key database. The public SSH
-          # keys for a host may be obtained using the utility `ssh-keyscan`. For example,
           # `ssh-keyscan github.com`. The public key for github.com is always implicitly added.
           #ssh-known-hosts: ''
-          # Whether to perform strict host key checking. When true, adds the options
           # `StrictHostKeyChecking=yes` and `CheckHostIP=no` to the SSH command line. Use
           # the input `ssh-known-hosts` to configure additional hosts.
           # Default: true
           #ssh-strict: ''
-          # Whether to configure the token or SSH key with the local git config
           # Default: true
           #persist-credentials: ''
           # Relative path under $GITHUB_WORKSPACE to place the repository
@@ -67,9 +114,6 @@ jobs:
           # Whether to download Git-LFS files
           # Default: false
           lfs: 'false'
-          # Whether to checkout submodules: `true` to checkout submodules or `recursive` to
-          # recursively checkout submodules.
-          #
           # When the `ssh-key` input is not provided, SSH URLs beginning with
           # `git@github.com:` are converted to HTTPS.
           #
@@ -79,26 +123,22 @@ jobs:
           # config --global --add safe.directory <path>`
           # Default: true
           set-safe-directory: 'true'
-        id: prepare_tag
-        if: startsWith(github.ref, 'refs/tags/')
-      - run: |
-          TAG_NAME="${GITHUB_REF##refs/tags/}"
-          echo "::set-output name=tag_name::${TAG_NAME}"
-          echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"
       - name: '🚀 Deploy'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          #personal_token: '${{ secrets.GH_PAT }}'
-          #deploy_key: ${{ secrets.DEPLOY_KEY }}
-          #external_repository: 'z-shell/${{ matrix.repo }}'
-          publish_branch: 'gh-pages'
-          publish_dir: './docs'
-          #cname: wiki.zshell.dev
-          keep_files: true
-          allow_empty_commit: true
-          user_name: 'digital-teams[bot]'
-          user_email: 'digital-teams@pm.me'
-          full_commit_message: '${{ github.event.head_commit.message }}'
-          tag_name: '${{ steps.prepare_tag.outputs.deploy_tag_name }}'
-          tag_message: 'Deployment ${{ steps.prepare_tag.outputs.tag_name }}'
+          personal_token: ${{ secrets.personal_token }}
+          deploy_key: ${{ secrets.deploy_key }}
+          external_repository: ${{ inputs.external_repository }}'
+          publish_branch: ${{ inputs.publish_branch }}
+          publish_dir: ${{ inputs.publish_dir }}
+          destination_dir: ${{ inputs.destination_dir }}
+          exclude_assets: ${{ inputs.exclude_assets }}
+          cname: ${{ inputs.cname }}
+          keep_files: ${{ inputs.keep_files }}
+          allow_empty_commit: ${{ inputs.allow_empty_commit }}
+          user_name: ${{ inputs.user_name }}
+          user_email: ${{ inputs.full_commit_message }}
+          full_commit_message: ${{ inputs
+          tag_name: ${{ inputs.tag_name }}
+          tag_message: ${{ inputs.tag_message }}
