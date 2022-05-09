@@ -2,9 +2,6 @@
 name: "🚀 Deploy"
 
 on:
-  push:
-    branches: [ main ]
-    tags: ['v*.*.*']
   workflow_dispatch:
   workflow_call:
 
@@ -27,7 +24,7 @@ jobs:
           # The branch, tag or SHA to checkout. When checking out the repository that
           # triggered a workflow, this defaults to the reference or SHA for that event.
           # Otherwise, uses the default branch.
-          ref: 'main'
+          #ref: 'main'
           # Personal access token (PAT) used to fetch the repository. The PAT is configured
           # with the local git config, which enables your scripts to run authenticated git
           # commands. The post-job step removes the PAT.
