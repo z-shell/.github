@@ -1,0 +1,20 @@
+---
+name: '♻️ Trunk Call'
+on:
+  workflow_dispatch:
+  push:
+    branches: ['main']
+    tags: ['v*.*.*']
+  pull_request:
+    types: [opened, synchronize]
+#  schedule:
+#    - cron: 0 04 * * 1-5
+
+jobs:
+  check-call:
+    name: '♻️ Trunk'
+    uses: z-shell/.github/.github/workflows/trunk-check.yml@main
+#    with:
+#      RUN_ARGS: 'npm i -g pnpm && pnpm i -r'
+#    secrets:
+#      TRUNK_TOKEN: ${{ secrets.TRUNK_TOKEN }}
