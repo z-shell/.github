@@ -1,11 +1,12 @@
 ---
-name: "🚀 Deploy Wiki"
+name: "🚀 Deploy"
 
 on:
   push:
     branches: [ main ]
     tags: ['v*.*.*']
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   publish:
@@ -17,6 +18,7 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
         with:
+          repository: z-shell/z-a-meta-plugins
           ref: main
           fetch-depth: 0
         id: prepare_tag
