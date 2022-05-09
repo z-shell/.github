@@ -27,4 +27,4 @@ jobs:
 #      RUN_SHELL: 'bash'
 #      RUN_NODE: 'false'
 #      RUN_NODE_VERSION: '16'
-#     RUN_NODE_ARGS: 'npm --version'
+#      RUN_NODE_ARGS: 'npm --version'
