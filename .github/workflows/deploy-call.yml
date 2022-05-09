@@ -118,7 +118,7 @@ jobs:
         with:
           personal_token: ${{ secrets.personal_token }}
           deploy_key: ${{ secrets.deploy_key }}
-          external_repository: ${{ inputs.external_repository }}'
+          external_repository: ${{ inputs.external_repository }}
           publish_branch: ${{ inputs.publish_branch }}
           publish_dir: ${{ inputs.publish_dir }}
           destination_dir: ${{ inputs.destination_dir }}
