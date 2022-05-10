@@ -1,5 +1,5 @@
 ---
-name: '♻️ Call Trunk Check'
+name: '⭕ Trunk Call'
 on:
   workflow_call:
     outputs:
