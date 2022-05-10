@@ -2,13 +2,6 @@
 name: '⭕ Trunk Call'
 on:
   workflow_call:
-#    outputs:
-#      workflow:
-#        description: "The first job output"
-#        value: ${{ jobs.prepare.outputs.workflow }}
-#      workflow_out_two:
-#        description: "The second job output"
-#        value: ${{ jobs.trunk.outputs.job_out_two }}
     secrets:
       trunk-token:
         description: >
@@ -54,11 +47,26 @@ on:
         required: false
         type: string        
 # ===   TRUNK END   === #
-      call_arguments:
-        description: 'Pass commands to run from the caller workflow'
+      get_dependencies:
+        description: 'Pass required dependencies from the caller workflow'
+        default: 'sudo apt update && sudo apt install -yq zsh'
+        required: false
+        type: string
+      call_arguments1:
+        description: 'Pass first arguments from the caller workflow'
+        default: 'echo FunnyBunnyWithSomeMoney'
+        required: false
+        type: string 
+      call_arguments2:
+        description: 'Pass second arguments from the caller workflow'
         default: 'echo FunnyBunnyWithSomeMoney'
         required: false
         type: string
+      call_arguments3:
+        description: 'Pass third arguments from the caller workflow'
+        default: 'echo FunnyBunnyWithSomeMoney'
+        required: false
+        type: string        
       shell:
         description: 'Run in shell specified from the caller workflow'
         default: 'bash'
@@ -88,6 +96,7 @@ jobs:
   build-matrix:
     runs-on: ubuntu-latest
     outputs:
+      outputs: ${{ steps.step.outputs.matrix }}
       output1: ${{ steps.step1.outputs.matrix }}
       output2: ${{ steps.step2.outputs.matrix }}
       output3: ${{ steps.step3.outputs.matrix }}    
@@ -100,9 +109,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '${{ matrix.node_version }}'
+      - id: step
+        run: |
+          MATRIX="${{ inputs.get_dependencies }}"
+          echo "MATRIX=${MATRIX}" >&2
+          echo "::set-output name=matrix::${MATRIX}"          
       - id: step1
         run: |
-          MATRIX="sudo apt update && sudo apt install -yq zsh && ${{ inputs.call_arguments }}"
+          MATRIX="${{ inputs.call_arguments1 }}"
           echo "MATRIX=${MATRIX}" >&2
           echo "::set-output name=matrix::${MATRIX}"
       - id: step2
@@ -116,9 +130,10 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - run: |
-          echo ${{needs.build-matrix.outputs.output1}} 
-          echo ${{needs.build-matrix.outputs.output2}} ${{needs.build-matrix.outputs.output3}}
+      - run: echo ${{needs.build-matrix.outputs.output}
+      - run: echo ${{needs.build-matrix.outputs.output1}} 
+      - run: echo ${{needs.build-matrix.outputs.output2}}
+      - run: echo ${{needs.build-matrix.outputs.output3}}
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
