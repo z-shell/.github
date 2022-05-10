@@ -2,13 +2,13 @@
 name: '⭕ Trunk Call'
 on:
   workflow_call:
-    outputs:
-      workflow_out_one:
-        description: "The first job output"
-        value: ${{ jobs.my_job.outputs.job_out_one }}
-      workflow_out_two:
-        description: "The second job output"
-        value: ${{ jobs.my_job.outputs.job_out_two }}
+#    outputs:
+#      workflow_out_one:
+#        description: "The first job output"
+#        value: ${{ jobs.my_job.outputs.job_out_one }}
+#      workflow_out_two:
+#        description: "The second job output"
+#        value: ${{ jobs.my_job.outputs.job_out_two }}
     secrets:
       trunk-token:
         description: >
@@ -108,8 +108,8 @@ jobs:
           trunk-token: ${{ secrets.trunk-token }}
           check-mode: ${{ inputs.check-mode }}
           arguments: ${{ inputs.arguments }}
-          if: ${{ failure() }}
-          run: echo FunnyBunyFailed-NoMoney
+#          if: ${{ failure() }}
+#          run: echo FunnyBunyFailed-NoMoney
 
 #      - name: My backup step
 #        if: ${{ failure() }}
