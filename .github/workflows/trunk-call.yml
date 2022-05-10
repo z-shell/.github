@@ -104,7 +104,8 @@ jobs:
           MATRIX="sudo apt update && sudo apt install -yq zsh && ${{ inputs.call_arguments }}"
           echo "MATRIX=${MATRIX}" >&2
           echo "::set-output name=matrix::${MATRIX}"
-  trunk:
+
+  trunk-check:
     runs-on: ubuntu-latest
     needs: build-matrix
     steps:
