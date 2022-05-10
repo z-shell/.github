@@ -88,7 +88,9 @@ jobs:
   build-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      output1: ${{ steps.step1.outputs.matrix }}
+      output2: ${{ steps.step2.outputs.matrix }}
+      output3: ${{ steps.step3.outputs.matrix }}    
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
@@ -98,12 +100,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '${{ matrix.node_version }}'
-      - name: "✨ Set matrix output"
-        id: set-matrix
+      - id: step1
         run: |
           MATRIX="sudo apt update && sudo apt install -yq zsh && ${{ inputs.call_arguments }}"
           echo "MATRIX=${MATRIX}" >&2
           echo "::set-output name=matrix::${MATRIX}"
+      - id: step2
+        run: echo "::set-output name=matrix::hello"
+      - id: step3
+        run: echo "::set-output name=matrix::world"  
 
   trunk-check:
     runs-on: ubuntu-latest
@@ -111,7 +116,7 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - run: "{{ steps.set-matrix.outputs.matrix }}"
+      - run: echo {{needs.build-matrix/outputs.output1}} ${{needs.build-matrix.outputs.output2}} ${{needs.build-matrix.outputs.output3}}
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
