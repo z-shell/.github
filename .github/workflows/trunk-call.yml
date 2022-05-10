@@ -116,7 +116,9 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - run: echo {{needs.build-matrix/outputs.output1}} ${{needs.build-matrix.outputs.output2}} ${{needs.build-matrix.outputs.output3}}
+      - run: |
+          echo ${{needs.build-matrix/outputs.output1}} 
+          echo ${{needs.build-matrix.outputs.output2}} ${{needs.build-matrix.outputs.output3}}
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
