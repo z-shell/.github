@@ -49,7 +49,7 @@ on:
 # ===   TRUNK END   === #
       get_dependencies:
         description: 'Pass required dependencies from the caller workflow'
-        default: 'sudo apt update && sudo apt install -yq zsh'
+        default: 'echo '
         required: false
         type: string
       call_arguments1:
@@ -111,19 +111,25 @@ jobs:
           node-version: '${{ matrix.node_version }}'
       - id: step0
         run: |
-          MATRIX="${{ inputs.get_dependencies }}"
-          echo "MATRIX=${MATRIX}" >&2
-          echo "::set-output name=matrix0::${MATRIX}"        
+          MATRIX0="${{ inputs.get_dependencies }}"
+          echo "MATRIX0=${MATRIX0}" >&2
+          echo "::set-output name=matrix0::${MATRIX0}"      
       - id: step1
         run: |
-          MATRIX="${{ inputs.call_arguments1 }}"
-          echo "MATRIX=${MATRIX}" >&2
-          echo "::set-output name=matrix1::${MATRIX}"
+          MATRIX1="${{ inputs.call_arguments1 }}"
+          echo "MATRIX1=${MATRIX1}" >&2
+          echo "::set-output name=matrix1::${MATRIX1}"
       - id: step2
-        run: echo "::set-output name=matrix2::hello"
+        run: |
+          MATRIX2="${{ inputs.call_arguments2 }}"
+          echo "MATRIX2=${MATRIX2}" >&2
+          echo "::set-output name=matrix2::${MATRIX2}"
       - id: step3
-        run: echo "::set-output name=matrix3::world"  
-
+        run: |
+          MATRIX3="${{ inputs.call_arguments3 }}"
+          echo "MATRIX3=${MATRIX3}" >&2
+          echo "::set-output name=matrix1::${MATRIX3}"
+          
   trunk-check:
     runs-on: ubuntu-latest
     needs: build-matrix
