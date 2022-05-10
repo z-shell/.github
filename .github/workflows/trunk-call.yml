@@ -3,12 +3,12 @@ name: '⭕ Trunk Call'
 on:
   workflow_call:
 #    outputs:
-#      workflow_out_one:
+#      workflow:
 #        description: "The first job output"
-#        value: ${{ jobs.my_job.outputs.job_out_one }}
+#        value: ${{ jobs.prepare.outputs.workflow }}
 #      workflow_out_two:
 #        description: "The second job output"
-#        value: ${{ jobs.my_job.outputs.job_out_two }}
+#        value: ${{ jobs.trunk.outputs.job_out_two }}
     secrets:
       trunk-token:
         description: >
@@ -85,22 +85,36 @@ on:
         type: string
 
 jobs:
-  trunk:
-    runs-on: [ubuntu-latest]
-    defaults:
-      run:
-        shell: ${{ inputs.shell }}
-        working-directory: ${{ inputs.working-directory }}
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v3
-        if: ${{ github.repository_owner == inputs.username }}
-      - run: sudo apt update && sudo apt install -yq zsh
-      - run: ${{ inputs.call_arguments }}
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: "✨ Set matrix output"
+        id: set-matrix
+        run: |
+          MATRIX="sudo apt update && sudo apt install -yq zsh && ${{ inputs.call_arguments }}"
+          echo "MATRIX=${MATRIX}" >&2
+          echo "::set-output name=matrix::${MATRIX}"
+  trunk:
+    runs-on: ubuntu-latest
+    needs: build-matrix
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          working-directory: ${{ inputs.working-directory }}
+          shell: ${{ inputs.shell }}
         if: ${{ inputs.node_enable == true }}
       - uses: actions/setup-node@v3
         with:
           node-version: '${{ matrix.node_version }}'
-      - run: ${{ inputs.call_arguments }}
+      - run: echo "{{ steps.set-matrix.outputs.matrix }}"
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
@@ -108,6 +122,7 @@ jobs:
           trunk-token: ${{ secrets.trunk-token }}
           check-mode: ${{ inputs.check-mode }}
           arguments: ${{ inputs.arguments }}
+
 #          if: ${{ failure() }}
 #          run: echo FunnyBunyFailed-NoMoney
 
