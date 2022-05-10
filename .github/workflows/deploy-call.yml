@@ -26,7 +26,6 @@ on:
         required: false
         type: string          
       publish_dir:
-        default: 'docs'
         description: '⭐️ Source Directory `publish_dir`'
         required: false
         type: string  
@@ -101,7 +100,7 @@ jobs:
           # `git@github.com:` are converted to HTTPS.
           #
           # Default: false
-          submodules: 'false'
+          submodules: 'true'
           # Add repository path as safe.directory for Git global config by running `git
           # config --global --add safe.directory <path>`
           # Default: true
@@ -112,7 +111,18 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF##refs/tags/}"
           echo "::set-output name=tag_name::${TAG_NAME}"
-          echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"          
+          echo "::set-output name=deploy_tag_name::deploy-${TAG_NAME}"
+      - name: Read .env
+        id: read-env
+        run: |
+          . ./.env
+          echo "::set-output name=NODE_VERSION::${NODE_VERSION}"
+          echo "::set-output name=HUGO_VERSION::${HUGO_VERSION}"
+          echo "::set-output name=GO_VERSION::${GO_VERSION}"
+          echo "::set-output name=PYTHON_VERSION::${PYTHON_VERSION}"
+          echo "::set-output name=DOCKER_VERSION::${DOCKER_VERSION}"
+          echo "::set-output name=ZSH_VERSION::${ZSH_VERSION}"
+          echo "::set-output name=RUBY_VERSION::${RUBY_VERSION}"
       - name: '🚀 Deploy'
         uses: peaceiris/actions-gh-pages@v3
         with:
