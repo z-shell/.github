@@ -123,6 +123,11 @@ jobs:
           echo "::set-output name=DOCKER_VERSION::${DOCKER_VERSION}"
           echo "::set-output name=ZSH_VERSION::${ZSH_VERSION}"
           echo "::set-output name=RUBY_VERSION::${RUBY_VERSION}"
+        if: ${{ steps.hugo-version.outputs.HUGO_VERSION }}
+      - uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '${{ steps.hugo-version.outputs.HUGO_VERSION }}'
+          extended: true          
       - name: '🚀 Deploy'
         uses: peaceiris/actions-gh-pages@v3
         with:
