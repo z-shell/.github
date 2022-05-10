@@ -2,6 +2,13 @@
 name: '♻️ Call Trunk Check'
 on:
   workflow_call:
+    outputs:
+      workflow_out_one:
+        description: "The first job output"
+        value: ${{ jobs.my_job.outputs.job_out_one }}
+      workflow_out_two:
+        description: "The second job output"
+        value: ${{ jobs.my_job.outputs.job_out_two }}
     secrets:
       trunk-token:
         description: >
@@ -77,6 +84,8 @@ on:
         required: false
         type: string
 
+
+
 jobs:
   trunk:
     runs-on: ubuntu-latest
@@ -87,9 +96,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 #        if: ${{ github.repository_owner == inputs.username }}
-      - run: |
-          sudo apt update
-          sudo apt install -yq zsh
+      - run: sudo apt update && sudo apt install -yq zsh
       - run: ${{ inputs.RUN_ARGS }}
         if: ${{ true == inputs.RUN_NODE }}
       - uses: actions/setup-node@v3
