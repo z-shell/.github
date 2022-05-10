@@ -13,10 +13,11 @@ jobs:
     secrets:
       personal_token: ${{ secrets.GH_PAT }}
 #     deploy_key: ''
+    with:
 #     external_repository: ''
 #     publish_branch: ''
 #     publish_dir: ''
 #     destination_dir: ''
 #     cname: ''
-#     keep_files: true
-#     allow_empty_commit: true
+     keep_files: true
+     allow_empty_commit: true
