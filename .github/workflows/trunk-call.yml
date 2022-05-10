@@ -53,12 +53,12 @@ on:
         description: Extra arguments to pass to trunk
         required: false
         type: string        
+# ===   TRUNK END   === #
       call_arguments:
         description: 'Pass commands to run from the caller workflow'
         default: 'echo FunnyBunnyWithSomeMoney'
         required: false
         type: string
-# ===   TRUNK END   === #
       shell:
         description: 'Run in shell specified from the caller workflow'
         default: 'bash'
@@ -69,11 +69,11 @@ on:
         default: '.'
         required: false
         type: string        
-      RUN_NODE:
+      enable_node:
         description: 'Enable Node Action'
         required: false
         type: string   
-      RUN_NODE_VERSION:
+      node_version:
         description: 'Set Node versions'
         default: '16'
         required: false
@@ -86,21 +86,21 @@ on:
 
 jobs:
   trunk:
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest]
     defaults:
       run:
         shell: ${{ inputs.shell }}
         working-directory: ${{ inputs.working-directory }}
     steps:
       - uses: actions/checkout@v3
-#        if: ${{ github.repository_owner == inputs.username }}
+        if: ${{ github.repository_owner == inputs.username }}
       - run: sudo apt update && sudo apt install -yq zsh
-      - run: ${{ inputs.RUN_ARGS }}
-        if: ${{ true == inputs.RUN_NODE }}
+      - run: ${{ inputs.call_arguments }}
+        if: ${{ inputs.node_enable == true }}
       - uses: actions/setup-node@v3
         with:
-          node-version: '${{ inputs.RUN_NODE_VERSION }}'
-      - run: ${{ inputs.RUN_NODE_ARGS }}
+          node-version: '${{ matrix.node_version }}'
+      - run: ${{ inputs.call_arguments }}
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
@@ -108,6 +108,9 @@ jobs:
           trunk-token: ${{ secrets.trunk-token }}
           check-mode: ${{ inputs.check-mode }}
           arguments: ${{ inputs.arguments }}
+          if: ${{ failure() }}
+          run: echo FunnyBunyFailed-NoMoney
+
 #      - name: My backup step
 #        if: ${{ failure() }}
 #        uses: actions/WhereIsBunny@1.0.0
