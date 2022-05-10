@@ -96,7 +96,7 @@ jobs:
   build-matrix:
     runs-on: ubuntu-latest
     outputs:
-      outputs: ${{ steps.step.outputs.matrix }}
+      output0: ${{ steps.step0.outputs.matrix }}
       output1: ${{ steps.step1.outputs.matrix }}
       output2: ${{ steps.step2.outputs.matrix }}
       output3: ${{ steps.step3.outputs.matrix }}    
@@ -109,20 +109,20 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '${{ matrix.node_version }}'
-      - id: step
+      - id: step0
         run: |
           MATRIX="${{ inputs.get_dependencies }}"
           echo "MATRIX=${MATRIX}" >&2
-          echo "::set-output name=matrix::${MATRIX}"          
+          echo "::set-output name=matrix0::${MATRIX}"        
       - id: step1
         run: |
           MATRIX="${{ inputs.call_arguments1 }}"
           echo "MATRIX=${MATRIX}" >&2
-          echo "::set-output name=matrix::${MATRIX}"
+          echo "::set-output name=matrix1::${MATRIX}"
       - id: step2
-        run: echo "::set-output name=matrix::hello"
+        run: echo "::set-output name=matrix2::hello"
       - id: step3
-        run: echo "::set-output name=matrix::world"  
+        run: echo "::set-output name=matrix3::world"  
 
   trunk-check:
     runs-on: ubuntu-latest
@@ -130,10 +130,12 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - run: echo ${{needs.build-matrix.outputs.output}
-      - run: echo ${{needs.build-matrix.outputs.output1}} 
-      - run: echo ${{needs.build-matrix.outputs.output2}}
-      - run: echo ${{needs.build-matrix.outputs.output3}}
+      # ===  OUTPUT RUN  === #
+      - run: echo ${{needs.build-matrix0.outputs.output0}}
+      - run: echo ${{needs.build-matrix1.outputs.output1}} 
+      - run: echo ${{needs.build-matrix2.outputs.output2}}
+      - run: echo ${{needs.build-matrix3.outputs.output3}}
+
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
@@ -141,6 +143,7 @@ jobs:
           trunk-token: ${{ secrets.trunk-token }}
           check-mode: ${{ inputs.check-mode }}
           arguments: ${{ inputs.arguments }}
+
 #          if: ${{ failure() }}
 #          run: echo FunnyBunyFailed-NoMoney
 
