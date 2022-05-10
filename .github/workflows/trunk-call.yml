@@ -94,8 +94,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-          working-directory: ${{ inputs.working-directory }}
-          shell: ${{ inputs.shell }}
+        if: ${{ inputs.node_enable == true }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '${{ matrix.node_version }}'
       - name: "✨ Set matrix output"
         id: set-matrix
         run: |
@@ -108,12 +110,6 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
-        if: ${{ inputs.node_enable == true }}
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '${{ matrix.node_version }}'
       - run: echo "{{ steps.set-matrix.outputs.matrix }}"
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
