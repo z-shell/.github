@@ -1,10 +1,12 @@
 ---
-name: '♻️ Trunk Check Call'
+name: '♻️ Call Trunk Check'
 on:
   workflow_call:
     secrets:
-      TRUNK_TOKEN:
-        description: 'A Trunk token passed from the caller workflow'
+      trunk-token:
+        description: >
+          You can find a per-repo API token in the Trunk web app settings.
+          This will cause results to be uploaded to the Trunk web app if this job is a scheduled job running on a branch, or if `check-mode` is set to 'all'.
         required: false
     inputs:
       username:
@@ -12,37 +14,54 @@ on:
         default: 'z-shell'
         required: false
         type: string
-      TRUNK_PATH:
-        description: 'The path is the full path to the trunk launcher from the caller workflow'
+# ===   TRUNK INPUT   === #
+      trunk_path:
+        description: >
+          Path to Trunk Launcher.
+          If not provided, we'll look for it the repo root, `.trunk/bin` and `tools/`.
+          If it can't be found anywhere and is not provided explicitly, we'll download it on demand."
         required: false
-        type: string          
-      GITHUB_REF_NAME:
-        description: 'GitHub branch or reference from the caller workflow'
+        type: string
+      cache:
+        default: "true"
+        description: >
+          Cache trunk downloads and results between runs.
+          Caching is only needed when using ephemeral CI runners.
         required: false
-        type: string  
-      TRUNK_CHECK_MODE:
-        description: 'Run trunk check on all files in a repo'
+        type: string
+      upload-series:
+        description: >
+          Upload series name, for when `trunk-token` is provided. If not provided, we'll use the branch name.
+        required: false
+        type: string
+      check-mode:
+        description: >
+          Trunk check mode. Leave unset to autodetect just changes.
+          Set to 'all' to check the entire repository.
+          If `trunk-token` is set with 'all', 'all' will also upload results to the Trunk web app.
         default: 'all'
         required: false
         type: string  
-      TRUNK_ARGUMENTS:
-        description: 'Pass arguments to trunk from the caller workflow'
+      arguments:
+        description: Extra arguments to pass to trunk
         required: false
-        type: string  
-      INPUT_LABEL:
-        description: 'Run multiple Trunk Check jobs on different platforms at the same time, value from the caller workflow'
-        required: false
-        type: string  
-      RUN_ARGS:
+        type: string        
+      call_arguments:
         description: 'Pass commands to run from the caller workflow'
         default: 'echo FunnyBunnyWithSomeMoney'
         required: false
-        type: string  
-      RUN_SHELL:
+        type: string
+# ===   TRUNK END   === #
+      shell:
         description: 'Run in shell specified from the caller workflow'
         default: 'bash'
         required: false
         type: string
+      working-directory:
+        description: 'Run in shell specified from the caller workflow'
+        default: '.'
+        required: false
+        type: string        
       RUN_NODE:
         description: 'Enable Node Action'
         required: false
@@ -51,27 +70,20 @@ on:
         description: 'Set Node versions'
         default: '16'
         required: false
-        type: string   
+        type: string
       RUN_NODE_ARGS:
         description: 'Pass arguments to Node'
         default: 'npm --version'
         required: false
         type: string
-      
-#  env:
-#    GITHUB_REPOSITORY: z-shell
-#    GITHUB_SHA: 
-#    INPUT_LABEL: 
-#    INPUT_TRUNK_TOKEN: 
-#    INPUT_UPLOAD_SERIES: 
 
 jobs:
   trunk:
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: ${{ inputs.RUN_SHELL }}
-        working-directory: .
+        shell: ${{ inputs.shell }}
+        working-directory: ${{ inputs.working-directory }}
     steps:
       - uses: actions/checkout@v3
 #        if: ${{ github.repository_owner == inputs.username }}
@@ -84,12 +96,13 @@ jobs:
         with:
           node-version: '${{ inputs.RUN_NODE_VERSION }}'
       - run: ${{ inputs.RUN_NODE_ARGS }}
-      - uses: trunk-io/trunk-action@v1.0.2   
+      # ===   TRUNK RUN   === #
+      - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
-          trunk-path: ${{ inputs.TRUNK_PATH }}
-          trunk-token: ${{ secrets.TRUNK_TOKEN }}
-          check-mode: ${{ inputs.TRUNK_CHECK_MODE }}
-          arguments: ${{ inputs.TRUNK_ARGUMENTS }}
+          trunk-path: ${{ inputs.trunk_path }}
+          trunk-token: ${{ secrets.trunk-token }}
+          check-mode: ${{ inputs.check-mode }}
+          arguments: ${{ inputs.arguments }}
 
 #      - name: My backup step
 #        if: ${{ failure() }}
