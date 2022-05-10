@@ -1,30 +1,29 @@
 ---
-name: '♻️ Trunk Call'
+name: '⭕ Trunk'
 on:
-  workflow_dispatch:
   push:
     branches: ['main']
     tags: ['v*.*.*']
   pull_request:
     types: [opened, synchronize]
-#  schedule:
-#    - cron: 0 04 * * 1-5
+  schedule:
+    - cron: 0 04 * * 1-5
+  workflow_dispatch: {}
 
 jobs:
   check-call:
-    name: '♻️ Trunk'
+    name: '⚡'
     uses: z-shell/.github/.github/workflows/trunk-call.yml@main
-#    secrets:
-#      TRUNK_TOKEN: ${{ secrets.TRUNK_TOKEN }}
-#    with:
-#      RUN_ARGS: 'npm i -g pnpm && pnpm i -r'
-#      TRUNK_PATH: ''
-#      GITHUB_REF_NAME: ''
-#      TRUNK_CHECK_MODE: 'all'
-#      TRUNK_ARGUMENTS: ''
-#      INPUT_LABEL: ''
-#      RUN_ARGS: 'echo FunnyBunnyWithSomeMoney'
-#      RUN_SHELL: 'bash'
-#      RUN_NODE: 'false'
-#      RUN_NODE_VERSION: '16'
-#      RUN_NODE_ARGS: 'npm --version'
+    secrets:
+      trunk_token: ${{ secrets.TRUNK_TOKEN }}
+    with:
+      trunk_path: ''
+      cache: ''
+      upload-series: ''
+      check-mode: ''
+      arguments: ''
+      call_arguments: 'npm i -g pnpm && pnpm i -r'
+      RUN_SHELL: ''
+      RUN_NODE: ''
+      RUN_NODE_VERSION: ''
+      RUN_NODE_ARGS: ''
