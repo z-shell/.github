@@ -130,10 +130,21 @@ jobs:
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
           echo "::set-output name=matrix1::${MATRIX3}"
-          
+
+  setup-node:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.node_enable }}
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+      - run: ${{ inputs.node_arguments1 }}
+
   trunk-check:
     runs-on: ubuntu-latest
-    needs: build-matrix
+    needs: 
+      - build-matrix
+      - setup-node
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
