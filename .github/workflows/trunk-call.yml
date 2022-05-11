@@ -14,7 +14,7 @@ on:
         default: 'z-shell'
         required: false
         type: string
-# ===   TRUNK INPUT   === #
+      # TRUNK INPUT
       trunk_path:
         description: >
           Path to Trunk Launcher.
@@ -46,9 +46,14 @@ on:
         description: Extra arguments to pass to trunk
         required: false
         type: string        
-# ===   TRUNK END   === #
+      # WORKFLOW
+      os-version:
+        description: 'Required OS for workflow.'
+        default: 'ubuntu-latest'
+        required: false
+        type: string      
       get_dependencies:
-        description: 'Pass commands for dependencies from the caller workflow'
+        description: 'Pass commands prepare or install dependencies'
         default: 'echo FunnyBunnyWithSomeMoney 0'
         required: false
         type: string
@@ -68,20 +73,19 @@ on:
         required: false
         type: string        
       shell:
-        description: 'Run in shell specified from the caller workflow'
-        default: 'bash'
+        description: 'Shell to run workflow'
         required: false
         type: string
       working-directory:
         description: 'Run in shell specified from the caller workflow'
-        default: '.'
+        default: ${{ github_workspace }}
         required: false
         type: string        
       enable_node:
         default: false
         description: 'Enable Node Action'
         required: false
-        type: boolean   
+        type: boolean
       node_version:
         description: 'Set Node versions'
         default: '16'
@@ -94,7 +98,7 @@ on:
 
 jobs:
   build-matrix:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.os-version }}
     outputs:
       output0: ${{ steps.step0.outputs.matrix0 }}
       output1: ${{ steps.step1.outputs.matrix1 }}
@@ -103,9 +107,6 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
       - id: step0
         run: |
           MATRIX0="${{ inputs.get_dependencies }}"
@@ -127,6 +128,7 @@ jobs:
           echo "MATRIX3=${MATRIX3}" >&2
           echo "::set-output name=matrix1::${MATRIX3}"
 
+      # NODE
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
@@ -134,19 +136,19 @@ jobs:
       - run: ${{ inputs.node_arguments }}
 
   trunk-check:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.os-version }}
     needs: 
       - build-matrix
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      # ===  OUTPUT RUN  === #
+      # OUTPUT
       - run: echo ${{needs.build-matrix.outputs.output0}}
-      - run: echo ${{needs.build-matrix.outputs.output1}} 
+      - run: echo ${{needs.build-matrix.outputs.output1}}
       - run: echo ${{needs.build-matrix.outputs.output2}}
       - run: echo ${{needs.build-matrix.outputs.output3}}
 
-      # ===   TRUNK RUN   === #
+      # TRUNK
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
           trunk-path: ${{ inputs.trunk_path }}
