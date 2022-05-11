@@ -105,8 +105,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
+
       - id: step0
-        run: echo "::set-output name=matrix0::${{ inputs.get_dependencies }}"
+        run: |
+          MATRIX0="${{ inputs.get_dependencies }}"
+          echo "MATRIX1=${MATRIX0}" >&2
+          echo "::set-output name=matrix0::${MATRIX0}"        
       - id: step1
         run: |
           MATRIX1="${{ inputs.call_arguments1 }}"
@@ -127,6 +131,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
         if: ${{ inputs.node_enable }}
+      - run: ${{ inputs.node_arguments }}
 
   trunk-check:
     runs-on: ubuntu-latest
