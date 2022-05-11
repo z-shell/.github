@@ -54,17 +54,17 @@ on:
         type: string
       call_arguments1:
         description: 'Pass first arguments from the caller workflow'
-        default: 'echo FunnyBunnyWithSomeMoney'
+        default: 'echo FunnyBunnyWithSomeMoney 1'
         required: false
         type: string 
       call_arguments2:
         description: 'Pass second arguments from the caller workflow'
-        default: 'echo FunnyBunnyWithSomeMoney'
+        default: 'echo FunnyBunnyWithSomeMoney 2'
         required: false
         type: string
       call_arguments3:
         description: 'Pass third arguments from the caller workflow'
-        default: 'echo FunnyBunnyWithSomeMoney'
+        default: 'echo FunnyBunnyWithSomeMoney 3'
         required: false
         type: string        
       shell:
@@ -96,10 +96,10 @@ jobs:
   build-matrix:
     runs-on: ubuntu-latest
     outputs:
-      output0: ${{ steps.step0.outputs.matrix }}
-      output1: ${{ steps.step1.outputs.matrix }}
-      output2: ${{ steps.step2.outputs.matrix }}
-      output3: ${{ steps.step3.outputs.matrix }}    
+      output0: ${{ steps.step0.outputs.matrix0 }}
+      output1: ${{ steps.step1.outputs.matrix1 }}
+      output2: ${{ steps.step2.outputs.matrix2 }}
+      output3: ${{ steps.step3.outputs.matrix3 }}    
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
@@ -110,10 +110,7 @@ jobs:
         with:
           node-version: '${{ matrix.node_version }}'
       - id: step0
-        run: |
-          MATRIX0="${{ inputs.get_dependencies }}"
-          echo "MATRIX0=${MATRIX0}" >&2
-          echo "::set-output name=matrix0::${MATRIX0}"      
+        run: echo "::set-output name=matrix0::${{ inputs.get_dependencies }}"      
       - id: step1
         run: |
           MATRIX1="${{ inputs.call_arguments1 }}"
@@ -137,10 +134,10 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
       # ===  OUTPUT RUN  === #
-      - run: echo ${{needs.build-matrix0.outputs.output0}}
-      - run: echo ${{needs.build-matrix1.outputs.output1}} 
-      - run: echo ${{needs.build-matrix2.outputs.output2}}
-      - run: echo ${{needs.build-matrix3.outputs.output3}}
+      - run: echo ${{needs.build-matrix.outputs.output0}}
+      - run: echo ${{needs.build-matrix.outputs.output1}} 
+      - run: echo ${{needs.build-matrix.outputs.output2}}
+      - run: echo ${{needs.build-matrix.outputs.output3}}
 
       # ===   TRUNK RUN   === #
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
