@@ -78,15 +78,16 @@ on:
         required: false
         type: string        
       enable_node:
+        default: false
         description: 'Enable Node Action'
         required: false
-        type: string   
+        type: boolean   
       node_version:
         description: 'Set Node versions'
         default: '16'
         required: false
         type: string
-      RUN_NODE_ARGS:
+      node_arguments:
         description: 'Pass arguments to Node'
         default: 'npm --version'
         required: false
@@ -105,10 +106,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-        if: ${{ inputs.node_enable == true }}
+        if: ${{ inputs.node_enable }}
       - uses: actions/setup-node@v3
         with:
-          node-version: '${{ matrix.node_version }}'
+          node-version: ${{ matrix.node_version }}
+        if: ${{ inputs.node_enable }}
+      - run: ${{ inputs.node_arguments1 }}
+
       - id: step0
         run: echo "::set-output name=matrix0::${{ inputs.get_dependencies }}"      
       - id: step1
