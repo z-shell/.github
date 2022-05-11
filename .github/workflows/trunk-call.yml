@@ -78,9 +78,9 @@ on:
         type: string
       working-directory:
         description: 'Run in shell specified from the caller workflow'
-        default: ${{ github_workspace }}
+        default: '${{ github_workspace }}'
         required: false
-        type: string        
+        type: string
       enable_node:
         default: false
         description: 'Enable Node Action'
