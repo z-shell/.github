@@ -77,8 +77,7 @@ on:
         required: false
         type: string
       working-directory:
-        description: 'Run in shell specified from the caller workflow'
-        default: '${{ github_workspace }}'
+        description: 'The default working directory on the runner for steps, and the default location of your repository when using the checkout action.'
         required: false
         type: string
       enable_node:
