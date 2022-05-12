@@ -6,7 +6,7 @@ on:
     tags: ["v*.*.*"]
   pull_request:
     types: [opened, synchronize]
-    schedule:
+  schedule:
       - cron: 0 04 * * 1-5
   workflow_dispatch: {}
 
@@ -39,6 +39,6 @@ jobs:
       # TRUNK
       trunk_path: ''
       cache: 'true'
-      upload-series: ''
+      upload-series: 'main'
       check-mode: 'all'
       arguments: '--ci'
