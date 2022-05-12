@@ -71,7 +71,7 @@ on:
         required: false
         type: string        
       call_on_fail:
-        description: 'Pass argument on run failure'
+        description: 'Pass argument to run on failure'
         required: false
         type: string   
       shell:
@@ -148,7 +148,9 @@ jobs:
     steps:
       - name: '⤵️ Check out code from GitHub'
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0
+          
       - run: echo ${{needs.build-matrix.outputs.output0}}
       - run: echo ${{needs.build-matrix.outputs.output1}}
       - run: echo ${{needs.build-matrix.outputs.output2}}
