@@ -129,7 +129,7 @@ jobs:
 
       # NODE
       - if: ${{ inputs.node_enable }}
-      - uses: actions/setup-node@v3
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
       - run: ${{ inputs.node_arguments }}
