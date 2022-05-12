@@ -132,7 +132,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
-      - run: ${{ inputs.node_arguments }}
+      - if: ${{ inputs.node_enable }}
+        run: ${{ inputs.node_arguments }}
 
   trunk-check:
     runs-on: ${{ inputs.os-version }}
