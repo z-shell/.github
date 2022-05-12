@@ -56,20 +56,24 @@ on:
         required: false
         type: string
       call_arguments1:
-        description: 'Pass first arguments from the caller workflow'
+        description: 'Pass first argument'
         default: 'echo FunnyBunnyWithSomeMoney 1'
         required: false
         type: string 
       call_arguments2:
-        description: 'Pass second arguments from the caller workflow'
+        description: 'Pass second argument'
         default: 'echo FunnyBunnyWithSomeMoney 2'
         required: false
         type: string
       call_arguments3:
-        description: 'Pass third arguments from the caller workflow'
+        description: 'Pass third argument'
         default: 'echo FunnyBunnyWithSomeMoney 3'
         required: false
         type: string        
+      call_on_fail:
+        description: 'Pass argument on run failure'
+        required: false
+        type: string   
       shell:
         description: 'Shell to run workflow'
         required: false
@@ -102,7 +106,7 @@ jobs:
       output2: ${{ steps.step2.outputs.matrix2 }}
       output3: ${{ steps.step3.outputs.matrix3 }}    
     steps:
-      - name: ⤵️ Check out code from GitHub
+      - name: '⤵️ Check out code from GitHub'
         uses: actions/checkout@v3
       - id: step0
         name: '🚀 Run 0'
@@ -133,7 +137,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
-      - if: ${{ inputs.node_enable }}
+      - if: ${{ inputs.node_arguments }}
         name: '🔷 Run run'
         run: ${{ inputs.node_arguments }}
 
@@ -142,15 +146,14 @@ jobs:
     needs: 
       - build-matrix
     steps:
-      - name: ⤵️ Check out code from GitHub
+      - name: '⤵️ Check out code from GitHub'
         uses: actions/checkout@v3
-      # OUTPUT
+
       - run: echo ${{needs.build-matrix.outputs.output0}}
       - run: echo ${{needs.build-matrix.outputs.output1}}
       - run: echo ${{needs.build-matrix.outputs.output2}}
       - run: echo ${{needs.build-matrix.outputs.output3}}
 
-      # TRUNK
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
           trunk-path: ${{ inputs.trunk_path }}
@@ -160,22 +163,5 @@ jobs:
           arguments: ${{ inputs.arguments }}
 
       - if: ${{ failure() }}
-        run: echo FunnyBunyFailed-NoMoney
-
-#  example_matrix:
-#    strategy:
-#      matrix:
-#        os: [windows-latest, ubuntu-latest]
-#        node: [12, 14, 16]
-#        include:
-#          - os: windows-latest
-#            node: 16
-#            npm: 6
-#    runs-on: ${{ matrix.os }}
-#    steps:
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: ${{ matrix.node }}
-#      - if: ${{ matrix.npm }}
-#        run: npm install -g npm@${{ matrix.npm }}
-#      - run: npm --version
+        name: '🆘 Run on fail'
+        run: ${{ inputs.call_on_fail }}
