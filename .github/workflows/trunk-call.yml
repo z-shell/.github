@@ -14,7 +14,6 @@ on:
         default: 'z-shell'
         required: false
         type: string
-      # TRUNK INPUT
       trunk_path:
         description: >
           Path to Trunk Launcher.
@@ -46,12 +45,11 @@ on:
         description: Extra arguments to pass to trunk
         required: false
         type: string        
-      # WORKFLOW
-      os-version:
+      runs-on:
         description: 'Required OS for workflow.'
         default: 'ubuntu-latest'
         required: false
-        type: string      
+        type: string
       get_dependencies:
         description: 'Pass commands prepare or install dependencies'
         default: 'echo FunnyBunnyWithSomeMoney 0'
@@ -97,7 +95,7 @@ on:
 
 jobs:
   build-matrix:
-    runs-on: ${{ inputs.os-version }}
+    runs-on: ${{ inputs.runs-on }}
     outputs:
       output0: ${{ steps.step0.outputs.matrix0 }}
       output1: ${{ steps.step1.outputs.matrix1 }}
@@ -130,19 +128,17 @@ jobs:
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
           echo "::set-output name=matrix3::${MATRIX3}"
-
-      # NODE
       - if: ${{ inputs.node_enable }}
         name: '🔷 Node setup'
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
       - if: ${{ inputs.node_enable }}
-        name: '🔷 Run'
+        name: '🔷 Run run'
         run: ${{ inputs.node_arguments }}
 
   trunk-check:
-    runs-on: ${{ inputs.os-version }}
+    runs-on: ${{ inputs.runs-on }}
     needs: 
       - build-matrix
     steps:
@@ -163,12 +159,9 @@ jobs:
           upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
 
-#          if: ${{ failure() }}
-#          run: echo FunnyBunyFailed-NoMoney
+      - if: ${{ failure() }}
+        run: echo FunnyBunyFailed-NoMoney
 
-#      - name: My backup step
-#        if: ${{ failure() }}
-#        uses: actions/WhereIsBunny@1.0.0
 #  example_matrix:
 #    strategy:
 #      matrix:
