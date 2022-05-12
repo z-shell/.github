@@ -129,15 +129,16 @@ jobs:
         run: |
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
-          echo "::set-output name=matrix1::${MATRIX3}"
+          echo "::set-output name=matrix3::${MATRIX3}"
 
       # NODE
       - if: ${{ inputs.node_enable }}
+        name: '🔷 Node setup'
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
       - if: ${{ inputs.node_enable }}
-        name: '🚀 Node run'
+        name: '🔷 Run'
         run: ${{ inputs.node_arguments }}
 
   trunk-check:
