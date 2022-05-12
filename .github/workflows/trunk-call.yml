@@ -133,6 +133,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
       - if: ${{ inputs.node_enable }}
+        name: '🚀 Node run'
         run: ${{ inputs.node_arguments }}
 
   trunk-check:
