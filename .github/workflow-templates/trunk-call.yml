@@ -39,6 +39,6 @@ jobs:
       # TRUNK
       trunk_path: ''
       cache: 'true'
-      upload-series: 'main'
+      upload-series: ''
       check-mode: 'all'
       arguments: '--ci'
