@@ -107,21 +107,25 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
       - id: step0
+        name: '🚀 Run 0'
         run: |
           MATRIX0="${{ inputs.get_dependencies }}"
           echo "MATRIX1=${MATRIX0}" >&2
           echo "::set-output name=matrix0::${MATRIX0}"        
       - id: step1
+        name: '🚀 Run 1'
         run: |
           MATRIX1="${{ inputs.call_arguments1 }}"
           echo "MATRIX1=${MATRIX1}" >&2
-          echo "::set-output name=matrix1::${MATRIX1}"
+          echo "::set-output name=matrix1::${MATRIX1}"          
       - id: step2
+        name: '🚀 Run 2'
         run: |
           MATRIX2="${{ inputs.call_arguments2 }}"
           echo "MATRIX2=${MATRIX2}" >&2
           echo "::set-output name=matrix2::${MATRIX2}"
       - id: step3
+        name: '🚀 Run 3'      
         run: |
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
@@ -155,6 +159,7 @@ jobs:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
           check-mode: ${{ inputs.check-mode }}
+          upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
 
 #          if: ${{ failure() }}
