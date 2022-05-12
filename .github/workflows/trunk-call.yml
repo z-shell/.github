@@ -128,10 +128,10 @@ jobs:
           echo "::set-output name=matrix1::${MATRIX3}"
 
       # NODE
+      - if: ${{ inputs.node_enable }}
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
-        if: ${{ inputs.node_enable }}
       - run: ${{ inputs.node_arguments }}
 
   trunk-check:
