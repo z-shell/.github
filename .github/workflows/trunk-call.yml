@@ -82,21 +82,20 @@ on:
         description: 'The default working directory on the runner for steps, and the default location of your repository when using the checkout action.'
         required: false
         type: string
-      enable_node:
-        default: false
-        description: 'Enable Node Action'
-        required: false
-        type: boolean
       node_version:
         description: 'Set Node versions'
         default: '16'
         required: false
         type: string
-      node_arguments:
-        description: 'Pass arguments to Node'
+      npm_arguments:
+        description: 'Pass arguments to npm'
         required: false
         type: string
-
+      pnpm_arguments:
+        description: 'Pass arguments to pnpm'
+        required: false
+        type: string
+        
 jobs:
   build-matrix:
     runs-on: ${{ inputs.runs-on }}
@@ -132,14 +131,29 @@ jobs:
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
           echo "::set-output name=matrix3::${MATRIX3}"
-      - if: ${{ inputs.node_enable }}
-        name: '🔷 Node setup'
+
+      - if: ${{ inputs.npm_arguments }}
+        name: '🔷 Node setup npm'
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
-      - if: ${{ inputs.node_arguments }}
-        name: '🔷 Run run'
-        run: ${{ inputs.node_arguments }}
+          cache: 'npm'
+      - if: ${{ inputs.npm_arguments }}
+        name: '🔷 Run npm'
+        run: ${{ inputs.npm_arguments }}
+
+      - if: ${{ inputs.pnpm_arguments }}
+        name: '🔷 Node setup pnpm'      
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7.1.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: 'pnpm'
+      - if: ${{ inputs.pnpm_arguments }}
+        name: '🔷 Run pnpm'
+        run: pnpm install --frozen-lockfile
 
   trunk-check:
     runs-on: ${{ inputs.runs-on }}
