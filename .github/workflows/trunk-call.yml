@@ -152,9 +152,9 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           #cache: 'pnpm'
-      - id: matrix_pnpm
+      - if: ${{ inputs.pnpm_arguments }}          
+        id: matrix_pnpm
         name: '🔷 Run pnpm'
-        if: ${{ inputs.pnpm_arguments }}
         run: |
           MATRIX_PNPM="${{ inputs.pnpm_arguments }}"
           echo "MATRIX_PNPM=${MATRIX_PNPM}" >&2
@@ -174,8 +174,7 @@ jobs:
       - run: echo ${{needs.build-matrix.outputs.output1}}
       - run: echo ${{needs.build-matrix.outputs.output2}}
       - run: echo ${{needs.build-matrix.outputs.output3}}
-      - if: ${{ inputs.pnpm_arguments }}
-        run: echo ${{needs.build-matrix.outputs.matrix_pnpm}}
+      - run: echo ${{needs.build-matrix.outputs.matrix_pnpm}}
 
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
