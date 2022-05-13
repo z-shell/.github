@@ -158,7 +158,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
-      - if: ${{ inputs.pnpm_arguments }    
+      - if: ${{ inputs.pnpm_arguments }}
         name: '🔷 Run pnpm'
         run: ${{ inputs.pnpm_arguments }}
 
