@@ -156,7 +156,7 @@ jobs:
           #cache: 'pnpm'
       - if: ${{ inputs.pnpm_arguments }}
         name: '🔷 Run pnpm'
-      - id: matrix_pnpm
+        id: matrix_pnpm
         run: |
           MATRIX_PNPM="${{ inputs.pnpm_arguments }}"
           echo "MATRIX_PNPM=${MATRIX_PNPM}" >&2
