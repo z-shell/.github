@@ -144,17 +144,19 @@ jobs:
         run: ${{ inputs.npm_arguments }}
 
       - if: ${{ inputs.pnpm_arguments }}
-        name: '🔷 Node setup pnpm'      
+        name: '🔷 Setup pnpm'      
         uses: pnpm/action-setup@v2
         with:
           version: 7.1.0
-      - uses: actions/setup-node@v3
+      - if: ${{ inputs.pnpm_arguments }}
+        name: '🔷 Setup Node'                
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           #cache: 'pnpm'
-      - if: ${{ inputs.pnpm_arguments }}          
-        id: matrix_pnpm
+      - if: ${{ inputs.pnpm_arguments }}
         name: '🔷 Run pnpm'
+      - id: matrix_pnpm
         run: |
           MATRIX_PNPM="${{ inputs.pnpm_arguments }}"
           echo "MATRIX_PNPM=${MATRIX_PNPM}" >&2
