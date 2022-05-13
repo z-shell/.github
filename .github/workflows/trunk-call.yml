@@ -103,7 +103,8 @@ jobs:
       output0: ${{ steps.step0.outputs.matrix0 }}
       output1: ${{ steps.step1.outputs.matrix1 }}
       output2: ${{ steps.step2.outputs.matrix2 }}
-      output3: ${{ steps.step3.outputs.matrix3 }}    
+      output3: ${{ steps.step3.outputs.matrix3 }}
+      output_pnpm: ${{ steps.matrix_pnpm.outputs.matrix_pnpm }}
     steps:
       - name: '⤵️ Check out code from GitHub'
         uses: actions/checkout@v3
@@ -151,10 +152,14 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
-      - if: ${{ inputs.pnpm_arguments }}
+      - id: matrix_pnpm
         name: '🔷 Run pnpm'
-        run: pnpm install --frozen-lockfile
-
+        if: ${{ inputs.pnpm_arguments }}
+        run: |
+          MATRIX_PNPM="${{ inputs.pnpm_arguments }}"
+          echo "MATRIX_PNPM=${MATRIX_PNPM}" >&2
+          echo "::set-output name=matrix_pnpm::${MATRIX_PNPM}"
+          
   trunk-check:
     runs-on: ${{ inputs.runs-on }}
     needs: 
@@ -169,6 +174,8 @@ jobs:
       - run: echo ${{needs.build-matrix.outputs.output1}}
       - run: echo ${{needs.build-matrix.outputs.output2}}
       - run: echo ${{needs.build-matrix.outputs.output3}}
+      - if: ${{ inputs.pnpm_arguments }}
+        run: echo ${{needs.build-matrix.outputs.matrix_pnpm}}
 
       - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd 
         with:
