@@ -169,7 +169,7 @@ jobs:
 
       - if: ${{ inputs.yarn_arguments }}
         name: "🟩 Setup Node"
-      - uses: actions/setup-node@v3
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           cache: "yarn"
