@@ -37,10 +37,10 @@ jobs:
     # TRUNK:
     # https://github.com/trunk-io/trunk-action
     #trunk_path: ''
-    #cache: ''
-    #upload-series: ''
     #check-mode: ''
+    #upload-series: ''
     #arguments: ''
+    #cache: ''
 
     # Pass arguments to run on fail
     #call_on_fail: ''
