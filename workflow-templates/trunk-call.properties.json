@@ -1,4 +1,4 @@
 {
-  "name": "Organization Linter",
-  "description": "Workflow Trunk check for organization repositories"
+  "name": "Trunk Check",
+  "description": "Trunk Check: a blazingly fast meta code checker and formatter with extraordinary features like caching, preexisting issue detection, a daemon, and a language server."
 }
