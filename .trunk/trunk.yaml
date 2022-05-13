@@ -17,18 +17,15 @@ lint:
         - name: PATH
           list: ["${env.PATH}"]
   enabled:
-    - zsh-n@system
-    - actionlint@1.6.12
-    - gitleaks@8.8.4
-    - hadolint@2.10.0
+    - actionlint@1.6.9
+    - gitleaks@8.3.0
     - markdownlint@0.31.1
-    - prettier@2.6.2
+    - prettier@2.5.1
     - shellcheck@0.8.0
     - shfmt@3.4.0
   ignore:
-    - linters: [ALL]
-      paths:
-        - '.*'
     - linters: [actionlint]
       paths:
         - .github/workflows/sync-labels.yml
+        - .github/workflows/trunk-call.yml
+        - .github/workflows/deploy-call.yml

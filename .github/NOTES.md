@@ -11,6 +11,7 @@ curl \
   https://api.github.com/repos/user/repo/dispatches \
   -d '{ "event_type": "setup" }'
 ```
+
 Or, with JavaScript (@octokit/core.js):
 
 ```js

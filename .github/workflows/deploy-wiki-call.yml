@@ -2,18 +2,18 @@
 name: "🚀 Deploy Wiki"
 
 on:
-#  push:
-#    branches: [ main ]
-#    tags: ['v*.*.*']
+  #  push:
+  #    branches: [ main ]
+  #    tags: ['v*.*.*']
   workflow_call:
   workflow_dispatch:
-  
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-      cancel-in-progress: true    
+      cancel-in-progress: true
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3

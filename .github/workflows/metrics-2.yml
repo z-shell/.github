@@ -2,7 +2,7 @@
 name: "🌀 Z Metrics 2"
 on:
   schedule:
-    - cron: "* 3 * * */3"
+    - cron: "0 3 * * */3"
   workflow_dispatch:
   push:
     paths: [".github/workflows/metrics-2.yml"]
