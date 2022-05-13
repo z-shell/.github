@@ -11,36 +11,34 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  check-call:
+  trunk:
     name: "⚡"
-    uses: z-shell/.github/.github/workflows/trunk-call.yml@main
+    uses: z-shell/.github/.github/workflows/trunk.yml@main
     #secrets:
     #  trunk-token: ${{ secrets.TRUNK_TOKEN }}
     with:
       runs-on: "ubuntu-latest"
+      # Pass commands to install or prepare dependencies.
+      #get_dependencies: 'sudo apt update && sudo apt install -yq zsh'
+      # Pass arguments to run before launching Trunk
+      #call_arguments0: ''
+      #call_arguments1: ''
+      #call_arguments2: ''
+      #call_arguments3: ''
 
-    # Pass commands to install or prepare dependencies.
-    #get_dependencies: 'sudo apt update && sudo apt install -yq zsh'
+      #node_version: '16'
+      #npm_arguments: 'npm --version'
+      #pnpm_arguments 'pnpm --version'
+      #yarn_arguments 'yarn --version'
 
-    # Pass arguments to run before launching Trunk
-    #call_arguments0: ''
-    #call_arguments1: ''
-    #call_arguments2: ''
-    #call_arguments3: ''
+      # TRUNK:
+      # https://docs.trunk.io/get-started
+      # https://github.com/trunk-io/trunk-action
+      #trunk_path: ''
+      #check-mode: ''
+      #upload-series: ''
+      #arguments: ''
+      #cache: ''
 
-    #node_version: '16'
-    #npm_arguments: 'npm --version'
-    #pnpm_arguments 'pnpm --version'
-    #yarn_arguments 'yarn --version'
-
-
-    # TRUNK:
-    # https://github.com/trunk-io/trunk-action
-    #trunk_path: ''
-    #check-mode: ''
-    #upload-series: ''
-    #arguments: ''
-    #cache: ''
-
-    # Pass arguments to run on fail
-    #call_on_fail: ''
+      # Pass arguments to run on fail
+      #call_on_fail: ''
