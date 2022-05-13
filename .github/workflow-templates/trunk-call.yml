@@ -17,7 +17,7 @@ jobs:
     #secrets:
     #  trunk-token: ${{ secrets.TRUNK_TOKEN }}
     with:
-      runs-on: "ubuntu-latest"
+      #runs-on: "ubuntu-latest"
       
       # Pass commands to install or prepare dependencies.
       #get_dependencies: 'sudo apt update && sudo apt install -yq zsh'
@@ -31,14 +31,14 @@ jobs:
       # Pass arguments to run on fail 
       #call_on_fail: ''
 
-      shell: "bash"
-      enable_node: false
-      node_version: '16'
-      node_arguments: ''
-
+      #shell: "bash"
+      #node_version: '16'
+      #npm_arguments: 'npm --version'
+      #pnpm_arguments 'pnpm --version'
+      
       # TRUNK
-      trunk_path: ''
-      cache: 'true'
-      upload-series: ''
-      check-mode: 'all'
-      arguments: '--ci'
+      #trunk_path: ''
+      #cache: 'true'
+      #upload-series: 'main'
+      #check-mode: 'all'
+      #arguments: ''
