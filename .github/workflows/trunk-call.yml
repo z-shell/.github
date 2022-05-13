@@ -151,7 +151,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
-          cache: 'pnpm'
+          #cache: 'pnpm'
       - id: matrix_pnpm
         name: '🔷 Run pnpm'
         if: ${{ inputs.pnpm_arguments }}
