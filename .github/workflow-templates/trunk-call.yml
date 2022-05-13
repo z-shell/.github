@@ -16,7 +16,7 @@ jobs:
     uses: z-shell/.github/.github/workflows/trunk-call.yml@main
     #secrets:
     #  trunk-token: ${{ secrets.TRUNK_TOKEN }}
-    with:
+    #with:
       #runs-on: "ubuntu-latest"
       
       # Pass commands to install or prepare dependencies.
