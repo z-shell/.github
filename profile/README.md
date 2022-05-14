@@ -7,9 +7,9 @@
 <!--  === === === === --><!-- </td></tr> -->
 <tr><td align="center">
 <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
-  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" />
-  </a>
-  <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-dark-mode-only" /><img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/metrics.svg?sanitize=true#gh-light-mode-only" />
+  <img align="center" style="width:80%;height:auto" src="img/z_git.png" alt="ZI+GIT Logo" />
+</a>
+  <img align="center" style="width:80%;height:auto" src="../metrics/metrics.svg" />
 <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg?sanitize=true#gh-dark-mode-only" /><img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/followup/followup.svg?sanitize=true#gh-light-mode-only" />
 <!--  
 <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">-->
