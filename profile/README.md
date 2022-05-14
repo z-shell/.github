@@ -1,5 +1,5 @@
-<!--  === === === === --><!-- <tr align="center" width="100%"><td> -->
-<!-- Announments --> <!-- [ Unlocked: 2, Left: 15 ] -->
+<!--  === === === === --><!-- Announments -->
+<!-- <tr align="center" width="100%"><td> -->
 <!-- <h1></h1> --> <!-- FIND THE SECRET -->
 <!-- <h2></h2> --> <!-- RECEIVE THE KEY -->
 <!-- <h3></h3> --> <!-- UNLOCK THE PRICE -->
@@ -30,36 +30,23 @@
       <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg" />
     </a>
     </td></tr>
-<!--    <tr><td align="center">
-        <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-          <img src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" width="80%" height="auto" />
-        </a>
-      </td>
-    </tr> -->
+<tr><td align="center">
+  <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
+    <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
+  </a>
+  </td>
+</tr>
 <tr><td align="center">
 <a href="https://github.com/z-shell/zi/">
   <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
 </a>
-      <a href="https://github.com/z-shell/zw/">
-        <img align="center" style="width:40%;height:auto"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
-        </a>
-        <a href="https://github.com/z-shell/community/">
-          <img align="center" style="width:40%;height:auto"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
-        </a>
-        <a href="https://github.com/z-shell/status/">
-          <img align="center" style="width:40%;height:auto"
-            src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" />
-        </a>
-      </td></tr><tr><td align="center">
-  <!--
-  <h2 align="left">Internationalization and localization<h2>
-      <a href="https://digitalclouds.crowdin.com/z-shell#languages">
-        <img align="center" src="https://badges.awesome-crowdin.com/translation-200015146-2.png" alt="i18n" width="60%" height="auto" />
-      </a>
-  -->
-<div align="center">
-<!-- Updating Translatiuons -->
-</div></td></tr>
-</table>
+<a href="https://github.com/z-shell/zw/">
+  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
+</a>
+<a href="https://github.com/z-shell/community/">
+  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
+</a>
+<a href="https://github.com/z-shell/status/">
+  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" />
+</a>
+</td></tr></table>

@@ -160,7 +160,7 @@ jobs:
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: ${{ inputs.node_version }}
           cache: "pnpm"
       - if: ${{ inputs.pnpm_arguments }}
         name: "▶️ Run pnpm"
@@ -170,7 +170,7 @@ jobs:
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: ${{ inputs.node_version }}
           cache: "yarn"
       - if: ${{ inputs.yarn_arguments }}
         name: "▶️ Run yarn"
@@ -180,7 +180,7 @@ jobs:
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: ${{ inputs.node_version }}
           cache: "npm"
       - if: ${{ inputs.npm_arguments }}
         name: "▶️ Run npm"
