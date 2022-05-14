@@ -1,11 +1,10 @@
-<table style="width:100%;height:auto">
 <!--  === === === === --><!-- <tr align="center" width="100%"><td> -->
 <!-- Announments --> <!-- [ Unlocked: 2, Left: 15 ] -->
 <!-- <h1></h1> --> <!-- FIND THE SECRET -->
 <!-- <h2></h2> --> <!-- RECEIVE THE KEY -->
 <!-- <h3></h3> --> <!-- UNLOCK THE PRICE -->
 <!--  === === === === --><!-- </td></tr> -->
-<tr><td align="center">
+<table><tr><td align="center">
 <a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
   <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/profile/img/z_git.png" alt="ZI+GIT Logo" />
 </a>
@@ -39,8 +38,7 @@
     </tr> -->
 <tr><td align="center">
 <a href="https://github.com/z-shell/zi/">
-<img align="center" style="width:40%;height:auto" 
-     src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
+  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
 </a>
       <a href="https://github.com/z-shell/zw/">
         <img align="center" style="width:40%;height:auto"
