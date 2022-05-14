@@ -1,9 +1,9 @@
-name: 👾 CodeQL
+name: 👾 Code Scan
 
 on:
   workflow_dispatch:
-#  push:
-#  pull_request:
+  pull_request:
+  push:
 #  schedule:
 #    - cron: '15 21 * * 6'
 
@@ -24,9 +24,9 @@ jobs:
           key: python
           coverage-file: coverage.xml
           dsn: ${{ secrets.DEEPSOURCE_DSN }}        
-      - name: 🏗 Initialize CodeQL
-        uses: github/codeql-action/init@v2
-      - name: 🏗 Autobuild
-        uses: github/codeql-action/autobuild@v2
-      - name: 🚀 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+#      - name: 🏗 Initialize CodeQL
+#        uses: github/codeql-action/init@v2
+#      - name: 🏗 Autobuild
+#        uses: github/codeql-action/autobuild@v2
+#      - name: 🚀 Perform CodeQL Analysis
+#        uses: github/codeql-action/analyze@v2
