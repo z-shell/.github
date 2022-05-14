@@ -12,14 +12,15 @@
 <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
   <img align="center" style="width:80%;height:auto" src="https://github.zshell.dev/.github/plugin/followup/followup.svg" />
 </a>
+<!--
 <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
   <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/projects/projects.svg" />
 </a>
   </td></tr><tr><td align="center">
   <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
     <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/pagespeed/detailed.svg" />
-  </a>
-  </td></tr><tr><td align="center">
+  </a></td></tr>
+-->
     <a title="Twitter" target="_self" href="https://twitter.com/zshell_zi/">
       <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/tweets/tweets.svg" />
     </a>
@@ -29,15 +30,11 @@
     <a title="DEV" target="_self" href="https://dev.to/tag/zsh">
       <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg" />
     </a>
-    </td></tr>
-<tr><td align="center">
-  <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-    <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
-  </a>
-  </td>
-</tr>
-<tr><td align="center">
-<a href="https://github.com/z-shell/zi/">
+
+ <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
+  <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
+ </a>
+  <a href="https://github.com/z-shell/zi/">
   <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
 </a>
 <a href="https://github.com/z-shell/zw/">
