@@ -1,0 +1,32 @@
+name: Summary CI
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  repository_dispatch:
+    types: [summary]
+  workflow_dispatch:
+jobs:
+  release:
+    name: Generate README
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: z-shell/status
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GH_PAT }}
+      - name: Update summary in README
+        uses: upptime/uptime-monitor@v1.26.4
+        with:
+          command: "readme"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Run readme-repos-list
+        uses: koj-co/readme-repos-list@master
+        with:
+          token: ${{ secrets.GH_PAT }}
+          query: "topic:upptime"
+          size: 20
+          max: 1000
+          one-per-owner: true
