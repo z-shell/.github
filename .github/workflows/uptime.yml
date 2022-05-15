@@ -22,6 +22,11 @@ jobs:
           command: "readme"
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GH_PAT }}          
       - name: Run readme-repos-list
         uses: koj-co/readme-repos-list@master
         with:
