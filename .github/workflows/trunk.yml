@@ -186,7 +186,7 @@ jobs:
         name: "▶️ Run npm"
         run: ${{ inputs.npm_arguments }}
 
-      - uses: trunk-io/trunk-action@29e16ed0984c534f2cce634fc991652e5ab572fd
+      - uses: trunk-io/trunk-action@b64e8d2c91b6bff32cad2c4445656afd942a124d
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
