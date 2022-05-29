@@ -2,7 +2,7 @@ name: "🌀 Z Activity"
 
 on:
   schedule:
-    - cron: "0 0/6 * * *"
+    - cron: "0 1 * * 0/2"
   workflow_dispatch:
   push:
     paths: [".github/workflows/activity_metrics.yml"]
