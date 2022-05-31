@@ -43,6 +43,14 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: https://dev.to/feed/tag/zsh
           plugin_rss_limit: 2
+      - uses: lowlighter/metrics@58025c0755c249c0a7c0ed5d8f5b8848e1bfb374
+        with:
+          filename: metrics/plugin/rss/ops.io.zsh.svg
+          token: NOT_NEEDED
+          base: ""
+          plugin_rss: yes
+          plugin_rss_source: https://community.ops.io/feed/zsh
+          plugin_rss_limit: 2
 #     - uses: actions/checkout@v3
 #         with:
 #         ref: main
