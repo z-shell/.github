@@ -23,7 +23,7 @@ jobs:
         with:
           key: python
           coverage-file: coverage.xml
-          dsn: ${{ secrets.DEEPSOURCE_DSN }}        
+          dsn: ${{ secrets.DEEPSOURCE_DSN }}
 #      - name: 🏗 Initialize CodeQL
 #        uses: github/codeql-action/init@v2
 #      - name: 🏗 Autobuild

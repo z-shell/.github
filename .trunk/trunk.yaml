@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 0.11.0-beta
+  version: 0.12.1-beta
 repo:
   repo:
     host: github.com
@@ -17,10 +17,10 @@ lint:
         - name: PATH
           list: ["${env.PATH}"]
   enabled:
-    - actionlint@1.6.9
-    - gitleaks@8.3.0
+    - actionlint@1.6.13
+    - gitleaks@8.8.6
     - markdownlint@0.31.1
-    - prettier@2.5.1
+    - prettier@2.6.2
     - shellcheck@0.8.0
     - shfmt@3.4.0
   ignore:
