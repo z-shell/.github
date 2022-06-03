@@ -1,3 +1,4 @@
 {
-    "schedule": "weekly"
+  "schedule": "weekly",
+  "ignoredFiles": ["metrics/**"]    
 }
