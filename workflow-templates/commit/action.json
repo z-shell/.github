@@ -1,0 +1,4 @@
+{
+  "name": "GitHub Action for Git commit",
+  "description": "This Action for git commits any changed files and pushes those changes back to the origin repository."
+}
