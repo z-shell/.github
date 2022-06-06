@@ -1,4 +1,5 @@
 {
   "name": "Sync Organization Labels",
-  "description": "Workflow synchronizes the Organization labels"
+  "description": "Workflow synchronizes the Organization labels",
+  "iconName": "z-shell"
 }
