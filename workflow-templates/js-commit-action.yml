@@ -1,0 +1,25 @@
+---
+name: JS Commit
+
+# Inputs:
+# with:
+#   commitMessage: - Optional. Git Commit Message. Defaults to "Regenerate build artifacts."
+#   wdPath: - Optional. To specify a directory other than the repository root to check for changed files.
+
+on: [push]
+
+jobs:
+  grunt-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Build
+        uses: z-shell/.github/actions/build@main
+
+      - name: Commit
+        uses: z-shell/.github/actions/commit@main

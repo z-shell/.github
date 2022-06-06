@@ -1,0 +1,5 @@
+{
+  "name": "Run JS build tasks with Gulp, Grunt or NPM.",
+  "description": "Looks for a gulpfile.js or Gruntfile.js in the working directory, then installs any required npm packages and runs the build tool. If it finds neither gulp or grunt, the script runs npm. Set the workflow args arguments to run the tasks of your choice.",
+  "iconName": "z-shell"
+}
