@@ -1,6 +1,6 @@
 name: "GitHub Action for git commit"
 description: "Commits any changed files and pushes the result back to origin branch."
-author: "elstudio"
+author: "z-shell"
 branding:
   icon: "git-commit"
   color: "green"
@@ -17,6 +17,14 @@ inputs:
     description: "Message to log for this commit"
     required: false
     default: "Regenerate build artifacts."
+  commitUserEmail:
+    description: "User email for the commit message"
+    required: false
+    default: "$GITHUB_ACTOR@users.noreply.github.com"
+  commitUserName:
+    description: "User name for the commit message"
+    required: false
+    default: "$GITHUB_ACTOR"
 runs:
   using: "composite"
   steps:
@@ -26,3 +34,5 @@ runs:
         DEBUG: ${{ inputs.debug }}git
         WD_PATH: ${{ inputs.wdPath }}
         COMMIT_MESSAGE: ${{ inputs.commitMessage }}
+        COMMIT_EMAIL: ${{ inputs.commitUserEmail }}        
+        COMMIT_USER: ${{ inputs.commitUserName }}
