@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin.env sh
 ## This GitHub Action for git commits any changed files and pushes
 ## those changes back to the origin repository.
 ##
@@ -29,8 +29,8 @@ fi
 # Set up .netrc file with GitHub credentials
 git_setup() {
   # Git requires our "name" and email address -- use GitHub handle
-  git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-  git config user.name "$GITHUB_ACTOR"
+  git config user.email "$COMMIT_EMAIL"
+  git config user.name "$COMMIT_USER"
 }
 
 # This section only runs if there have been file changes
