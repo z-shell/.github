@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="229" class="">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="213" class="">
     <defs>
         <style/>
     </defs>
@@ -22,6 +22,15 @@
                             zshell_zi
                         </div>
                         <div class="tweet">
+                            "✨〰️ ZI 〰️✨ Annex - LinkBin" by Emre
+                            <span class="hashtag">#LearnAboutOps</span>
+                            <a href="https://t.co/pHplZdBrJf" class="link">community.ops.io/emre/-zi-annex…</a>
+                            <span class="hashtag">#zi</span>
+                            <span class="hashtag">#zsh</span>
+                            <span class="hashtag">#zshell</span>
+                            <div class="date">02:19:13 on 9 Jun 2022</div>
+                        </div>
+                        <div class="tweet">
                             "⚙️ ❮ZSH Plugin Standard❯" by
                             <span class="mention">@zshell_zi</span>
                             <span class="hashtag">#DEVCommunity</span>
@@ -33,18 +42,6 @@
                             <span class="hashtag">#zinit</span>
                             <span class="hashtag">#opensource</span>
                             <div class="date">13:08:31 on 6 Jun 2022</div>
-                        </div>
-                        <div class="tweet">
-                            "✨〰️ ZI 〰️✨ Nickname a plugin or snippet" by Emre
-                            <span class="hashtag">#LearnAboutOps</span>
-                            <a href="https://t.co/wLZPXIR4pl" class="link">community.ops.io/zsh/-zi-nickna…</a>
-                            <span class="hashtag">#zi</span>
-                            <span class="hashtag">#zsh</span>
-                            <span class="hashtag">#zsh</span>
-                            -plugins
-                            <span class="hashtag">#opensource</span>
-                            <span class="hashtag">#DevOps</span>
-                            <div class="date">21:59:19 on 5 Jun 2022</div>
                         </div>
                     </section>
                 </div>
