@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
-if [ "$DEBUG" == "false" ]; then
+if [ "$DEBUG" = "false" ]; then
   # Carry on, but do quit on errors
   set -e
 else
@@ -10,9 +10,9 @@ else
   export ACTIONS_STEP_DEBUG=true
 fi
 
-if [ ! -z "$WD_PATH" ]; then
+if [ -n "$WD_PATH" ]; then
   echo "Changing dir to $WD_PATH"
-  cd $WD_PATH
+  cd "$WD_PATH"
 fi
 
 echo "Installing NPM dependencies"
@@ -25,7 +25,7 @@ if [ -e "gulpfile.js" ]; then
   echo "Running Gulp with args"
   sh -c "gulp $*"
 # Gruntfile can be js or coffeescript file
-elif [ -f "Gruntfile.js" -o -f "Gruntfile.coffee" ]; then
+elif [ -f "Gruntfile.js" ] || [ -f "Gruntfile.coffee" ]; then
   npm install -g grunt-cli
   echo "Running Grunt with args"
   sh -c "grunt $*"

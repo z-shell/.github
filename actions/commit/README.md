@@ -2,31 +2,20 @@
 
 This Action for git commits any changed files and pushes those changes back to the origin repository.
 
-**V3 or later of this action (elstudio/actions-js-build/commit@v4) requires actions/checkout@v2 or later.**
-
 ## Usage
 
 An example workflow to commit and push any changes back to the GitHub origin repository:
 
-```yaml
+```YAML
 name: Grunt build and commit updated stylesheets
 
 on: [push]
 
 jobs:
-  grunt-build:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 12
-
-      - name: Compile with Grunt
-        uses: elstudio/actions-js-build/build@4
-        with:
-          wdPath: "./web/themes/nw8"
+      - uses: actions/checkout@v3
 
       - name: Commit changes
         uses: elstudio/actions-js-build/commit@v4
@@ -36,5 +25,7 @@ jobs:
 
 ### Inputs
 
-- `commitMessage` - **Optional**. Git Commit Message. Defaults to "Regenerate build artifacts."
+- `commitMessage` - **Optional**. Git commit message. Defaults to "Regenerate build artifacts."
+- `commitUserEmail` **Optional**. Git commit user email. Defaults to "$GITHUB_ACTOR@users.noreply.github.com"
+- `commitUserName` **Optional**. Git commit user name. Defaults to "$GITHUB_ACTOR"
 - `wdPath` - **Optional**. To specify a directory other than the repository root to check for changed files.

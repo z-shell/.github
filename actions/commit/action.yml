@@ -20,19 +20,17 @@ inputs:
   commitUserEmail:
     description: "User email for the commit message"
     required: false
-    default: "$GITHUB_ACTOR@users.noreply.github.com"
   commitUserName:
     description: "User name for the commit message"
     required: false
-    default: "$GITHUB_ACTOR"
 runs:
   using: "composite"
   steps:
     - run: ${{ github.action_path }}/entrypoint.sh
       shell: bash
       env:
-        DEBUG: ${{ inputs.debug }}git
+        DEBUG: ${{ inputs.debug }}
         WD_PATH: ${{ inputs.wdPath }}
         COMMIT_MESSAGE: ${{ inputs.commitMessage }}
-        COMMIT_EMAIL: ${{ inputs.commitUserEmail }}        
+        COMMIT_EMAIL: ${{ inputs.commitUserEmail }}
         COMMIT_USER: ${{ inputs.commitUserName }}

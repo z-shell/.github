@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 0.12.1-beta
+  version: 0.13.0-beta
 repo:
   repo:
     host: github.com
@@ -8,7 +8,7 @@ repo:
     name: .github
 lint:
   disabled:
-    - shellcheck
+    - svgo
   linters:
     - name: markdownlint
       command:
@@ -19,9 +19,5 @@ lint:
     - gitleaks@8.8.7
     - markdownlint@0.31.1
     - prettier@2.6.2
-    - shfmt@3.4.0
-  ignore:
-    - linters: [actionlint]
-      paths:
-        - ".github/workflows/trunk-call.yml"
-        - ".github/workflows/deploy-call.yml"
+    - shfmt@3.5.0
+    - shellcheck@0.8.0
