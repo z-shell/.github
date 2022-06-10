@@ -18,7 +18,8 @@ jobs:
       - name: "🆗 Commit"
         uses: z-shell/.github/actions/commit@main
         #  with:
-        #    commitMessage: - Optional. Git Commit Message. Defaults to "Regenerate build artifacts."
-        #    workDir: - Optional. To specify a directory other than the repository root to check for changed files.
-
+        #    commitMessage: Git Commit Message. Defaults to "Regenerate build artifacts." [Optional]
+        #    workDir: To specify a directory other than the repository root to check for changed files [Optional]
+        #    commitUserEmail: User email for the commit message [Optional]
+        #    commitUserName: User name for the commit message [Optional]
 ```
