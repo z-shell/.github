@@ -1,9 +1,9 @@
 ---
-name: "Add ⭐"
+name: "⭐ Star"
 on:
   watch:
 jobs:
-  add-star:
+  star:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

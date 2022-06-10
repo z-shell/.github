@@ -1,18 +1,10 @@
-# GitHub Action for Git commit
-
-This Action for git commits any changed files and pushes those changes back to the origin repository.
-
-## Usage
-
-An example workflow to commit and push any changes back to the GitHub origin repository:
-
-```YAML
+---
 name: "🆗 Commit"
 
 on: [push]
 
 jobs:
-  grunt-build:
+  commit:
     runs-on: ubuntu-latest
     steps:
       - name: "🆗 Commit"
@@ -20,5 +12,3 @@ jobs:
         #  with:
         #    commitMessage: - Optional. Git Commit Message. Defaults to "Regenerate build artifacts."
         #    workDir: - Optional. To specify a directory other than the repository root to check for changed files.
-
-```

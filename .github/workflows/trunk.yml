@@ -52,22 +52,18 @@ on:
         type: string
       get_dependencies:
         description: "Pass commands prepare or install dependencies"
-        default: "echo FunnyBunnyWithSomeMoney 0"
         required: false
         type: string
       call_arguments1:
         description: "Pass first argument"
-        default: "echo FunnyBunnyWithSomeMoney 1"
         required: false
         type: string
       call_arguments2:
         description: "Pass second argument"
-        default: "echo FunnyBunnyWithSomeMoney 2"
         required: false
         type: string
       call_arguments3:
         description: "Pass third argument"
-        default: "echo FunnyBunnyWithSomeMoney 3"
         required: false
         type: string
       call_on_fail:
@@ -120,18 +116,21 @@ jobs:
           echo "::set-output name=matrix0::${MATRIX0}"
       - id: step1
         name: "🚀 Run 1"
+        if: ${{ inputs.call_arguments1 }}
         run: |
           MATRIX1="${{ inputs.call_arguments1 }}"
           echo "MATRIX1=${MATRIX1}" >&2
           echo "::set-output name=matrix1::${MATRIX1}"
       - id: step2
         name: "🚀 Run 2"
+        if: ${{ inputs.call_arguments2 }}
         run: |
           MATRIX2="${{ inputs.call_arguments2 }}"
           echo "MATRIX2=${MATRIX2}" >&2
           echo "::set-output name=matrix2::${MATRIX2}"
       - id: step3
         name: "🚀 Run 3"
+        if: ${{ inputs.call_arguments3 }}
         run: |
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
@@ -145,17 +144,23 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - run: echo ${{needs.build-matrix.outputs.output0}}
-      - run: echo ${{needs.build-matrix.outputs.output1}}
-      - run: echo ${{needs.build-matrix.outputs.output2}}
-      - run: echo ${{needs.build-matrix.outputs.output3}}
-
+      - if: ${{ inputs.get_dependencies }}
+        name: "🚀 Run 0"
+        run: echo ${{needs.build-matrix.outputs.output0}}
+      - if: ${{ inputs.call_arguments1 }}
+        name: "🚀 Run 1"
+        run: echo ${{needs.build-matrix.outputs.output1}}
+      - if: ${{ inputs.call_arguments2 }}
+        name: "🚀 Run 2"
+        run: echo ${{needs.build-matrix.outputs.output2}}
+      - if: ${{ inputs.call_arguments3 }}
+        name: "🚀 Run 3"
+        run: echo ${{needs.build-matrix.outputs.output3}}
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
         with:
-          version: 7.1.0
+          version: 7.1.9
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3
@@ -165,7 +170,6 @@ jobs:
       - if: ${{ inputs.pnpm_arguments }}
         name: "▶️ Run pnpm"
         run: ${{ inputs.pnpm_arguments }}
-
       - if: ${{ inputs.yarn_arguments }}
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3
@@ -175,7 +179,6 @@ jobs:
       - if: ${{ inputs.yarn_arguments }}
         name: "▶️ Run yarn"
         run: ${{ inputs.yarn_arguments }}
-
       - if: ${{ inputs.npm_arguments }}
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3

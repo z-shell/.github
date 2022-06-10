@@ -1,11 +1,11 @@
-name: "GitHub Action for git commit"
+name: "GitHub Action - Commit"
 description: "Commits any changed files and pushes the result back to origin branch."
 author: "z-shell"
 branding:
   icon: "git-commit"
   color: "green"
 inputs:
-  wdPath:
+  workDir:
     description: "Working directory path"
     required: false
     default: ""
@@ -30,7 +30,7 @@ runs:
       shell: bash
       env:
         DEBUG: ${{ inputs.debug }}
-        WD_PATH: ${{ inputs.wdPath }}
+        WD_PATH: ${{ inputs.workDir }}
         COMMIT_MESSAGE: ${{ inputs.commitMessage }}
         COMMIT_EMAIL: ${{ inputs.commitUserEmail }}
         COMMIT_USER: ${{ inputs.commitUserName }}

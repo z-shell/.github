@@ -2,7 +2,7 @@
 name: "⭕ Trunk Check"
 on:
   push:
-    branches: [$default-branch]
+    branches: ["main"]
     tags: ["v*.*.*"]
   pull_request:
     types: [opened, synchronize]
@@ -12,9 +12,9 @@ jobs:
   trunk:
     name: "⚡"
     uses: z-shell/.github/.github/workflows/trunk.yml@main
-    #secrets:
-    # API token from the Trunk web app settings. This will cause results to be uploaded to the Trunk web app. (Optional)
-    #trunk-token: ${{ secrets.TRUNK_TOKEN }}
+    secrets:
+      # API token from the Trunk web app settings. This will cause results to be uploaded to the Trunk web app. (Optional)
+      trunk-token: ${{ secrets.TRUNK_TOKEN }}
     #with:
     # GitHub Actions OS, defaults to ubuntu-latest (Optional).
     #runs-on:
