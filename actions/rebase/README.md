@@ -9,6 +9,7 @@ on:
     types: [created]
 jobs:
   rebase:
+    runs-on: ubuntu-latest
     name: 🔁 Rebase
     if: >-
       github.event.issue.pull_request != '' && 
