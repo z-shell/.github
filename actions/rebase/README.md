@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     name: 🔁 Rebase
     if: >-
-      github.event.issue.pull_request != '' && 
+      github.event.issue.pull_request != '' &&
       (
-        contains(github.event.comment.body, '/rebase') || 
+        contains(github.event.comment.body, '/rebase') ||
         contains(github.event.comment.body, '/autosquash')
       )
     steps:
@@ -55,10 +55,9 @@ You can also optionally specify the PR number of the branch to rebase, if the ac
         PR_NUMBER: 12
 ```
 
-
 ## Restricting who can call the action
 
 It's possible to use `author_association` field of a comment to restrict who can call the action and skip the rebase for others. Simply add the following expression to the `if` statement in your workflow file: `github.event.comment.author_association == 'MEMBER'`. See [documentation](https://developer.github.com/v4/enum/commentauthorassociation/) for a list of all available values of `author_association`.
 
 > GitHub can also optionally dismiss an existing review automatically after rebase, so you'll need to re-approve again which will trigger the test workflow.
-Set it up in your repository *Settings* > *Branches* > *Branch protection rules* > *Require pull request reviews before merging* > *Dismiss stale pull request approvals when new commits are pushed*.
+> Set it up in your repository _Settings_ > _Branches_ > _Branch protection rules_ > _Require pull request reviews before merging_ > _Dismiss stale pull request approvals when new commits are pushed_.

@@ -2,8 +2,8 @@ name: "🔁 Rebase"
 description: Rebases pull request on comment '/rebase'
 maintainer: Z-Shell
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: "docker"
+  image: "Dockerfile"
 inputs:
   autosquash:
     description: Should the rebase autosquash fixup and squash commits

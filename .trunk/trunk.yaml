@@ -15,6 +15,7 @@ lint:
         [markdownlint, -q, --config, .github/.markdownlint.yaml, "${target}"]
       direct_configs: [.github/.markdownlint.yaml]
   enabled:
+    - hadolint@2.10.0
     - actionlint@1.6.13
     - gitleaks@8.8.7
     - markdownlint@0.31.1
