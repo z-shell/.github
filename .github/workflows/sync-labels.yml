@@ -19,8 +19,6 @@ jobs:
           path: .github
       - name: ♻️ Fetch Labels
         run: |
-          git config user.name digital-teams[bot]
-          git config user.email digital-teams@pm.me
           curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labels.yml -o labels.yml
       - name: 🚀 Run Label Syncer
         uses: micnncim/action-label-syncer@3abd5ab72fda571e69fffd97bd4e0033dd5f495c
