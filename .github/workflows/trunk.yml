@@ -135,7 +135,7 @@ jobs:
           MATRIX3="${{ inputs.call_arguments3 }}"
           echo "MATRIX3=${MATRIX3}" >&2
           echo "::set-output name=matrix3::${MATRIX3}"
-  trunk-check:
+  trunk:
     runs-on: ${{ inputs.runs-on }}
     needs:
       - build-matrix
