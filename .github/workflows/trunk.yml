@@ -96,6 +96,10 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   build-matrix:
     runs-on: ${{ inputs.runs-on }}
@@ -159,8 +163,6 @@ jobs:
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
-        with:
-          version: 7.1.9
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟩 Setup Node"
         uses: actions/setup-node@v3
