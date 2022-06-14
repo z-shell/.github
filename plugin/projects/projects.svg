@@ -44,7 +44,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M2.5 1.75a.25.25 0 01.25-.25h8.5a.25.25 0 01.25.25v7.736a.75.75 0 101.5 0V1.75A1.75 1.75 0 0011.25 0h-8.5A1.75 1.75 0 001 1.75v11.5c0 .966.784 1.75 1.75 1.75h3.17a.75.75 0 000-1.5H2.75a.25.25 0 01-.25-.25V1.75zM4.75 4a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM4 7.75A.75.75 0 014.75 7h2a.75.75 0 010 1.5h-2A.75.75 0 014 7.75zm11.774 3.537a.75.75 0 00-1.048-1.074L10.7 14.145 9.281 12.72a.75.75 0 00-1.062 1.058l1.943 1.95a.75.75 0 001.055.008l4.557-4.45z"/>
                                     </svg>
-                                    53 done · 2 doing · 13 todo
+                                    64 done · 11 todo
                                 </div>
                             </section>
                         </div>
@@ -53,9 +53,9 @@
                                 <mask id="project-bar">
                                     <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                                 </mask>
-                                <rect mask="url(#project-bar)" x="0" y="0" width="358.5294117647059" height="8" fill="#238636"/>
-                                <rect mask="url(#project-bar)" x="358.5294117647059" y="0" width="13.529411764705882" height="8" fill="#8957e5"/>
-                                <rect mask="url(#project-bar)" x="372.05882352941177" y="0" width="87.94117647058823" height="8" fill="#d1d5da"/>
+                                <rect mask="url(#project-bar)" x="0" y="0" width="392.53333333333336" height="8" fill="#238636"/>
+                                <rect mask="url(#project-bar)" x="392.53333333333336" y="0" width="0" height="8" fill="#8957e5"/>
+                                <rect mask="url(#project-bar)" x="392.53333333333336" y="0" width="67.46666666666667" height="8" fill="#d1d5da"/>
                             </svg>
                         </div>
                         <div class="row fill-width">
@@ -79,7 +79,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3.5a.75.75 0 00.471.696l2.5 1a.75.75 0 00.557-1.392L8.5 7.742V4.75z"/>
                                     </svg>
-                                    Updated 4 days ago
+                                    Updated less than 1 day ago
                                 </div>
                             </section>
                             <section>
@@ -87,7 +87,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M2.5 1.75a.25.25 0 01.25-.25h8.5a.25.25 0 01.25.25v7.736a.75.75 0 101.5 0V1.75A1.75 1.75 0 0011.25 0h-8.5A1.75 1.75 0 001 1.75v11.5c0 .966.784 1.75 1.75 1.75h3.17a.75.75 0 000-1.5H2.75a.25.25 0 01-.25-.25V1.75zM4.75 4a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM4 7.75A.75.75 0 014.75 7h2a.75.75 0 010 1.5h-2A.75.75 0 014 7.75zm11.774 3.537a.75.75 0 00-1.048-1.074L10.7 14.145 9.281 12.72a.75.75 0 00-1.062 1.058l1.943 1.95a.75.75 0 001.055.008l4.557-4.45z"/>
                                     </svg>
-                                    5 done · 9 todo
+                                    8 done · 9 todo
                                 </div>
                             </section>
                         </div>
@@ -96,52 +96,9 @@
                                 <mask id="project-bar">
                                     <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                                 </mask>
-                                <rect mask="url(#project-bar)" x="0" y="0" width="164.28571428571428" height="8" fill="#238636"/>
-                                <rect mask="url(#project-bar)" x="164.28571428571428" y="0" width="0" height="8" fill="#8957e5"/>
-                                <rect mask="url(#project-bar)" x="164.28571428571428" y="0" width="295.7142857142857" height="8" fill="#d1d5da"/>
-                            </svg>
-                        </div>
-                        <div class="row fill-width">
-                            <section>
-                                <div class="field">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                                        <path fill-rule="evenodd" d="M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0114.25 14H1.75A1.75 1.75 0 010 12.25v-8.5zm1.75-.25a.25.25 0 00-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25v-8.5a.25.25 0 00-.25-.25H1.75zM3.5 6.25a.75.75 0 01.75-.75h7a.75.75 0 010 1.5h-7a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h4a.75.75 0 000-1.5h-4z"/>
-                                    </svg>
-                                    ❮ Community ❯
-                                </div>
-                            </section>
-                        </div>
-                        <div class="row fill-width">
-                            <section>
-                                <div class="field description">Workspace scope: community</div>
-                            </section>
-                        </div>
-                        <div class="row">
-                            <section>
-                                <div class="field">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                                        <path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3.5a.75.75 0 00.471.696l2.5 1a.75.75 0 00.557-1.392L8.5 7.742V4.75z"/>
-                                    </svg>
-                                    Updated 11 days ago
-                                </div>
-                            </section>
-                            <section>
-                                <div class="field">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                                        <path fill-rule="evenodd" d="M2.5 1.75a.25.25 0 01.25-.25h8.5a.25.25 0 01.25.25v7.736a.75.75 0 101.5 0V1.75A1.75 1.75 0 0011.25 0h-8.5A1.75 1.75 0 001 1.75v11.5c0 .966.784 1.75 1.75 1.75h3.17a.75.75 0 000-1.5H2.75a.25.25 0 01-.25-.25V1.75zM4.75 4a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM4 7.75A.75.75 0 014.75 7h2a.75.75 0 010 1.5h-2A.75.75 0 014 7.75zm11.774 3.537a.75.75 0 00-1.048-1.074L10.7 14.145 9.281 12.72a.75.75 0 00-1.062 1.058l1.943 1.95a.75.75 0 001.055.008l4.557-4.45z"/>
-                                    </svg>
-                                    2 done · 1 todo
-                                </div>
-                            </section>
-                        </div>
-                        <div class="field center horizontal-wrap ">
-                            <svg class="bar" xmlns="http://www.w3.org/2000/svg" width="460" height="8">
-                                <mask id="project-bar">
-                                    <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
-                                </mask>
-                                <rect mask="url(#project-bar)" x="0" y="0" width="306.66666666666663" height="8" fill="#238636"/>
-                                <rect mask="url(#project-bar)" x="306.66666666666663" y="0" width="0" height="8" fill="#8957e5"/>
-                                <rect mask="url(#project-bar)" x="306.66666666666663" y="0" width="153.33333333333331" height="8" fill="#d1d5da"/>
+                                <rect mask="url(#project-bar)" x="0" y="0" width="216.47058823529412" height="8" fill="#238636"/>
+                                <rect mask="url(#project-bar)" x="216.47058823529412" y="0" width="0" height="8" fill="#8957e5"/>
+                                <rect mask="url(#project-bar)" x="216.47058823529412" y="0" width="243.52941176470588" height="8" fill="#d1d5da"/>
                             </svg>
                         </div>
                         <div class="row fill-width">
@@ -165,7 +122,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3.5a.75.75 0 00.471.696l2.5 1a.75.75 0 00.557-1.392L8.5 7.742V4.75z"/>
                                     </svg>
-                                    Updated 12 days ago
+                                    Updated less than 1 day ago
                                 </div>
                             </section>
                             <section>
@@ -173,7 +130,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M2.5 1.75a.25.25 0 01.25-.25h8.5a.25.25 0 01.25.25v7.736a.75.75 0 101.5 0V1.75A1.75 1.75 0 0011.25 0h-8.5A1.75 1.75 0 001 1.75v11.5c0 .966.784 1.75 1.75 1.75h3.17a.75.75 0 000-1.5H2.75a.25.25 0 01-.25-.25V1.75zM4.75 4a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM4 7.75A.75.75 0 014.75 7h2a.75.75 0 010 1.5h-2A.75.75 0 014 7.75zm11.774 3.537a.75.75 0 00-1.048-1.074L10.7 14.145 9.281 12.72a.75.75 0 00-1.062 1.058l1.943 1.95a.75.75 0 001.055.008l4.557-4.45z"/>
                                     </svg>
-                                    6 done · 5 todo
+                                    11 done · 5 todo
                                 </div>
                             </section>
                         </div>
@@ -182,9 +139,9 @@
                                 <mask id="project-bar">
                                     <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                                 </mask>
-                                <rect mask="url(#project-bar)" x="0" y="0" width="250.90909090909088" height="8" fill="#238636"/>
-                                <rect mask="url(#project-bar)" x="250.90909090909088" y="0" width="0" height="8" fill="#8957e5"/>
-                                <rect mask="url(#project-bar)" x="250.90909090909088" y="0" width="209.0909090909091" height="8" fill="#d1d5da"/>
+                                <rect mask="url(#project-bar)" x="0" y="0" width="316.25" height="8" fill="#238636"/>
+                                <rect mask="url(#project-bar)" x="316.25" y="0" width="0" height="8" fill="#8957e5"/>
+                                <rect mask="url(#project-bar)" x="316.25" y="0" width="143.75" height="8" fill="#d1d5da"/>
                             </svg>
                         </div>
                         <div class="row fill-width">
@@ -208,7 +165,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3.5a.75.75 0 00.471.696l2.5 1a.75.75 0 00.557-1.392L8.5 7.742V4.75z"/>
                                     </svg>
-                                    Updated May 05 2022
+                                    Updated 1 day ago
                                 </div>
                             </section>
                             <section>
@@ -216,7 +173,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                         <path fill-rule="evenodd" d="M2.5 1.75a.25.25 0 01.25-.25h8.5a.25.25 0 01.25.25v7.736a.75.75 0 101.5 0V1.75A1.75 1.75 0 0011.25 0h-8.5A1.75 1.75 0 001 1.75v11.5c0 .966.784 1.75 1.75 1.75h3.17a.75.75 0 000-1.5H2.75a.25.25 0 01-.25-.25V1.75zM4.75 4a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM4 7.75A.75.75 0 014.75 7h2a.75.75 0 010 1.5h-2A.75.75 0 014 7.75zm11.774 3.537a.75.75 0 00-1.048-1.074L10.7 14.145 9.281 12.72a.75.75 0 00-1.062 1.058l1.943 1.95a.75.75 0 001.055.008l4.557-4.45z"/>
                                     </svg>
-                                    4 done · 1 doing · 3 todo
+                                    17 done · 1 doing · 3 todo
                                 </div>
                             </section>
                         </div>
@@ -225,9 +182,52 @@
                                 <mask id="project-bar">
                                     <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                                 </mask>
-                                <rect mask="url(#project-bar)" x="0" y="0" width="230" height="8" fill="#238636"/>
-                                <rect mask="url(#project-bar)" x="230" y="0" width="57.5" height="8" fill="#8957e5"/>
-                                <rect mask="url(#project-bar)" x="287.5" y="0" width="172.5" height="8" fill="#d1d5da"/>
+                                <rect mask="url(#project-bar)" x="0" y="0" width="372.3809523809524" height="8" fill="#238636"/>
+                                <rect mask="url(#project-bar)" x="372.3809523809524" y="0" width="21.904761904761905" height="8" fill="#8957e5"/>
+                                <rect mask="url(#project-bar)" x="394.2857142857143" y="0" width="65.71428571428571" height="8" fill="#d1d5da"/>
+                            </svg>
+                        </div>
+                        <div class="row fill-width">
+                            <section>
+                                <div class="field">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                                        <path fill-rule="evenodd" d="M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0114.25 14H1.75A1.75 1.75 0 010 12.25v-8.5zm1.75-.25a.25.25 0 00-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25v-8.5a.25.25 0 00-.25-.25H1.75zM3.5 6.25a.75.75 0 01.75-.75h7a.75.75 0 010 1.5h-7a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h4a.75.75 0 000-1.5h-4z"/>
+                                    </svg>
+                                    ❮ Community ❯
+                                </div>
+                            </section>
+                        </div>
+                        <div class="row fill-width">
+                            <section>
+                                <div class="field description">Workspace scope: community</div>
+                            </section>
+                        </div>
+                        <div class="row">
+                            <section>
+                                <div class="field">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                                        <path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3.5a.75.75 0 00.471.696l2.5 1a.75.75 0 00.557-1.392L8.5 7.742V4.75z"/>
+                                    </svg>
+                                    Updated 13 days ago
+                                </div>
+                            </section>
+                            <section>
+                                <div class="field">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                                        <path fill-rule="evenodd" d="M2.5 1.75a.25.25 0 01.25-.25h8.5a.25.25 0 01.25.25v7.736a.75.75 0 101.5 0V1.75A1.75 1.75 0 0011.25 0h-8.5A1.75 1.75 0 001 1.75v11.5c0 .966.784 1.75 1.75 1.75h3.17a.75.75 0 000-1.5H2.75a.25.25 0 01-.25-.25V1.75zM4.75 4a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM4 7.75A.75.75 0 014.75 7h2a.75.75 0 010 1.5h-2A.75.75 0 014 7.75zm11.774 3.537a.75.75 0 00-1.048-1.074L10.7 14.145 9.281 12.72a.75.75 0 00-1.062 1.058l1.943 1.95a.75.75 0 001.055.008l4.557-4.45z"/>
+                                    </svg>
+                                    2 done · 1 todo
+                                </div>
+                            </section>
+                        </div>
+                        <div class="field center horizontal-wrap ">
+                            <svg class="bar" xmlns="http://www.w3.org/2000/svg" width="460" height="8">
+                                <mask id="project-bar">
+                                    <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
+                                </mask>
+                                <rect mask="url(#project-bar)" x="0" y="0" width="306.66666666666663" height="8" fill="#238636"/>
+                                <rect mask="url(#project-bar)" x="306.66666666666663" y="0" width="0" height="8" fill="#8957e5"/>
+                                <rect mask="url(#project-bar)" x="306.66666666666663" y="0" width="153.33333333333331" height="8" fill="#d1d5da"/>
                             </svg>
                         </div>
                     </section>
