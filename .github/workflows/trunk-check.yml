@@ -8,13 +8,17 @@ on:
     types: [opened, synchronize]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   trunk:
     name: "⚡"
     uses: z-shell/.github/.github/workflows/trunk.yml@main
-    secrets:
-      # API token from the Trunk web app settings. This will cause results to be uploaded to the Trunk web app. (Optional)
-      trunk-token: ${{ secrets.TRUNK_TOKEN }}
+    #secrets:
+    # API token from the Trunk web app settings. This will cause results to be uploaded to the Trunk web app. (Optional)
+    #  trunk-token: ${{ secrets.TRUNK_TOKEN }}
     #with:
     # GitHub Actions OS, defaults to ubuntu-latest (Optional).
     #runs-on:
