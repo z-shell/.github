@@ -96,6 +96,10 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-matrix:
     runs-on: ${{ inputs.runs-on }}
