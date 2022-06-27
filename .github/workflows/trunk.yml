@@ -96,10 +96,6 @@ on:
         required: false
         type: string
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-matrix:
     runs-on: ${{ inputs.runs-on }}
@@ -141,6 +137,9 @@ jobs:
           echo "::set-output name=matrix3::${MATRIX3}"
   trunk:
     runs-on: ${{ inputs.runs-on }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     needs:
       - build-matrix
     steps:
