@@ -1,13 +1,13 @@
 ---
-name: "🌀 Z Metrics 2"
+name: "🌀 Z PageSpeed Insights"
 on:
   schedule:
     - cron: "0 3 * * */3"
   workflow_dispatch:
   push:
-    paths: [".github/workflows/metrics-2.yml"]
+    paths: [".github/workflows/pagespeed.yml"]
   pull_request:
-    paths: [".github/workflows/metrics-2.yml"]
+    paths: [".github/workflows/pagespeed.yml"]
 
 jobs:
   pagespeed:
@@ -23,4 +23,4 @@ jobs:
           plugin_pagespeed: yes
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
-          plugin_pagespeed_url: https://z.digitalclouds.dev
+          plugin_pagespeed_url: https://z.digitalclouds.dev/blog
