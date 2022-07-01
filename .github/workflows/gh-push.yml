@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows:
-      - "🌀 Z PageSpeed Insights"    
+      - "🌀 Z PageSpeed Insights"
       - "🌀 Z Activity"
       - "🌀 Z Metrics"
       - "🌀 Z Reader"
