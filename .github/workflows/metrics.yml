@@ -62,12 +62,12 @@ jobs:
           user: z-shell
           repo: f-sy-h
           plugin_followup: yes
-      - uses: lowlighter/metrics@cb6115082a9c7e027d1a53c3c869cdec5f44bd43
-        with:
-          filename: metrics/plugin/achievements.svg
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_achievements: yes
-          plugin_achievements_only: >-
-            polyglots, developers, infographiles, managers
+#      - uses: lowlighter/metrics@cb6115082a9c7e027d1a53c3c869cdec5f44bd43
+#        with:
+#          filename: metrics/plugin/achievements.svg
+#          token: ${{ secrets.ORG_TOKEN }}
+#          base: ""
+#          user: z-shell
+#          plugin_achievements: yes
+#          plugin_achievements_only: >-
+#            polyglots, developers, infographiles, managers
