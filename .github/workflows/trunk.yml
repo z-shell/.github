@@ -97,13 +97,13 @@ on:
         type: string
 
 jobs:
-  build-matrix:
+  matrix:
     runs-on: ${{ inputs.runs-on }}
     outputs:
       output0: ${{ steps.step0.outputs.matrix0 }}
       output1: ${{ steps.step1.outputs.matrix1 }}
-      output2: ${{ steps.step2.outputs.matrix2 }}
-      output3: ${{ steps.step3.outputs.matrix3 }}
+    #      output2: ${{ steps.step2.outputs.matrix2 }}
+    #      output3: ${{ steps.step3.outputs.matrix3 }}
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v3
@@ -121,44 +121,39 @@ jobs:
           MATRIX1="${{ inputs.call_arguments1 }}"
           echo "MATRIX1=${MATRIX1}" >&2
           echo "::set-output name=matrix1::${MATRIX1}"
-      - id: step2
-        name: "🚀 Run 2"
-        if: ${{ inputs.call_arguments2 }}
-        run: |
-          MATRIX2="${{ inputs.call_arguments2 }}"
-          echo "MATRIX2=${MATRIX2}" >&2
-          echo "::set-output name=matrix2::${MATRIX2}"
-      - id: step3
-        name: "🚀 Run 3"
-        if: ${{ inputs.call_arguments3 }}
-        run: |
-          MATRIX3="${{ inputs.call_arguments3 }}"
-          echo "MATRIX3=${MATRIX3}" >&2
-          echo "::set-output name=matrix3::${MATRIX3}"
+  #      - id: step2
+  #        name: "🚀 Run 2"
+  #        if: ${{ inputs.call_arguments2 }}
+  #        run: |
+  #          MATRIX2="${{ inputs.call_arguments2 }}"
+  #          echo "MATRIX2=${MATRIX2}" >&2
+  #          echo "::set-output name=matrix2::${MATRIX2}"
+  #      - id: step3
+  #        name: "🚀 Run 3"
+  #        if: ${{ inputs.call_arguments3 }}
+  #        run: |
+  #          MATRIX3="${{ inputs.call_arguments3 }}"
+  #          echo "MATRIX3=${MATRIX3}" >&2
+  #          echo "::set-output name=matrix3::${MATRIX3}"
+
   trunk:
     runs-on: ${{ inputs.runs-on }}
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     needs:
-      - build-matrix
+      - matrix
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - if: ${{ inputs.get_dependencies }}
-        name: "🚀 Run 0"
-        run: echo ${{needs.build-matrix.outputs.output0}}
-      - if: ${{ inputs.call_arguments1 }}
-        name: "🚀 Run 1"
-        run: echo ${{needs.build-matrix.outputs.output1}}
-      - if: ${{ inputs.call_arguments2 }}
-        name: "🚀 Run 2"
-        run: echo ${{needs.build-matrix.outputs.output2}}
-      - if: ${{ inputs.call_arguments3 }}
-        name: "🚀 Run 3"
-        run: echo ${{needs.build-matrix.outputs.output3}}
+        name: "🚀 Pre run"
+        run: echo ${{needs.matrix.outputs.output0}}
+      #     - if: ${{ inputs.call_arguments2 }}
+      #       name: "🚀 Run 2"
+      #       run: echo ${{needs.matrix.outputs.output2}}
+      #     - if: ${{ inputs.call_arguments3 }}
+      #       name: "🚀 Run 3"
+      #       run: echo ${{needs.matrix.outputs.output3}}
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
@@ -189,7 +184,9 @@ jobs:
       - if: ${{ inputs.npm_arguments }}
         name: "▶️ Run npm"
         run: ${{ inputs.npm_arguments }}
-
+      - if: ${{ inputs.call_arguments1 }}
+        name: "🚀 Post run"
+        run: echo ${{needs.matrix.outputs.output1}}
       - uses: trunk-io/trunk-action@b64e8d2c91b6bff32cad2c4445656afd942a124d
         with:
           trunk-path: ${{ inputs.trunk_path }}
