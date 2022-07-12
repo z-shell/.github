@@ -1,0 +1,5 @@
+{
+  "name": "Organization Labeler",
+  "description": "Workflow assigns labeles based on repository layout.",
+  "iconName": "z-shell"
+}

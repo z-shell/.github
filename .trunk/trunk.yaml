@@ -17,7 +17,7 @@ lint:
   enabled:
     - hadolint@2.10.0
     - actionlint@1.6.15
-    - gitleaks@8.8.11
+    - gitleaks@8.8.12
     - markdownlint@0.31.1
     - prettier@2.7.1
     - shfmt@3.5.0
