@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@cb6115082a9c7e027d1a53c3c869cdec5f44bd43
+      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: "metrics/plugin/projects/projects.svg"
           token: ${{ secrets.ORG_TOKEN }}
@@ -25,7 +25,7 @@ jobs:
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
       - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@cb6115082a9c7e027d1a53c3c869cdec5f44bd43
+      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: "metrics/plugin/projects/projects2.svg"
           token: ${{ secrets.ORG_TOKEN }}
