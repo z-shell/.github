@@ -1,20 +1,27 @@
 ---
-name: "⭕ Trunk Check"
+name: "⭕ Trunk"
 on:
   push:
-    branches: [$default-branch]
+    branches: [main]
     tags: ["v*.*.*"]
   pull_request:
     types: [opened, synchronize]
-  workflow_dispatch:
+  schedule:
+    - cron: "0 05 * * 2"
+  workflow_dispatch: {}
 
 jobs:
-  trunk:
+  check:
+    if: github.event.schedule != '0 05 * * 5'
     name: "⚡"
     uses: z-shell/.github/.github/workflows/trunk.yml@main
-    #secrets:
-    # API token from the Trunk web app settings. This will cause results to be uploaded to the Trunk web app. (Optional)
-    #trunk-token: ${{ secrets.TRUNK_TOKEN }}
+  upload:
+    if: github.event.schedule == '0 05 * * 5'
+    name: "🆙"
+    uses: z-shell/.github/.github/workflows/trunk.yml@main
+    secrets:
+      trunk-token: ${{ secrets.TRUNK_TOKEN }}
+    # Trunk arguments (optional)
     #with:
     # GitHub Actions OS, defaults to ubuntu-latest (Optional).
     #runs-on:
