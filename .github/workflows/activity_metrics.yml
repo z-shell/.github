@@ -24,13 +24,3 @@ jobs:
           plugin_projects: yes
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
-      - uses: actions/checkout@v3
-      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
-        with:
-          filename: "metrics/plugin/projects/projects2.svg"
-          token: ${{ secrets.ORG_TOKEN }}
-          base: ""
-          user: z-shell
-          plugin_projects: yes
-          plugin_projects_descriptions: yes
-          plugin_projects_repositories: z-shell/zi/projects/4
