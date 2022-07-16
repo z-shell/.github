@@ -21,7 +21,7 @@ jobs:
       - name: ♻️ Fetch Configuration
         run: |
           [[ -d .github ]] || command mkdir .github
-          [[ -f .github/labeler.yml ]] || command curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labeler.yml -o .github/labeler.yml
+          command curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labeler.yml -o .github/labeler.yml
       - name: 🚀 Run Labeler
         uses: actions/labeler@v4
         with:
