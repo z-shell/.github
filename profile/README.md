@@ -30,15 +30,18 @@
   <a title="DEV" target="_self" href="https://dev.to/tag/zsh">
     <img align="center" style="width:80%;height:auto" src="https://github.com/z-shell/.github/raw/main/metrics/plugin/rss/dev.tag.zsh.rss.svg" />
   </a>
--->
-<a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
-  <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/22b5c20547922a367a07014324273061ca71a472.svg" />
+<a title="ZI" target="_self" href="https://github.com/z-shell/zi/">
+  <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" />
 </a>
+<a title="ZI WIKI" target="_self" href="https://github.com/z-shell/wiki/">
+  <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/7d47a082266db29fe494900bbee9c99febc24f38.svg" />
+</a>
+-->
 <a href="https://github.com/z-shell/zi/">
   <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
 </a>
 <a href="https://github.com/z-shell/zw/">
-  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zw&card_width=150&theme=github_dark" />
+  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=wiki&card_width=150&theme=github_dark" />
 </a>
 <a href="https://github.com/z-shell/community/">
   <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
