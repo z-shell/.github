@@ -25,7 +25,7 @@ jobs:
   #          token: ${{ secrets.ORG_TOKEN }}
   #          base: ""
   #          plugin_repositories: yes
-  #          plugin_repositories_featured: z-shell/zi, z-shell/zw, z-shell/f-sy-h, z-shell/community
+  #          plugin_repositories_featured: z-shell/zi, z-shell/wiki, z-shell/f-sy-h, z-shell/community
   metrics-indepth:
     runs-on: ubuntu-latest
     steps:
@@ -48,11 +48,11 @@ jobs:
           plugin_followup: yes
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
-          filename: "metrics/plugin/followup/zw_followup.svg"
+          filename: "metrics/plugin/followup/wiki_followup.svg"
           template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
-          repo: zw
+          repo: wiki
           plugin_followup: yes
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
