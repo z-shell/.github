@@ -4,11 +4,18 @@ name: "🆗 Commit"
 on: [push]
 
 jobs:
-  commit:
+  checksum:
+    name: Generate checksum
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
       - name: "🆗 Commit"
         uses: z-shell/.github/actions/commit@main
-        #  with:
-        #    commitMessage: - Optional. Git Commit Message. Defaults to "Regenerate build artifacts."
-        #    workDir: - Optional. To specify a directory other than the repository root to check for changed files.
+        with:
+          # Optional: Git Commit Message. Defaults to "Regenerate build artifacts."
+          commitMessage: Checksum ${{ github.sha }}
+          # Optional: workDir: - Optional. To specify a directory other than the repository root to check for changed files.
+          workDir: .
+          commitUserName: digital-teams[bot]
+          commitUserEmail: digital-teams@pm.me
