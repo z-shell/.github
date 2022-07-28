@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
+  workflow_call:
 #  schedule:
 #    - cron: '15 21 * * 6'
 
@@ -19,14 +20,9 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - uses: deepsourcelabs/test-coverage-action@master
-        with:
-          key: python
-          coverage-file: coverage.xml
-          dsn: ${{ secrets.DEEPSOURCE_DSN }}
-#      - name: 🏗 Initialize CodeQL
-#        uses: github/codeql-action/init@v2
-#      - name: 🏗 Autobuild
-#        uses: github/codeql-action/autobuild@v2
-#      - name: 🚀 Perform CodeQL Analysis
-#        uses: github/codeql-action/analyze@v2
+      - name: 🏗 Initialize CodeQL
+        uses: github/codeql-action/init@v2
+      - name: 🏗 Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: 🚀 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
