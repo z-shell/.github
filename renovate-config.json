@@ -13,7 +13,7 @@
     "workarounds:all"
   ],
   "dependencyDashboardApproval": true,
-  "dependencyDashboardHeader": "Updates & Dependencies - Dashboard"
+  "dependencyDashboardHeader": "Updates & Dependencies - Dashboard",
   "dependencyDashboardFooter": "https://www.zshell.dev | Mend Renovate | Dependency Update Automation",
   "assigneesFromCodeOwners": true,
   "commitBody": "Signed-off-by: digital-teams[bot] <actions@zshell.dev>",
