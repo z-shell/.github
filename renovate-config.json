@@ -8,6 +8,7 @@
     ":autodetectPinVersions",
     ":prHourlyLimit2",
     ":prConcurrentLimit10",
+    ":gitSignOff",
     "group:monorepos",
     "group:recommended",
     "workarounds:all"
