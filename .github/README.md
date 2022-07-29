@@ -21,7 +21,9 @@ Initialize it with (`trunk init`). All linters and formatters, as well as the ve
 4. Locally format your changes → `trunk fmt` ([docs](https://docs.trunk.io/check/cli))
 5. Make sure no lint and format issues leak onto `main`
 
-## Renovate Mend:
+## Renovate Mend
+
+### Preset
 
 ```json
 {
