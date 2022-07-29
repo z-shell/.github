@@ -13,27 +13,32 @@
     "workarounds:all"
   ],
   "dependencyDashboardApproval": true,
-  "dependencyDashboardHeader": "Updates & Dependencies - Dashboard",
-  "dependencyDashboardFooter": "https://www.zshell.dev | Mend Renovate | Dependency Update Automation",
+  "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | Dependency Update Automation",
+  "dependencyDashboardFooter": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
-  "commitBody": "Signed-off-by: digital-teams[bot] <actions@zshell.dev>",
-  "pin": {
-    "commitBody": "[skip CI]"
-  },
+  "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "groupName": "all dependencies",
   "separateMajorMinor": false,
   "groupSlug": "all",
+  "separateMinorPatch": true,
+  "patch": {
+    "automerge": true
+  },
+  "pin": {
+    "commitBody": "[skip CI]"
+    "automerge": true
+  },
+
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
       "groupName": "all dependencies",
       "groupSlug": "all"
-    }
-  ],
-  "lockFileMaintenance": {
-    "enabled": true
-  },
-  "packageRules": [
+    },
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
