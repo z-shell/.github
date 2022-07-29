@@ -18,21 +18,22 @@
   "assigneesFromCodeOwners": true,
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "groupName": "all dependencies",
-  "separateMajorMinor": false,
   "groupSlug": "all",
+  "separateMajorMinor": false,
   "separateMinorPatch": true,
   "patch": {
     "automerge": true
   },
   "pin": {
-    "commitBody": "[skip CI]"
+    "commitBody": "[skip CI]",
     "automerge": true
   },
-
   "lockFileMaintenance": {
+    "commitBody": "[skip CI]",
     "enabled": true,
     "automerge": true
   },
+  "labels": ["dependencies 📦"],
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
