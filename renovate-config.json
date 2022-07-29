@@ -14,8 +14,7 @@
     "workarounds:all"
   ],
   "dependencyDashboardApproval": true,
-  "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | Dependency Update Automation",
-  "dependencyDashboardFooter": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
+  "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "groupName": "all dependencies",
