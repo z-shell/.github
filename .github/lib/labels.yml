@@ -38,7 +38,7 @@
 - name: "dependencies 📦"
   color: fbca04
   description: "Change in project Javascript dependencies."
-- name: "javasrcipt 📦"
+- name: "javascript 📦"
   color: fbca04
   description: "Change in project dependencies."
 - name: "submodules ⚙️"
