@@ -9,7 +9,7 @@ on:
     paths: [".github/workflows/metrics.yml"]
   workflow_dispatch: {}
 
-concurrency: 
+concurrency:
   group: metrics
 
 jobs:

@@ -22,6 +22,6 @@ jobs:
       - name: 🚀 Run Labeler
         uses: actions/labeler@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           sync-labels: false

@@ -9,7 +9,7 @@ on:
   pull_request:
     paths: [".github/workflows/activity_metrics.yml"]
 
-concurrency: 
+concurrency:
   group: metrics
 
 jobs:
