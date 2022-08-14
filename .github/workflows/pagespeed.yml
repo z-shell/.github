@@ -3,18 +3,21 @@ name: "🌀 Z PageSpeed Insights"
 on:
   schedule:
     - cron: "0 3 * * */3"
-  workflow_dispatch:
   push:
     paths: [".github/workflows/pagespeed.yml"]
   pull_request:
     paths: [".github/workflows/pagespeed.yml"]
+  workflow_dispatch: {}
+
+concurrency: 
+  group: metrics
 
 jobs:
   pagespeed:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: "metrics/plugin/pagespeed/detailed.svg"
