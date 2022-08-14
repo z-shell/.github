@@ -16,13 +16,12 @@ jobs:
       actions: read
       contents: read
       security-events: write
-
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - name: 🏗 Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@bbc2e7010f187d73e9eb71ea708c31bbbe580964
       - name: 🏗 Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@bbc2e7010f187d73e9eb71ea708c31bbbe580964
       - name: 🚀 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@bbc2e7010f187d73e9eb71ea708c31bbbe580964
