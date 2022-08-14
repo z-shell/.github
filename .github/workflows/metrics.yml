@@ -3,33 +3,26 @@ name: "🌀 Z Metrics"
 on:
   schedule:
     - cron: "02 02 * * *"
-  workflow_dispatch:
   push:
     paths: [".github/workflows/metrics.yml"]
   pull_request:
     paths: [".github/workflows/metrics.yml"]
+  workflow_dispatch: {}
+
+concurrency: 
+  group: metrics
+
 jobs:
   metrics:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: "metrics/metrics.svg"
           token: ${{ secrets.ORG_TOKEN }}
           user: z-shell
-  #      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
-  #        with:
-  #          filename: "metrics/plugin/repositories/repositories.svg"
-  #          token: ${{ secrets.ORG_TOKEN }}
-  #          base: ""
-  #          plugin_repositories: yes
-  #          plugin_repositories_featured: z-shell/zi, z-shell/wiki, z-shell/f-sy-h, z-shell/community
-  metrics-indepth:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: "metrics/plugin/followup/followup.svg"
@@ -62,12 +55,3 @@ jobs:
           user: z-shell
           repo: f-sy-h
           plugin_followup: yes
-#      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
-#        with:
-#          filename: metrics/plugin/achievements.svg
-#          token: ${{ secrets.ORG_TOKEN }}
-#          base: ""
-#          user: z-shell
-#          plugin_achievements: yes
-#          plugin_achievements_only: >-
-#            polyglots, developers, infographiles, managers
