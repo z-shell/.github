@@ -10,13 +10,10 @@ on:
 
 jobs:
   triage:
-    permissions:
-      contents: read
-      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3
+        uses: actions/checkout@bbc2e7010f187d73e9eb71ea708c31bbbe580964
       - name: ♻️ Prepare
         run: |
           [[ -d .github ]] || command mkdir .github
