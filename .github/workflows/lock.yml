@@ -2,7 +2,7 @@
 name: 🔒 Lock closed issues and PRs
 
 on:
-  workflow-call:
+  workflow_call:
   schedule:
     - cron: "30 2 * * *"
 
