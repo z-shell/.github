@@ -17,13 +17,14 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
-      - name: ♻️ Fetch Configuration
+      - name: ♻️ Prepare
         run: |
           [[ -d .github ]] || command mkdir .github
           [[ -f .github/labeler.yml ]] || \
           command curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labeler.yml -o .github/labeler.yml
       - name: 🚀 Run Labeler
-        uses: actions/labeler@v4
+        uses: actions/labeler@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
           sync-labels: false
