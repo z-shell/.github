@@ -3,17 +3,20 @@ name: "🌀 Z Reader"
 on:
   schedule:
     - cron: "02 02 * * */2"
-  workflow_dispatch:
   push:
     paths: [".github/workflows/reader.yml"]
   pull_request:
     paths: [".github/workflows/reader.yml"]
+  workflow_dispatch: {}
+
+concurrency:
+  group: metrics
 
 jobs:
   metrics-tweet:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: metrics/plugin/tweets/tweets.svg
@@ -23,33 +26,21 @@ jobs:
           plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
           plugin_tweets_attachments: no
           plugin_tweets_user: zshell_zi
-  metrics-rss:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      #      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
-      #        with:
-      #          filename: metrics/plugin/rss/dev.zshell.rss.svg
-      #          token: NOT_NEEDED
-      #          base: ""
-      #          plugin_rss: yes
-      #          plugin_rss_source: https://dev.to/feed/z-shell
-      #          plugin_rss_limit: 2
-      #      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
-      #        with:
-      #          filename: metrics/plugin/rss/dev.tag.zsh.rss.svg
-      #          token: NOT_NEEDED
-      #          base: ""
-      #          plugin_rss: yes
-      #          plugin_rss_source: https://dev.to/feed/tag/zsh
-      #          plugin_rss_limit: 2
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
-          filename: metrics/plugin/rss/ops.io.zsh.svg
+          filename: metrics/plugin/rss/dev.zshell.rss.svg
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
-          plugin_rss_source: https://community.ops.io/feed/zsh
+          plugin_rss_source: https://dev.to/feed/z-shell
+          plugin_rss_limit: 2
+      - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
+        with:
+          filename: metrics/plugin/rss/dev.tag.zsh.rss.svg
+          token: NOT_NEEDED
+          base: ""
+          plugin_rss: yes
+          plugin_rss_source: https://dev.to/feed/tag/zsh
           plugin_rss_limit: 2
 #     - uses: actions/checkout@v3
 #         with:
