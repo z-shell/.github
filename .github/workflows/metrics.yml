@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - uses: lowlighter/metrics@26bbaac4a9cf67bce1676e0435eff56fe043e8bc
         with:
           filename: "metrics/metrics.svg"
