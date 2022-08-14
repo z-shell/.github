@@ -4,11 +4,10 @@ name: "🆗 Commit"
 on: [push]
 
 jobs:
-  checksum:
-    name: Generate checksum
+  commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout sources
+      - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
       - name: "🆗 Commit"
         uses: z-shell/.github/actions/commit@main
@@ -17,5 +16,5 @@ jobs:
           commitMessage: Checksum ${{ github.sha }}
           # Optional: workDir: - Optional. To specify a directory other than the repository root to check for changed files.
           workDir: .
-          commitUserName: digital-teams[bot]
-          commitUserEmail: digital-teams@pm.me
+          commitUserName: ${{ secrets.ACTIONS_USER }}
+          commitUserEmail: ${{ secrets.ACTIONS_MAIL }}
