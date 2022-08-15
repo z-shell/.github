@@ -1,5 +1,0 @@
-{
-  "name": "Pull Request Labeler",
-  "description": "Workflow assigns labeles based on repository layout.",
-  "iconName": "z-shell"
-}
