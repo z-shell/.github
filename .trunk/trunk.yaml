@@ -17,9 +17,9 @@ lint:
   enabled:
     - git-diff-check@SYSTEM
     - hadolint@2.10.0
-    - actionlint@1.6.15
-    - gitleaks@8.10.3
-    - markdownlint@0.32.1
+    - actionlint@1.6.16
+    - gitleaks@8.11.1
+    - markdownlint@0.32.2
     - prettier@2.7.1
     - shfmt@3.5.0
     - shellcheck@0.8.0
