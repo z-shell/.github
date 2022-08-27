@@ -21,6 +21,39 @@ Initialize it with (`trunk init`). All linters and formatters, as well as the ve
 4. Locally format your changes → `trunk fmt` ([docs](https://docs.trunk.io/check/cli))
 5. Make sure no lint and format issues leak onto `main`
 
+### Preset
+
+Common configuration located at `.trunk/trunk.yaml`
+
+```yaml
+version: 0.1
+cli:
+  version: 0.16.1-beta
+  options:
+    - commands: [check, fmt]
+    - args: -y
+repo:
+  repo:
+    host: github.com
+    owner: z-shell
+    name: <repo>
+actions:
+  enabled:
+    - trunk-check-pre-push
+    - trunk-fmt-pre-commit
+    - trunk-cache-prune
+    - trunk-check-upgrade
+    - trunk-upgrade
+lint:
+  enabled:
+    - git-diff-check@SYSTEM
+    - actionlint@1.6.16
+    - gitleaks@8.11.2
+    - markdownlint@0.32.2
+    - prettier@2.7.1
+    - shfmt@3.5.0
+```
+
 ## Renovate Mend
 
 ### Preset
