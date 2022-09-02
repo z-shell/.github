@@ -32,6 +32,11 @@ cli:
   options:
     - commands: [check, fmt]
     - args: -y
+plugins:
+  sources:
+    - id: trunk
+      ref: v0.0.3
+      uri: https://github.com/trunk-io/plugins
 repo:
   repo:
     host: github.com
