@@ -27,3 +27,7 @@ lint:
     - prettier@2.7.1
     - shfmt@3.5.0
     - shellcheck@0.8.0
+  ignore:
+    - linters: [svgo]
+      paths:
+        - "metrics/**"
