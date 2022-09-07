@@ -1,8 +1,10 @@
 ---
 name: "📦 Dependency Review"
+
 on:
   pull_request:
   workflow_call:
+
 permissions:
   contents: read
 
@@ -10,6 +12,7 @@ jobs:
   dependency-review:
     name: "🏭 Scanning"
     runs-on: ubuntu-latest
+    environment: code-check    
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
