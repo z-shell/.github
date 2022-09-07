@@ -2,21 +2,20 @@
 name: 🔒 Lock closed issues and PRs
 
 on:
-  workflow_call:
   schedule:
     - cron: "30 2 * * *"
-
-permissions:
-  issues: write
-  pull-requests: write
-
-concurrency:
-  group: lock
+  workflow_call: {}
 
 jobs:
   lock:
     name: 🔐 Lock closed issues and PRs
     runs-on: ubuntu-latest
+    environment: project-automation
+    permissions:
+      issues: write
+      pull-requests: write
+    concurrency:
+      group: lock
     steps:
       - uses: dessant/lock-threads@e460dfeb36e731f3aeb214be6b0c9a9d9a67eda6
         with:
