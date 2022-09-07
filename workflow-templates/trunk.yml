@@ -1,0 +1,35 @@
+---
+name: "⭕ Trunk"
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    types: [opened, synchronize]
+  schedule:
+    - cron: "0 05 * * 2"
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    if: github.event.schedule != '0 05 * * 5'
+    name: "⚡"
+    uses: z-shell/.github/.github/workflows/trunk.yml@main
+  upload:
+    if: github.event.schedule == '0 05 * * 5'
+    name: "🆙"
+    uses: z-shell/.github/.github/workflows/trunk.yml@main
+    secrets:
+      trunk-token: ${{ secrets.TRUNK_TOKEN }}
+    # Trunk arguments (optional)
+    #with:
+    # GitHub Actions OS, defaults to ubuntu-latest (Optional).
+    #runs-on:
+    # If it can't be found anywhere and is not provided explicitly, we'll download it on demand. (Optional)
+    #trunk-path:
+    # Set to 'all' to check the entire repository. (Leave unset to autodetect just changes)
+    #check-mode:
+    # Upload series name, for when `trunk-token` is provided. If not provided, we'll use the branch name. (Optional)
+    #upload-series:
+    # Pass arguments to trunk (Optional)
+    #arguments:

@@ -1,0 +1,5 @@
+{
+  "name": "Pull Request Labels",
+  "description": "Workflow check pull request labels",
+  "iconName": "z-shell"
+}
