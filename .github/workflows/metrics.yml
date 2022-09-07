@@ -11,7 +11,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-
+  cancel-in-progress: true
+  
 env:
   metrics_svg: metrics/plugin/metrics.svg
   followup_svg: metrics/plugin/followup/followup.svg
