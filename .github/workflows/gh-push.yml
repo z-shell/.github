@@ -20,7 +20,7 @@ jobs:
     defaults:
       run:
         working-directory: metrics
-    environment: github-pages        
+    environment: github-pages
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v3
