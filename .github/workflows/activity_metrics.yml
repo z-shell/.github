@@ -12,6 +12,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   projects_svg: metrics/plugin/projects/projects.svg
