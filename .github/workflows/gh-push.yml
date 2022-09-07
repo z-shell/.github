@@ -2,7 +2,6 @@
 name: "🚀 Deploy GH Pages"
 
 on:
-  workflow_dispatch:
   workflow_run:
     workflows:
       - "🌀 Z PageSpeed Insights"
@@ -11,6 +10,7 @@ on:
       - "🌀 Z Reader"
     types:
       - completed
+  workflow_dispatch: {}
 
 jobs:
   deploy:
@@ -18,35 +18,22 @@ jobs:
     environment: production
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    defaults:
+      run:
+        working-directory: metrics
     steps:
-      - name: ⤵️ Check out code from GitHub
+      - name: '⤵️ Check out code from GitHub'
         uses: actions/checkout@v3
-      #      - name: Cache
-      #        uses: actions/cache@v3.0.2
-      #        with:
-      #        # A list of files, directories, and wildcard patterns to cache and restore
-      #          path:
-      #          # An explicit key for restoring and saving the cache
-      #          key:
-      #          # An ordered list of keys to use for restoring the cache if no cache hit occurred for key
-      #          restore-keys: # optional
-      #          # The chunk size used to split up large files during upload, in bytes
-      #          upload-chunk-size: # optional
-      #      - uses: ericcornelissen/svgo-action@v3
-      #        id: svgo  # <-- You need to give the SVGO Action's step a unique id
-      #      - name: Did any SVGs get optimized?
-      #        run: echo ${{ steps.svgo.outputs.DID_OPTIMIZE }}
-      #                   ^^^^         ^^^^^^^^^^^^
-      #                   |            |
-      #                   |            | The name of the output you want to use
-      #                   |
-      #                   | The id of the SVGO Action's step
-      - name: 🚀 Deploy to GitHub Pages
+      - name: '📥 Download a single artifact'
+        uses: actions/download-artifact@v3
+        with:
+          name: metrics-svg
+      - name: '🚀 Deploy to GitHub Pages'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: metrics
+          publish_dir: '.'
           keep_files: true
           user_name: ${{ secrets.ACTIONS_USER }}
           user_email: ${{ secrets.ACTIONS_MAIL }}
