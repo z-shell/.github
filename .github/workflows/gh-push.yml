@@ -12,14 +12,15 @@ on:
       - completed
   workflow_dispatch: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+defaults:
+  run:
+    working-directory: metrics
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-    defaults:
-      run:
-        working-directory: metrics
     environment: github-pages
     steps:
       - name: "⤵️ Check out code from GitHub"
