@@ -6,12 +6,13 @@ on:
   push:
     paths:
       - .github/lib/labels.yml
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   labels:
     name: ♻️ Sync labels
     runs-on: ubuntu-latest
+    environment: project-automation        
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
