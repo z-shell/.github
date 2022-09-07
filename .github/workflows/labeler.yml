@@ -11,6 +11,7 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
+    environment: project-automation
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@bbc2e7010f187d73e9eb71ea708c31bbbe580964
