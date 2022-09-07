@@ -4,43 +4,52 @@ on:
   schedule:
     - cron: "02 02 * * */2"
   push:
-    paths: [".github/workflows/reader.yml"]
+    paths: [.github/workflows/reader.yml]
   pull_request:
-    paths: [".github/workflows/reader.yml"]
+    paths: [.github/workflows/reader.yml]
   workflow_dispatch: {}
 
 concurrency:
-  group: metrics
+  group: ${{ github.workflow }}-${{ github.ref }}
+env:
+  tweets_svg: metrics/plugin/tweets/tweets.svg
+  teeter_user: zshell_zi
+  dev_feed_zshell_svg: metrics/plugin/rss/dev.zshell.rss.svg
+  dev_feed_zshell_url: https://dev.to/feed/z-shell
+  dev_tag_zsh_svg: metrics/plugin/rss/dev.tag.zsh.rss.svg
+  dev_tag_zsh_url: https://dev.to/feed/tag/zsh
 
 jobs:
-  metrics-tweet:
+  content-metrics:
+    environment: production
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - uses: lowlighter/metrics@7e4bab7d85c7d114cc928299765f830c107270a4
         with:
-          filename: metrics/plugin/tweets/tweets.svg
+          filename: ${{ env.tweets_svg }}
           token: NOT_NEEDED
           base: ""
           plugin_tweets: yes
           plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
           plugin_tweets_attachments: no
-          plugin_tweets_user: zshell_zi
+          plugin_tweets_user: ${{ env.teeter_user }}
       - uses: lowlighter/metrics@7e4bab7d85c7d114cc928299765f830c107270a4
         with:
-          filename: metrics/plugin/rss/dev.zshell.rss.svg
+          filename: ${{ env.dev_feed_zshell_svg }}
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
-          plugin_rss_source: https://dev.to/feed/z-shell
+          plugin_rss_source: ${{ env.dev_feed_zshell_url }}
           plugin_rss_limit: 2
       - uses: lowlighter/metrics@7e4bab7d85c7d114cc928299765f830c107270a4
         with:
-          filename: metrics/plugin/rss/dev.tag.zsh.rss.svg
+          filename: ${{ env.dev_tag_zsh_svg }}
           token: NOT_NEEDED
           base: ""
           plugin_rss: yes
-          plugin_rss_source: https://dev.to/feed/tag/zsh
+          plugin_rss_source: ${{ env.dev_tag_zsh_url }}
           plugin_rss_limit: 2
 #     - uses: actions/checkout@v3
 #         with:
@@ -58,3 +67,8 @@ jobs:
 #          plugin_stackoverflow_user: digitalclouds
 #          plugin_stackoverflow_sections: answers-top
 #          plugin_stackoverflow_limit: 2
+      - name: "📤 Archive metrics SVG"
+        uses: actions/upload-artifact@v3
+        with:
+          name: metrics-svg
+          path: metrics
