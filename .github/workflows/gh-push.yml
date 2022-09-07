@@ -24,10 +24,6 @@ jobs:
     steps:
       - name: '⤵️ Check out code from GitHub'
         uses: actions/checkout@v3
-      - name: '📥 Download SVG artifact'
-        uses: actions/download-artifact@v3
-        with:
-          name: metrics-svg
       - name: '🚀 Deploy to GitHub Pages'
         uses: peaceiris/actions-gh-pages@v3
         with:
