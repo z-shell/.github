@@ -21,9 +21,7 @@ Initialize it with (`trunk init`). All linters and formatters, as well as the ve
 4. Locally format your changes → `trunk fmt` ([docs](https://docs.trunk.io/check/cli))
 5. Make sure no lint and format issues leak onto `main`
 
-### Preset
-
-Common configuration located at `.trunk/trunk.yaml`
+Common preset located at `.trunk/trunk.yaml`
 
 ```yaml
 version: 0.1
@@ -61,7 +59,7 @@ lint:
 
 ## Renovate Mend
 
-### Preset
+Preset:
 
 ```json
 {
@@ -72,12 +70,14 @@ lint:
 
 Store Renovate configuration as above in one of these locations:
 
-    renovate.json
-    renovate.json5
-    .github/renovate.json
-    .github/renovate.json5
-    .gitlab/renovate.json
-    .gitlab/renovate.json5
-    .renovaterc
-    .renovaterc.json
-    package.json (within a "renovate" section)
+```verilog
+renovate.json
+renovate.json5
+.github/renovate.json
+.github/renovate.json5
+.gitlab/renovate.json
+.gitlab/renovate.
+.renovaterc
+.renovaterc.json
+package.json (within a "renovate" section)
+```
