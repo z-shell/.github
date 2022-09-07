@@ -99,6 +99,7 @@ on:
 jobs:
   matrix:
     runs-on: ${{ inputs.runs-on }}
+    environment: code-check
     outputs:
       output0: ${{ steps.step0.outputs.matrix0 }}
       output1: ${{ steps.step1.outputs.matrix1 }}
@@ -140,11 +141,10 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     needs:
       - matrix
+    environment: code-check
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - if: ${{ inputs.get_dependencies }}
         name: "🚀 Pre run"
         run: echo ${{needs.matrix.outputs.output0}}
