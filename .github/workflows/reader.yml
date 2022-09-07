@@ -51,22 +51,22 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: ${{ env.dev_tag_zsh_url }}
           plugin_rss_limit: 2
-#     - uses: actions/checkout@v3
-#         with:
-#         ref: main
-#      - uses: ericcornelissen/svgo-action@v3
-#        with:
-#        repo-token: ${{ secrets.GITHUB_TOKEN }}
-#      - name: Top answers from stackoverflow
-#        uses: ss-o/metrics@latest
-#        with:
-#          filename: metrics/plugin.stackoverflow.svg
-#          token: NOT_NEEDED
-#          base: ""
-#          plugin_stackoverflow: yes
-#          plugin_stackoverflow_user: digitalclouds
-#          plugin_stackoverflow_sections: answers-top
-#          plugin_stackoverflow_limit: 2
+      #     - uses: actions/checkout@v3
+      #         with:
+      #         ref: main
+      #      - uses: ericcornelissen/svgo-action@v3
+      #        with:
+      #        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #      - name: Top answers from stackoverflow
+      #        uses: ss-o/metrics@latest
+      #        with:
+      #          filename: metrics/plugin.stackoverflow.svg
+      #          token: NOT_NEEDED
+      #          base: ""
+      #          plugin_stackoverflow: yes
+      #          plugin_stackoverflow_user: digitalclouds
+      #          plugin_stackoverflow_sections: answers-top
+      #          plugin_stackoverflow_limit: 2
       - name: "📤 Archive metrics SVG"
         uses: actions/upload-artifact@v3
         with:
