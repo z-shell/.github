@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":dependencyDashboard",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":ignoreModulesAndTests",
+    ":autodetectPinVersions",
+    ":prHourlyLimit2",
+    ":prConcurrentLimit10",
+    ":gitSignOff",
+    "group:monorepos",
+    "group:recommended",
+    "workarounds:all"
+  ],
+  "dependencyDashboardApproval": true,
+  "dependencyDashboardAutoclose": true,
+  "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
+  "assigneesFromCodeOwners": true,
+  "gitAuthor": "actions@zshell.dev",
+  "commitBody": "Signed-off-by: {{{gitAuthor}}}",
+  "groupName": "all dependencies",
+  "groupSlug": "all",
+  "separateMajorMinor": false,
+  "separateMinorPatch": true,
+  "patch": {
+    "automerge": true
+  },
+  "pin": {
+    "commitBody": "[skip CI]",
+    "automerge": true
+  },
+  "lockFileMaintenance": {
+    "commitBody": "[skip CI]",
+    "enabled": true,
+    "automerge": true
+  },
+  "labels": ["dependencies 📦"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["optionalDependencies"],
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "automerge": true
+    },
+    {
+      "matchPackagePrefixes": ["@types/"],
+      "automerge": true
+    }
+  ]
+}
