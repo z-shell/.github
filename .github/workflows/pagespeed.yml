@@ -4,26 +4,36 @@ on:
   schedule:
     - cron: "0 3 * * */3"
   push:
-    paths: [".github/workflows/pagespeed.yml"]
+    paths: [.github/workflows/pagespeed.yml]
   pull_request:
-    paths: [".github/workflows/pagespeed.yml"]
+    paths: [.github/workflows/pagespeed.yml]
   workflow_dispatch: {}
 
 concurrency:
-  group: metrics
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
+  pagespeed_url: https://wiki.zshell.dev
 
 jobs:
   pagespeed:
-    timeout-minutes: 15
+    environment: production
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - uses: lowlighter/metrics@7e4bab7d85c7d114cc928299765f830c107270a4
         with:
-          filename: "metrics/plugin/pagespeed/detailed.svg"
+          filename: ${{ env.pagespeed_svg }}
           token: NOT_NEEDED
           base: ""
           plugin_pagespeed: yes
           plugin_pagespeed_detailed: yes
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
-          plugin_pagespeed_url: https://wiki.zshell.dev
+          plugin_pagespeed_url: ${{ env.pagespeed_url }}
+      - name: "📤 Archive metrics SVG"
+        uses: actions/upload-artifact@v3
+        with:
+          name: metrics-svg
+          path: metrics
