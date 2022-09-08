@@ -17,7 +17,6 @@
   "dependencyDashboardAutoclose": true,
   "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
-  "gitAuthor": "actions@zshell.dev",
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "groupName": "all dependencies",
   "groupSlug": "all",
