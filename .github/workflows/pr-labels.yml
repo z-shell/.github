@@ -11,7 +11,6 @@ jobs:
   pr_labels:
     name: 🏭 Verify PR Labels
     runs-on: ubuntu-latest
-    environment: project-automation
     steps:
       - name: 🏷 Verify PR has a valid label
         uses: jesusvasquez333/verify-pr-label-action@v1.4.0
