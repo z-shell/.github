@@ -14,7 +14,6 @@ on:
 jobs:
   welcome:
     runs-on: ubuntu-latest
-    environment: project-automation
     steps:
       - uses: actions/checkout@v3
       - uses: EddieHubCommunity/gh-action-community/src/welcome@b0655168a4ac6fb03e3b649d943ad2c583900c35
