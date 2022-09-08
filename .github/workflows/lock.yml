@@ -10,7 +10,6 @@ jobs:
   lock:
     name: 🔐 Lock closed issues and PRs
     runs-on: ubuntu-latest
-    environment: project-automation
     permissions:
       issues: write
       pull-requests: write
