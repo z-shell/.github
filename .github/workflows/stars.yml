@@ -7,7 +7,6 @@ on:
 jobs:
   star:
     runs-on: ubuntu-latest
-    environment: project-automation
     steps:
       - uses: actions/checkout@v3
       - run: |
