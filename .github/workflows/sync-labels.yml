@@ -12,7 +12,6 @@ jobs:
   labels:
     name: ♻️ Sync labels
     runs-on: ubuntu-latest
-    environment: project-automation
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
