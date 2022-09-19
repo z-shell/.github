@@ -185,7 +185,7 @@ jobs:
       - if: ${{ inputs.call_arguments1 }}
         name: "🚀 Post run"
         run: echo ${{needs.matrix.outputs.output1}}
-      - uses: trunk-io/trunk-action@b64e8d2c91b6bff32cad2c4445656afd942a124d
+      - uses: trunk-io/trunk-action@22e948f7bb9f870bc6c42625585f1ef27e9c5afc
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
