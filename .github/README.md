@@ -26,14 +26,14 @@ Common preset located at `.trunk/trunk.yaml`
 ```yaml
 version: 0.1
 cli:
-  version: 0.16.1-beta
+  version: 0.18.0-beta
   options:
     - commands: [check, fmt]
     - args: -y
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.3
+      ref: v0.0.4
       uri: https://github.com/trunk-io/plugins
 repo:
   repo:
