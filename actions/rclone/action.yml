@@ -5,9 +5,16 @@ branding:
   icon: "arrow-up"
   color: "green"
 inputs:
-  args:
-    description: "User name for the commit message"
+  RCLONE_CONF:
+    description: "Configuration for rclone"
+    required: true
+  RCLONE_CONF_PATH:
+    description: "Default PATH to rclone configuration"
     required: false
+    default: "${HOME}/.config/rclone"
+  RUN:
+    description: "Run required arguments with rclone"
+    required: true
 
 runs:
   using: "composite"
@@ -15,4 +22,6 @@ runs:
     - run: ${{ github.action_path }}/entrypoint.sh
       shell: bash
       env:
-        RCLONE_CONF: ${{ inputs.args }}
+        RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
+        RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
+        RUN: ${{ inputs.RUN }}
