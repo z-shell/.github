@@ -15,9 +15,11 @@ inputs:
   RUN:
     description: "Run required arguments with rclone"
     required: true
-
 runs:
   using: "docker"
   image: "Dockerfile"
+  env:
+    RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
+    RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
   args:
     - ${{ inputs.RUN }}
