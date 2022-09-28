@@ -7,9 +7,11 @@ Run [rclone](https://rclone.org) to sync files and directories from different cl
 ```yaml
 ---
 name: "🔄 Rclone"
+# Working example: https://github.com/z-shell/wiki/blob/main/.github/workflows/rclone.yml
 on:
   push:
     paths:
+      # Paths which will tigger workflow
       - "static/**"
   workflow_dispatch: {}
 
@@ -19,24 +21,29 @@ concurrency:
 
 jobs:
   sync:
-    if: github.repository == 'z-shell/wiki'
+    # Limit to specific repository. (e.g: z-shell/wiki)
+    #if: github.repository == 'org-or-user/repository-name'
     runs-on: ubuntu-latest
-    environment: R2
+    environment: rclone
     env:
-      sync_path: static
-      remote_path: "r2store:r2-store/public"
+      # Set paths to be used as arguments to pass for rclone.
+      # Source path (some/path/to/source)
+      local_path: ""
+      # Remote path (remote:some/remote/path
+      remote_path: ""
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v3
       - name: "⏫ Run rclone"
         uses: z-shell/.github/actions/rclone@v1.0.0
         with:
-          # Configuration to set up for rclone (required)
-          config: ${{ secrets.R2_STORE }}
+          # The RCLONE_CONFIG secret must be set to set up for rclone (required)
+          config: ${{ secrets.RCLONE_CONFIG }}
           # Pass any argumets supported by rclone (required)
-          args: "sync ${{ env.sync_path }} ${{ env.remote_path }}"
+          args: "sync ${{ env.local_path }} ${{ env.remote_path }}"
           # Set custom location for rclone configuration file (optional)
-          config-file: ""
+          # Will try to detect the default location using rclone.
+          #config-file: ""
           # Verbose debugging and logging or carry on, but do quit on errors (optional)
           debug: false
 ```
