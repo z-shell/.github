@@ -13,13 +13,7 @@ fi
 CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | awk '{print $1}')
 
 if [[ -n $RCLONE_CONF ]]; then
-  if [[ -f $CONFIG_FILE ]]; then
-    echo "$RCLONE_CONF" >"$CONFIG_FILE"
-  else
-    echo "Unable to locate configuration file:"
-    echo "$CONFIG_FILE"
-    exit 1
-  fi
+  echo "$RCLONE_CONF" >"$CONFIG_FILE"
 else
   echo "The configuaration for the rclone is not set"
   exit 1
