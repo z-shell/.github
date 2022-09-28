@@ -12,6 +12,9 @@ inputs:
     description: "Verbose output and logging"
     required: false
     default: false
+  args:
+    description: "Argumets to pass for rclone"
+    required: true
 
 runs:
   using: "docker"
@@ -19,3 +22,5 @@ runs:
   env:
     RCLONE_CONF: ${{ inputs.config }}
     DEBUG: ${{ inputs.debug }}
+  args:
+    - ${{ inputs.args }}

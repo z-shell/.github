@@ -10,18 +10,24 @@ else
   export ACTIONS_STEP_DEBUG=true
 fi
 
-CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | awk '{print $1}')
+if [[ -z $CONFIG_FILE ]]; then
+  # Get default location for the configuration file
+  CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | awk '{print $1}')
+fi
 
 if [[ -n $RCLONE_CONF ]]; then
+  # Write user set rclone configuration
   echo "$RCLONE_CONF" >"$CONFIG_FILE"
 else
+  # Unable to proceed if rclone configuration not set
   echo "The configuaration for the rclone is not set"
   exit 1
 fi
 
 if [[ ! -x "$(command -v rclone)" ]]; then
-  echo 'Error: rclone failed to install or has non-executable permissions' >&2
+  # Unable to proceed as executible rclone not found
+  echo 'Failed to install rclone or has non-executable permissions' >&2
   exit 1
 fi
 
-bash -c "rclone $*"
+sh -c "rclone $*"
