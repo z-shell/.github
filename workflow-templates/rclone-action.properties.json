@@ -1,5 +1,5 @@
 {
-  "name": "GitHub Action - rclone",
+  "name": "GitHub Action - Rclone",
   "description": "GitHub Action runs rclone with given arguments to organize files and directories from different cloud storage providers.",
   "iconName": "z-shell"
 }
