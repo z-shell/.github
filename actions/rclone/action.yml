@@ -9,10 +9,10 @@ inputs:
     description: "Set custom location for rclone configuration file"
     required: false
   config:
-    description: "Configuration for rclone"
+    description: "Configuration to set up for rclone"
     required: true
   debug:
-    description: "Verbose output and logging"
+    description: "Verbose debugging and logging or carry on, but do quit on errors"
     required: false
     default: false
   args:

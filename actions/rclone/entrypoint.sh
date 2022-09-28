@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 # Run rclone for files and directories from different cloud storage providers.
-
 if [[ $DEBUG == "false" ]]; then
   # Carry on, but do quit on errors
   set -e
-else
+elif [[ $DEBUG == "true" ]]; then
   # Verbose debugging
   set -exuo pipefail xtrace
   export LOG_LEVEL=debug
