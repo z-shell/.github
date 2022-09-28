@@ -11,4 +11,5 @@ else
 fi
 
 set -o xtrace
-bash -c "rclone $RUN"
+
+rclone "$RUN"
