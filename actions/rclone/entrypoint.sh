@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Run rclone for files and directories from different cloud storage providers.
+
 if [[ $DEBUG == "false" ]]; then
   # Carry on, but do quit on errors
   set -e
@@ -30,4 +32,5 @@ if [[ ! -x "$(command -v rclone)" ]]; then
   exit 1
 fi
 
-sh -c "rclone $*"
+run_rclone=$(sh -c "rclone $*")
+echo "::set-output name=rclone::$run_rclone"

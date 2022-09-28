@@ -1,10 +1,13 @@
 name: "GitHub Action - rclone"
-description: "Commits any changed files and pushes the result back to origin branch."
+description: "Run rclone for files and directories from different cloud storage providers"
 author: "z-shell"
 branding:
   icon: "arrow-up"
   color: "green"
 inputs:
+  config-file:
+    description: "Set custom location for rclone configuration file"
+    required: false
   config:
     description: "Configuration for rclone"
     required: true
@@ -15,11 +18,14 @@ inputs:
   args:
     description: "Argumets to pass for rclone"
     required: true
-
+outputs:
+  rclone:
+    description: "The output of rclone"
 runs:
   using: "docker"
   image: "Dockerfile"
   env:
+    CONFIG_FILE: ${{ inputs.config-file }}
     RCLONE_CONF: ${{ inputs.config }}
     DEBUG: ${{ inputs.debug }}
   args:
