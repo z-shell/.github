@@ -4,6 +4,18 @@ author: "z-shell"
 branding:
   icon: "arrow-up"
   color: "green"
+inputs:
+  config:
+    description: "Configuration for rclone"
+    required: true
+  debug:
+    description: "Verbose output and logging"
+    required: false
+    default: false
+
 runs:
   using: "docker"
   image: "Dockerfile"
+  env:
+    RCLONE_CONF: ${{ inputs.config }}
+    DEBUG: ${{ inputs.debug }}
