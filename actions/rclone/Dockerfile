@@ -11,8 +11,8 @@ LABEL "com.github.actions.icon"="arrow-up"
 LABEL "com.github.actions.color"="green"
 
 # trunk-ignore(hadolint/DL3018)
-RUN apk --no-cache add bash ca-certificates fuse openssh-client rclone
-#  && wget -qO- https://rclone.org/install.sh | bash \
+RUN apk --no-cache add bash ca-certificates fuse openssh-client rclone && rclone selfupdate
+#&& wget -qO- https://rclone.org/install.sh | bash
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
