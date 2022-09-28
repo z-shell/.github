@@ -1,4 +1,8 @@
 version: 0.1
+runtimes:
+  enabled:
+    - go@1.18.3
+    - node@16.14.2
 cli:
   version: 0.18.0-beta
   options:
@@ -27,8 +31,8 @@ lint:
     - svgo@2.8.0
     - git-diff-check@SYSTEM
     - hadolint@2.10.0
-    - actionlint@1.6.17
-    - gitleaks@8.12.0
+    - actionlint@1.6.19
+    - gitleaks@8.13.0
     - markdownlint@0.32.2
     - prettier@2.7.1
     - shfmt@3.5.0
