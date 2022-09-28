@@ -11,14 +11,16 @@ inputs:
   RCLONE_CONF_PATH:
     description: "Default PATH to rclone configuration"
     required: false
-    default: "${HOME}/.config/rclone"
+    default: "$HOME/.config/rclone"
   RUN:
     description: "Run required arguments with rclone"
     required: true
+
+env:
+  RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
+  RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
+  RUN: ${{ inputs.RUN }}
+
 runs:
   using: "docker"
   image: "Dockerfile"
-  env:
-    RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
-    RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
-    RUN: ${{ inputs.RUN }}
