@@ -22,8 +22,7 @@ else
 fi
 
 if [[ -n $RUN ]]; then
-  rclone=$(rclone "$RUN")
-  echo "::set-output name=rclone::$rclone"
+  rclone "$RUN"
 else
   echo "The RUN environment variable is empty"
   exit 1
