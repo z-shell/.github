@@ -15,6 +15,7 @@ inputs:
   RUN:
     description: "Run required arguments with rclone"
     required: true
+
 runs:
   using: "composite"
   steps:

@@ -10,7 +10,6 @@ LABEL "com.github.actions.description"="Run rclone to sync files and directories
 LABEL "com.github.actions.icon"="arrow-up"
 LABEL "com.github.actions.color"="green"
 
-# trunk-ignore(hadolint/DL4006)
 # trunk-ignore(hadolint/DL3018)
 RUN apk --no-cache add \
   bash \
@@ -19,8 +18,9 @@ RUN apk --no-cache add \
   ca-certificates \
   fuse \
   openssh-client \
-  && wget -qO- https://rclone.org/install.sh | bash \
-  && apk del curl unzip
+  rclone
+#  && wget -qO- https://rclone.org/install.sh | bash \
+#  && apk del curl unzip
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
