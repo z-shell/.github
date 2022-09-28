@@ -4,10 +4,9 @@ set -e
 
 if [[ -n $RCLONE_CONF_PATH ]]; then
   if [[ -d $RCLONE_CONF_PATH ]]; then
-    echo "$RCLONE_CONF_PATH"
+    echo "Set directory: $RCLONE_CONF_PATH"
   else
     mkdir -p "$RCLONE_CONF_PATH"
-    echo "$RCLONE_CONF_PATH"
   fi
 else
   echo "The RCLONE_CONF_PATH environment variable is empty"
@@ -21,10 +20,7 @@ else
   exit 1
 fi
 
-if [[ -n $RUN ]]; then
-  echo "$RUN"
-  bash -c "rclone $RUN"
-fi
+bash -c "rclone $*"
 #else
 #  echo "The RUN environment variable is empty"
 #  exit 1

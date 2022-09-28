@@ -5,13 +5,6 @@ branding:
   icon: "arrow-up"
   color: "green"
 inputs:
-  RCLONE_CONF:
-    description: "Configuration for rclone"
-    required: true
-  RCLONE_CONF_PATH:
-    description: "Default PATH to rclone configuration"
-    required: false
-    default: "$HOME/.config/rclone"
   RUN:
     description: "Run required arguments with rclone"
     required: true
@@ -19,7 +12,5 @@ inputs:
 runs:
   using: "docker"
   image: "Dockerfile"
-  env:
-    RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
-    RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
-    RUN: ${{ inputs.RUN }}
+  args:
+    - ${{ inputs.RUN }}
