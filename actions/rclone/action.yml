@@ -5,17 +5,14 @@ branding:
   icon: "arrow-up"
   color: "green"
 inputs:
-  RCLONE_CONF:
+  args:
     description: "User name for the commit message"
     required: false
+
 runs:
   using: "composite"
   steps:
     - run: ${{ github.action_path }}/entrypoint.sh
       shell: bash
       env:
-        DEBUG: ${{ inputs.debug }}
-        WD_PATH: ${{ inputs.workDir }}
-        COMMIT_MESSAGE: ${{ inputs.commitMessage }}
-        COMMIT_EMAIL: ${{ inputs.commitUserEmail }}
-        COMMIT_USER: ${{ inputs.commitUserName }}
+        RCLONE_CONF: ${{ inputs.args }}

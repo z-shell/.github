@@ -11,7 +11,7 @@ LABEL "com.github.actions.icon"="arrow-up"
 LABEL "com.github.actions.color"="green"
 
 # trunk-ignore(hadolint/DL4006)
-RUN apk --no-cache \
+RUN apk --no-cache add \
 bash=5.1.16-r2 \
 curl=7.83.1-r3 \
 unzip=6.0-r9 \
