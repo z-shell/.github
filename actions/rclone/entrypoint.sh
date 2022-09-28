@@ -10,6 +10,4 @@ else
   exit 1
 fi
 
-set -o xtrace
-
-rclone "$RUN"
+sh -c "rclone $RUN"
