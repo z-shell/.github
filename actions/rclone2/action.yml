@@ -4,13 +4,6 @@ author: "z-shell"
 branding:
   icon: "arrow-up"
   color: "green"
-inputs:
-  RUN:
-    description: "Run required arguments with rclone"
-    required: true
-
 runs:
   using: "docker"
   image: "Dockerfile"
-  args:
-    - ${{ inputs.RUN }}
