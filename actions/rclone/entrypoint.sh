@@ -22,8 +22,10 @@ else
 fi
 
 if [[ -n $RUN ]]; then
-  rclone "$RUN"
-else
-  echo "The RUN environment variable is empty"
-  exit 1
+  echo "$RUN"
+  bash -c "rclone $RUN"
 fi
+#else
+#  echo "The RUN environment variable is empty"
+#  exit 1
+#fi
