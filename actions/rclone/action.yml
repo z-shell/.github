@@ -15,9 +15,6 @@ inputs:
   RUN:
     description: "Run required arguments with rclone"
     required: true
-outputs:
-  rclone:
-    description: "The output of rclone"
 
 runs:
   using: "docker"
