@@ -1,6 +1,8 @@
 ---
 name: "🔄 Rclone"
-# Working example: https://github.com/z-shell/wiki/blob/main/.github/workflows/rclone.yml
+# Working examples:
+# https://github.com/z-shell/wiki/blob/main/.github/workflows/rclone.yml
+# https://github.com/z-shell/zi-src/blob/main/.github/workflows/rclone-action.yml
 on:
   push:
     paths:
