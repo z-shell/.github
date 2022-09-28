@@ -21,5 +21,6 @@ runs:
   env:
     RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
     RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
+    RUN: ${{ inputs.RUN }}
   args:
-    - ${{ inputs.RUN }}
+    - ${{ env.RUN }}

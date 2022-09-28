@@ -10,4 +10,4 @@ else
   exit 1
 fi
 
-sh -c "rclone $RUN"
+bash -c "rclone $RUN"
