@@ -15,13 +15,6 @@ inputs:
   RUN:
     description: "Run required arguments with rclone"
     required: true
-
 runs:
-  using: "composite"
-  steps:
-    - run: ${{ github.action_path }}/entrypoint.sh
-      shell: bash
-      env:
-        RCLONE_CONF: ${{ inputs.RCLONE_CONF }}
-        RCLONE_CONF_PATH: ${{ inputs.RCLONE_CONF_PATH }}
-        RUN: ${{ inputs.RUN }}
+  using: "docker"
+  image: "Dockerfile"
