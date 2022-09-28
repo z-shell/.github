@@ -11,16 +11,16 @@ LABEL "com.github.actions.icon"="arrow-up"
 LABEL "com.github.actions.color"="green"
 
 # trunk-ignore(hadolint/DL4006)
+# trunk-ignore(hadolint/DL3018)
 RUN apk --no-cache add \
-bash=5.1.16-r2 \
-curl=7.83.1-r3 \
-unzip=6.0-r9 \
-ca-certificates=20220614-r0 \
-fuse=2.9.9-r1 \
-openssh=9.0_p1-r2 \
-&& wget -qO- https://rclone.org/install.sh | bash \
-&& apk del bash curl unzip
-
+  bash \
+  curl \
+  unzip \
+  ca-certificates \
+  fuse \
+  openssh-client \
+  && wget -qO- https://rclone.org/install.sh | bash \
+  && apk del curl unzip
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

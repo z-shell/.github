@@ -3,12 +3,10 @@
 set -e
 
 if [[ -n $RCLONE_CONF ]]; then
-  if [[ ! -d $RCLONE_CONF_PATH ]]; then
-    mkdir -p "$RCLONE_CONF_PATH"
-  fi
+  [[ -d $RCLONE_CONF_PATH ]] || mkdir -p "$RCLONE_CONF_PATH"
   echo "$RCLONE_CONF" >"${RCLONE_CONF_PATH}/rclone.conf"
 else
-  echo "Set the RCLONE_CONF env variable."
+  echo "The RCLONE_CONF environment variable is empty"
   exit 1
 fi
 
