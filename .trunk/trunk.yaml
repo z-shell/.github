@@ -4,7 +4,7 @@ runtimes:
     - go@1.18.3
     - node@16.14.2
 cli:
-  version: 0.18.0-beta
+  version: 0.18.1-beta
   options:
     - commands: [check, fmt]
     - args: -y
@@ -20,6 +20,7 @@ repo:
     name: .github
 actions:
   enabled:
+    - trunk-announce
     - trunk-upgrade-available
     - trunk-check-pre-push
     - trunk-fmt-pre-commit
