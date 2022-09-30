@@ -11,8 +11,6 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3.0.2
       - name: 🚀 Run Labeler
         uses: actions/labeler@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
         env:
