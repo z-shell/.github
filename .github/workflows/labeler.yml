@@ -2,23 +2,15 @@
 name: 🔖 Pull Request Labeler
 on:
   pull_request_target:
-  workflow_call:
+    branches: [main]
   push:
-    paths:
-      - .github/lib/labeler.yml
+    paths: [.github/lib/labeler.yml]
   workflow_dispatch: {}
 
 jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@bbc2e7010f187d73e9eb71ea708c31bbbe580964
-      - name: ♻️ Prepare
-        run: |
-          [[ -d .github ]] || command mkdir .github
-          [[ -f .github/labeler.yml ]] || \
-          command curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labeler.yml -o .github/labeler.yml
       - name: 🚀 Run Labeler
         uses: actions/labeler@e54e5b338fbd6e6cdb5d60f51c22335fc57c401e
         env:
