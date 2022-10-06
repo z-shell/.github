@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 30
     environment: metrics
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - uses: lowlighter/metrics@cf98a50eb63499d520bea42d8129d1cb8682de0f
         with:
           filename: ${{ env.tweets_svg }}
