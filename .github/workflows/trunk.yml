@@ -106,7 +106,7 @@ jobs:
     #      output3: ${{ steps.step3.outputs.matrix3 }}
     steps:
       - name: "⤵️ Check out code from GitHub"
-        uses: actions/checkout@v3
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: step0
         name: "🚀 Run 0"
         if: ${{ inputs.get_dependencies }}
@@ -142,7 +142,7 @@ jobs:
       - matrix
     steps:
       - name: "⤵️ Check out code from GitHub"
-        uses: actions/checkout@v3
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - if: ${{ inputs.get_dependencies }}
         name: "🚀 Pre run"
         run: echo ${{needs.matrix.outputs.output0}}
