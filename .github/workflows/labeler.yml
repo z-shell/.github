@@ -2,10 +2,10 @@
 name: 🔖 Pull Request Labeler
 on:
   pull_request_target:
-    branches: [main]
-  push:
-    paths: [.github/lib/labeler.yml]
-  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   triage:
