@@ -101,9 +101,9 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     outputs:
       output0: ${{ steps.step0.outputs.matrix0 }}
-      output1: ${{ steps.step1.outputs.matrix1 }}
-    #      output2: ${{ steps.step2.outputs.matrix2 }}
-    #      output3: ${{ steps.step3.outputs.matrix3 }}
+    # output1: ${{ steps.step1.outputs.matrix1 }}
+    # output2: ${{ steps.step2.outputs.matrix2 }}
+    # output3: ${{ steps.step3.outputs.matrix3 }}
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
@@ -114,13 +114,13 @@ jobs:
           MATRIX0="${{ inputs.get_dependencies }}"
           echo "MATRIX1=${MATRIX0}" >&2
           echo "::set-output name=matrix0::${MATRIX0}"
-      - id: step1
-        name: "🚀 Run 1"
-        if: ${{ inputs.call_arguments1 }}
-        run: |
-          MATRIX1="${{ inputs.call_arguments1 }}"
-          echo "MATRIX1=${MATRIX1}" >&2
-          echo "::set-output name=matrix1::${MATRIX1}"
+  #    - id: step1
+  #      name: "🚀 Run 1"
+  #      if: ${{ inputs.call_arguments1 }}
+  #      run: |
+  #        MATRIX1="${{ inputs.call_arguments1 }}"
+  #        echo "MATRIX1=${MATRIX1}" >&2
+  #        echo "::set-output name=matrix1::${MATRIX1}"
   #      - id: step2
   #        name: "🚀 Run 2"
   #        if: ${{ inputs.call_arguments2 }}
@@ -164,27 +164,27 @@ jobs:
       - if: ${{ inputs.pnpm_arguments }}
         name: "▶️ Run pnpm"
         run: ${{ inputs.pnpm_arguments }}
-      - if: ${{ inputs.yarn_arguments }}
-        name: "🟩 Setup Node"
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "yarn"
-      - if: ${{ inputs.yarn_arguments }}
-        name: "▶️ Run yarn"
-        run: ${{ inputs.yarn_arguments }}
-      - if: ${{ inputs.npm_arguments }}
-        name: "🟩 Setup Node"
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "npm"
-      - if: ${{ inputs.npm_arguments }}
-        name: "▶️ Run npm"
-        run: ${{ inputs.npm_arguments }}
-      - if: ${{ inputs.call_arguments1 }}
-        name: "🚀 Post run"
-        run: echo ${{needs.matrix.outputs.output1}}
+      #- if: ${{ inputs.yarn_arguments }}
+      #  name: "🟩 Setup Node"
+      #  uses: actions/setup-node@v3
+      #  with:
+      #    node-version: ${{ inputs.node_version }}
+      #    cache: "yarn"
+      #- if: ${{ inputs.yarn_arguments }}
+      #  name: "▶️ Run yarn"
+      #  run: ${{ inputs.yarn_arguments }}
+      #- if: ${{ inputs.npm_arguments }}
+      #  name: "🟩 Setup Node"
+      #  uses: actions/setup-node@v3
+      #  with:
+      #    node-version: ${{ inputs.node_version }}
+      #    cache: "npm"
+      #- if: ${{ inputs.npm_arguments }}
+      #  name: "▶️ Run npm"
+      #  run: ${{ inputs.npm_arguments }}
+      #- if: ${{ inputs.call_arguments1 }}
+      #  name: "🚀 Post run"
+      #  run: echo ${{needs.matrix.outputs.output1}}
       - uses: trunk-io/trunk-action@22e948f7bb9f870bc6c42625585f1ef27e9c5afc
         with:
           trunk-path: ${{ inputs.trunk_path }}
