@@ -154,14 +154,15 @@ jobs:
       #       run: echo ${{needs.matrix.outputs.output3}}
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟧 Setup pnpm"
-        uses: pnpm/action-setup@v2      
+        uses: pnpm/action-setup@v2
       - if: ${{ inputs.pnpm_arguments }}
-        name: "▶️ Run pnpm"      
+        name: "▶️ Setup pnpm cache" 
         uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node_version }}
-          cache: "pnpm"        
-      - run: ${{ inputs.pnpm_arguments }}
+          cache: "pnpm"
+      - if: ${{ inputs.pnpm_arguments }}
+        run: ${{ inputs.pnpm_arguments }}
       #- if: ${{ inputs.yarn_arguments }}
       #  name: "🟩 Setup Node"
       #  uses: actions/setup-node@v3
