@@ -156,7 +156,7 @@ jobs:
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
       - if: ${{ inputs.pnpm_arguments }}
-        name: "🟧 Setup pnpm cache"
+        name: "🟧 Setup cache"
         uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node_version }}
