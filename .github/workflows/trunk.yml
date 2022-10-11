@@ -156,12 +156,13 @@ jobs:
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
       - if: ${{ inputs.pnpm_arguments }}
-        name: "▶️ Setup pnpm cache" 
+        name: "🟧 Setup pnpm cache"
         uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
       - if: ${{ inputs.pnpm_arguments }}
+        name: "🟩 Run pnpm"
         run: ${{ inputs.pnpm_arguments }}
       #- if: ${{ inputs.yarn_arguments }}
       #  name: "🟩 Setup Node"
