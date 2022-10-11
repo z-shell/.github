@@ -11,7 +11,7 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.4
+      ref: v0.0.5
       uri: https://github.com/trunk-io/plugins
 repo:
   repo:
@@ -32,8 +32,8 @@ lint:
     - svgo@2.8.0
     - git-diff-check@SYSTEM
     - hadolint@2.10.0
-    - actionlint@1.6.19
-    - gitleaks@8.13.0
+    - actionlint@1.6.21
+    - gitleaks@8.14.1
     - markdownlint@0.32.2
     - prettier@2.7.1
     - shfmt@3.5.0
