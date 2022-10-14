@@ -33,7 +33,7 @@ lint:
     - git-diff-check@SYSTEM
     - hadolint@2.10.0
     - actionlint@1.6.21
-    - gitleaks@8.14.1
+    - gitleaks@8.15.0
     - markdownlint@0.32.2
     - prettier@2.7.1
     - shfmt@3.5.0
