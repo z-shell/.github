@@ -1,7 +1,7 @@
 <div align="center">
 
 <a target="_self" href="https://github.com/z-shell/zi/">
-  <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/z_git.png" alt="ZI+GIT Logo" />
+  <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/branch_box.png" alt="ZI+GIT Logo" />
 </a>
 <a target="_self" href="https://github.com/z-shell/zi/">
   <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/metrics.svg" />
