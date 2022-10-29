@@ -99,13 +99,11 @@ on:
 jobs:
   matrix:
     runs-on: ${{ inputs.runs-on }}
-    outputs:
-      output0: ${{ steps.step0.outputs.matrix0 }}
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: step0
-        name: "🚀 Run 0"
+        name: "🚀 Pre run"
         if: ${{ inputs.get_dependencies }}
         run: |
           echo "MATRIX=${{ inputs.get_dependencies }}" >> $GITHUB_ENV
