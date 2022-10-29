@@ -4,7 +4,7 @@ runtimes:
     - go@1.18.3
     - node@16.14.2
 cli:
-  version: 0.18.1-beta
+  version: 1.0.1
   options:
     - commands: [check, fmt]
     - args: -y
@@ -29,7 +29,7 @@ actions:
     - trunk-upgrade
 lint:
   enabled:
-    - svgo@2.8.0
+    - svgo@3.0.0
     - git-diff-check@SYSTEM
     - hadolint@2.10.0
     - actionlint@1.6.21
