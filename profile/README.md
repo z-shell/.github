@@ -11,10 +11,12 @@
 </a>
 <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
   <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/pagespeed/detailed.svg" />
-</a>  
+</a>
+<!--
 <a title="Z-Shell Projects" target="_self" href="https://github.com/orgs/z-shell/projects">
   <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/projects/projects.svg" />
 </a>
+-->
 <a title="Twitter" target="_self" href="https://twitter.com/zshell_zi/">
   <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/tweets/tweets.svg" />
 </a>
