@@ -2,7 +2,7 @@
 name: "⭐ Star"
 on:
   watch:
-  workflow_call:
+    types: [started]
 
 jobs:
   star:
