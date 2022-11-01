@@ -16,7 +16,7 @@ inputs:
   commitMessage:
     description: "Message to log for this commit"
     required: false
-    default: "Regenerate build artifacts."
+    default: "${{ github.sha }}"
   commitUserEmail:
     description: "User email for the commit message"
     required: false
