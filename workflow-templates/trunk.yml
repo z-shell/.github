@@ -21,6 +21,7 @@ jobs:
     uses: z-shell/.github/.github/workflows/trunk.yml@main
     secrets:
       trunk-token: ${{ secrets.TRUNK_TOKEN }}
+
     # Trunk arguments (optional)
     #with:
     # GitHub Actions OS, defaults to ubuntu-latest (Optional).

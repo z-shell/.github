@@ -13,8 +13,9 @@ jobs:
         uses: z-shell/.github/actions/commit@main
         with:
           # Optional: Git Commit Message. Defaults to "Regenerate build artifacts."
-          commitMessage: Checksum ${{ github.sha }}
-          # Optional: workDir: - Optional. To specify a directory other than the repository root to check for changed files.
+          commitMessage: ${{ github.sha }}
+          # Optional: workDir: - Optional.
+          # To specify a directory other than the repository root to check for changed files.
           workDir: .
           commitUserName: ${{ secrets.ACTIONS_USER }}
           commitUserEmail: ${{ secrets.ACTIONS_MAIL }}

@@ -33,8 +33,3 @@ jobs:
           plugin_projects: yes
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
-      - name: "📤 Archive metrics SVG"
-        uses: actions/upload-artifact@v3
-        with:
-          name: metrics-svg
-          path: metrics

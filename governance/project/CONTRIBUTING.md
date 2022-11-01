@@ -6,7 +6,7 @@ You represent that if you do not own copyright in the code that you have the aut
 
 [Should be further filled in by the project - including defining the requirements to reach maintainer status]
 
-The Project abides by the Organization's [code of conduct](https://github.com/z-shell/.github/blob/main/governance/organization/CODE_OF_CONDUCT.md) and [trademark policy](https://github.com/z-shell/.github/blob/main/governance/organization/TRADEMARKS.md).
+The Project abides by the Organization's [code of conduct](CODE_OF_CONDUCT.md) and [trademark policy](https://github.com/z-shell/.github/blob/main/governance/organization/TRADEMARKS.md).
 
 ## Community membership
 
