@@ -51,7 +51,7 @@ on:
         required: false
         type: string
       get_dependencies:
-        description: "Pass commands prepare or install dependencies"
+        description: "Pass commands to prepare or install dependencies"
         required: false
         type: string
       call_arguments1:
@@ -97,27 +97,14 @@ on:
         type: string
 
 jobs:
-  matrix:
-    runs-on: ${{ inputs.runs-on }}
-    outputs:
-      matrix: ${{ steps.dependencies.outputs.matrix }}    
-    steps:
-      - id: dependencies
-        name: "🚀 Pre run"
-        if: ${{ inputs.get_dependencies }}
-        run: |
-          echo "matrix=${{ inputs.get_dependencies }}" >> $GITHUB_OUTPUT
-
   trunk:
     runs-on: ${{ inputs.runs-on }}
-    needs:
-      - matrix
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - if: ${{ inputs.get_dependencies }}
-        name: "🚀 Pre run"
-        run: echo "${{ needs.matrix.outputs.dependencies }}
+        name: "🚀 Prepare"
+        run: echo ${{ inputs.get_dependencies }}
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
