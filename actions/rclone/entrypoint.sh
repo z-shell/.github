@@ -32,4 +32,4 @@ if [[ ! -x "$(command -v rclone)" ]]; then
 fi
 
 run_rclone=$(sh -c "rclone $*")
-echo "::set-output name=rclone::$run_rclone"
+echo "rclone=$run_rclone" >> $GITHUB_OUTPUT
