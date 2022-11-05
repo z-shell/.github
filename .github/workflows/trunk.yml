@@ -99,12 +99,14 @@ on:
 jobs:
   matrix:
     runs-on: ${{ inputs.runs-on }}
+    outputs:
+      matrix: ${{ steps.dependencies.outputs.matrix }}    
     steps:
-      - id: step0
+      - id: dependencies
         name: "🚀 Pre run"
         if: ${{ inputs.get_dependencies }}
         run: |
-          echo "MATRIX=${{ inputs.get_dependencies }}" >> $GITHUB_ENV
+          echo "matrix=${{ inputs.get_dependencies }}" >> $GITHUB_OUTPUT
 
   trunk:
     runs-on: ${{ inputs.runs-on }}
@@ -115,7 +117,7 @@ jobs:
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - if: ${{ inputs.get_dependencies }}
         name: "🚀 Pre run"
-        run: echo "${{ env.action_state }}"
+        run: echo "${{ needs.matrix.outputs.dependencies }}
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟧 Setup pnpm"
         uses: pnpm/action-setup@v2
