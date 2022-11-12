@@ -36,7 +36,7 @@ jobs:
           base: ""
           plugin_rss: yes
           plugin_rss_source: ${{ env.zsh_activity_url }}
-          plugin_rss_limit: 2      
+          plugin_rss_limit: 2
       - uses: lowlighter/metrics@cf98a50eb63499d520bea42d8129d1cb8682de0f
         with:
           filename: ${{ env.tweets_svg }}
