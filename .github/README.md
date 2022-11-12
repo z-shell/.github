@@ -33,20 +33,20 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.4
+      ref: v0.0.6
       uri: https://github.com/trunk-io/plugins
 repo:
   repo:
     host: github.com
     owner: z-shell
-    name: <repo>
+    name: .github
 actions:
   enabled:
+    - trunk-announce
     - trunk-check-pre-push
     - trunk-fmt-pre-commit
+    - trunk-upgrade-available
     - trunk-cache-prune
-    - trunk-check-upgrade
-    - trunk-upgrade
 lint:
   enabled:
     - git-diff-check@SYSTEM
