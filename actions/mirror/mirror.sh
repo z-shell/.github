@@ -14,7 +14,7 @@ echo "SOURCE=$SOURCE_REPO"
 echo "DESTINATION=$DESTINATION_REPO"
 echo "DRY RUN=$DRY_RUN"
 
-command git clone --mirror "$SOURCE_REPO" "$SOURCE_DIR" && cd "$SOURCE_DIR" || true
+command git clone --mirror "$SOURCE_REPO" "$SOURCE_DIR" && cd "$SOURCE_DIR"
 command git remote set-url --push origin "$DESTINATION_REPO"
 command git fetch -p origin
 command git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
