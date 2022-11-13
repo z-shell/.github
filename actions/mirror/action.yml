@@ -1,0 +1,26 @@
+name: "GitHub Action - Mirror"
+description: "Action for mirroring a remote repository using SSH."
+author: "z-shell"
+branding:
+  icon: "copy"
+  color: "green"
+inputs:
+  source:
+    description: "SSH URL of the source repository."
+    required: true
+    default: ""
+  target:
+    description: "SSH URL of the target repository"
+    required: true
+    default: ""
+  dry-run:
+    description: "Dry-run"
+    required: false
+    default: "false"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.source }}
+    - ${{ inputs.target }}
+    - ${{ inputs.dry-run }}
