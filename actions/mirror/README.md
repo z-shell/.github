@@ -2,13 +2,13 @@
 
 ## Example workflow
 
-```yml
-name: "SSH Mirror"
+```yaml
+---
+name: "🔄 SSH Mirror"
 
 on:
-  push:
-  delete:
-  create:
+  schedule:
+    - cron: "0 12 * * *"
   workflow_dispatch:
     inputs:
       dry-run:
@@ -32,11 +32,12 @@ jobs:
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         with:
           # SSH URL of the source repository (required).
-          source: "git@example1.com:user/repo.git"
+          source: "ssh://sallsource@git.code.sf.net/p/zsh/web"
           # SSH URL of the target repository (required).
-          target: "git@example2.com:user/repo.git"
-          # Do not apply any changes (optional).
-          dry-run: false
+          target: "ssh://git@github.com/z-shell/web"
+          # Manually dispatch workflow and set dry-run: [true/false] (optional).
+          dry-run: ${{ inputs.dry-run }}
+
 ```
 
 ## Docker
