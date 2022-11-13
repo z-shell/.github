@@ -17,7 +17,7 @@ on:
         default: "false"
 
 concurrency:
-group: ssh-mirror-${{ github.ref }}
+  group: ssh-mirror-${{ github.ref }}
 
 jobs:
   ssh-mirror:
