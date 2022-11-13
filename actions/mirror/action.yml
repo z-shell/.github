@@ -1,5 +1,5 @@
-name: "GitHub Action - Mirror"
-description: "Action for mirroring a remote repository using SSH."
+name: "GitHub Action - SSH Mirror"
+description: "Action for mirroring a remote repositories using SSH."
 author: "z-shell"
 branding:
   icon: "copy"
