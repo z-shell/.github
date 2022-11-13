@@ -37,7 +37,6 @@ jobs:
           target: "ssh://git@github.com/z-shell/web"
           # Manually dispatch workflow and set dry-run: [true/false] (optional).
           dry-run: ${{ inputs.dry-run }}
-
 ```
 
 ## Docker
