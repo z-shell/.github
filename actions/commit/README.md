@@ -15,6 +15,13 @@ jobs:
   grunt-build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+      - run: |
+          echo "Something to be commited"
+          date > date.txt
       - name: "🆗 Commit"
         uses: z-shell/.github/actions/commit@main
         #  with:
