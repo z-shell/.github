@@ -27,11 +27,11 @@ actions:
     - trunk-cache-prune
 lint:
   enabled:
-    - svgo@3.0.1
+    - svgo@3.0.2
     - git-diff-check@SYSTEM
     - hadolint@2.12.0
     - actionlint@1.6.22
-    - gitleaks@8.15.0
+    - gitleaks@8.15.1
     - markdownlint@0.32.2
     - prettier@2.7.1
     - shfmt@3.5.0
