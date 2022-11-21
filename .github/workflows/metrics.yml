@@ -4,8 +4,7 @@ on:
   schedule:
     - cron: "02 02 * * *"
   push:
-    paths: [.github/workflows/metrics.yml]
-  pull_request:
+    branches: [main]  
     paths: [.github/workflows/metrics.yml]
   workflow_dispatch: {}
 
