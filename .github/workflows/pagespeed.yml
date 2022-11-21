@@ -4,9 +4,8 @@ on:
   schedule:
     - cron: "0 3 * * */3"
   push:
-    paths: [.github/workflows/pagespeed.yml]
-  pull_request:
-    paths: [.github/workflows/pagespeed.yml]
+    branches: [main]  
+    paths: [.github/workflows/pagespeed.yml]    
   workflow_dispatch: {}
 
 concurrency:
