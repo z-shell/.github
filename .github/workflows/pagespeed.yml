@@ -22,7 +22,7 @@ jobs:
     environment: metrics
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: lowlighter/metrics@4c94975e259100ec9ba654cddcc8ed8bf720193e
+      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.pagespeed_svg }}
           token: NOT_NEEDED
