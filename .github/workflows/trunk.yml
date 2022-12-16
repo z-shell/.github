@@ -117,7 +117,7 @@ jobs:
       - if: ${{ inputs.pnpm_arguments }}
         name: "🟩 Run pnpm"
         run: ${{ inputs.pnpm_arguments }}
-      - uses: trunk-io/trunk-action@22e948f7bb9f870bc6c42625585f1ef27e9c5afc
+      - uses: trunk-io/trunk-action@274409d390f23841b19a1b84b55339196b56453d
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
