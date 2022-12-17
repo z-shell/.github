@@ -30,7 +30,7 @@ jobs:
           filename: ${{ env.metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
-          base: header, repositories
+          base: ""
           plugin_lines: yes
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
