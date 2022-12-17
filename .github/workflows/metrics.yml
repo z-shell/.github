@@ -66,7 +66,7 @@ jobs:
           template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
-          base: header, activity,community,repositories          
+          base: header, activity,community,repositories
           repo: wiki
           plugin_followup: yes
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
@@ -75,7 +75,7 @@ jobs:
           template: repository
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
-          base: header, activity,community,repositories          
+          base: header, activity,community,repositories
           repo: f-sy-h
           plugin_followup: yes
       - name: "📤 Archive metrics SVG"
