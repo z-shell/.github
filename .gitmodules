@@ -1,3 +1,0 @@
-[submodule "community"]
-	path = community
-	url = git@github.com:z-shell/community.git
