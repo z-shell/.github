@@ -6,12 +6,10 @@
 <a target="_self" href="https://github.com/z-shell/zi/">
   <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/metrics.svg" />
 </a>
-<!--
-<a target="_self" href="https://github.com/orgs/z-shell/projects">
-  <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/followup/followup.svg" />
+<a target="_self" href="https://github.com/orgs/z-shell">
+  <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/stargazers/worldmap.svg" />
 </a>
--->
-<a title="ZI WIKI" target="_self" href="https://github.com/z-shell/zw/">
+<a title="ZI WIKI" target="_self" href="https://github.com/z-shell/wiki">
   <img align="center" style="width:80%;height:auto" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/pagespeed/detailed.svg" />
 </a>
 <!--
