@@ -1,29 +1,22 @@
 version: 0.1
-runtimes:
-  enabled:
-    - go@1.18.3
-    - node@16.14.2
 cli:
   version: 1.2.1
   options:
+    - commands: [ALL]
+      args: --monitor=true
     - commands: [check, fmt]
     - args: -y
-plugins:
-  sources:
-    - id: trunk
-      ref: v0.0.8
-      uri: https://github.com/trunk-io/plugins
 repo:
   repo:
     host: github.com
     owner: z-shell
     name: .github
-actions:
-  enabled:
-    - trunk-announce
-    - trunk-check-pre-push
-    - trunk-upgrade-available
-    - trunk-cache-prune
+plugins:
+  sources:
+    - id: trunk
+      uri: https://github.com/trunk-io/plugins
+      ref: v0.0.8
+      import_to_global: true
 lint:
   enabled:
     - oxipng@7.0.0
@@ -40,3 +33,15 @@ lint:
     - linters: [svgo]
       paths:
         - "metrics/**"
+runtimes:
+  enabled:
+    - go@1.18.3
+    - node@16.14.2
+actions:
+  enabled:
+    - git-lfs
+    - trunk-upgrade-available
+    - trunk-fmt-pre-commit
+    - trunk-check-pre-push
+    - trunk-cache-prune
+    - trunk-announce
