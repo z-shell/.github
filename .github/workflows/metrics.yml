@@ -10,7 +10,7 @@ on:
 
 env:
   metrics_svg: metrics/plugin/metrics.svg
-  repositories_svg: metrics/plugin/repositories_metrics.svg
+  repositories_metrics_svg: metrics/plugin/repositories_metrics.svg
   followup_svg: metrics/plugin/followup/followup.svg
   stargazers_worldmap_svg: metrics/plugin/stargazers/worldmap.svg
   zi_followup_svg: metrics/plugin/followup/zi_followup.svg
