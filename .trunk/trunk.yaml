@@ -39,7 +39,6 @@ runtimes:
     - node@16.14.2
 actions:
   enabled:
-    - git-lfs
     - trunk-upgrade-available
     - trunk-fmt-pre-commit
     - trunk-check-pre-push
