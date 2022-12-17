@@ -8,10 +8,6 @@ on:
     paths: [.github/workflows/metrics.yml]
   workflow_dispatch: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   metrics_svg: metrics/plugin/metrics.svg
   followup_svg: metrics/plugin/followup/followup.svg
@@ -24,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: metrics
+    concurrency:
+      group: ci-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
@@ -31,6 +30,8 @@ jobs:
           filename: ${{ env.metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
+          base: header, repositories
+          plugin_lines: yes
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.followup_svg }}
