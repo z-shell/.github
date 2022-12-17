@@ -11,6 +11,7 @@ on:
 env:
   metrics_svg: metrics/plugin/metrics.svg
   followup_svg: metrics/plugin/followup/followup.svg
+  stargazers_worldmap_svg: metrics/plugin/stargazers/worldmap.svg
   zi_followup_svg: metrics/plugin/followup/zi_followup.svg
   wiki_followup_svg: metrics/plugin/followup/wiki_followup.svg
   f-sy-h_followup_svg: metrics/plugin/followup/f-sy-h_followup.svg
@@ -30,8 +31,17 @@ jobs:
           filename: ${{ env.metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
-          base: ""
           plugin_lines: yes
+      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+        with:
+          filename: ${{ env.stargazers_worldmap_svg }}
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_stargazers: no
+          plugin_stargazers_charts: no
+          plugin_stargazers_worldmap: yes
+          plugin_stargazers_worldmap_token: ${{ secrets.GOOGLE_MAP_TOKEN }}
+          #plugin_stargazers_worldmap_sample: 200
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.followup_svg }}
