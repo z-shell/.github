@@ -43,8 +43,8 @@
                                     <rect class="day" x="30" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
                                     <rect class="day" x="45" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
                                     <rect class="day" x="60" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
-                                    <rect class="day" x="75" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-L4-bg)" rx="2" ry="2"/>
-                                    <rect class="day" x="90" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
+                                    <rect class="day" x="75" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
+                                    <rect class="day" x="90" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-L4-bg)" rx="2" ry="2"/>
                                     <rect class="day" x="105" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
                                     <rect class="day" x="120" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
                                     <rect class="day" x="135" y="0" width="11" height="11" fill="var(--color-calendar-graph-day-bg)" rx="2" ry="2"/>
@@ -166,7 +166,7 @@
                 </div>
             </div>
             <footer>
-                <span>Last updated 16 Dec 2022, 12:06:10 with lowlighter/metrics@3.30.0</span>
+                <span>Last updated 17 Dec 2022, 02:38:48 with lowlighter/metrics@3.30.0</span>
             </footer>
         </div>
         <div xmlns="http://www.w3.org/1999/xhtml" id="metrics-end"></div>
