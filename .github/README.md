@@ -26,35 +26,44 @@ Example preset of [.trunk/trunk.yaml](../.trunk/trunk.yaml):
 ```yaml
 version: 0.1
 cli:
-  version: 0.18.0-beta
+  version: 1.2.1
   options:
+    - commands: [ALL]
+      args: --monitor=true
     - commands: [check, fmt]
     - args: -y
-plugins:
-  sources:
-    - id: trunk
-      ref: v0.0.6
-      uri: https://github.com/trunk-io/plugins
 repo:
   repo:
     host: github.com
     owner: z-shell
     name: .github
-actions:
-  enabled:
-    - trunk-announce
-    - trunk-check-pre-push
-    - trunk-fmt-pre-commit
-    - trunk-upgrade-available
-    - trunk-cache-prune
+plugins:
+  sources:
+    - id: trunk
+      uri: https://github.com/trunk-io/plugins
+      ref: v0.0.8
+      import_to_global: true
 lint:
   enabled:
+    - oxipng@7.0.0
+    - svgo@3.0.2
     - git-diff-check@SYSTEM
-    - actionlint@1.6.16
-    - gitleaks@8.11.2
+    - actionlint@1.6.22
+    - gitleaks@8.15.2
     - markdownlint@0.32.2
-    - prettier@2.7.1
+    - prettier@2.8.1
     - shfmt@3.5.0
+runtimes:
+  enabled:
+    - go@1.18.3
+    - node@16.14.2
+actions:
+  enabled:
+    - trunk-upgrade-available
+    - trunk-fmt-pre-commit
+    - trunk-check-pre-push
+    - trunk-cache-prune
+    - trunk-announce
 ```
 
 ## Renovate Mend
