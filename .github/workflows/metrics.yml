@@ -49,7 +49,6 @@ jobs:
           plugin_stargazers_charts: no
           plugin_stargazers_worldmap: yes
           plugin_stargazers_worldmap_token: ${{ secrets.GOOGLE_MAP_TOKEN }}
-          #plugin_stargazers_worldmap_sample: 200
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.followup_svg }}
@@ -85,8 +84,3 @@ jobs:
           base: header, activity,community,repositories
           repo: f-sy-h
           plugin_followup: yes
-      - name: "📤 Archive metrics SVG"
-        uses: actions/upload-artifact@v3
-        with:
-          name: metrics-svg
-          path: metrics
