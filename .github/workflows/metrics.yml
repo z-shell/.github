@@ -38,6 +38,7 @@ jobs:
           filename: ${{ env.stargazers_worldmap_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
+          user: ${{ github.repository_owner }}
           plugin_stargazers: true
           plugin_stargazers_charts: no
           plugin_stargazers_worldmap: yes
