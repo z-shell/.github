@@ -38,7 +38,7 @@ jobs:
           filename: ${{ env.repositories_metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
-          base: repositories          
+          base: repositories
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.stargazers_worldmap_svg }}
