@@ -19,6 +19,9 @@ plugins:
       import_to_global: true
 lint:
   enabled:
+    - isort@5.11.3
+    - flake8@6.0.0
+    - black@22.12.0
     - oxipng@7.0.0
     - svgo@3.0.2
     - git-diff-check@SYSTEM
@@ -35,6 +38,7 @@ lint:
         - "metrics/**"
 runtimes:
   enabled:
+    - python@3.10.8
     - go@1.18.3
     - node@16.14.2
 actions:
