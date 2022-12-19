@@ -6,7 +6,7 @@ RUN pip install \
 
 COPY verify_pr_lables.py /verify_pr_lables.py
 
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 ENTRYPOINT ["/verify_pr_lables.py"]
