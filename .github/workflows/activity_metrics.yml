@@ -46,7 +46,7 @@ jobs:
           repo: zi
           plugin_people: yes
           plugin_people_thanks: ss-o
-          plugin_people_types: contributors, stargazers, watchers
+          plugin_people_types: contributors, stargazers, thanks
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.wiki-repository-people_svg }}
@@ -56,7 +56,7 @@ jobs:
           template: repository
           repo: wiki
           plugin_people: yes
-          plugin_people_types: contributors, stargazers, watchers
+          plugin_people_types: contributors, stargazers
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.f-sy-h-repository-people_svg }}
@@ -66,7 +66,7 @@ jobs:
           template: repository
           repo: F-Sy-H
           plugin_people: yes
-          plugin_people_types: contributors, stargazers, watchers
+          plugin_people_types: contributors, stargazers
       - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
         with:
           filename: ${{ env.org-people_svg }}
