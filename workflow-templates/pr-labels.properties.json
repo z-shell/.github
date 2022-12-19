@@ -1,5 +1,5 @@
 {
-  "name": "Pull Request Labels",
-  "description": "Workflow check pull request labels",
+  "name": "Verify PR Labels",
+  "description": "GitHub Action verifies pull-request labels",
   "iconName": "z-shell"
 }
