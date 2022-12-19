@@ -1,7 +1,7 @@
 FROM python:3.11.1-alpine3.17
 
 RUN pip install \
-  --root-user-action=ignore
+  --root-user-action=ignore \
   --no-cache-dir pygithub==1.57
 
 COPY verify_pr_lables.py /verify_pr_lables.py
