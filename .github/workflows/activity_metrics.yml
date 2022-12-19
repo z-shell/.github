@@ -3,7 +3,7 @@ name: "🌀 Z Activity"
 
 on:
   schedule:
-    - cron: "0 1 * * 0/2"
+    - cron: "0 1 * * 0/4"
   workflow_dispatch:
   push:
     branches: [main]
@@ -15,6 +15,10 @@ concurrency:
 
 env:
   projects_svg: metrics/plugin/projects/projects.svg
+  org-people_svg: metrics/plugin/people/org-people.svg
+  zi-repository-people_svg: metrics/plugin/people/zi-repository.svg
+  wiki-repository-people_svg: metrics/plugin/people/wiki-repository.svg
+  f-sy-h-repository-people_svg: metrics/plugin/people/f-sy-h-repository.svg
 
 jobs:
   metrics-activity:
@@ -32,3 +36,38 @@ jobs:
           plugin_projects: yes
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
+      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+        with:
+          filename: ${{ env.zi-repository-people_svg }}
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          repo: zi
+          plugin_people: yes
+          plugin_people_thanks: ss-o
+          plugin_people_types: contributors, stargazers, watchers
+      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+        with:
+          filename: ${{ env.wiki-repository-people_svg }}
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          repo: wiki
+          plugin_people: yes
+          plugin_people_types: contributors, stargazers, watchers
+      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+        with:
+          filename: ${{ env.f-sy-h-repository-people_svg }}
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          template: repository
+          repo: F-Sy-H
+          plugin_people: yes
+          plugin_people_types: contributors, stargazers, watchers
+      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+        with:
+          filename: ${{ env.org-people_svg }}
+          token: ${{ secrets.ORG_TOKEN }}
+          base: ""
+          plugin_people: yes
+          plugin_people_types: followers
