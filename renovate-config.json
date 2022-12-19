@@ -31,7 +31,7 @@
   },
   "lockFileMaintenance": {
     "commitBody": "[skip CI]",
-    "enabled": true,
+    "enabled": false,
     "automerge": true
   },
   "labels": ["dependencies 📦"],
