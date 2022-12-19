@@ -4,8 +4,8 @@ RUN pip install --no-cache-dir pygithub==1.57
 
 COPY verify_pr_lables.py /verify_pr_lables.py
 
-# Force stdin, stdout and stderr to be totally unbuffered.
-# This warranty the order of output messages send to the console
+ENV ENV PIP_ROOT_USER_ACTION=ignore
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED=1
 
 ENTRYPOINT ["/verify_pr_lables.py"]
