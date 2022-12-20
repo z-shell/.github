@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">My Shell Setup</div>
-                                <div class="date">27 Nov 2022</div>
+                                <div class="title">What's in my RC 2022</div>
+                                <div class="date">19 Dec 2022</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Configuring macOS command line</div>
-                                <div class="date">7 Nov 2022</div>
+                                <div class="title">My Shell Setup</div>
+                                <div class="date">27 Nov 2022</div>
                             </div>
                         </div>
                     </section>
