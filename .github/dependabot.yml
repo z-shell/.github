@@ -13,3 +13,7 @@ updates:
     directory: "/actions/rclone/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/actions/verify-pr-labels/"
+    schedule:
+      interval: "weekly"
