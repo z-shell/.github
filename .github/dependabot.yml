@@ -17,3 +17,11 @@ updates:
     directory: "/actions/verify-pr-labels/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/actions/mirror/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/actions/rebase/"
+    schedule:
+      interval: "weekly"
