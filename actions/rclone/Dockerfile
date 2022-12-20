@@ -1,5 +1,4 @@
-ARG VERSION=edge
-FROM alpine:${VERSION}
+FROM alpine:3.17
 
 LABEL repository="http://github.com/z-shell/.github"
 LABEL homepage="http://github.com/z-shell/.github"
@@ -11,9 +10,14 @@ LABEL "com.github.actions.icon"="arrow-up"
 LABEL "com.github.actions.color"="green"
 
 # trunk-ignore(hadolint/DL3018)
-RUN apk --no-cache add coreutils \
-bash ca-certificates fuse openssh-client rclone \
-&& rclone selfupdate -q
+RUN apk --no-cache add \
+  coreutils \
+  bash \
+  ca-certificates \
+  fuse \
+  openssh-client\
+  rclone \
+  && rclone selfupdate -q
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
