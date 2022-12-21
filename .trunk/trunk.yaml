@@ -19,7 +19,7 @@ plugins:
       import_to_global: true
 lint:
   enabled:
-    - isort@5.11.3
+    - isort@5.11.4
     - flake8@6.0.0
     - black@22.12.0
     - oxipng@7.0.0
