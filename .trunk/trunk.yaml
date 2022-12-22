@@ -39,7 +39,7 @@ lint:
 runtimes:
   enabled:
     - python@3.10.8
-    - go@1.18.3
+    - go@1.19.4
     - node@18.12.1
 actions:
   enabled:
