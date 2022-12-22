@@ -27,19 +27,19 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: header
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.repositories_metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: repositories
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.stargazers_worldmap_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -49,7 +49,7 @@ jobs:
           plugin_stargazers_charts: no
           plugin_stargazers_worldmap: yes
           plugin_stargazers_worldmap_token: ${{ secrets.GOOGLE_MAP_TOKEN }}
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.followup_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
           user: ${{ github.repository_owner }}
           plugin_followup: yes
           plugin_followup_indepth: yes
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.zi_followup_svg }}
           template: repository
@@ -66,7 +66,7 @@ jobs:
           base: header, activity,community,repositories
           repo: zi
           plugin_followup: yes
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.wiki_followup_svg }}
           template: repository
@@ -75,7 +75,7 @@ jobs:
           base: header, activity,community,repositories
           repo: wiki
           plugin_followup: yes
-      - uses: lowlighter/metrics@f99da6c94154d2a35384b004b2cfbd7cc83830b9
+      - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.f-sy-h_followup_svg }}
           template: repository
