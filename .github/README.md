@@ -30,8 +30,8 @@ cli:
   options:
     - commands: [ALL]
       args: --monitor=true
-    - commands: [check, fmt]
-    - args: -y
+    - commands: [check]
+      args: -y
 repo:
   repo:
     host: github.com
@@ -55,8 +55,8 @@ lint:
     - shfmt@3.5.0
 runtimes:
   enabled:
-    - go@1.18.3
-    - node@16.14.2
+    - go@1.19.4
+    - node@18.12.1
 actions:
   enabled:
     - trunk-upgrade-available
