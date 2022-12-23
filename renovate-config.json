@@ -21,7 +21,7 @@
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "groupName": "all dependencies",
   "groupSlug": "all",
-  "separateMajorMinor": false,
+  "separateMajorMinor": true,
   "separateMinorPatch": true,
   "patch": {
     "automerge": true
@@ -32,8 +32,8 @@
   },
   "lockFileMaintenance": {
     "commitBody": "[skip CI]",
-    "enabled": false,
-    "automerge": true
+    "automerge": true,
+    "extends": ["group:all"]
   },
   "labels": ["dependencies 📦"],
   "packageRules": [
@@ -43,15 +43,38 @@
     },
     {
       "matchDepTypes": ["optionalDependencies"],
+      "groupSlug": "optional-dependencies",
       "automerge": true
     },
     {
       "matchDepTypes": ["devDependencies"],
+      "groupSlug": "dev-dependencies",
       "automerge": true
     },
     {
       "matchDepTypes": ["peerDependencies"],
+      "groupSlug": "peer-dependencies",
       "automerge": true
+    },
+    {
+      "groupName": "Eslint",
+      "groupSlug": "eslint-packages",
+      "matchPackagePatterns": ["^eslint"]
+    },
+    {
+      "groupName": "Stylelint",
+      "groupSlug": "stylelint-packages",
+      "matchPackagePatterns": ["^stylelint"]
+    },
+    {
+      "groupName": "Docusaurus",
+      "groupSlug": "docusaurus-packages",
+      "matchPackagePrefixes": ["@docusaurus/"]
+    },
+    {
+      "groupName": "Font Awesome",
+      "groupSlug": "fontawesome-packages",
+      "matchPackagePrefixes": ["@fortawesome/"]
     },
     {
       "matchPackagePrefixes": ["@types/"],
