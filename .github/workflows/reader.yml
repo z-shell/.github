@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: metrics
+    if: github.repository == 'z-shell/.github'    
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
