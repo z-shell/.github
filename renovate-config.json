@@ -57,6 +57,12 @@
       "automerge": true
     },
     {
+      "rebaseWhen": "behind-base-branch",
+      "groupSlug": "pin-dependencies",
+      "commitMessageAction": "Pin",
+      "group": {"commitMessageTopic": "dependencies", "commitMessageExtra": ""}
+    },
+    {
       "groupName": "Eslint",
       "groupSlug": "eslint-packages",
       "matchPackagePatterns": ["^eslint"]
