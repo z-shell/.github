@@ -78,7 +78,7 @@ on:
 
 jobs:
   trunk:
-    name: "⭕ Trunk Check"
+    name: "✨ Checking"
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: "⤵ Check out code from GitHub"
