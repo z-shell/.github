@@ -54,18 +54,6 @@ on:
         description: "Pass commands to prepare or install dependencies"
         required: false
         type: string
-      call_arguments1:
-        description: "Pass first argument"
-        required: false
-        type: string
-      call_arguments2:
-        description: "Pass second argument"
-        required: false
-        type: string
-      call_arguments3:
-        description: "Pass third argument"
-        required: false
-        type: string
       call_on_fail:
         description: "Pass argument to run on failure"
         required: false
@@ -83,48 +71,40 @@ on:
         default: "16"
         required: false
         type: string
-      npm_arguments:
-        description: "Pass arguments to npm"
-        required: false
-        type: string
       pnpm_arguments:
-        description: "Pass arguments to pnpm"
-        required: false
-        type: string
-      yarn_arguments:
         description: "Pass arguments to pnpm"
         required: false
         type: string
 
 jobs:
   trunk:
+    name: "⭕ Trunk Check"
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: "⤵️ Check out code from GitHub"
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - name: "⤵ Check out code from GitHub"
+        uses: actions/checkout@v3.2.0
+        with:
+          fetch-depth: 0
       - if: ${{ inputs.get_dependencies }}
-        name: "🚀 Prepare"
+        name: "🏗 Prepare"
         run: echo ${{ inputs.get_dependencies }}
       - if: ${{ inputs.pnpm_arguments }}
-        name: "🟧 Setup pnpm"
-        uses: pnpm/action-setup@v2
+        name: "📦 Setup pnpm"
+        uses: pnpm/action-setup@v2.2.4
       - if: ${{ inputs.pnpm_arguments }}
-        name: "🟧 Setup cache"
-        uses: actions/setup-node@v3
+        name: "⎔ Setup node"
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
       - if: ${{ inputs.pnpm_arguments }}
-        name: "🟩 Run pnpm"
+        name: "🚀 Run"
         run: ${{ inputs.pnpm_arguments }}
-      - uses: trunk-io/trunk-action@274409d390f23841b19a1b84b55339196b56453d
+      - name: "✨ Check"
+        uses: trunk-io/trunk-action@274409d390f23841b19a1b84b55339196b56453d
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
           check-mode: ${{ inputs.check-mode }}
           upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
-
-      - if: ${{ failure() }}
-        name: "🆘 Run on fail"
-        run: ${{ inputs.call_on_fail }}
