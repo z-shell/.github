@@ -26,12 +26,7 @@ Example preset of [.trunk/trunk.yaml](../.trunk/trunk.yaml):
 ```yaml
 version: 0.1
 cli:
-  version: 1.2.1
-  options:
-    - commands: [ALL]
-      args: --monitor=true
-    - commands: [check]
-      args: -y
+  version: 1.3.1
 repo:
   repo:
     host: github.com
