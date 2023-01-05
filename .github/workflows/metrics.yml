@@ -27,7 +27,7 @@ jobs:
       cancel-in-progress: true
     if: github.repository == 'z-shell/.github'
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - uses: lowlighter/metrics@c1240845bc6547ad60bfcf8d26838c82be83d573
         with:
           filename: ${{ env.metrics_svg }}
