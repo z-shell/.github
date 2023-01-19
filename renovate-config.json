@@ -5,14 +5,21 @@
     "config:base",
     ":dependencyDashboard",
     ":semanticPrefixFixDepsChoreOthers",
+    ":separateMultipleMajorReleases",
+    ":enableVulnerabilityAlerts",
     ":ignoreModulesAndTests",
     ":autodetectPinVersions",
-    ":prHourlyLimit2",
     ":prConcurrentLimit10",
-    ":gitSignOff",
-    "group:monorepos",
     "group:recommended",
-    "workarounds:all"
+    ":automergeLinters",
+    ":prHourlyLimit2",
+    ":automergeMinor",
+    ":automergePatch",
+    ":automergeTypes",
+    "group:monorepos",
+    "workarounds:all",
+    ":gitSignOff",
+    ":pinSkipCi"
   ],
   "dependencyDashboardApproval": true,
   "dependencyDashboardAutoclose": true,
@@ -21,26 +28,8 @@
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "groupName": "all dependencies",
   "groupSlug": "all",
-  "separateMajorMinor": true,
-  "separateMinorPatch": true,
-  "patch": {
-    "automerge": true
-  },
-  "pin": {
-    "commitBody": "[skip CI]",
-    "automerge": true
-  },
-  "lockFileMaintenance": {
-    "commitBody": "[skip CI]",
-    "automerge": true,
-    "extends": ["group:all"]
-  },
   "labels": ["dependencies 📦"],
   "packageRules": [
-    {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true
-    },
     {
       "matchDepTypes": ["optionalDependencies"],
       "groupSlug": "optional-dependencies",
@@ -75,10 +64,6 @@
       "groupName": "Font Awesome",
       "groupSlug": "fontawesome-packages",
       "matchPackagePrefixes": ["@fortawesome/"]
-    },
-    {
-      "matchPackagePrefixes": ["@types/"],
-      "automerge": true
     }
   ]
 }
