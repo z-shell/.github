@@ -21,8 +21,8 @@ lint:
     - svgo@3.0.2
     - git-diff-check@SYSTEM
     - hadolint@2.12.0
-    - actionlint@1.6.22
-    - gitleaks@8.15.2
+    - actionlint@1.6.23
+    - gitleaks@8.15.3
     - markdownlint@0.33.0
     - prettier@2.8.3
     - shfmt@3.5.0
