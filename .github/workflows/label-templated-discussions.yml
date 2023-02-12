@@ -1,4 +1,5 @@
-name: Label Templated Discussions
+---
+name: "🏷️ Label Templated Discussions"
 
 on:
   discussion:
