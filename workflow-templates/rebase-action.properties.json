@@ -1,5 +1,0 @@
-{
-  "name": "GitHub Action - Rebase",
-  "description": "GitHub Action rebase pull requests with comments: /autosquash, /rebase.",
-  "iconName": "z-shell"
-}
