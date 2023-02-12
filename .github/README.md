@@ -1,15 +1,38 @@
 <h1> Z-Shell GitHub Organization </h1>
 
+## Github Actions & Workflows
+
+The set of [workflows](https://github.com/z-shell/.github/tree/main/workflow-templates) and [actions](https://github.com/z-shell/.github/tree/main/actions) for the organization to leverage GitHub’s collaborative capabilities and allow everyone in your organization who has permission to create workflows to do so more quickly and easily.
+
+<div align="center">
+ <p align="center">
+  <a href="https://github.com/z-shell/.github/actions/new">
+    <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/.github/img/github_actions.png" alt="Z-Shell Github Actions" height="auto" width="70%" />
+  </a>
+  </p>
+</div>
+
 ## Trunk
 
+<div align="center">
+ <p align="center">
   <a href="https://slack.trunk.io">
-    <img src="https://img.shields.io/badge/slack-slack.trunk.io-blue?logo=slack"/>
+    <img align="center" src="https://user-images.githubusercontent.com/59910950/218301528-2a6de256-e767-4871-b67f-f2b3f4a2fa16.png" alt="Trunk App" height="auto" width="70%" />
   </a>
-  <a href="https://docs.trunk.io">
-    <img src="https://img.shields.io/badge/docs.trunk.io-7f7fcc?label=docs&logo=readthedocs&labelColor=555555&logoColor=ffffff"/>
-  </a>
+ </p>
+  <p align="center">
+    <a href="https://slack.trunk.io">
+      <img align="center" src="https://img.shields.io/badge/slack-slack.trunk.io-blue?logo=slack"/>
+    </a>
+    <a href="https://docs.trunk.io">
+      <img align="center" src="https://img.shields.io/badge/docs.trunk.io-7f7fcc?label=docs&logo=readthedocs&labelColor=555555&logoColor=ffffff"/>
+    </a>
+  </p>
+</div>
 
 ### Get Started
+
+- [📊 app.trunk.io/z-shell](https://app.trunk.io/z-shell)
 
 Initialize it with (`trunk init`). All linters and formatters, as well as the version of Trunk itself, are versioned in `.trunk/trunk.yaml` ([configs](https://github.com/trunk-io/configs)).
 
@@ -23,44 +46,6 @@ Initialize it with (`trunk init`). All linters and formatters, as well as the ve
 
 Example preset of [.trunk/trunk.yaml](../.trunk/trunk.yaml):
 
-```yaml
-version: 0.1
-cli:
-  version: 1.3.1
-repo:
-  repo:
-    host: github.com
-    owner: z-shell
-    name: .github
-plugins:
-  sources:
-    - id: trunk
-      uri: https://github.com/trunk-io/plugins
-      ref: v0.0.8
-      import_to_global: true
-lint:
-  enabled:
-    - oxipng@7.0.0
-    - svgo@3.0.2
-    - git-diff-check@SYSTEM
-    - actionlint@1.6.22
-    - gitleaks@8.15.2
-    - markdownlint@0.32.2
-    - prettier@2.8.1
-    - shfmt@3.5.0
-runtimes:
-  enabled:
-    - go@1.19.4
-    - node@18.12.1
-actions:
-  enabled:
-    - trunk-upgrade-available
-    - trunk-fmt-pre-commit
-    - trunk-check-pre-push
-    - trunk-cache-prune
-    - trunk-announce
-```
-
 ## Renovate Mend
 
 Example preset of [.github/renovate.json](https://github.com/z-shell/wiki/blob/main/.github/renovate.json):
@@ -72,16 +57,12 @@ Example preset of [.github/renovate.json](https://github.com/z-shell/wiki/blob/m
 }
 ```
 
-Store Renovate configuration as above in one of these locations:
-
-```verilog
-renovate.json
-renovate.json5
-.github/renovate.json
-.github/renovate.json5
-.gitlab/renovate.json
-.gitlab/renovate.
-.renovaterc
-.renovaterc.json
-package.json (within a "renovate" section)
-```
+<!--
+<div align="center">
+  <p>
+    <a href="https://docs.renovatebot.com/">
+      <img align="center" src="https://user-images.githubusercontent.com/59910950/218302002-477fbdc8-eda9-4e09-908b-35c777d48d17.jpg" alt="renovate" height="auto" width="50%" />
+    </a>
+  </p>
+</div>
+-->
