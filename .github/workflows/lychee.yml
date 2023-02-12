@@ -10,7 +10,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "public/**"
+      - "**/*.md"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,9 +32,9 @@ jobs:
         id: lychee
         uses: lycheeverse/lychee-action@ed29d118eda549bc65cbc0ea7323e1606e0c2721
         with:
-          args: --user-agent "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" --verbose --no-progress --insecure './public/arf.json'
+          args: --user-agent "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" --verbose --no-progress '**/*.md'
           format: markdown
-          output: ./docs/LINKS_REPORT.md
+          output: ./.github/LINKS_REPORT.md
           fail: false
           jobSummary: true
         env:
@@ -46,5 +46,5 @@ jobs:
         with:
           title: Link Checker Report
           content-filepath: ./docs/LINKS_REPORT.md
-          issue-number: 49
-          labels: report, automated issue
+          issue-number: ""
+          labels: maintenance 📈
