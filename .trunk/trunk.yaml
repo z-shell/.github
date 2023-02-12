@@ -1,6 +1,9 @@
 version: 0.1
 cli:
   version: 1.4.1
+merge:
+  required_statuses:
+    - Trunk Check
 repo:
   repo:
     host: github.com
@@ -11,7 +14,6 @@ plugins:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
       ref: v0.0.10
-      import_to_global: true
 lint:
   enabled:
     - isort@5.12.0
@@ -43,3 +45,9 @@ actions:
     - trunk-check-pre-push
     - trunk-cache-prune
     - trunk-announce
+    - sh-hook
+  definitions:
+    - id: sh-hook
+      triggers:
+        - git_hooks: [pre-push, pre-commit]
+      run: .github/hook.sh
