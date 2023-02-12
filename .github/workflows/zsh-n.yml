@@ -3,19 +3,11 @@ name: "✅ Zsh"
 on:
   push:
     paths:
-      - "**/*.ch"
       - "**/*.zsh"
-      - "tests/*"
-      - "share/*"
-      - "themes/*"
       - "functions/*"
   pull_request:
     paths:
-      - "**/*.ch"
       - "**/*.zsh"
-      - "tests/*"
-      - "share/*"
-      - "themes/*"
       - "functions/*"
   workflow_dispatch: {}
 
