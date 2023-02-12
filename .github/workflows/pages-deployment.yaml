@@ -1,5 +1,5 @@
 ---
-name: "🛳  Deploy Wiki"
+name: "🛳  Deploy CloudFlare Pages"
 on:
   push:
     branches: [main]
