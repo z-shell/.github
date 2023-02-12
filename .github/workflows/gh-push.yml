@@ -10,6 +10,9 @@ on:
       - "🌀 Z Reader"
     types:
       - completed
+  push:
+    branches: [main]
+    paths: [./profile]
   workflow_dispatch: {}
 
 concurrency:
@@ -22,12 +25,23 @@ jobs:
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
-      - name: "🚀 Deploy to GitHub Pages"
+        with:
+          fetch-depth: 0
+      - name: "🚀 Deploy Metrics to GitHub Pages"
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: metrics
+          keep_files: true
+          user_name: ${{ secrets.ACTIONS_USER }}
+          user_email: ${{ secrets.ACTIONS_MAIL }}
+      - if: github.event.push
+      - name: "🚀 Deploy Profile to GitHub Pages"
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_branch: gh-pages
+          publish_dir: profile
           keep_files: true
           user_name: ${{ secrets.ACTIONS_USER }}
           user_email: ${{ secrets.ACTIONS_MAIL }}
