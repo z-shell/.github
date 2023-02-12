@@ -1,5 +1,6 @@
 {
   "name": "Close Stale Issues and PRs",
   "description": "Warns and then closes issues and PRs that have had no activity for a specified amount of time.",
-  "iconName": "z-shell"
+  "iconName": "z-shell",
+  "categories": ["Automation", "Shell"]
 }
