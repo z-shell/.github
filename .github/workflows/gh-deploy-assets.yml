@@ -4,7 +4,7 @@ name: "🚀 Deploy Assets"
 on:
   push:
     branches: [main]
-    paths: ['./profile/**', '!.metrics/']
+    paths: ["./profile/**", "!.metrics/"]
   workflow_dispatch: {}
 
 concurrency:
@@ -19,8 +19,7 @@ jobs:
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
         with:
           fetch-depth: 0
-      - if: github.event.
-        name: "🚀 Deploy Profile to GitHub Pages"
+      - name: "🚀 Deploy Profile to GitHub Pages"
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_branch: gh-pages
