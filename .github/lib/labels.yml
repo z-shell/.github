@@ -88,9 +88,9 @@
 - name: "resolved ☑️"
   color: 0e8a16
   description: "The issue has been fixed and is therefore considered resolved."
-#- name: "Breaking Changes 🔥"
-#  color: ee0701
-#  description: "Must be addressed as soon as possible."
+- name: "high-priority 🔥"
+  color: ee0701
+  description: "Must be addressed as soon as possible."
 - name: "priority-low 🔖"
   color: ffffff
   description: "This issue currently can't be resolved."
@@ -104,11 +104,11 @@
 - name: "package 📦"
   color: 3e16f3
   description: "Related with package"
-#- name: "major 🔺"
-#  color: b60205
-#  description: "This PR causes a major bump in the version number."
-#- name: "minor 🔸"
-#  color: 5319e7
-#  description: "This PR causes a minor bump in the version number."
-#- name: "misc ⬣"
-#  color: 5319e7
+- name: "major 🔺"
+  color: b60205
+  description: "This PR causes a major bump in the version number."
+- name: "minor 🔸"
+  color: 5319e7
+  description: "This PR causes a minor bump in the version number."
+- name: "misc ⬣"
+  color: 5319e7
