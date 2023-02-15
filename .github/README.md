@@ -37,11 +37,11 @@ The set of [workflows](https://github.com/z-shell/.github/tree/main/workflow-tem
 Initialize it with (`trunk init`). All linters and formatters, as well as the version of Trunk itself, are versioned in `.trunk/trunk.yaml` ([configs](https://github.com/trunk-io/configs)).
 
 1. Install Trunk → `curl https://get.trunk.io -fsSL | bash`
-   ([docs](https://docs.trunk.io/get-started))
-2. Setup Trunk in your repo → `trunk init` ([docs](https://docs.trunk.io/get-started))
+   ([docs](https://docs.trunk.io/docs/get-started))
+2. Setup Trunk in your repo → `trunk init` ([docs](https://docs.trunk.io/docs/get-started))
 3. Locally check your changes for issues → `trunk check`
-   ([docs](https://docs.trunk.io/check/overview))
-4. Locally format your changes → `trunk fmt` ([docs](https://docs.trunk.io/check/cli))
+   ([docs](https://docs.trunk.io/docs/overview))
+4. Locally format your changes → `trunk fmt` ([docs](https://docs.trunk.io/docs/overview))
 5. Make sure no lint and format issues leak onto `main`
 
 Example preset of [.trunk/trunk.yaml](../.trunk/trunk.yaml):

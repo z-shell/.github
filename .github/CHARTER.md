@@ -1,6 +1,6 @@
 # Charter for the Z-Shell Organization
 
-This is the organizational charter for the Z-Shell Organization (the "Organization"). By adding their name to the [Steering Committee.md file](./STEERING-COMMITTEE.md), Steering Committee members agree as follows.
+This is the organizational charter for the Z-Shell Organization (the "Organization"). By adding their name to the [Steering Committee file](./STEERING_COMMITTEE.md), Steering Committee members agree as follows.
 
 ## 1. Mission
 
@@ -48,14 +48,14 @@ In order to be eligible to be a Organization project, a project must:
 - Be approved by the Steering Committee.
 - Agree to follow the guidance and direction of the Steering Committee.
 - Use only the following outbound licenses or agreements unless otherwise approved:
-  - For code, a license on the Open Source Initiative's list of [Popular Licenses](https://opensource.org/licenses).
+  - For code, a license on the Open Source Initiative's list of [Popular Licenses](https://opensource.org/licenses/).
   - For data, a license on the Open Knowledge Foundation's list of [Recommended Conformant Licenses](http://opendefinition.org/licenses/).
   - For specifications, a community developed and maintained specification agreement, such the [Open Web Foundation Agreements](https://www.openwebfoundation.org/the-agreements) or [Community Specification Agreement](https://github.com/CommunitySpecification/1.0).
-- Include and adhere to the Organization's policies, including the [trademark policy](./TRADEMARKS.md), the [antitrust policy](./ANTITRUST.md), and the [code of conduct](./CODE-OF-CONDUCT.md).
+- Include and adhere to the Organization's policies, including the [trademark policy](./TRADEMARKS.md), the [antitrust policy](./ANTITRUST.md), and the [code of conduct](./CODE_OF_CONDUCT.md).
 
 ## 9. Amendments
 
-Amendments to this charter, the [antitrust policy](./ANTITRUST.md), the [trademark policy](./TRADEMARKS.md), or the [code of conduct](./CODE-OF-CONDUCT.md) may only be made with at least a 3/4 affirmative vote of the Steering Committee.
+Amendments to this charter, the [antitrust policy](./ANTITRUST.md), the [trademark policy](./TRADEMARKS.md), or the [code of conduct](./CODE_OF_CONDUCT.md) may only be made with at least a 3/4 affirmative vote of the Steering Committee.
 
 ---
 

@@ -32,7 +32,7 @@ jobs:
         id: lychee
         uses: lycheeverse/lychee-action@ed29d118eda549bc65cbc0ea7323e1606e0c2721
         with:
-          args: --user-agent "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" --verbose --no-progress '**/*.md'
+          args: --user-agent "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" --exclude-file './.github/.lycheeignore' --verbose --no-progress './**/*.md'
           format: markdown
           output: ./.github/LINKS_REPORT.md
           fail: false
