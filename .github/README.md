@@ -1,4 +1,19 @@
 <h1> Z-Shell GitHub Organization </h1>
+<div align="center">
+
+[![♻️ Sync Labels](https://github.com/z-shell/.github/actions/workflows/sync-labels.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/sync-labels.yml)
+[![✅ Lychee](https://github.com/z-shell/.github/actions/workflows/lychee.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/lychee.yml)
+[![⭕ Trunk](https://github.com/z-shell/.github/actions/workflows/trunk-check.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/trunk-check.yml)
+[![🚀 Deploy Assets](https://github.com/z-shell/.github/actions/workflows/gh-deploy-assets.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/gh-deploy-assets.yml)
+[![🚀 Deploy GH Pages](https://github.com/z-shell/.github/actions/workflows/gh-push.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/gh-push.yml)
+
+
+[![🌀 Z Activity](https://github.com/z-shell/.github/actions/workflows/activity_metrics.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/activity_metrics.yml)
+[![🌀 Z Metrics](https://github.com/z-shell/.github/actions/workflows/metrics.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/metrics.yml)
+[![🌀 Z PageSpeed Insights](https://github.com/z-shell/.github/actions/workflows/pagespeed.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/pagespeed.yml)
+[![🌀 Z Reader](https://github.com/z-shell/.github/actions/workflows/reader.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/reader.yml)
+
+</div>
 
 ## Github Actions & Workflows
 
