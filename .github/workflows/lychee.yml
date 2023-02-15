@@ -46,5 +46,5 @@ jobs:
         with:
           title: Link Checker Report
           content-filepath: ./.github/LINKS_REPORT.md
-          issue-number: ""
+          issue-number: "88"
           labels: maintenance 📈
