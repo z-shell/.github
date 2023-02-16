@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Customize prompt in Zsh: prompt in Z shell</div>
-                                <div class="date">11 Feb 2023</div>
+                                <div class="title">Setting up ZSH and Oh-my-ZHS with autocomplete plugins</div>
+                                <div class="date">14 Feb 2023</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,7 +29,7 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Instalando e configurando Zsh e Oh My Zsh</div>
+                                <div class="title">Customize prompt in Zsh: prompt in Z shell</div>
                                 <div class="date">11 Feb 2023</div>
                             </div>
                         </div>
