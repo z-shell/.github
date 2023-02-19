@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.4.1
+  version: 1.5.0
 merge:
   required_statuses:
     - Trunk Check
@@ -13,7 +13,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v0.0.10
+      ref: v0.0.11
 lint:
   enabled:
     - isort@5.12.0
