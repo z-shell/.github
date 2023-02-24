@@ -49,7 +49,7 @@ In order to be eligible to be a Organization project, a project must:
 - Agree to follow the guidance and direction of the Steering Committee.
 - Use only the following outbound licenses or agreements unless otherwise approved:
   - For code, a license on the Open Source Initiative's list of [Popular Licenses](https://opensource.org/licenses/).
-  - For data, a license on the Open Knowledge Foundation's list of [Recommended Conformant Licenses](http://opendefinition.org/licenses/).
+  - For data, a license on the Open Knowledge Foundation's list of [Recommended Conformant Licenses](https://opendefinition.org/licenses/).
   - For specifications, a community developed and maintained specification agreement, such the [Open Web Foundation Agreements](https://www.openwebfoundation.org/the-agreements) or [Community Specification Agreement](https://github.com/CommunitySpecification/1.0).
 - Include and adhere to the Organization's policies, including the [trademark policy](./TRADEMARKS.md), the [antitrust policy](./ANTITRUST.md), and the [code of conduct](./CODE_OF_CONDUCT.md).
 
