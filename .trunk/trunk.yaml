@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.5.0
+  version: 1.5.1
 merge:
   required_statuses:
     - Trunk Check
@@ -16,6 +16,7 @@ plugins:
       ref: v0.0.11
 lint:
   enabled:
+    - taplo@0.7.0
     - isort@5.12.0
     - flake8@6.0.0
     - black@23.1.0
@@ -33,6 +34,9 @@ lint:
     - linters: [svgo]
       paths:
         - "metrics/**"
+    - linters: [markdownlint]
+      paths:
+        - ".github/styles/**"
 runtimes:
   enabled:
     - python@3.10.8

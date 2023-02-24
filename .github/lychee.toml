@@ -85,11 +85,7 @@ method = "get"
 #glob_ignore_case = false
 
 # Exclude URLs and mail addresses from checking (supports regex).
-exclude = [
-  '/z-shell/.github/actions',
-  '/daweedkob',
-  '/tondrejk'
-]
+exclude = ['/z-shell/.github/actions', '/daweedkob', '/tondrejk']
 
 # Exclude these filesystem paths from getting checked.
 #exclude_path = ["clip"]

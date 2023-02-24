@@ -1,0 +1,27 @@
+---
+name: "✅ Vale"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-text:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ Checkout
+        uses: actions/checkout@v3.3.0
+
+      - name: "📊 Vale Grammar Check"
+        id: vale-reviewdog
+        uses: errata-ai/vale-action@reviewdog
+        with:
+          files: '[".github", "profile"]'
+          reporter: github-pr-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
