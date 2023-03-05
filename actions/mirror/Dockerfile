@@ -1,6 +1,8 @@
 FROM alpine:3.17
 
-RUN apk add --no-cache git=2.38.2-r0 openssh-client-default=9.1_p1-r1
+RUN apk --no-cache add \
+  git=~2 \
+  openssh-client-default=~9
 
 COPY *.sh /
 
