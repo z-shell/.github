@@ -1,0 +1,63 @@
+name: "🌀 Z Reader"
+
+on:
+  schedule:
+    - cron: "02 02 * * */2"
+  push:
+    branches: [main]
+    paths: [.github/workflows/reader.yml]
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  zsh_activity_svg: metrics/plugin/rss/zsh/activity.svg
+  zsh_activity_url: https://sourceforge.net/p/zsh/activity/feed
+  tweets_svg: metrics/plugin/tweets/tweets.svg
+  teeter_user: zshell_zi
+  dev_feed_zshell_svg: metrics/plugin/rss/dev.zshell.rss.svg
+  dev_feed_zshell_url: https://dev.to/feed/z-shell
+  dev_tag_zsh_svg: metrics/plugin/rss/dev.tag.zsh.rss.svg
+  dev_tag_zsh_url: https://dev.to/feed/tag/zsh
+
+jobs:
+  content-metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.repository == 'z-shell/.github'
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+        with:
+          filename: ${{ env.zsh_activity_svg }}
+          token: NOT_NEEDED
+          base: ""
+          plugin_rss: yes
+          plugin_rss_source: ${{ env.zsh_activity_url }}
+          plugin_rss_limit: 2
+      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+        with:
+          filename: ${{ env.tweets_svg }}
+          token: NOT_NEEDED
+          base: ""
+          plugin_tweets: yes
+          plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
+          plugin_tweets_attachments: no
+          plugin_tweets_user: ${{ env.teeter_user }}
+      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+        with:
+          filename: ${{ env.dev_feed_zshell_svg }}
+          token: NOT_NEEDED
+          base: ""
+          plugin_rss: yes
+          plugin_rss_source: ${{ env.dev_feed_zshell_url }}
+          plugin_rss_limit: 2
+      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+        with:
+          filename: ${{ env.dev_tag_zsh_svg }}
+          token: NOT_NEEDED
+          base: ""
+          plugin_rss: yes
+          plugin_rss_source: ${{ env.dev_tag_zsh_url }}
+          plugin_rss_limit: 2

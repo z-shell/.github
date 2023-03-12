@@ -1,0 +1,110 @@
+---
+name: "⭕ Trunk Call"
+on:
+  workflow_call:
+    secrets:
+      trunk-token:
+        description: >
+          You can find a per-repo API token in the Trunk web app settings.
+          This will cause results to be uploaded to the Trunk web app if this job is a scheduled job running on a branch, or if `check-mode` is set to 'all'.
+        required: false
+    inputs:
+      username:
+        description: "A username passed from the caller workflow"
+        default: "z-shell"
+        required: false
+        type: string
+      trunk_path:
+        description: >
+          Path to Trunk Launcher.
+          If not provided, we'll look for it the repo root, `.trunk/bin` and `tools/`.
+          If it can't be found anywhere and is not provided explicitly, we'll download it on demand."
+        required: false
+        type: string
+      cache:
+        default: "true"
+        description: >
+          Cache trunk downloads and results between runs.
+          Caching is only needed when using ephemeral CI runners.
+        required: false
+        type: string
+      upload-series:
+        description: >
+          Upload series name, for when `trunk-token` is provided. If not provided, we'll use the branch name.
+        required: false
+        type: string
+      check-mode:
+        description: >
+          Trunk check mode. Leave unset to autodetect just changes.
+          Set to 'all' to check the entire repository.
+          If `trunk-token` is set with 'all', 'all' will also upload results to the Trunk web app.
+        default: "all"
+        required: false
+        type: string
+      arguments:
+        description: Extra arguments to pass to trunk
+        required: false
+        type: string
+      runs-on:
+        description: "Required OS for workflow."
+        default: "ubuntu-latest"
+        required: false
+        type: string
+      get_dependencies:
+        description: "Pass commands to prepare or install dependencies"
+        required: false
+        type: string
+      call_on_fail:
+        description: "Pass argument to run on failure"
+        required: false
+        type: string
+      shell:
+        description: "Shell to run workflow"
+        required: false
+        type: string
+      working-directory:
+        description: "The default working directory on the runner for steps, and the default location of your repository when using the checkout action."
+        required: false
+        type: string
+      node_version:
+        description: "Set Node versions"
+        default: "16"
+        required: false
+        type: string
+      pnpm_arguments:
+        description: "Pass arguments to pnpm"
+        required: false
+        type: string
+
+jobs:
+  trunk:
+    name: "✨ Checking"
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: "⤵ Check out code from GitHub"
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+        with:
+          fetch-depth: 0
+      - if: ${{ inputs.get_dependencies }}
+        name: "🏗 Prepare"
+        run: echo ${{ inputs.get_dependencies }}
+      - if: ${{ inputs.pnpm_arguments }}
+        name: "📦 Setup pnpm"
+        uses: pnpm/action-setup@v2.2.4
+      - if: ${{ inputs.pnpm_arguments }}
+        name: "⎔ Setup node"
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+      - if: ${{ inputs.pnpm_arguments }}
+        name: "🚀 Run"
+        run: ${{ inputs.pnpm_arguments }}
+      - name: "✨ Check"
+        uses: trunk-io/trunk-action@b033203e937f42022e351f1313cf84123c4472df
+        with:
+          trunk-path: ${{ inputs.trunk_path }}
+          trunk-token: ${{ secrets.trunk-token }}
+          check-mode: ${{ inputs.check-mode }}
+          upload-series: ${{ inputs.upload-series }}
+          arguments: ${{ inputs.arguments }}

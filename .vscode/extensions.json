@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "vivaxy.vscode-conventional-commits",
+    "trunk.io",
+    "gruntfuggly.todo-tree",
+    "sourcegraph.sourcegraph"
+  ]
+}

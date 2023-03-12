@@ -1,0 +1,28 @@
+---
+name: ♻️ Sync Labels
+
+on:
+  workflow_call:
+  push:
+    paths:
+      - .github/lib/labels.yml
+  workflow_dispatch: {}
+
+jobs:
+  labels:
+    name: ♻️ Sync labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+        with:
+          path: .github
+      - name: ♻️ Fetch Labels
+        run: |
+          curl -fsSl https://raw.githubusercontent.com/z-shell/.github/main/.github/lib/labels.yml -o labels.yml
+      - name: 🚀 Run Label Syncer
+        uses: micnncim/action-label-syncer@3abd5ab72fda571e69fffd97bd4e0033dd5f495c
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          manifest: labels.yml

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Organization level configuration for automated dependency updates",
+  "extends": [
+    "config:base",
+    ":dependencyDashboard",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":separateMultipleMajorReleases",
+    ":enableVulnerabilityAlerts",
+    ":ignoreModulesAndTests",
+    ":autodetectPinVersions",
+    ":prConcurrentLimit10",
+    "group:recommended",
+    ":automergeLinters",
+    ":prHourlyLimit2",
+    ":automergeMinor",
+    ":automergePatch",
+    ":automergeTypes",
+    "group:monorepos",
+    "workarounds:all",
+    ":gitSignOff",
+    ":pinSkipCi"
+  ],
+  "dependencyDashboardApproval": true,
+  "dependencyDashboardAutoclose": true,
+  "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
+  "assigneesFromCodeOwners": true,
+  "commitBody": "Signed-off-by: {{{gitAuthor}}}",
+  "groupName": "all dependencies",
+  "groupSlug": "all",
+  "labels": ["dependencies 📦"],
+  "packageRules": [
+    {
+      "matchDepTypes": ["optionalDependencies"],
+      "groupSlug": "optional-dependencies",
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "groupSlug": "dev-dependencies",
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "groupSlug": "peer-dependencies",
+      "automerge": true
+    },
+    {
+      "groupName": "Eslint",
+      "groupSlug": "eslint-packages",
+      "matchPackagePatterns": ["^eslint"]
+    },
+    {
+      "groupName": "Stylelint",
+      "groupSlug": "stylelint-packages",
+      "matchPackagePatterns": ["^stylelint"]
+    },
+    {
+      "groupName": "Docusaurus",
+      "groupSlug": "docusaurus-packages",
+      "matchPackagePrefixes": ["@docusaurus/"]
+    },
+    {
+      "groupName": "Font Awesome",
+      "groupSlug": "fontawesome-packages",
+      "matchPackagePrefixes": ["@fortawesome/"]
+    }
+  ]
+}

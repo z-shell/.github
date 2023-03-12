@@ -1,0 +1,32 @@
+name: "GitHub Action - rclone"
+description: "Run rclone for files and directories from different cloud storage providers"
+author: "z-shell"
+branding:
+  icon: "arrow-up"
+  color: "green"
+inputs:
+  config-file:
+    description: "Set custom location for rclone configuration file"
+    required: false
+  config:
+    description: "Configuration to set up for rclone"
+    required: true
+  debug:
+    description: "Verbose debugging and logging or carry on, but do quit on errors"
+    required: false
+    default: false
+  args:
+    description: "Argumets to pass for rclone"
+    required: true
+outputs:
+  rclone:
+    description: "The output of rclone"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    CONFIG_FILE: ${{ inputs.config-file }}
+    RCLONE_CONF: ${{ inputs.config }}
+    DEBUG: ${{ inputs.debug }}
+  args:
+    - ${{ inputs.args }}

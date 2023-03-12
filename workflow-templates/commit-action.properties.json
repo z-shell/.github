@@ -1,0 +1,5 @@
+{
+  "name": "GitHub Action - Commit",
+  "description": "GitHub Action commits any changed files and pushes changes back to the origin repository.",
+  "iconName": "z-shell"
+}

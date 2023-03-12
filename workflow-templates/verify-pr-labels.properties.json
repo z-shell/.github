@@ -1,0 +1,5 @@
+{
+  "name": "Verify PR Labels",
+  "description": "GitHub Action verifies pull-request labels",
+  "iconName": "z-shell"
+}
