@@ -14,14 +14,14 @@ def get_env_var(env_var_name, echo_value=False):
     If the values is 'None', then a ValueError exception will
     be thrown.
 
-    Args
+    Args:
     ----
     env_var_name : str
         The name of the environmental variable.
     echo_value : bool, optional, default False
         Print the resulting value.
 
-    Returns
+    Returns:
     -------
     value : str
         The value from the environmental variable.
