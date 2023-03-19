@@ -9,6 +9,7 @@
     ":enableVulnerabilityAlerts",
     ":ignoreModulesAndTests",
     ":autodetectPinVersions",
+    ":preserveSemverRanges",
     ":prConcurrentLimit10",
     "group:recommended",
     ":automergeLinters",
@@ -21,15 +22,23 @@
     ":gitSignOff",
     ":pinSkipCi"
   ],
+  "dependencyDashboardTitle": "📊 Dependency Dashboard",
   "dependencyDashboardApproval": true,
   "dependencyDashboardAutoclose": true,
   "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
+  "osvVulnerabilityAlerts": true,
+  "platformCommit": true,
+  "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],  
+  "commitBodyTable": true,
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
-  "groupName": "all dependencies",
-  "groupSlug": "all",
+  "automergeType": "pr",
   "labels": ["dependencies 📦"],
   "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
     {
       "matchDepTypes": ["optionalDependencies"],
       "groupSlug": "optional-dependencies",
