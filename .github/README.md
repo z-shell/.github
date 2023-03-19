@@ -48,7 +48,7 @@ The set of [workflows](https://github.com/z-shell/.github/tree/main/workflow-tem
 
 - [📊 app.trunk.io/z-shell](https://app.trunk.io/z-shell)
 
-Initialize it with (`trunk init`). All linters and formatters, as well as the version of Trunk itself, are versioned in `.trunk/trunk.yaml` ([configs](https://github.com/trunk-io/configs)).
+Initialize it with (`trunk init`). All linters and formatters, as well as the version of Trunk itself, are versioned in `.trunk/trunk.yaml` ([plugins](https://github.com/trunk-io/plugins)).
 
 1. Install Trunk → `curl https://get.trunk.io -fsSL | bash`
    ([docs](https://docs.trunk.io/docs/get-started))
