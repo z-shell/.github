@@ -2,15 +2,27 @@
 name: "✅ Lychee"
 
 on:
-  repository_dispatch:
-  workflow_dispatch:
-  workflow_call:
+  repository_dispatch: {}
+  workflow_dispatch: {}
+  workflow_call: {}
   schedule:
     - cron: "00 18 * * *"
   push:
     branches: [main]
     paths:
-      - "**/*.md"
+      - "**.md"
+      - "**.mdx"
+      - "profile/*"
+      - ".github/*"
+      - "actions/*/*"
+  pull_request_target:
+    branches: [main]
+    paths:
+      - "**.md"
+      - "**.mdx"
+      - "profile/*"
+      - ".github/*"
+      - "actions/*/*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,19 +39,17 @@ jobs:
           path: .lycheecache
           key: cache-lychee-${{ github.sha }}
           restore-keys: cache-lychee-
-
       - name: "📊 Lychee Link Checker"
         id: lychee
         uses: lycheeverse/lychee-action@9ace499fe66cee282a29eaa628fdac2c72fa087f
         with:
-          args: --config ./.github/lychee.toml -- './**/*.md'
+          args: --config ./.github/lychee.toml -- '**.md*' '**.html'
           format: markdown
           output: ./.github/LINKS_REPORT.md
           fail: false
           jobSummary: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: "🔖 Create Issue From File"
         if: env.lychee_exit_code != 0
         uses: peter-evans/create-issue-from-file@v4
@@ -47,3 +57,4 @@ jobs:
           title: " 📢 Link Checker Report"
           content-filepath: ./.github/LINKS_REPORT.md
           labels: maintenance 📈
+          issue-number: 102
