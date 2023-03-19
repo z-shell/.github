@@ -18,7 +18,7 @@ lint:
   disabled:
     - yamllint
   enabled:
-    - ruff@0.0.256
+    - ruff@0.0.257
     - taplo@0.7.0
     - isort@5.12.0
     - flake8@6.0.0

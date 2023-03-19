@@ -29,7 +29,7 @@
   "assigneesFromCodeOwners": true,
   "osvVulnerabilityAlerts": true,
   "platformCommit": true,
-  "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],  
+  "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
   "commitBodyTable": true,
   "commitBody": "Signed-off-by: {{{gitAuthor}}}",
   "automergeType": "pr",
