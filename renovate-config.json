@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Organization level configuration for automated dependency updates",
-  "extends": [    
+  "extends": [
     "config:base",
     ":dependencyDashboard",
     ":semanticPrefixFixDepsChoreOthers",
@@ -20,7 +20,7 @@
     ":pinSkipCi",
     "group:recommended",
     "group:monorepos",
-    "workarounds:all"    
+    "workarounds:all"
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
   "dependencyDashboardApproval": true,
@@ -51,6 +51,10 @@
     {
       "matchDepTypes": ["peerDependencies"],
       "groupSlug": "peer-dependencies",
+      "automerge": true
+    },
+    {
+      "matchPackagePrefixes": ["@types/"],
       "automerge": true
     }
   ]
