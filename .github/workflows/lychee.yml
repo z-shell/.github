@@ -12,25 +12,20 @@ on:
     paths:
       - "**.md"
       - "**.mdx"
-      - "profile/*"
-      - ".github/*"
-      - "actions/*/*"
+      - "**.html"
   pull_request_target:
     branches: [main]
     paths:
       - "**.md"
       - "**.mdx"
-      - "profile/*"
-      - ".github/*"
-      - "actions/*/*"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - "**.html"
 
 jobs:
-  check-links:
+  links-check:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true    
     steps:
       - uses: actions/checkout@v3.3.0
       - name: "📤 Restore cache"
