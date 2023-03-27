@@ -44,7 +44,7 @@ jobs:
       - name: "📊 Lychee Link Checker"
         uses: lycheeverse/lychee-action@9ace499fe66cee282a29eaa628fdac2c72fa087f
         with:
-          args: --config ./.github/lychee.toml -- '**.md*' '**.html'
+          args: "--config ./.github/lychee.toml './**/*.md*' './**/*.html'"
           format: markdown
           output: ./.github/LINKS_REPORT.md
           fail: false
