@@ -34,13 +34,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
       - name: "📤 Restore cache"
-        uses: actions/cache@v3
+        id: restore-cache
+        uses: actions/cache/restore@v3
         with:
           path: .lycheecache
           key: cache-lychee-${{ github.sha }}
           restore-keys: cache-lychee-
+
       - name: "📊 Lychee Link Checker"
-        id: lychee
         uses: lycheeverse/lychee-action@9ace499fe66cee282a29eaa628fdac2c72fa087f
         with:
           args: --config ./.github/lychee.toml -- '**.md*' '**.html'
@@ -50,6 +51,14 @@ jobs:
           jobSummary: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "📥 Save cache"
+        uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: .lycheecache
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+
       - name: "🔖 Create Issue From File"
         if: env.lychee_exit_code != 0
         uses: peter-evans/create-issue-from-file@v4
