@@ -23,7 +23,7 @@ jobs:
     if: github.repository == 'z-shell/.github'
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
-      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
         with:
           filename: ${{ env.pagespeed_svg }}
           token: NOT_NEEDED
