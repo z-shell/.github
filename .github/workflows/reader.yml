@@ -8,19 +8,6 @@ on:
     paths: [.github/workflows/reader.yml]
   workflow_dispatch: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-env:
-  zsh_activity_svg: metrics/plugin/rss/zsh/activity.svg
-  zsh_activity_url: https://sourceforge.net/p/zsh/activity/feed
-  tweets_svg: metrics/plugin/tweets/tweets.svg
-  teeter_user: zshell_zi
-  dev_feed_zshell_svg: metrics/plugin/rss/dev.zshell.rss.svg
-  dev_feed_zshell_url: https://dev.to/feed/z-shell
-  dev_tag_zsh_svg: metrics/plugin/rss/dev.tag.zsh.rss.svg
-  dev_tag_zsh_url: https://dev.to/feed/tag/zsh
-
 jobs:
   content-metrics:
     runs-on: ubuntu-latest
