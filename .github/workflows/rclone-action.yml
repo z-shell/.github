@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   sync:
-    if: github.repository == 'z-shell/wiki'
+    if: github.repository.owner == 'z-shell'
     runs-on: ubuntu-latest
     environment: R2
     env:
