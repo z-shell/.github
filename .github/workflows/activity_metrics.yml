@@ -27,7 +27,7 @@ jobs:
     if: github.repository == 'z-shell/.github'
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
-      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
         with:
           filename: ${{ env.projects_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
           plugin_projects: yes
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
-      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
         with:
           filename: ${{ env.zi-repository-people_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
           repo: zi
           plugin_people: yes
           plugin_people_types: contributors, stargazers
-      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
         with:
           filename: ${{ env.wiki-repository-people_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
           repo: wiki
           plugin_people: yes
           plugin_people_types: contributors, stargazers
-      - uses: lowlighter/metrics@3dd06164327476b9730a815a70ad39cbf5032f7e
+      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
         with:
           filename: ${{ env.f-sy-h-repository-people_svg }}
           token: ${{ secrets.ORG_TOKEN }}
