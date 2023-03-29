@@ -10,8 +10,10 @@ permissions:
 jobs:
   triage:
     runs-on: ubuntu-latest
+    if: github.repository.owner == 'z-shell'    
     steps:
       - name: 🚀 Run Labeler
         uses: actions/labeler@ba790c862c380240c6d5e7427be5ace9a05c754b
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}        
           sync-labels: false
