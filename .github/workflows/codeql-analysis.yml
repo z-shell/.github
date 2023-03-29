@@ -1,10 +1,10 @@
 name: 👾 Code Scan
 
 on:
-  workflow_dispatch:
-  pull_request:
-  push:
-  workflow_call:
+  workflow_dispatch: {}
+  pull_request: {}
+  push: {}
+  workflow_call: {}
 #  schedule:
 #    - cron: '15 21 * * 6'
 

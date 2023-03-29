@@ -2,7 +2,7 @@
 name: ♻️ Sync Labels
 
 on:
-  workflow_call:
+  workflow_call: {}
   push:
     paths:
       - .github/lib/labels.yml

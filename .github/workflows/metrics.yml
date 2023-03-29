@@ -8,24 +8,23 @@ on:
     paths: [.github/workflows/metrics.yml]
   workflow_dispatch: {}
 
-env:
-  metrics_svg: metrics/plugin/metrics.svg
-  repositories_metrics_svg: metrics/plugin/repositories_metrics.svg
-  followup_svg: metrics/plugin/followup/followup.svg
-  stargazers_worldmap_svg: metrics/plugin/stargazers/worldmap.svg
-  zi_followup_svg: metrics/plugin/followup/zi_followup.svg
-  wiki_followup_svg: metrics/plugin/followup/wiki_followup.svg
-  f-sy-h_followup_svg: metrics/plugin/followup/f-sy-h_followup.svg
-
 jobs:
   metrics:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: metrics
+    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     concurrency:
       group: ci-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
-    if: github.repository == 'z-shell/.github'
+    env:
+      metrics_svg: metrics/plugin/metrics.svg
+      repositories_metrics_svg: metrics/plugin/repositories_metrics.svg
+      followup_svg: metrics/plugin/followup/followup.svg
+      stargazers_worldmap_svg: metrics/plugin/stargazers/worldmap.svg
+      zi_followup_svg: metrics/plugin/followup/zi_followup.svg
+      wiki_followup_svg: metrics/plugin/followup/wiki_followup.svg
+      f-sy-h_followup_svg: metrics/plugin/followup/f-sy-h_followup.svg
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee

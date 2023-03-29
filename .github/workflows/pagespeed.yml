@@ -8,19 +8,17 @@ on:
     paths: [.github/workflows/pagespeed.yml]
   workflow_dispatch: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-
-env:
-  pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
-  pagespeed_url: https://wiki.zshell.dev
-
 jobs:
   pagespeed:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: metrics
-    if: github.repository == 'z-shell/.github'
+    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    env:
+      pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
+      pagespeed_url: https://wiki.zshell.dev
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee

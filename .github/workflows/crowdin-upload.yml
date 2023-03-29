@@ -12,19 +12,19 @@ on:
       - "src/pages/**"
   workflow_dispatch: {}
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-  CROWDIN_PROJECT: ${{ secrets.CROWDIN_PROJECT }}
-  CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
-
 jobs:
   upload:
     runs-on: ubuntu-latest
     environment: Crowdin
     timeout-minutes: 10
+    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      CROWDIN_PROJECT: ${{ secrets.CROWDIN_PROJECT }}
+      CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v3

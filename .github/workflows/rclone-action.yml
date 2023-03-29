@@ -17,6 +17,9 @@ jobs:
     if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     runs-on: ubuntu-latest
     environment: R2
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     env:
       img_local_path: "static/img"
       img_remote_path: "r2store:r2-store/img"

@@ -25,7 +25,19 @@ jobs:
   content-metrics:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: github.repository == 'z-shell/.github'
+    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      zsh_activity_svg: metrics/plugin/rss/zsh/activity.svg
+      zsh_activity_url: https://sourceforge.net/p/zsh/activity/feed
+      tweets_svg: metrics/plugin/tweets/tweets.svg
+      teeter_user: zshell_zi
+      dev_feed_zshell_svg: metrics/plugin/rss/dev.zshell.rss.svg
+      dev_feed_zshell_url: https://dev.to/feed/z-shell
+      dev_tag_zsh_svg: metrics/plugin/rss/dev.tag.zsh.rss.svg
+      dev_tag_zsh_url: https://dev.to/feed/tag/zsh
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee

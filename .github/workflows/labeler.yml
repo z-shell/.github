@@ -3,14 +3,13 @@ name: 🔖 Pull Request Labeler
 on:
   pull_request_target: {}
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   triage:
     runs-on: ubuntu-latest
     if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: 🚀 Run Labeler
         uses: actions/labeler@ba790c862c380240c6d5e7427be5ace9a05c754b

@@ -6,16 +6,15 @@ on:
     - cron: "30 2 * * *"
   workflow_call: {}
 
-permissions:
-  issues: write
-  pull-requests: write
-concurrency:
-  group: lock
-
 jobs:
   lock:
     name: 🔐 Lock closed issues and PRs
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    concurrency:
+      group: lock
     steps:
       # https://github.com/dessant/lock-threads#available-input-parameters
       - uses: dessant/lock-threads@c1b35aecc5cdb1a34539d14196df55838bb2f836
@@ -36,7 +35,7 @@ jobs:
 
             To build on this closed PR, you can clone it using this method:
               - https://stackoverflow.com/a/14969986
-            Then open a new PR, referencing this closedc PR in your message.
+            Then open a new PR, referencing this closed PR in your message.
 
       - uses: dessant/lock-threads@c1b35aecc5cdb1a34539d14196df55838bb2f836
         with:

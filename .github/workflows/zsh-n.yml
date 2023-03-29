@@ -5,10 +5,12 @@ on:
     paths:
       - "**/*.zsh"
       - "functions/*"
+      - "functions/.*"
   pull_request:
     paths:
       - "**/*.zsh"
       - "functions/*"
+      - "functions/.*"
   workflow_dispatch: {}
 
 jobs:

@@ -7,13 +7,14 @@ on:
 jobs:
   star:
     runs-on: ubuntu-latest
+    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - run: |
           echo -e "\nA :star: from [@${{github.actor}}](https://github.com/${{github.actor}})" >> .github/stars.md
       - uses: z-shell/.github/actions/commit@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           PUSH_BRANCH: "main"
         with:
           commitMessage: "Repository star"
