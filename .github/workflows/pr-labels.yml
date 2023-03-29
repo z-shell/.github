@@ -2,16 +2,16 @@
 name: 🏷️ Verify PR Labels
 
 on:
-  workflow_call:
+  workflow_call: {}
   pull_request_target:
-    types: ["opened", "labeled", "unlabeled", "synchronize"]
+    types: [opened, labeled, unlabeled, synchronize]
   workflow_dispatch: {}
 
 jobs:
   pr_labels:
     name: 🏭 Verify PR Labels
     runs-on: ubuntu-latest
-    if: github.repository.owner == 'z-shell'    
+    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     steps:
       - name: 🏷 Verify PR has a valid label
         uses: z-shell/.github/actions/verify-pr-labels@main

@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.6.1
+  version: 1.7.0
 merge:
   required_statuses:
     - Trunk Check
@@ -22,7 +22,7 @@ lint:
     - taplo@0.7.0
     - isort@5.12.0
     - flake8@6.0.0
-    - black@23.1.0
+    - black@23.3.0
     - oxipng@8.0.0
     - svgo@3.0.2
     - git-diff-check@SYSTEM
