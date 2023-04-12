@@ -13,12 +13,12 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v0.0.13
+      ref: v0.0.15
 lint:
   disabled:
     - yamllint
   enabled:
-    - ruff@0.0.259
+    - ruff@0.0.261
     - taplo@0.7.0
     - isort@5.12.0
     - flake8@6.0.0
@@ -27,8 +27,8 @@ lint:
     - svgo@3.0.2
     - git-diff-check@SYSTEM
     - hadolint@2.12.0
-    - actionlint@1.6.23
-    - gitleaks@8.16.1
+    - actionlint@1.6.24
+    - gitleaks@8.16.2
     - markdownlint@0.33.0
     - prettier@2.8.7
     - shfmt@3.5.0
