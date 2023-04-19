@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.7.0
+  version: 1.8.0
 merge:
   required_statuses:
     - Trunk Check
@@ -13,7 +13,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v0.0.15
+      ref: v0.0.16
 lint:
   disabled:
     - yamllint
