@@ -1,4 +1,4 @@
-FROM alpine:3.17
+FROM alpine:3
 
 RUN apk --no-cache add \
   git=~2 \
