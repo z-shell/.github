@@ -93,7 +93,7 @@ jobs:
         uses: pnpm/action-setup@v2.2.4
       - if: ${{ inputs.pnpm_arguments }}
         name: "⎔ Setup node"
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3.7.0
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
@@ -101,7 +101,7 @@ jobs:
         name: "🚀 Run"
         run: ${{ inputs.pnpm_arguments }}
       - name: "✨ Check"
-        uses: trunk-io/trunk-action@e5f1a3f123a2440f9cd28e036495a1c1f2a20568
+        uses: trunk-io/trunk-action@585ad971e85a2a7cc5f62b1468f7bbc7262ef599
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}

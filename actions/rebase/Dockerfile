@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:3
 
 LABEL version="1.0.0"
 LABEL repository="http://github.com/z-shell/.github"
