@@ -101,7 +101,7 @@ jobs:
         name: "🚀 Run"
         run: ${{ inputs.pnpm_arguments }}
       - name: "✨ Check"
-        uses: trunk-io/trunk-action@585ad971e85a2a7cc5f62b1468f7bbc7262ef599
+        uses: trunk-io/trunk-action@b61eb5749343e65e59ef104575a328b59f7285df
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
