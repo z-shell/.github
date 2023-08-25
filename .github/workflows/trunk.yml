@@ -83,7 +83,6 @@ on:
 
 jobs:
   trunk:
-    name: "🚀 Run"
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: "⤵ Check out code from GitHub"
