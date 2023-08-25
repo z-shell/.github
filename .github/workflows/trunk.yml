@@ -1,5 +1,5 @@
 ---
-name: "⭕ Trunk"
+name: "⭕ Trunk workflow call"
 on:
   workflow_call:
     secrets:
@@ -68,7 +68,7 @@ on:
         type: string
       node_version:
         description: "Set Node versions"
-        default: "16"
+        default: "lts/*"
         required: false
         type: string
       pnpm_arguments:
@@ -78,8 +78,8 @@ on:
       upgrade_action:
         description: "Action to trigger"
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: "false"
 
 jobs:
   trunk:
@@ -113,6 +113,6 @@ jobs:
           check-mode: ${{ inputs.check-mode }}
           upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
-      - if: inputs.upgrade_action == 'true'
+      - if: ${{ inputs.upgrade_action == 'true' }}
         name: "✨ Upgrade"
         uses: trunk-io/trunk-action/upgrade@v1.1.7
