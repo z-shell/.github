@@ -8,6 +8,7 @@ on:
     types: [opened, synchronize]
   schedule:
     - cron: "0 06 * * 5"
+    - cron: "0 06 * * 2"
   workflow_dispatch: {}
 
 jobs:
@@ -20,6 +21,7 @@ jobs:
     secrets:
       trunk-token: ${{ secrets.TRUNK_TOKEN }}
   upgrade:
+    if: github.event.schedule == '0 06 * * 2'
     uses: z-shell/.github/.github/workflows/trunk.yml@main
     with:
-      upgrade_action: true
+      action: upgrade
