@@ -75,15 +75,15 @@ on:
         description: "Pass arguments to pnpm"
         required: false
         type: string
-      upgrade_action:
+      action:
         description: "Action to trigger"
         required: false
         type: string
-        default: "false"
+        default: "check"
 
 jobs:
   trunk:
-    name: "✨ Checking"
+    name: "🚀 Run"
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: "⤵ Check out code from GitHub"
@@ -105,7 +105,8 @@ jobs:
       - if: ${{ inputs.pnpm_arguments }}
         name: "🚀 Run"
         run: ${{ inputs.pnpm_arguments }}
-      - name: "✨ Check"
+      - if: ${{ inputs.action == 'check' }}
+        name: "✨ Check"
         uses: trunk-io/trunk-action@883e222ef19201ad402ef73e58101ec8186d7d54
         with:
           trunk-path: ${{ inputs.trunk_path }}
@@ -113,6 +114,6 @@ jobs:
           check-mode: ${{ inputs.check-mode }}
           upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
-      - if: ${{ inputs.upgrade_action == 'true' }}
+      - if: ${{ inputs.action == 'upgrade' }}
         name: "✨ Upgrade"
         uses: trunk-io/trunk-action/upgrade@v1.1.7
