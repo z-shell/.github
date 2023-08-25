@@ -113,14 +113,6 @@ jobs:
           check-mode: ${{ inputs.check-mode }}
           upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
-  upgrade:
-    if: ${{ inputs.upgrade_action == 'true' }}
-    runs-on: ${{ inputs.runs-on }}
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: "✅ Checkout"
-        uses: actions/checkout@v3
-      - name: "✨ Trunk Upgrade"
+      - if: ${{ inputs.upgrade_action == 'true' }}
+        name: "✨ Upgrade"
         uses: trunk-io/trunk-action/upgrade@v1.1.7
