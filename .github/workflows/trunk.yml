@@ -79,6 +79,7 @@ on:
         description: "Action to trigger"
         required: false
         type: boolean
+        default: false
 
 jobs:
   trunk:
@@ -113,7 +114,7 @@ jobs:
           upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
   upgrade:
-    if: ${{ inputs.upgrade_action }}
+    if: ${{ inputs.upgrade_action == 'true' }}
     runs-on: ${{ inputs.runs-on }}
     permissions:
       contents: write
