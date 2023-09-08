@@ -17,7 +17,7 @@ jobs:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - name: "🏗 Dependency Review"
-        uses: actions/dependency-review-action@f6fff72a3217f580d5afd49a46826795305b63c7
+        uses: actions/dependency-review-action@6c5ccdad469c9f8a2996bfecaec55a631a347034
         with:
           # Possible values: "critical", "high", "moderate", "low"
           fail-on-severity: high
