@@ -27,7 +27,7 @@ jobs:
       dev_tag_zsh_url: https://dev.to/feed/tag/zsh
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.zsh_activity_svg }}
           token: NOT_NEEDED
@@ -35,7 +35,7 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: ${{ env.zsh_activity_url }}
           plugin_rss_limit: 2
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.tweets_svg }}
           token: NOT_NEEDED
@@ -44,7 +44,7 @@ jobs:
           plugin_tweets_token: ${{ secrets.TWITTER_BEARER_TOKEN }}
           plugin_tweets_attachments: no
           plugin_tweets_user: ${{ env.teeter_user }}
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.dev_feed_zshell_svg }}
           token: NOT_NEEDED
@@ -52,7 +52,7 @@ jobs:
           plugin_rss: yes
           plugin_rss_source: ${{ env.dev_feed_zshell_url }}
           plugin_rss_limit: 2
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.dev_tag_zsh_svg }}
           token: NOT_NEEDED
