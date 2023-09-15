@@ -16,7 +16,7 @@ jobs:
     if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     steps:
       - name: ✅ Checkout
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
 
       - name: "📊 Vale Grammar Check"
         id: vale-reviewdog
