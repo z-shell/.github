@@ -25,7 +25,7 @@ jobs:
       f-sy-h-repository-people_svg: metrics/plugin/people/f-sy-h-repository.svg
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.projects_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -34,7 +34,7 @@ jobs:
           plugin_projects: yes
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.zi-repository-people_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
           repo: zi
           plugin_people: yes
           plugin_people_types: contributors, stargazers
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.wiki-repository-people_svg }}
           token: ${{ secrets.ORG_TOKEN }}
@@ -54,7 +54,7 @@ jobs:
           repo: wiki
           plugin_people: yes
           plugin_people_types: contributors, stargazers
-      - uses: lowlighter/metrics@dd64c50bf38be91795e73980f3483d028e7e55ee
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.f-sy-h-repository-people_svg }}
           token: ${{ secrets.ORG_TOKEN }}
