@@ -9,7 +9,6 @@ LABEL "com.github.actions.description"="Rebases pull request on '/rebase'"
 LABEL "com.github.actions.icon"="git-commit"
 LABEL "com.github.actions.color"="green"
 
-# trunk-ignore(hadolint/DL3018)
 RUN apk --no-cache add jq bash curl git git-lfs
 
 COPY entrypoint.sh /entrypoint.sh

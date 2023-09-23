@@ -1,13 +1,14 @@
 FROM alpine:3
 
 RUN apk --no-cache add \
-  fuse=~2.9 \
-  bash=~5.2 \
-  rclone=~1.60 \
-  coreutils=~9.1 \
-  ca-certificates=~20220614 \
-  openssh-client-default=~9.1
+  fuse \
+  bash \
+  rclone \
+  coreutils \
+  ca-certificates \
+  openssh-client-default
 
-COPY entrypoint.sh /entrypoint.sh
+WORKDIR /app
+COPY . /app
 
 ENTRYPOINT ["/entrypoint.sh"]
