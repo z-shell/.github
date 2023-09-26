@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: Crowdin
     timeout-minutes: 10
-    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true

@@ -2,12 +2,12 @@
 name: "⭐ Star"
 on:
   watch:
-    types: [starred]
+    types: [started]
 
 jobs:
   star:
     runs-on: ubuntu-latest
-    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
+    if: github.repository == 'z-shell/.github'
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - run: |

@@ -12,7 +12,6 @@ jobs:
   labels:
     name: ♻️ Sync labels
     runs-on: ubuntu-latest
-    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c

@@ -55,6 +55,7 @@ actions:
     - trunk-check-pre-push
     - trunk-fmt-pre-commit
   enabled:
+    - git-blame-ignore-revs
     - trunk-upgrade-available
     - trunk-cache-prune
     - trunk-announce

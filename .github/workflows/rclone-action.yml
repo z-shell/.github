@@ -14,7 +14,6 @@ concurrency:
 
 jobs:
   sync:
-    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     runs-on: ubuntu-latest
     environment: R2
     concurrency:

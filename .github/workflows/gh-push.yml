@@ -15,8 +15,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: github-pages
-    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     steps:

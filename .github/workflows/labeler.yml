@@ -6,7 +6,6 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
-    if: github.repository == z-shell/${{ github.ACTION_REPOSITORY }}
     permissions:
       contents: read
       pull-requests: write
