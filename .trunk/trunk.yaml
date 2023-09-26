@@ -23,7 +23,7 @@ lint:
     - yamllint
   enabled:
     - bandit@1.7.5
-    - ruff@0.0.290
+    - ruff@0.0.291
     - taplo@0.8.1
     - isort@5.12.0
     - flake8@6.1.0
@@ -32,7 +32,7 @@ lint:
     - svgo@3.0.2
     - git-diff-check@SYSTEM
     - hadolint@2.12.0
-    - actionlint@1.6.25
+    - actionlint@1.6.26
     - gitleaks@8.18.0
     - markdownlint@0.37.0
     - prettier@3.0.3
