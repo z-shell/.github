@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.16.0
+  version: 1.16.2
 merge:
   required_statuses:
     - Trunk Check
@@ -13,7 +13,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v1.2.3
+      ref: v1.2.5
 lint:
   disabled:
     - terrascan
@@ -23,7 +23,7 @@ lint:
     - yamllint
   enabled:
     - bandit@1.7.5
-    - ruff@0.0.291
+    - ruff@0.0.292
     - taplo@0.8.1
     - isort@5.12.0
     - flake8@6.1.0
