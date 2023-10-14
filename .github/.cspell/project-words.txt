@@ -6,4 +6,5 @@ imgbotconfig
 jesusvasquez
 markdownlint
 pagespeed
+rclone
 Syncer

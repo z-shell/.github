@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.16.2
+  version: 1.17.0
 merge:
   required_statuses:
     - Trunk Check
@@ -22,13 +22,13 @@ lint:
     - trufflehog
     - yamllint
   enabled:
+    - oxipng@9.0.0
     - bandit@1.7.5
     - ruff@0.0.292
     - taplo@0.8.1
     - isort@5.12.0
     - flake8@6.1.0
     - black@23.9.1
-    - oxipng@8.0.0
     - svgo@3.0.2
     - git-diff-check@SYSTEM
     - hadolint@2.12.0
@@ -49,7 +49,7 @@ runtimes:
   enabled:
     - python@3.10.8
     - go@1.21.0
-    - node@18.12.1
+    - node@20.0.0
 actions:
   disabled:
     - trunk-check-pre-push

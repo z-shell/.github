@@ -9,6 +9,6 @@ RUN apk --no-cache add \
   openssh-client-default
 
 WORKDIR /app
-COPY . /app
+COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

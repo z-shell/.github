@@ -21,12 +21,12 @@ if [[ -n $RCLONE_CONF ]]; then
   echo "$RCLONE_CONF" >"$CONFIG_FILE"
 else
   # Unable to proceed if rclone configuration not set
-  echo "The configuaration for the rclone is not set"
+  echo "The configuration for the rclone is not set"
   exit 1
 fi
 
 if [[ ! -x "$(command -v rclone)" ]]; then
-  # Unable to proceed as executible rclone not found
+  # Unable to proceed as executable rclone not found
   echo 'Failed to install rclone or has non-executable permissions' >&2
   exit 1
 fi
