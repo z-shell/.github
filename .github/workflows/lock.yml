@@ -17,7 +17,7 @@ jobs:
       group: lock
     steps:
       # https://github.com/dessant/lock-threads#available-input-parameters
-      - uses: dessant/lock-threads@d42e5f49803f3c4e14ffee0378e31481265dda22
+      - uses: dessant/lock-threads@1bf7ec25051fe7c00bdd17e6a7cf3d7bfb7dc771
         with:
           github-token: ${{ github.token }}
           issue-inactive-days: "60"
@@ -37,7 +37,7 @@ jobs:
               - https://stackoverflow.com/a/14969986
             Then open a new PR, referencing this closed PR in your message.
 
-      - uses: dessant/lock-threads@d42e5f49803f3c4e14ffee0378e31481265dda22
+      - uses: dessant/lock-threads@1bf7ec25051fe7c00bdd17e6a7cf3d7bfb7dc771
         with:
           github-token: ${{ github.token }}
           exclude-any-pr-labels: "wip"
