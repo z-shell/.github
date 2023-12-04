@@ -1,7 +1,6 @@
 <h1> Z-Shell GitHub Organization </h1>
 <div align="center">
 
-[![♻️ Sync Labels](https://github.com/z-shell/.github/actions/workflows/sync-labels.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/sync-labels.yml)
 [![✅ Lychee](https://github.com/z-shell/.github/actions/workflows/lychee.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/lychee.yml)
 [![⭕ Trunk](https://github.com/z-shell/.github/actions/workflows/trunk-check.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/trunk-check.yml)
 [![🚀 Deploy Assets](https://github.com/z-shell/.github/actions/workflows/gh-deploy-assets.yml/badge.svg)](https://github.com/z-shell/.github/actions/workflows/gh-deploy-assets.yml)
