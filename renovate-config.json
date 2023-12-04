@@ -2,60 +2,33 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Organization level configuration for automated dependency updates",
   "extends": [
-    "config:base",
-    ":dependencyDashboard",
-    ":semanticPrefixFixDepsChoreOthers",
-    ":separateMultipleMajorReleases",
-    ":enableVulnerabilityAlerts",
-    ":ignoreModulesAndTests",
-    ":autodetectPinVersions",
-    ":preserveSemverRanges",
-    ":prConcurrentLimit10",
+    "config:best-practices",
     ":automergeLinters",
-    ":prHourlyLimit2",
-    ":automergeMinor",
     ":automergePatch",
     ":automergeTypes",
-    ":gitSignOff",
-    ":pinSkipCi",
-    "group:recommended",
-    "group:monorepos",
-    "workarounds:all"
+    ":automergeMinor",
+    "packages:eslint",
+    "packages:react",
+    "packages:stylelint",
+    "replacements:all",
+    "security:openssf-scorecard",
+    "workarounds:all",
+    ":semanticCommits",
+    ":gitSignOff"
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
   "dependencyDashboardApproval": true,
   "dependencyDashboardAutoclose": true,
   "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
-  "osvVulnerabilityAlerts": true,
   "platformCommit": true,
   "commitBodyTable": true,
-  "automergeType": "pr",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "automergeType": "pr",
+    "platformAutomerge": false
+  },
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
   "labels": ["dependencies 📦"],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true
-    },
-    {
-      "matchDepTypes": ["optionalDependencies"],
-      "groupSlug": "optional-dependencies",
-      "automerge": true
-    },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "groupSlug": "dev-dependencies",
-      "automerge": true
-    },
-    {
-      "matchDepTypes": ["peerDependencies"],
-      "groupSlug": "peer-dependencies",
-      "automerge": true
-    },
-    {
-      "matchPackagePrefixes": ["@types/"],
-      "automerge": true
-    }
-  ]
 }
