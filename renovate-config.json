@@ -30,5 +30,5 @@
     "platformAutomerge": false
   },
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
-  "labels": ["dependencies 📦"],
+  "labels": ["dependencies 📦"]
 }
