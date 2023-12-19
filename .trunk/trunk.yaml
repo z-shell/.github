@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.17.2
+  version: 1.18.1
 merge:
   required_statuses:
     - Trunk Check
@@ -13,7 +13,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v1.3.0
+      ref: v1.4.1
 lint:
   disabled:
     - terrascan
@@ -23,19 +23,19 @@ lint:
     - yamllint
   enabled:
     - oxipng@9.0.0
-    - bandit@1.7.5
-    - ruff@0.1.6
+    - bandit@1.7.6
+    - ruff@0.1.8
     - taplo@0.8.1
-    - isort@5.12.0
+    - isort@5.13.2
     - flake8@6.1.0
-    - black@23.9.1
-    - svgo@3.0.5
+    - black@23.12.0
+    - svgo@3.1.0
     - git-diff-check@SYSTEM
     - hadolint@2.12.0
     - actionlint@1.6.26
     - gitleaks@8.18.1
-    - markdownlint@0.37.0
-    - prettier@3.1.0
+    - markdownlint@0.38.0
+    - prettier@3.1.1
     - shfmt@3.6.0
     - shellcheck@0.9.0
   ignore:
