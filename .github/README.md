@@ -35,10 +35,10 @@ The set of [workflows](https://github.com/z-shell/.github/tree/main/workflow-tem
  </p>
   <p align="center">
     <a href="https://slack.trunk.io">
-      <img align="center" src="https://img.shields.io/badge/slack-slack.trunk.io-blue?logo=slack"/>
+      <img align="center" src="https://img.shields.io/badge/slack-slack.trunk.io-blue?logo=slack" alt="Trunk Slack" />
     </a>
     <a href="https://docs.trunk.io">
-      <img align="center" src="https://img.shields.io/badge/docs.trunk.io-7f7fcc?label=docs&logo=readthedocs&labelColor=555555&logoColor=ffffff"/>
+      <img align="center" src="https://img.shields.io/badge/docs.trunk.io-7f7fcc?label=docs&logo=readthedocs&labelColor=555555&logoColor=ffffff" alt="Trunk Docs" />
     </a>
   </p>
 </div>
