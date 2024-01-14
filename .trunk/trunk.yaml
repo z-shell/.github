@@ -13,7 +13,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v1.4.1
+      ref: v1.4.2
 lint:
   disabled:
     - terrascan
@@ -24,7 +24,7 @@ lint:
   enabled:
     - oxipng@9.0.0
     - bandit@1.7.6
-    - ruff@0.1.11
+    - ruff@0.1.12
     - taplo@0.8.1
     - isort@5.13.2
     - flake8@7.0.0
