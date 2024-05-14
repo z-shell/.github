@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="112" class="">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="111" class="">
     <defs>
         <style/>
     </defs>
@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">A quick bash/zsh tip</div>
-                                <div class="date">19 Apr 2024</div>
+                                <div class="title">Zsh + Oh My Zsh</div>
+                                <div class="date">13 May 2024</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Terramate ❤️ Zsh</div>
-                                <div class="date">26 Mar 2024</div>
+                                <div class="title">A quick bash/zsh tip</div>
+                                <div class="date">19 Apr 2024</div>
                             </div>
                         </div>
                     </section>
