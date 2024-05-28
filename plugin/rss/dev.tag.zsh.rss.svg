@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Finding Terminal Utopia</div>
-                                <div class="date">22 May 2024</div>
+                                <div class="title">My zsh config</div>
+                                <div class="date">26 May 2024</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">How to stop Storybook opening a new webpage on start (automatically with zsh)</div>
-                                <div class="date">21 May 2024</div>
+                                <div class="title">Finding Terminal Utopia</div>
+                                <div class="date">22 May 2024</div>
                             </div>
                         </div>
                     </section>
