@@ -27,6 +27,6 @@ jobs:
           base: ""
           plugin_pagespeed: yes
           plugin_pagespeed_pwa: yes
-          plugin_pagespeed_detailed: yes
+          plugin_pagespeed_detailed: no
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: ${{ env.pagespeed_url }}
