@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
-      - uses: EddieHubCommunity/gh-action-community/src/welcome@b0655168a4ac6fb03e3b649d943ad2c583900c35
+      - uses: EddieHubCommunity/gh-action-community/src/welcome@8a3d837a9a0d90f22a0d42f5722cf3d10da477cd
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: "<h3>Thank you for your feedback on this project! </h3> We will endeavour to get back to you soon."
