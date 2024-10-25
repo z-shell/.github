@@ -106,7 +106,7 @@ jobs:
         run: ${{ inputs.pnpm_arguments }}
       - if: ${{ inputs.action == 'check' }}
         name: "✨ Check"
-        uses: trunk-io/trunk-action@f6c5f1b90503c30e02059667dbc247f2257b63c5
+        uses: trunk-io/trunk-action@2eaee169140ec559bd556208f9f99cdfdf468da8
         with:
           trunk-path: ${{ inputs.trunk_path }}
           trunk-token: ${{ secrets.trunk-token }}
@@ -115,4 +115,4 @@ jobs:
           arguments: ${{ inputs.arguments }}
       - if: ${{ inputs.action == 'upgrade' }}
         name: "✨ Upgrade"
-        uses: trunk-io/trunk-action/upgrade@f6c5f1b90503c30e02059667dbc247f2257b63c5
+        uses: trunk-io/trunk-action/upgrade@2eaee169140ec559bd556208f9f99cdfdf468da8
