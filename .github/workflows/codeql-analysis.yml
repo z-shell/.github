@@ -20,8 +20,8 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - name: 🏗 Initialize CodeQL
-        uses: github/codeql-action/init@23acc5c183826b7a8a97bce3cecc52db901f8251
+        uses: github/codeql-action/init@9e8d0789d4a0fa9ceb6b1738f7e269594bdd67f0
       - name: 🏗 Autobuild
-        uses: github/codeql-action/autobuild@23acc5c183826b7a8a97bce3cecc52db901f8251
+        uses: github/codeql-action/autobuild@9e8d0789d4a0fa9ceb6b1738f7e269594bdd67f0
       - name: 🚀 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@23acc5c183826b7a8a97bce3cecc52db901f8251
+        uses: github/codeql-action/analyze@9e8d0789d4a0fa9ceb6b1738f7e269594bdd67f0
