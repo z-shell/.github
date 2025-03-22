@@ -15,12 +15,12 @@ jobs:
       group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     steps:
       - name: "⤵️ Check out code from GitHub"
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: "🚀 Deploy Profile to GitHub Pages"
         if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
