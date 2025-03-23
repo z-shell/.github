@@ -4,6 +4,7 @@
   "extends": [
     "config:best-practices",
     ":semanticCommits",
+    ":rebaseStalePrs",
     ":automergeLinters",
     ":automergePatch",
     ":automergeTypes",
@@ -11,12 +12,17 @@
     "packages:eslint",
     "packages:react",
     "packages:stylelint",
-    ":semanticPrefixFixDepsChoreOthers",
-    ":ignoreModulesAndTests",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests",
     "group:monorepos",
     "group:recommended",
     "replacements:all",
     "workarounds:all",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":configMigration",
+    ":pinSkipCi",
+    ":pinDevDependencies",
+    ":ignoreModulesAndTests",
     ":gitSignOff"
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
@@ -32,7 +38,6 @@
     "automergeType": "pr",
     "platformAutomerge": false
   },
-  "pinDigests": false,
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
   "labels": ["dependencies 📦"]
 }
