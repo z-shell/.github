@@ -3,6 +3,7 @@
   "description": "Organization level configuration for automated dependency updates",
   "extends": [
     "config:best-practices",
+    ":semanticCommits",
     ":automergeLinters",
     ":automergePatch",
     ":automergeTypes",
@@ -10,10 +11,7 @@
     "packages:eslint",
     "packages:react",
     "packages:stylelint",
-    "replacements:all",
     "security:openssf-scorecard",
-    "workarounds:all",
-    ":semanticCommits",
     ":gitSignOff"
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
@@ -29,6 +27,7 @@
     "automergeType": "pr",
     "platformAutomerge": false
   },
+   "pinDigests" false,
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
   "labels": ["dependencies 📦"]
 }
