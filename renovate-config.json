@@ -11,7 +11,12 @@
     "packages:eslint",
     "packages:react",
     "packages:stylelint",
-    "security:openssf-scorecard",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":ignoreModulesAndTests",
+    "group:monorepos",
+    "group:recommended",
+    "replacements:all",
+    "workarounds:all",
     ":gitSignOff"
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
@@ -27,7 +32,7 @@
     "automergeType": "pr",
     "platformAutomerge": false
   },
-   "pinDigests" false,
+  "pinDigests": false,
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
   "labels": ["dependencies 📦"]
 }
