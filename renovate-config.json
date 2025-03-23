@@ -4,18 +4,14 @@
   "extends": [
     "config:best-practices",
     ":automergeLinters",
-    ":semanticCommits",
-    ":rebaseStalePrs",    
     ":automergePatch",
     ":automergeTypes",
     ":automergeMinor",
+    ":semanticCommits",
+    ":rebaseStalePrs",
     ":gitSignOff",
     ":pinSkipCi"
   ],
-  "dependencyDashboardTitle": "📊 Dependency Dashboard",
-  "dependencyDashboardApproval": true,
-  "dependencyDashboardAutoclose": true,
-  "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
   "lockFileMaintenance": {
     "enabled": true,
@@ -26,3 +22,4 @@
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
   "labels": ["dependencies 📦"]
 }
+ 
