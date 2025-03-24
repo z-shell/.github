@@ -19,7 +19,7 @@ jobs:
       pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
       pagespeed_url: https://wiki.zshell.dev
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - uses: lowlighter/metrics@v3.34
         with:
           filename: ${{ env.pagespeed_svg }}
