@@ -1,4 +1,4 @@
-FROM python:3.14-rc-slim-bookworm
+FROM python:3.14-rc-alpine3.21
 
 RUN pip install \
   --root-user-action=ignore \
