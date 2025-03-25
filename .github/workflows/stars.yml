@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'z-shell/.github'
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - run: |
           echo -e "\nA :star: from [@${{github.actor}}](https://github.com/${{github.actor}})" >> .github/stars.md
       - uses: z-shell/.github/actions/commit@main
