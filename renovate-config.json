@@ -11,7 +11,7 @@
     ":automergeMinor",
     ":semanticCommits",
     ":rebaseStalePrs",
-    ":configMigration",    
+    ":configMigration",
     "group:monorepos",
     "group:recommended",
     "replacements:all",
