@@ -24,12 +24,6 @@
   "dependencyDashboardAutoclose": true,
   "dependencyDashboardHeader": "[Z-Shell](https://www.zshell.dev) | [Renovate Preset](https://github.com/z-shell/.github/blob/main/renovate-config.json)",
   "assigneesFromCodeOwners": true,
-  "lockFileMaintenance": {
-    "enabled": true,
-    "automerge": true,
-    "automergeType": "pr",
-    "platformAutomerge": false
-  },
   "postUpdateOptions": ["npmDedupe", "pnpmDedupe", "yarnDedupeHighest"],
-  "labels": ["dependencies 📦"]
+  "labels": ["renovate 📦"]
 }
