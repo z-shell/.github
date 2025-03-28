@@ -36,9 +36,4 @@ jobs:
           publish_dir: metrics
           keep_files: true
           user_name: ${{ secrets.ACTIONS_USER }}
-          user_email: ${{ secrets.ACTIONS_MAIL }}
-      - name: Notify on failure
-        if: failure()
-        uses: some/notification-action@v1
-        with:
-          message: "Deployment to GitHub Pages failed."
+          user_email: ${{ secrets.ACTIONS_MAIL }
