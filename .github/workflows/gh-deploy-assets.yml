@@ -7,12 +7,16 @@ on:
     paths: ["./profile/**", "!.metrics/"]
   workflow_dispatch: {}
 
+permissions: read-all
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: github-pages
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    permissions:
+      contents: write
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v4.2.2
