@@ -12,11 +12,16 @@ on:
       - completed
   workflow_dispatch: {}
 
+permissions: read-all
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+      group: deploy-${{ github.head_ref || github.run_id }}
+      cancel-in-progress: true
+    permissions:
+      contents: write
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v4.2.2
@@ -26,9 +31,14 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: metrics
           keep_files: true
           user_name: ${{ secrets.ACTIONS_USER }}
           user_email: ${{ secrets.ACTIONS_MAIL }}
+      - name: Notify on failure
+        if: failure()
+        uses: some/notification-action@v1
+        with:
+          message: "Deployment to GitHub Pages failed."
