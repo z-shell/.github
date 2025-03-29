@@ -8,7 +8,7 @@ on:
     paths: [.github/workflows/pagespeed.yml]
   workflow_dispatch: {}
 
-permissions: read-all
+permissions: {}
 
 jobs:
   pagespeed:
@@ -23,7 +23,6 @@ jobs:
       pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
       pagespeed_url: ${{ secrets.PAGESPEED_TEST_URL }}
     steps:
-      - uses: actions/checkout@v4
       - uses: lowlighter/metrics@v3.34         
         with:
           filename: ${{ env.pagespeed_svg }}
@@ -31,6 +30,6 @@ jobs:
           base: ""
           plugin_pagespeed: yes
           plugin_pagespeed_pwa: yes
-          plugin_pagespeed_detailed: yes
+          plugin_pagespeed_detailed: no
           plugin_pagespeed_token: ${{ secrets.PAGESPEED_TOKEN }}
           plugin_pagespeed_url: ${{ env.pagespeed_url }}
