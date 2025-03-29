@@ -12,7 +12,7 @@ on:
       - completed
   workflow_dispatch: {}
 
-permissions: read-all
+permissions: {}
 
 jobs:
   deploy:
@@ -22,6 +22,7 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: write
+      pages: write
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@v4.2.2
@@ -36,4 +37,4 @@ jobs:
           publish_dir: metrics
           keep_files: true
           user_name: ${{ secrets.ACTIONS_USER }}
-          user_email: ${{ secrets.ACTIONS_MAIL }
+          user_email: ${{ secrets.ACTIONS_MAIL }}
