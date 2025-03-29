@@ -24,7 +24,7 @@ jobs:
       pagespeed_url: ${{ secrets.PAGESPEED_TEST_URL }}
     steps:
       - uses: actions/checkout@v4
-      - uses: lowlighter/metrics@v3
+      - uses: lowlighter/metrics@v3.34         
         with:
           filename: ${{ env.pagespeed_svg }}
           token: NOT_NEEDED
