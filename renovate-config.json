@@ -3,7 +3,6 @@
   "description": "Organization level configuration for automated dependency updates",
   "extends": [
     "config:best-practices",
-    ":maintainLockFilesMonthly",
     ":preserveSemverRanges",
     ":automergeLinters",
     ":automergePatch",
@@ -18,6 +17,22 @@
     "workarounds:all",
     ":gitSignOff",
     ":pinSkipCi"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "packageManagers": ["pnpm"],
+      "lockFileMaintenance": {
+        "enabled": true
+      },
+      {
+        "matchPackagePatterns": ["*"],
+        "groupName": "all dependencies",
+        "packageManagers": ["pnpm"]
+      }      
+    }
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
   "dependencyDashboardApproval": true,
