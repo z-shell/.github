@@ -24,14 +24,11 @@
   "packageRules": [
     {
       "packageManagers": ["pnpm"],
+      "matchPackagePatterns": ["*"],
+      "groupName": "all dependencies",
       "lockFileMaintenance": {
         "enabled": true
-      },
-      {
-        "matchPackagePatterns": ["*"],
-        "groupName": "all dependencies",
-        "packageManagers": ["pnpm"]
-      }      
+      }
     }
   ],
   "dependencyDashboardTitle": "📊 Dependency Dashboard",
