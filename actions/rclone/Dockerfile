@@ -1,5 +1,5 @@
 # Use a specific version tag for the base image
-FROM alpine:3.21
+FROM alpine:3.22
 
 # Combine RUN commands into a single line to reduce the number of layers
 RUN apk --update --no-cache add \
