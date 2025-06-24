@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">A Glimpse into My Shell</div>
-                                <div class="date">25 May 2025</div>
+                                <div class="title">Install zsh with autosuggestion in amazon linux</div>
+                                <div class="date">23 Jun 2025</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">From Setup Hell to Dev Heaven: Why You Should Use Dotfiles</div>
-                                <div class="date">9 May 2025</div>
+                                <div class="title">A Complete Beginner's Guide to Zsh Setup on WSL</div>
+                                <div class="date">22 Jun 2025</div>
                             </div>
                         </div>
                     </section>
