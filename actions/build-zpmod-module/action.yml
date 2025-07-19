@@ -1,0 +1,36 @@
+---
+name: "Build Zpmod Module"
+description: "Build the zpmod Zsh module with proper configuration and verification"
+inputs:
+  branch-name:
+    description: "Branch name to build from"
+    required: false
+    default: "main"
+  target-directory:
+    description: "Target directory for build"
+    required: false
+    default: "."
+  install-script:
+    description: "Path to installation script"
+    required: false
+    default: "./Scripts/install.sh"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build zpmod module
+      shell: bash
+      env:
+        BRANCH_NAME: ${{ inputs.branch-name }}
+        TARGET_DIR: ${{ inputs.target-directory }}
+      run: |
+        sh ${{ inputs.install-script }} --no-git --target="$TARGET_DIR" --branch="$BRANCH_NAME"
+
+        # Verify build output
+        if [ -d "$TARGET_DIR/Src/zi" ]; then
+          ls -la "$TARGET_DIR/Src/zi"
+          echo "✅ zpmod module built successfully"
+        else
+          echo "❌ zpmod module build failed - no output found"
+          exit 1
+        fi

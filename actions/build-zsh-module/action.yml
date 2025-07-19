@@ -28,3 +28,10 @@ runs:
       run: |
         ls -la ./Src/zi/${{ inputs.module-name }}.*
         echo "✅ Module ${{ inputs.module-name }} built successfully"
+    - name: 🔨 Build zpmod module
+      env:
+        BRANCH_NAME: ${{ steps.branch.outputs.branch }}
+      run: |
+        sh ./Scripts/install.sh --no-git --target=$(pwd) --branch="$BRANCH_NAME"
+        ls -la ./Src/zi
+        echo "✅ ${{ matrix.platform }} build completed successfully"
