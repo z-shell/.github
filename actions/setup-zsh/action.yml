@@ -1,0 +1,33 @@
+---
+name: "Setup Zsh"
+description: "Setup Zsh for GitHub Actions"
+inputs:
+  version:
+    description: "Version of Zsh to install"
+    required: false
+    default: "latest"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Zsh on Ubuntu
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zsh
+        zsh --version
+
+    - name: Setup Zsh on macOS
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew install zsh
+        zsh --version
+
+    - name: Setup Zsh on Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        choco install zsh
+        zsh --version
