@@ -1,0 +1,31 @@
+---
+name: "Test Zsh Module"
+description: "Load and test a Zsh module with comprehensive functionality testing"
+inputs:
+  module-name:
+    description: "Name of the module to test"
+    required: true
+  test-scripts-path:
+    description: "Path to test scripts"
+    required: false
+    default: "test_files"
+runs:
+  using: "composite"
+  steps:
+    - name: Load module
+      shell: zsh {0}
+      run: |
+        module_path+=( "$PWD/Src" )
+        if zmodload zi/${{ inputs.module-name }}; then
+          echo "✅ Module ${{ inputs.module-name }} loaded successfully"
+        else
+          echo "❌ Failed to load module ${{ inputs.module-name }}"
+          exit 1
+        fi
+    - name: Run module tests
+      shell: zsh {0}
+      run: |
+        module_path+=( "$PWD/Src" )
+        zmodload zi/${{ inputs.module-name }}
+        # Test basic functionality
+        ${{ inputs.module-name }} source-study -l
