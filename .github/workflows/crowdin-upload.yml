@@ -26,7 +26,7 @@ jobs:
       CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
     steps:
       - name: "⤵️ Check out code from GitHub"
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
       - name: "🚀 Crowdin Upload"

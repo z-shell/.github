@@ -27,7 +27,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
       - name: "📤 Restore cache"
         id: restore-cache
         uses: actions/cache/restore@v3
