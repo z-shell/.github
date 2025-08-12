@@ -25,7 +25,7 @@ jobs:
       wiki_followup_svg: metrics/plugin/followup/wiki_followup.svg
       f-sy-h_followup_svg: metrics/plugin/followup/f-sy-h_followup.svg
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.metrics_svg }}
