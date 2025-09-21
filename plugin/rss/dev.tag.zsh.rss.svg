@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">rcp &amp; rmv: copying &amp; moving using rsync with the simplicity of cp &amp; mv</div>
-                                <div class="date">9 Sept 2025</div>
+                                <div class="title">Kiro Cannot Get Response from The Second Command in The Same Shell</div>
+                                <div class="date">20 Sept 2025</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Achieving 30ms Zsh Startup</div>
-                                <div class="date">12 Aug 2025</div>
+                                <div class="title">rcp &amp; rmv: copying &amp; moving using rsync with the simplicity of cp &amp; mv</div>
+                                <div class="date">9 Sept 2025</div>
                             </div>
                         </div>
                     </section>
