@@ -94,7 +94,7 @@ jobs:
         run: echo ${{ inputs.get_dependencies }}
       - if: ${{ inputs.pnpm_arguments }}
         name: "📦 Setup pnpm"
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4.2.0
       - if: ${{ inputs.pnpm_arguments }}
         name: "⎔ Setup node"
         uses: actions/setup-node@v4.3.0
