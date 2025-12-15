@@ -59,7 +59,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
       - run: pnpm i --prod
-      - uses: preactjs/compressed-size-action@v2
+      - uses: preactjs/compressed-size-action@v3
         with:
           build-script: "build:en"
           pattern: "{build/assets/js/*.js,build/assets/css/*.css,build/**/*.html,.docusaurus/globalData.json,build/blog/**/swiss-army-knife-for-zsh/*}"
