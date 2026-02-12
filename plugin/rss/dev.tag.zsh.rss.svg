@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="113" class="">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="111" class="">
     <defs>
         <style/>
     </defs>
@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">From 1.4s to 53ms: Optimizing zsh Startup on macOS</div>
-                                <div class="date">9 Feb 2026</div>
+                                <div class="title">I Replaced nvm, Homebrew Go, and Homebrew Python with a Single Tool</div>
+                                <div class="date">10 Feb 2026</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Zsh 및 쉘 환경 설정 가이드</div>
-                                <div class="date">31 Dec 2025</div>
+                                <div class="title">From 1.4s to 53ms: Optimizing zsh Startup on macOS</div>
+                                <div class="date">9 Feb 2026</div>
                             </div>
                         </div>
                     </section>
