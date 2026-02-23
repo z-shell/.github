@@ -54,7 +54,7 @@ jobs:
       - name: "📦 Setup pnpm"
         uses: pnpm/action-setup@v4.1.0
       - name: "⎔ Setup node"
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
@@ -83,7 +83,7 @@ jobs:
       - name: "📦 Setup pnpm"
         uses: pnpm/action-setup@v4.1.0
       - name: "⎔ Setup node"
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
