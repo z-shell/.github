@@ -97,7 +97,7 @@ jobs:
         uses: pnpm/action-setup@v4.1.0
       - if: ${{ inputs.pnpm_arguments }}
         name: "⎔ Setup node"
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
