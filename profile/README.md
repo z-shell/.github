@@ -1,10 +1,12 @@
-<br/>
-  <div align="center">
-    <p>
-    We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
-    </p>  
-  </div>
-<br/>
+<div align="center"><p>
+
+  <br/> 
+  
+  We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
+
+
+  <br/>
+</p></div>
 
 <div align="center">
 <table>
