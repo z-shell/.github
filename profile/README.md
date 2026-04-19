@@ -12,16 +12,16 @@
       <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/repositories_metrics.svg" width="80%" height="auto" alt="Repository Metrics" />
     </a>
   </p>
+  <!--
   <p>
     <a target="_self" href="https://github.com/orgs/z-shell">
       <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/stargazers/worldmap.svg" width="80%" height="auto" alt="Stargazers" />
     </a>
-    <!--
     <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/wiki">
       <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/pagespeed/detailed.svg" width="80%" height="auto" alt="Pagespeed" />
     </a>
-    -->
   </p>
+  -->
   <p>
     <a title="Activity for Zsh" target="_self" href="https://sourceforge.net/p/zsh/activity/">
       <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/rss/zsh/activity.svg" width="80%" height="auto" alt="Activity" />
