@@ -1,28 +1,9 @@
-<div align="center">
-  <a href="https://github.com/z-shell">
-    <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/hero.svg" width="100%" alt="Z-Shell Organization" />
-  </a>
-  <br/>
-  <p>
-    <a href="https://github.com/orgs/z-shell/repositories?type=source">
-      <img src="https://img.shields.io/badge/Repositories-90+-23c88a?style=flat-square&logo=github" alt="Repos" />
-    </a>
-    <a href="https://github.com/z-shell/wiki">
-      <img src="https://img.shields.io/badge/📚_Wiki-Documentation-23c88a?style=flat-square" alt="Wiki" />
-    </a>
-    <a href="https://github.com/orgs/z-shell/discussions">
-      <img src="https://img.shields.io/badge/💬_Discussions-Community-23c88a?style=flat-square" alt="Discussions" />
-    </a>
-    <a href="https://github.com/z-shell/.github/blob/main/LICENSE">
-      <img src="https://img.shields.io/badge/License-MIT-23c88a?style=flat-square" alt="License" />
-    </a>
-  </p>
-</div>
-
 <br/>
-
-We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
-
+  <div align="center">
+    <p>
+    We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
+    </p>  
+  </div>
 <br/>
 
 <div align="center">
