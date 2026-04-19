@@ -1,19 +1,20 @@
-<div align="center"><p>
+<div align="center">
 
-  <br/> 
-  
-  We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
+<br/>
+<br/>
 
+We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
 
-  <br/>
-</p></div>
+<br/>
+<br/>
 
+</div>
 <div align="center">
 <table>
 <tr>
 <td align="center" width="25%">
 <a href="https://github.com/orgs/z-shell/repositories?q=topic:zsh-plugin-manager+OR+topic:zsh-framework">
-<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-plugin-mgr.svg" width="100" height="100" alt="Zsh Tooling" />
+<img src="img/card-plugin-mgr.svg" width="100" height="100" alt="Zsh Tooling" />
 </a>
 <br/>
 <b>Zsh Tooling</b>
@@ -22,7 +23,7 @@
 </td>
 <td align="center" width="25%">
 <a href="https://github.com/orgs/z-shell/repositories?q=topic:zsh-plugin">
-<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-turbo.svg" width="100" height="100" alt="Plugins" />
+<img src="img/card-turbo.svg" width="100" height="100" alt="Plugins" />
 </a>
 <br/>
 <b>Plugins &amp; Extensions</b>
@@ -31,7 +32,7 @@
 </td>
 <td align="center" width="25%">
 <a href="https://github.com/orgs/z-shell/repositories?q=topic:zshell">
-<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-ecosystem.svg" width="100" height="100" alt="Ecosystem" />
+<img src="img/card-ecosystem.svg" width="100" height="100" alt="Ecosystem" />
 </a>
 <br/>
 <b>Ecosystem</b>
@@ -40,7 +41,7 @@
 </td>
 <td align="center" width="25%">
 <a href="https://github.com/orgs/z-shell/discussions">
-<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-community.svg" width="100" height="100" alt="Community" />
+<img src="img/card-community.svg" width="100" height="100" alt="Community" />
 </a>
 <br/>
 <b>Community</b>
@@ -52,7 +53,7 @@
 </div>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/divider.svg" width="80%" alt="" />
+  <img src="img/divider.svg" width="80%" alt="" />
 </div>
 
 ## 🗂️ Project Categories
@@ -89,7 +90,7 @@
 > [**Browse all repositories →**](https://github.com/orgs/z-shell/repositories?type=source&sort=stargazers)
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/divider.svg" width="80%" alt="" />
+  <img src="img/divider.svg" width="80%" alt="" />
 </div>
 
 ## 📚 Resources
