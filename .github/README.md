@@ -22,7 +22,7 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 ### What Makes It Special
 
 | Feature | How It Works |
-|:--|:--|
+| --- | --- |
 | **Organization Profile** | `profile/README.md` is rendered on the [organization's GitHub page](https://github.com/z-shell) as the public-facing profile. |
 | **Default Community Health Files** | Files like `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `GOVERNANCE.md` in `.github/` are used as fallbacks by any org repository that doesn't define its own. |
 | **Default Issue & PR Templates** | Templates in `.github/ISSUE_TEMPLATE/` and discussion forms in `.github/DISCUSSION_TEMPLATE/` are inherited by repositories without their own templates. |
@@ -37,7 +37,7 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 ## Repository Structure
 
 | Path | Purpose |
-|:--|:--|
+| --- | --- |
 | [`profile/`](../profile/) | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell) |
 | [`actions/`](../actions/) | Reusable composite GitHub Actions shared across all org repositories |
 | [`workflow-templates/`](../workflow-templates/) | Starter workflow templates available in the **Actions > New workflow** tab |
@@ -49,7 +49,7 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 These files in `.github/` act as **organization-wide defaults** — automatically used by any repository that doesn't have its own version:
 
 | File | Purpose |
-|:--|:--|
+| --- | --- |
 | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Contributor Covenant code of conduct |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines and requirements |
 | [`SECURITY.md`](SECURITY.md) | Security vulnerability reporting policy |
@@ -69,7 +69,7 @@ These files in `.github/` act as **organization-wide defaults** — automaticall
 Composite actions available to all repositories via `z-shell/.github/actions/<name>`:
 
 | Action | Description |
-|:--|:--|
+| --- | --- |
 | [`setup-zsh`](../actions/setup-zsh) | Set up Zsh environment for CI |
 | [`setup-zsh-development`](../actions/setup-zsh-development) | Set up Zsh development environment |
 | [`build-zpmod-module`](../actions/build-zpmod-module) | Build the Zpmod Zsh module |
@@ -94,7 +94,7 @@ steps:
 Starter workflows available in every org repository under **Actions > New workflow**:
 
 | Template | Description |
-|:--|:--|
+| --- | --- |
 | Commit Action | Automated commit workflow |
 | Rebase Action | PR auto-rebase workflow |
 | Lock Action | Issue/PR auto-lock |

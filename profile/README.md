@@ -77,7 +77,7 @@ We build and maintain an ecosystem of **open-source tools, plugins, and extensio
 ### Core
 
 | Project | Description | |
-|:--|:--|:--|
+| --- | --- | --- |
 | [**zi**](https://github.com/z-shell/zi) | ✨ A Swiss Army Knife for Zsh — Unix Shell | ![Stars](https://img.shields.io/github/stars/z-shell/zi?style=flat-square&color=23c88a) |
 | [**zpmod**](https://github.com/z-shell/zpmod) | ⚙️ Zsh module — transparent script compilation | ![Stars](https://img.shields.io/github/stars/z-shell/zpmod?style=flat-square&color=23c88a) |
 | [**zi-console**](https://github.com/z-shell/zi-console) | ⚙️ Console UI built on zsh/zcurses and ZUI | ![Stars](https://img.shields.io/github/stars/z-shell/zi-console?style=flat-square&color=23c88a) |
@@ -85,7 +85,7 @@ We build and maintain an ecosystem of **open-source tools, plugins, and extensio
 ### Plugins
 
 | Project | Description | |
-|:--|:--|:--|
+| --- | --- | --- |
 | [**F-Sy-H**](https://github.com/z-shell/F-Sy-H) | ⚙️ Feature-rich Syntax Highlighting | ![Stars](https://img.shields.io/github/stars/z-shell/F-Sy-H?style=flat-square&color=23c88a) |
 | [**H-S-MW**](https://github.com/z-shell/H-S-MW) | ⚙️ History search for multiple words | ![Stars](https://img.shields.io/github/stars/z-shell/H-S-MW?style=flat-square&color=23c88a) |
 | [**zsh-eza**](https://github.com/z-shell/zsh-eza) | ⚙️ Replace GNU/ls with eza | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-eza?style=flat-square&color=23c88a) |
@@ -97,7 +97,7 @@ We build and maintain an ecosystem of **open-source tools, plugins, and extensio
 ### Developer Tools
 
 | Project | Description | |
-|:--|:--|:--|
+| --- | --- | --- |
 | [**zsh-lint**](https://github.com/z-shell/zsh-lint) | 🔍 Linter for Zsh scripting language | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-lint?style=flat-square&color=23c88a) |
 | [**zsdoc**](https://github.com/z-shell/zsdoc) | 📄 Doxygen for Shell — Zsh and Bash scripts | ![Stars](https://img.shields.io/github/stars/z-shell/zsdoc?style=flat-square&color=23c88a) |
 | [**zui**](https://github.com/z-shell/zui) | ⚙️ Rapid TUI development library for Zsh | ![Stars](https://img.shields.io/github/stars/z-shell/zui?style=flat-square&color=23c88a) |
