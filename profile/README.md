@@ -1,54 +1,126 @@
 <div align="center">
+  <a href="https://github.com/z-shell">
+    <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/hero.svg" width="100%" alt="Z-Shell Organization" />
+  </a>
+  <br/>
   <p>
-    <a target="_self" href="https://github.com/z-shell/zi">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/branch_box.png" alt="ZI+GIT Logo" width="80%" height="auto" />
+    <a href="https://github.com/orgs/z-shell/repositories?type=source">
+      <img src="https://img.shields.io/badge/Repositories-90+-23c88a?style=flat-square&logo=github" alt="Repos" />
+    </a>
+    <a href="https://github.com/z-shell/wiki">
+      <img src="https://img.shields.io/badge/📚_Wiki-Documentation-23c88a?style=flat-square" alt="Wiki" />
+    </a>
+    <a href="https://github.com/orgs/z-shell/discussions">
+      <img src="https://img.shields.io/badge/💬_Discussions-Community-23c88a?style=flat-square" alt="Discussions" />
+    </a>
+    <a href="https://github.com/z-shell/.github/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/License-MIT-23c88a?style=flat-square" alt="License" />
     </a>
   </p>
-  <p>
-    <a target="_self" href="https://github.com/z-shell/zi">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/metrics.svg" width="80%" height="auto" alt="Metrics" />
-    </a>
-    <a target="_self" href="https://github.com/z-shell">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/repositories_metrics.svg" width="80%" height="auto" alt="Repository Metrics" />
-    </a>
-  </p>
-  <!--
-  <p>
-    <a target="_self" href="https://github.com/orgs/z-shell">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/stargazers/worldmap.svg" width="80%" height="auto" alt="Stargazers" />
-    </a>
-    <a title="ZI WIKI" target="_self" href="https://github.com/z-shell/wiki">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/pagespeed/detailed.svg" width="80%" height="auto" alt="Pagespeed" />
-    </a>
-  </p>
-  -->
-  <p>
-    <a title="Activity for Zsh" target="_self" href="https://sourceforge.net/p/zsh/activity/">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/rss/zsh/activity.svg" width="80%" height="auto" alt="Activity" />
-    </a>
-    <a title="DEV" target="_self" href="https://dev.to/tag/zsh">
-      <img align="center" src="https://raw.githubusercontent.com/z-shell/.github/main/metrics/plugin/rss/dev.tag.zsh.rss.svg" width="80%" height="auto" alt="Zsh Feed" />
-    </a>
-  <p>
 </div>
 
-<!--
-<a target="_self" href="https://github.com/z-shell/zi">
-  <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/1e1afffc6a6daa806a91f70670672f8cb537f52f.svg" />
+<br/>
+
+We build and maintain an ecosystem of **open-source tools, plugins, and extensions for the [Zsh](https://zsh.sourceforge.io/) shell**. Our projects span plugin management, syntax highlighting, completion systems, shell modules, developer tooling, and documentation — all designed to make Zsh more powerful, customizable, and enjoyable.
+
+<br/>
+
+<div align="center">
+<table>
+<tr>
+<td align="center" width="25%">
+<a href="https://github.com/orgs/z-shell/repositories?q=topic:zsh-plugin-manager+OR+topic:zsh-framework">
+<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-plugin-mgr.svg" width="100" height="100" alt="Zsh Tooling" />
 </a>
-<a target="_self" href="https://github.com/z-shell/wiki">
-  <img align="center" style="width:80%;height:auto" src="https://repobeats.axiom.co/api/embed/7d47a082266db29fe494900bbee9c99febc24f38.svg" />
+<br/>
+<b>Zsh Tooling</b>
+<br/>
+<sub>Plugin managers, modules, shell frameworks, and package management</sub>
+</td>
+<td align="center" width="25%">
+<a href="https://github.com/orgs/z-shell/repositories?q=topic:zsh-plugin">
+<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-turbo.svg" width="100" height="100" alt="Plugins" />
 </a>
-<a href="https://github.com/z-shell/zi">
-  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=zi&card_width=150&theme=github_dark" />
+<br/>
+<b>Plugins &amp; Extensions</b>
+<br/>
+<sub>Syntax highlighting, completions, integrations, and shell enhancements</sub>
+</td>
+<td align="center" width="25%">
+<a href="https://github.com/orgs/z-shell/repositories?q=topic:zshell">
+<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-ecosystem.svg" width="100" height="100" alt="Ecosystem" />
 </a>
-<a href="https://github.com/z-shell/wiki">
-  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=wiki&card_width=150&theme=github_dark" />
+<br/>
+<b>Ecosystem</b>
+<br/>
+<sub>Annexes, meta-plugins, packages, and community-maintained tools</sub>
+</td>
+<td align="center" width="25%">
+<a href="https://github.com/orgs/z-shell/discussions">
+<img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/card-community.svg" width="100" height="100" alt="Community" />
 </a>
-<a href="https://github.com/z-shell/community">
-  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=community&card_width=150&theme=github_dark" />
-</a>
-<a href="https://github.com/z-shell/status">
-  <img align="center" style="width:40%;height:auto" src="https://github-readme-stats.vercel.app/api/pin/?username=z-shell&repo=status&card_width=150&theme=github_dark" />
-</a>
--->
+<br/>
+<b>Community</b>
+<br/>
+<sub>Documentation, playground environments, discussions, and collaboration</sub>
+</td>
+</tr>
+</table>
+</div>
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/divider.svg" width="80%" alt="" />
+</div>
+
+## 🗂️ Project Categories
+
+### Core
+
+| Project | Description | |
+|:--|:--|:--|
+| [**zi**](https://github.com/z-shell/zi) | ✨ A Swiss Army Knife for Zsh — Unix Shell | ![Stars](https://img.shields.io/github/stars/z-shell/zi?style=flat-square&color=23c88a) |
+| [**zpmod**](https://github.com/z-shell/zpmod) | ⚙️ Zsh module — transparent script compilation | ![Stars](https://img.shields.io/github/stars/z-shell/zpmod?style=flat-square&color=23c88a) |
+| [**zi-console**](https://github.com/z-shell/zi-console) | ⚙️ Console UI built on zsh/zcurses and ZUI | ![Stars](https://img.shields.io/github/stars/z-shell/zi-console?style=flat-square&color=23c88a) |
+
+### Plugins
+
+| Project | Description | |
+|:--|:--|:--|
+| [**F-Sy-H**](https://github.com/z-shell/F-Sy-H) | ⚙️ Feature-rich Syntax Highlighting | ![Stars](https://img.shields.io/github/stars/z-shell/F-Sy-H?style=flat-square&color=23c88a) |
+| [**H-S-MW**](https://github.com/z-shell/H-S-MW) | ⚙️ History search for multiple words | ![Stars](https://img.shields.io/github/stars/z-shell/H-S-MW?style=flat-square&color=23c88a) |
+| [**zsh-eza**](https://github.com/z-shell/zsh-eza) | ⚙️ Replace GNU/ls with eza | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-eza?style=flat-square&color=23c88a) |
+| [**zsh-zoxide**](https://github.com/z-shell/zsh-zoxide) | ⚙️ Zoxide smart directory navigation | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-zoxide?style=flat-square&color=23c88a) |
+| [**zsh-navigation-tools**](https://github.com/z-shell/zsh-navigation-tools) | ⚙️ Curses-based tools — n-history, n-cd, n-env | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-navigation-tools?style=flat-square&color=23c88a) |
+| [**zsh-diff-so-fancy**](https://github.com/z-shell/zsh-diff-so-fancy) | ⚙️ diff-so-fancy integration | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-diff-so-fancy?style=flat-square&color=23c88a) |
+| [**zsh-fancy-completions**](https://github.com/z-shell/zsh-fancy-completions) | ⚙️ Enhanced completion configuration | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-fancy-completions?style=flat-square&color=23c88a) |
+
+### Developer Tools
+
+| Project | Description | |
+|:--|:--|:--|
+| [**zsh-lint**](https://github.com/z-shell/zsh-lint) | 🔍 Linter for Zsh scripting language | ![Stars](https://img.shields.io/github/stars/z-shell/zsh-lint?style=flat-square&color=23c88a) |
+| [**zsdoc**](https://github.com/z-shell/zsdoc) | 📄 Doxygen for Shell — Zsh and Bash scripts | ![Stars](https://img.shields.io/github/stars/z-shell/zsdoc?style=flat-square&color=23c88a) |
+| [**zui**](https://github.com/z-shell/zui) | ⚙️ Rapid TUI development library for Zsh | ![Stars](https://img.shields.io/github/stars/z-shell/zui?style=flat-square&color=23c88a) |
+| [**playground**](https://github.com/z-shell/playground) | 🐳 Docker-based user configuration playground | ![Stars](https://img.shields.io/github/stars/z-shell/playground?style=flat-square&color=23c88a) |
+
+> [**Browse all repositories →**](https://github.com/orgs/z-shell/repositories?type=source&sort=stargazers)
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/divider.svg" width="80%" alt="" />
+</div>
+
+## 📚 Resources
+
+- 📖 [**Wiki & Documentation**](https://github.com/z-shell/wiki) — Guides, references, and configuration examples
+- 🐳 [**Playground**](https://github.com/z-shell/playground) — Try configurations in a Docker environment
+- 💬 [**Discussions**](https://github.com/orgs/z-shell/discussions) — Ask questions and share setups
+- 🐛 [**Issue Tracker**](https://github.com/z-shell/zi/issues) — Report bugs or request features
+
+## 🤝 Contributing
+
+We welcome contributions across all repositories — bug fixes, documentation improvements, new plugins, or feature suggestions. Check individual repository guidelines or join the [discussions](https://github.com/orgs/z-shell/discussions) to get started.
+
+<div align="center">
+  <br/>
+  <sub>Built with ❤️ by the <a href="https://github.com/z-shell">Z-Shell</a> community</sub>
+</div>

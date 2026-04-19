@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 8" fill="none">
+  <defs>
+    <linearGradient id="div-grad" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#23c88a" stop-opacity="0"/>
+      <stop offset="20%" stop-color="#23c88a" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#50df8e" stop-opacity="0.8"/>
+      <stop offset="80%" stop-color="#23c88a" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#23c88a" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="3" width="800" height="2" rx="1" fill="url(#div-grad)"/>
+  <!-- Center diamond accent -->
+  <rect x="396" y="0" width="8" height="8" rx="1.5" fill="#50df8e" opacity="0.6" transform="rotate(45,400,4)"/>
+</svg>

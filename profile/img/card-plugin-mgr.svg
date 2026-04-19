@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="pm-bg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#23c88a" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#50df8e" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="pm-icon" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#50df8e"/>
+      <stop offset="100%" stop-color="#23c88a"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="20" fill="url(#pm-bg)"/>
+  <!-- Package box -->
+  <rect x="32" y="42" width="56" height="44" rx="5" fill="none" stroke="url(#pm-icon)" stroke-width="2.5"/>
+  <!-- Box lid flap -->
+  <line x1="32" y1="58" x2="88" y2="58" stroke="url(#pm-icon)" stroke-width="2" opacity="0.5"/>
+  <path d="M60 42 L48 50 L60 58 L72 50 Z" fill="#23c88a" opacity="0.25"/>
+  <!-- Center divider -->
+  <line x1="60" y1="58" x2="60" y2="86" stroke="#7feca2" stroke-width="1" opacity="0.3"/>
+  <!-- Download arrow -->
+  <line x1="60" y1="18" x2="60" y2="38" stroke="#50df8e" stroke-width="2.5" stroke-linecap="round"/>
+  <polyline points="51,30 60,40 69,30" fill="none" stroke="#50df8e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Zi hint in box -->
+  <polygon points="60,64 56,72 64,72" fill="#7feca2" opacity="0.4"/>
+  <polygon points="58,72 56,78 64,72" fill="#50df8e" opacity="0.3"/>
+  <!-- Particles -->
+  <circle cx="18" cy="24" r="2" fill="#50df8e" opacity="0.3"/>
+  <circle cx="102" cy="28" r="1.5" fill="#7feca2" opacity="0.3"/>
+  <circle cx="16" cy="98" r="1.5" fill="#5ae39c" opacity="0.2"/>
+  <circle cx="104" cy="100" r="2" fill="#50df8e" opacity="0.2"/>
+</svg>
