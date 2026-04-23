@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">ZSH + Starship: A Better Shell Experience for Linux Power Users</div>
-                                <div class="date">16 Apr 2026</div>
+                                <div class="title">My .zshrc is 350 lines and I mass-replaced every core Unix command</div>
+                                <div class="date">22 Apr 2026</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,7 +29,7 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Bash vs. Zsh vs. Fish: Which One Should You Actually Use?</div>
+                                <div class="title">ZSH + Starship: A Better Shell Experience for Linux Power Users</div>
                                 <div class="date">16 Apr 2026</div>
                             </div>
                         </div>
