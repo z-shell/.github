@@ -21,7 +21,7 @@
                             </svg>
                             <div class="infos">
                                 <div class="title">Fixing "No Credentials Found" when using AWS SSO Profiles in Zsh</div>
-                                <div class="date">24 Apr 2026</div>
+                                <div class="date">27 Apr 2026</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Debugging "No Credentials Found" when Aliasing AWS SSO Login in ZSH</div>
-                                <div class="date">23 Apr 2026</div>
+                                <div class="title">Fixing "No Credentials Found" when using AWS SSO Profiles in Zsh</div>
+                                <div class="date">24 Apr 2026</div>
                             </div>
                         </div>
                     </section>
