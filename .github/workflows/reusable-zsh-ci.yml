@@ -17,14 +17,24 @@ jobs:
       - name: ⚡ zsh -n on all .zsh files
         run: |
           set -euo pipefail
-          while IFS= read -r -d $'\0' file; do
+          mapfile -d '' files < <(find . -type f -name '*.zsh' -print0)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "ERROR: No .zsh files found to validate." >&2
+            exit 1
+          fi
+          for file in "${files[@]}"; do
             zsh -n "${file}"
-          done < <(find . -type f -name '*.zsh' -print0)
+          done
 
       - name: ⚡ zcompile all .zsh files
         run: |
           set -euo pipefail
-          while IFS= read -r -d $'\0' file; do
+          mapfile -d '' files < <(find . -type f -name '*.zsh' -print0)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "ERROR: No .zsh files found to compile." >&2
+            exit 1
+          fi
+          for file in "${files[@]}"; do
             zsh -fc 'zcompile -- "$1"' zsh "${file}"
             ls -al "${file}.zwc"
-          done < <(find . -type f -name '*.zsh' -print0)
+          done
