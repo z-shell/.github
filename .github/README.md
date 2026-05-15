@@ -21,14 +21,14 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 
 ### What Makes It Special
 
-| Feature | How It Works |
-| --- | --- |
-| **Organization Profile** | `profile/README.md` is rendered on the [organization's GitHub page](https://github.com/z-shell) as the public-facing profile. |
-| **Default Community Health Files** | Files like `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `GOVERNANCE.md` in `.github/` are used as fallbacks by any org repository that doesn't define its own. |
-| **Default Issue & PR Templates** | Templates in `.github/ISSUE_TEMPLATE/` and discussion forms in `.github/DISCUSSION_TEMPLATE/` are inherited by repositories without their own templates. |
-| **Reusable Composite Actions** | The `actions/` directory hosts [composite actions](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action) that any org repository can reference via `uses: z-shell/.github/actions/<name>@main`. |
-| **Workflow Templates** | The `workflow-templates/` directory provides [starter workflows](https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization) available in every org repository under **Actions > New workflow**. |
-| **Shared Dependency Config** | `renovate-config.json` defines a shared [Renovate](https://docs.renovatebot.com/) preset that org repositories can extend for consistent automated dependency updates. |
+| Feature                            | How It Works                                                                                                                                                                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Organization Profile**           | `profile/README.md` is rendered on the [organization's GitHub page](https://github.com/z-shell) as the public-facing profile.                                                                                                             |
+| **Default Community Health Files** | Files like `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `GOVERNANCE.md` in `.github/` are used as fallbacks by any org repository that doesn't define its own.                                                             |
+| **Default Issue & PR Templates**   | Templates in `.github/ISSUE_TEMPLATE/` and discussion forms in `.github/DISCUSSION_TEMPLATE/` are inherited by repositories without their own templates.                                                                                  |
+| **Reusable Composite Actions**     | The `actions/` directory hosts [composite actions](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action) that any org repository can reference via `uses: z-shell/.github/actions/<name>@main`.                |
+| **Workflow Templates**             | The `workflow-templates/` directory provides [starter workflows](https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization) available in every org repository under **Actions > New workflow**. |
+| **Shared Dependency Config**       | `renovate-config.json` defines a shared [Renovate](https://docs.renovatebot.com/) preset that org repositories can extend for consistent automated dependency updates.                                                                    |
 
 > **Note:** The `.github` repository must be **public** for default community health files to apply across the organization.
 
@@ -36,31 +36,31 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 
 ## Repository Structure
 
-| Path | Purpose |
-| --- | --- |
-| [`profile/`](../profile/) | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell) |
-| [`actions/`](../actions/) | Reusable composite GitHub Actions shared across all org repositories |
-| [`workflow-templates/`](../workflow-templates/) | Starter workflow templates available in the **Actions > New workflow** tab |
-| [`metrics/`](../metrics/) | Auto-generated organization metrics and analytics |
-| [`renovate-config.json`](../renovate-config.json) | Shared Renovate bot preset for dependency updates |
+| Path                                              | Purpose                                                                                                     |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell) |
+| [`actions/`](../actions/)                         | Reusable composite GitHub Actions shared across all org repositories                                        |
+| [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                  |
+| [`metrics/`](../metrics/)                         | Auto-generated organization metrics and analytics                                                           |
+| [`renovate-config.json`](../renovate-config.json) | Shared Renovate bot preset for dependency updates                                                           |
 
 ### Community Health Files
 
 These files in `.github/` act as **organization-wide defaults** — automatically used by any repository that doesn't have its own version:
 
-| File | Purpose |
-| --- | --- |
-| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Contributor Covenant code of conduct |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines and requirements |
-| [`SECURITY.md`](SECURITY.md) | Security vulnerability reporting policy |
-| [`GOVERNANCE.md`](GOVERNANCE.md) | Project governance roles and decision-making |
-| [`CHARTER.md`](CHARTER.md) | Organizational charter and mission |
-| [`STEERING_COMMITTEE.md`](STEERING_COMMITTEE.md) | Steering committee membership |
-| [`MAINTAINERS.md`](MAINTAINERS.md) | Project maintainer list |
-| [`TRADEMARKS.md`](TRADEMARKS.md) | Trademark usage policy |
-| [`ANTITRUST.md`](ANTITRUST.md) | Antitrust compliance policy |
-| [`ISSUE_TEMPLATE/`](ISSUE_TEMPLATE/) | Default issue forms (bug reports, features, docs, membership) |
-| [`DISCUSSION_TEMPLATE/`](DISCUSSION_TEMPLATE/) | Default discussion category forms |
+| File                                             | Purpose                                                       |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)       | Contributor Covenant code of conduct                          |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)             | Contribution guidelines and requirements                      |
+| [`SECURITY.md`](SECURITY.md)                     | Security vulnerability reporting policy                       |
+| [`GOVERNANCE.md`](GOVERNANCE.md)                 | Project governance roles and decision-making                  |
+| [`CHARTER.md`](CHARTER.md)                       | Organizational charter and mission                            |
+| [`STEERING_COMMITTEE.md`](STEERING_COMMITTEE.md) | Steering committee membership                                 |
+| [`MAINTAINERS.md`](MAINTAINERS.md)               | Project maintainer list                                       |
+| [`TRADEMARKS.md`](TRADEMARKS.md)                 | Trademark usage policy                                        |
+| [`ANTITRUST.md`](ANTITRUST.md)                   | Antitrust compliance policy                                   |
+| [`ISSUE_TEMPLATE/`](ISSUE_TEMPLATE/)             | Default issue forms (bug reports, features, docs, membership) |
+| [`DISCUSSION_TEMPLATE/`](DISCUSSION_TEMPLATE/)   | Default discussion category forms                             |
 
 ---
 
@@ -68,19 +68,19 @@ These files in `.github/` act as **organization-wide defaults** — automaticall
 
 Composite actions available to all repositories via `z-shell/.github/actions/<name>`:
 
-| Action | Description |
-| --- | --- |
-| [`setup-zsh`](../actions/setup-zsh) | Set up Zsh environment for CI |
+| Action                                                      | Description                        |
+| ----------------------------------------------------------- | ---------------------------------- |
+| [`setup-zsh`](../actions/setup-zsh)                         | Set up Zsh environment for CI      |
 | [`setup-zsh-development`](../actions/setup-zsh-development) | Set up Zsh development environment |
-| [`build-zpmod-module`](../actions/build-zpmod-module) | Build the Zpmod Zsh module |
-| [`test-zpmod-module`](../actions/test-zpmod-module) | Test the Zpmod module |
-| [`test-zsh-module`](../actions/test-zsh-module) | Test Zsh modules |
-| [`commit`](../actions/commit) | Automated commit action |
-| [`rebase`](../actions/rebase) | Automated rebase action |
-| [`mirror`](../actions/mirror) | Repository mirroring |
-| [`rclone`](../actions/rclone) | File sync with rclone |
-| [`determine-branch`](../actions/determine-branch) | Determine target branch |
-| [`verify-pr-labels`](../actions/verify-pr-labels) | Verify PR label compliance |
+| [`build-zpmod-module`](../actions/build-zpmod-module)       | Build the Zpmod Zsh module         |
+| [`test-zpmod-module`](../actions/test-zpmod-module)         | Test the Zpmod module              |
+| [`test-zsh-module`](../actions/test-zsh-module)             | Test Zsh modules                   |
+| [`commit`](../actions/commit)                               | Automated commit action            |
+| [`rebase`](../actions/rebase)                               | Automated rebase action            |
+| [`mirror`](../actions/mirror)                               | Repository mirroring               |
+| [`rclone`](../actions/rclone)                               | File sync with rclone              |
+| [`determine-branch`](../actions/determine-branch)           | Determine target branch            |
+| [`verify-pr-labels`](../actions/verify-pr-labels)           | Verify PR label compliance         |
 
 **Usage example:**
 
@@ -93,16 +93,16 @@ steps:
 
 Starter workflows available in every org repository under **Actions > New workflow**:
 
-| Template | Description |
-| --- | --- |
-| Commit Action | Automated commit workflow |
-| Rebase Action | PR auto-rebase workflow |
-| Lock Action | Issue/PR auto-lock |
-| Stale Action | Stale issue management |
-| Trunk | Trunk.io linting integration |
-| Sync Labels | Label synchronization |
-| Verify PR Labels | PR label validation |
-| Rclone Action | File sync with rclone |
+| Template         | Description                  |
+| ---------------- | ---------------------------- |
+| Commit Action    | Automated commit workflow    |
+| Rebase Action    | PR auto-rebase workflow      |
+| Lock Action      | Issue/PR auto-lock           |
+| Stale Action     | Stale issue management       |
+| Trunk            | Trunk.io linting integration |
+| Sync Labels      | Label synchronization        |
+| Verify PR Labels | PR label validation          |
+| Rclone Action    | File sync with rclone        |
 
 ## Renovate
 

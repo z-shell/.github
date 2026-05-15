@@ -22,10 +22,10 @@ lint:
     - trufflehog
     - yamllint
     - vale
+    - ruff
   enabled:
     - oxipng@10.1.0
     - bandit@1.9.4
-    - ruff@0.15.11
     - taplo@0.10.0
     - isort@8.0.1
     - flake8@7.3.0
@@ -43,14 +43,14 @@ lint:
     - linters: [svgo]
       paths:
         - "metrics/**"
-    - linters: [markdownlint]
-      paths:
-        - ".github/styles/**"
+#    - linters: [markdownlint]
+#      paths:
+#        - ".github/styles/**"
 runtimes:
   enabled:
-    - python@3.10.8
-    - go@1.21.0
-    - node@22.16.0
+    - python@3.13.3
+    - go@1.24.0
+    - node@23.8.0
 actions:
   disabled:
     - trunk-check-pre-push
