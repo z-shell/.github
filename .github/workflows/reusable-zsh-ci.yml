@@ -1,0 +1,32 @@
+---
+name: Reusable Zsh CI
+
+"on":
+  workflow_call: {}
+
+jobs:
+  zsh-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+
+      - name: ⚡ Install Zsh
+        run: sudo apt update && sudo apt-get install -yq zsh
+
+      - name: ⚡ zsh -n on all .zsh files
+        run: |
+          set -euo pipefail
+          find . -type f -name '*.zsh' -print0 |
+            while IFS= read -r -d '' file; do
+            zsh -n "${file}"
+          done
+
+      - name: ⚡ zcompile all .zsh files
+        run: |
+          set -euo pipefail
+          find . -type f -name '*.zsh' -print0 |
+            while IFS= read -r -d '' file; do
+            zsh -fc "zcompile ${file}"
+            ls -al "${file}.zwc"
+          done

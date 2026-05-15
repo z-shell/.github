@@ -1,6 +1,7 @@
 ---
 name: "✅ Zsh"
 on:
+  workflow_call: {}
   push:
     paths:
       - "**/*.zsh"
