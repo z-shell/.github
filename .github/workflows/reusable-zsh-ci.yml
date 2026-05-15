@@ -17,16 +17,14 @@ jobs:
       - name: ⚡ zsh -n on all .zsh files
         run: |
           set -euo pipefail
-          find . -type f -name '*.zsh' -print0 |
-            while IFS= read -r -d $'\0' file; do
+          while IFS= read -r -d $'\0' file; do
             zsh -n "${file}"
-          done
+          done < <(find . -type f -name '*.zsh' -print0)
 
       - name: ⚡ zcompile all .zsh files
         run: |
           set -euo pipefail
-          find . -type f -name '*.zsh' -print0 |
-            while IFS= read -r -d $'\0' file; do
+          while IFS= read -r -d $'\0' file; do
             zsh -fc 'zcompile -- "$1"' zsh "${file}"
             ls -al "${file}.zwc"
-          done
+          done < <(find . -type f -name '*.zsh' -print0)
