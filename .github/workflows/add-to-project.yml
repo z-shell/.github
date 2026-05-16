@@ -1,0 +1,29 @@
+# Reusable workflow: add a new issue or PR to the Z-Shell Tracker project.
+#
+# Called by per-repo workflows via:
+#   uses: z-shell/.github/.github/workflows/add-to-project.yml@main
+#   secrets: inherit
+#
+# Required org secret: ADD_TO_PROJECT_PAT
+#   Classic PAT with 'project' scope, added at:
+#   https://github.com/organizations/z-shell/settings/secrets/actions
+name: Add to Z-Shell Tracker
+
+on:
+  workflow_call:
+    inputs:
+      project-url:
+        description: Full URL of the GitHub Project (e.g. https://github.com/orgs/z-shell/projects/28)
+        required: false
+        type: string
+        default: https://github.com/orgs/z-shell/projects/28
+
+jobs:
+  add-to-project:
+    name: Add item to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: ${{ inputs.project-url }}
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}

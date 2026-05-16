@@ -1,0 +1,6 @@
+{
+  "name": "Z-Shell Project Tracker",
+  "description": "Automatically adds new issues and pull requests to the Z-Shell Tracker project board.",
+  "iconName": "z-shell",
+  "categories": ["Automation", "Project Management"]
+}

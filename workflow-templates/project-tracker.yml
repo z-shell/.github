@@ -1,0 +1,17 @@
+# Add issues and PRs to the Z-Shell Tracker project automatically.
+#
+# This workflow calls the shared reusable workflow from z-shell/.github.
+# No secrets need to be configured per-repo — ADD_TO_PROJECT_PAT is an
+# org-level secret inherited automatically.
+name: Track in Z-Shell Tracker
+
+on:
+  issues:
+    types: [opened, reopened, transferred]
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  track:
+    uses: z-shell/.github/.github/workflows/add-to-project.yml@main
+    secrets: inherit
