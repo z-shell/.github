@@ -13,7 +13,13 @@ fi
 
 if [[ -z $CONFIG_FILE ]]; then
   # Get default location for the configuration file
-  CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | awk '{print $1}')
+  CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | head -n 1 | awk '{print $NF}')
+fi
+
+if [[ -z $CONFIG_FILE ]]; then
+  # Fallback to a fixed path if rclone config file fails
+  CONFIG_FILE="/github/home/.config/rclone/rclone.conf"
+  mkdir -p "$(dirname "$CONFIG_FILE")"
 fi
 
 if [[ -n $RCLONE_CONF ]]; then
