@@ -24,6 +24,7 @@ fi
 
 if [[ -n $RCLONE_CONF ]]; then
   # Write user set rclone configuration
+  echo "::debug::Writing rclone config to $CONFIG_FILE"
   echo "$RCLONE_CONF" >"$CONFIG_FILE"
 else
   # Unable to proceed if rclone configuration not set
@@ -37,5 +38,6 @@ if [[ ! -x "$(command -v rclone)" ]]; then
   exit 1
 fi
 
-run_rclone=$(sh -c "rclone $*")
-echo "rclone=$run_rclone" >>"$GITHUB_OUTPUT"
+echo "::group::rclone output"
+rclone $*
+echo "::endgroup::"
