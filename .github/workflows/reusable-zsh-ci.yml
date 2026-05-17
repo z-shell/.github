@@ -1,0 +1,44 @@
+---
+name: Reusable Zsh CI
+
+"on":
+  workflow_call: {}
+
+jobs:
+  zsh-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+
+      - name: ⚡ Install Zsh
+        run: sudo apt update && sudo apt-get install -yq zsh
+
+      - name: ⚡ zsh -n on all .zsh files
+        run: |
+          set -euo pipefail
+          mapfile -d '' files < <(
+            find . -type d -name 'doc' -prune -o -type f -name '*.zsh' -print0
+          )
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "ERROR: No .zsh files found to validate." >&2
+            exit 1
+          fi
+          for file in "${files[@]}"; do
+            zsh -n "${file}"
+          done
+
+      - name: ⚡ zcompile all .zsh files
+        run: |
+          set -euo pipefail
+          mapfile -d '' files < <(
+            find . -type d -name 'doc' -prune -o -type f -name '*.zsh' -print0
+          )
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "ERROR: No .zsh files found to compile." >&2
+            exit 1
+          fi
+          for file in "${files[@]}"; do
+            zsh -fc 'zcompile -- "$1"' zsh "${file}"
+            ls -al "${file}.zwc"
+          done
