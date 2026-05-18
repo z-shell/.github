@@ -65,8 +65,33 @@ on:
         default: ""
 
       # Backward-compatible inputs retained for older caller workflows.
+      action:
+        description: Deprecated no-op retained for compatibility.
+        required: false
+        type: string
+        default: "check"
+      call_on_fail:
+        description: Deprecated no-op retained for compatibility.
+        required: false
+        type: string
+        default: ""
       get_dependencies:
         description: Deprecated; use setup-command.
+        required: false
+        type: string
+        default: ""
+      node_version:
+        description: Deprecated no-op retained for compatibility.
+        required: false
+        type: string
+        default: lts/*
+      pnpm_arguments:
+        description: Deprecated no-op retained for compatibility.
+        required: false
+        type: string
+        default: ""
+      shell:
+        description: Deprecated no-op retained for compatibility.
         required: false
         type: string
         default: ""
@@ -85,6 +110,11 @@ on:
         required: false
         type: string
         default: z-shell
+      working-directory:
+        description: Deprecated no-op retained for compatibility.
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
