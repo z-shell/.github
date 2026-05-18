@@ -1,118 +1,121 @@
 ---
-name: "⭕ Trunk workflow call"
+name: Trunk Code Quality
+
 on:
   workflow_call:
     secrets:
       trunk-token:
         description: >
-          You can find a per-repo API token in the Trunk web app settings.
-          This will cause results to be uploaded to the Trunk web app if this job is a scheduled job running on a branch, or if `check-mode` is set to 'all'.
+          Deprecated compatibility input. Trunk Code Quality web app uploads
+          are retired; this secret is intentionally ignored.
         required: false
     inputs:
-      username:
-        description: "A username passed from the caller workflow"
-        default: "z-shell"
+      arguments:
+        description: Extra arguments to pass to Trunk Code Quality.
         required: false
         type: string
-      trunk_path:
-        description: >
-          Path to Trunk Launcher.
-          If not provided, we'll look for it the repo root, `.trunk/bin` and `tools/`.
-          If it can't be found anywhere and is not provided explicitly, we'll download it on demand."
-        required: false
-        type: string
+        default: ""
       cache:
-        default: "true"
-        description: >
-          Cache trunk downloads and results between runs.
-          Caching is only needed when using ephemeral CI runners.
+        description: Cache Trunk downloads and linter artifacts on ephemeral runners.
         required: false
-        type: string
-      upload-series:
-        description: >
-          Upload series name, for when `trunk-token` is provided. If not provided, we'll use the branch name.
-        required: false
-        type: string
+        type: boolean
+        default: true
       check-mode:
         description: >
-          Trunk check mode. Leave unset to autodetect just changes.
-          Set to 'all' to check the entire repository.
-          If `trunk-token` is set with 'all', 'all' will also upload results to the Trunk web app.
-        default: "all"
+          Trunk check mode. Leave empty to let trunk-action infer the correct
+          mode for pull_request, push, schedule, and merge queue events. Set to
+          'all' only when the caller intentionally wants a full-repository scan.
         required: false
         type: string
-      arguments:
-        description: Extra arguments to pass to trunk
+        default: ""
+      debug:
+        description: Enable trunk-action debug mode.
+        required: false
+        type: boolean
+        default: false
+      post-init:
+        description: Optional shell commands to run after Trunk initialization.
         required: false
         type: string
+        default: ""
       runs-on:
-        description: "Required OS for workflow."
-        default: "ubuntu-latest"
+        description: Runner label for the Trunk job.
         required: false
         type: string
+        default: ubuntu-latest
+      setup-command:
+        description: Optional shell commands to prepare repository-specific dependencies.
+        required: false
+        type: string
+        default: ""
+      setup-deps:
+        description: Let trunk-action run .trunk/setup-ci dependency setup.
+        required: false
+        type: boolean
+        default: false
+      timeout-seconds:
+        description: Kill Trunk after this many seconds. Use 0 to disable timeout.
+        required: false
+        type: number
+        default: 0
+      trunk-path:
+        description: Optional path to a Trunk launcher binary.
+        required: false
+        type: string
+        default: ""
+
+      # Backward-compatible inputs retained for older caller workflows.
       get_dependencies:
-        description: "Pass commands to prepare or install dependencies"
+        description: Deprecated; use setup-command.
         required: false
         type: string
-      call_on_fail:
-        description: "Pass argument to run on failure"
+        default: ""
+      trunk_path:
+        description: Deprecated; use trunk-path.
         required: false
         type: string
-      shell:
-        description: "Shell to run workflow"
+        default: ""
+      upload-series:
+        description: Deprecated no-op; Trunk Code Quality uploads are retired.
         required: false
         type: string
-      working-directory:
-        description: "The default working directory on the runner for steps, and the default location of your repository when using the checkout action."
+        default: ""
+      username:
+        description: Deprecated no-op retained for compatibility.
         required: false
         type: string
-      node_version:
-        description: "Set Node versions"
-        default: "lts/*"
-        required: false
-        type: string
-      pnpm_arguments:
-        description: "Pass arguments to pnpm"
-        required: false
-        type: string
-      action:
-        description: "Action to trigger"
-        required: false
-        type: string
-        default: "check"
+        default: z-shell
+
+permissions:
+  contents: read
 
 jobs:
   trunk:
+    name: Trunk Code Quality
     runs-on: ${{ inputs.runs-on }}
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     steps:
-      - name: "⤵ Check out code from GitHub"
-        uses: actions/checkout@v4.2.2
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-      - if: ${{ inputs.get_dependencies }}
-        name: "🏗 Prepare"
-        run: echo ${{ inputs.get_dependencies }}
-      - if: ${{ inputs.pnpm_arguments }}
-        name: "📦 Setup pnpm"
-        uses: pnpm/action-setup@v4.1.0
-      - if: ${{ inputs.pnpm_arguments }}
-        name: "⎔ Setup node"
-        uses: actions/setup-node@v4.3.0
+
+      - name: Prepare repository dependencies
+        if: ${{ inputs['setup-command'] != '' || inputs.get_dependencies != '' }}
+        shell: bash
+        run: ${{ inputs['setup-command'] != '' && inputs['setup-command'] || inputs.get_dependencies }}
+
+      - name: Run Trunk Code Quality
+        uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
         with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
-      - if: ${{ inputs.pnpm_arguments }}
-        name: "🚀 Run"
-        run: ${{ inputs.pnpm_arguments }}
-      - if: ${{ inputs.action == 'check' }}
-        name: "✨ Check"
-        uses: trunk-io/trunk-action@v1
-        with:
-          trunk-path: ${{ inputs.trunk_path }}
-          trunk-token: ${{ secrets.trunk-token }}
-          check-mode: ${{ inputs.check-mode }}
-          upload-series: ${{ inputs.upload-series }}
           arguments: ${{ inputs.arguments }}
-      - if: ${{ inputs.action == 'upgrade' }}
-        name: "✨ Upgrade"
-        uses: trunk-io/trunk-action/upgrade@v1
+          cache: ${{ inputs.cache }}
+          check-mode: ${{ inputs['check-mode'] }}
+          debug: ${{ inputs.debug }}
+          post-init: ${{ inputs['post-init'] }}
+          setup-deps: ${{ inputs['setup-deps'] }}
+          timeout-seconds: ${{ inputs['timeout-seconds'] }}
+          trunk-path: ${{ inputs['trunk-path'] != '' && inputs['trunk-path'] || inputs.trunk_path }}
