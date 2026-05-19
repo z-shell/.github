@@ -24,13 +24,13 @@ jobs:
       contents: write
       pages: write
     steps:
-      - name: "⤵️ Check out code from GitHub"
-        uses: actions/checkout@v4.2.2
+      - name: "⤵️ Check out metrics branch"
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          ref: metrics
           fetch-depth: 0
       - name: "🚀 Deploy Metrics to GitHub Pages"
-        if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
