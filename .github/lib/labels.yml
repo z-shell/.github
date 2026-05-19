@@ -32,6 +32,9 @@
 - name: "maintenance 📈"
   color: 531999
   description: "Generic maintenance tasks."
+- name: "agent-memory 🧠"
+  color: 531999
+  description: "Cross-agent handoffs, blockers, and resumable progress context."
 - name: "ci 🤖"
   color: 5319e7
   description: "Work that improves the continuous integration."
