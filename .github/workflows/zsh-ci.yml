@@ -1,0 +1,68 @@
+---
+name: Zsh CI
+
+on:
+  workflow_call:
+    inputs:
+      zsh-version:
+        description: Zsh version to install ("latest" or a semver string).
+        required: false
+        type: string
+        default: latest
+      run-zcompile:
+        description: Run zcompile on all .zsh files in addition to zsh -n.
+        required: false
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zsh-syntax:
+    name: Zsh syntax check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Zsh
+        uses: z-shell/.github/actions/setup-zsh@main
+        with:
+          version: ${{ inputs.zsh-version }}
+
+      - name: Run zsh -n
+        shell: bash
+        run: |
+          mapfile -d '' files < <(find . -type d -name '.git' -prune -o -type f -name '*.zsh' -print0)
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "No .zsh files found — nothing to check."
+            exit 0
+          fi
+          failed=0
+          for f in "${files[@]}"; do
+            if ! zsh -n "$f" 2>&1; then
+              echo "::error file=$f::zsh -n syntax check failed"
+              failed=1
+            fi
+          done
+          exit "$failed"
+
+      - name: Run zcompile
+        if: inputs.run-zcompile
+        shell: bash
+        run: |
+          mapfile -d '' files < <(find . -type d -name '.git' -prune -o -type f -name '*.zsh' -print0)
+          failed=0
+          for f in "${files[@]}"; do
+            if ! zsh -fc 'zcompile -- "$1"' zsh "$f" 2>&1; then
+              echo "::error file=$f::zcompile failed"
+              failed=1
+            fi
+          done
+          exit "$failed"

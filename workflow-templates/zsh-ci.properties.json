@@ -1,0 +1,9 @@
+{
+  "name": "Zsh CI",
+  "description": "Runs zsh -n syntax check (and optional zcompile) on all .zsh files using the shared z-shell/.github reusable workflow.",
+  "iconName": "z-shell",
+  "categories": ["CI", "Shell"],
+  "filePatterns": [
+    ".*\\.zsh$"
+  ]
+}
