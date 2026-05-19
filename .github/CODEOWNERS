@@ -1,0 +1,16 @@
+# Default: TSC reviews everything
+*                               @z-shell/tsc
+
+# Composite actions
+/actions/                       @z-shell/tsc
+
+# Workflow files and templates
+/.github/workflows/             @z-shell/tsc
+/workflow-templates/            @z-shell/tsc
+
+# Org profile
+/profile/                       @z-shell/tsc
+
+# Configuration
+/.trunk/                        @z-shell/tsc
+/renovate-config.json           @z-shell/tsc

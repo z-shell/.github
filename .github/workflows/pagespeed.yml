@@ -23,11 +23,12 @@ jobs:
       pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
       pagespeed_url: ${{ secrets.PAGESPEED_TEST_URL }}
     steps:
-      - uses: lowlighter/metrics@v3.34
+      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6 # v3.34
         with:
           filename: ${{ env.pagespeed_svg }}
           token: NOT_NEEDED
           base: ""
+          committer_branch: metrics
           plugin_pagespeed: yes
           plugin_pagespeed_pwa: yes
           plugin_pagespeed_detailed: no
