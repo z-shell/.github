@@ -82,20 +82,42 @@ fi
 
 Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-managed loading.
 
-## Provide an unload function for side-effectful plugins
+## Mandatory SHA-pinning for GitHub Actions
 
 Observed in:
 
-- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
-- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `zd/.github/workflows/`
+- `src/.github/workflows/`
+- `wiki/.github/workflows/`
+- `zunit/.github/workflows/`
+- `zi/.github/workflows/`
 
 Pattern:
 
-- provide `<plugin-name>_plugin_unload`
-- remove `fpath` additions
-- undo hooks, widgets, aliases, and globals
-- self-destruct with `unfunction`
+- Pin all external and internal GitHub Action references to a full 40-character commit SHA.
+- Append a version or branch comment (e.g., `# v4` or `# main`) to the end of the line for human readability.
 
-This keeps plugin behavior reversible and makes side effects explicit.
+```yaml
+# Good: pinned to SHA with version comment
+uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#unload-function>
+# Bad: mutable tag
+uses: actions/checkout@v4
+```
+
+This ensures maximum security against tag-switching attacks and guarantees that CI runs are reproducible across time.
+
+## Debian-based CI/Docker Environments
+
+Observed in:
+
+- `zd/docker/Dockerfile`
+- `src/.github/workflows/`
+- `zunit/.github/workflows/`
+
+Pattern:
+
+- Prefer `debian:trixie-slim` (or current stable) or `ubuntu-latest` over Alpine Linux for CI/Docker environments.
+- Ensure `glibc` compatibility and standard GNU userland tools (e.g., `apt-get`, `autoreconf`, `make`) are available to support consistent compilation and testing of Zsh and its modules.
+
+This reduces toolchain fragmentation and prevents subtle bugs caused by `musl` libc differences when testing Zsh plugins that rely on compiled modules or specific system behaviors.
