@@ -121,3 +121,16 @@ Pattern:
 - Ensure `glibc` compatibility and standard GNU userland tools (e.g., `apt-get`, `autoreconf`, `make`) are available to support consistent compilation and testing of Zsh and its modules.
 
 This reduces toolchain fragmentation and prevents subtle bugs caused by `musl` libc differences when testing Zsh plugins that rely on compiled modules or specific system behaviors.
+
+## AI Orchestration Placement
+
+Observed in:
+
+- `z-shell-dot-github/.github/agents/`
+- `wiki/.github/agents/`
+
+Pattern:
+
+- Place general-purpose engineering personas, global skills, and cross-repository instructions exclusively in the central `z-shell-dot-github` meta-repository.
+- Place domain-specific agents or instructions (e.g., Docusaurus documentation writers) directly in the repository where that specialized context applies (e.g., `wiki/`).
+- Do not store AI boilerplate (agents, instructions, `.cursorrules`) in standard plugins. If a skill applies to more than one plugin, it belongs in the central meta-repository.
