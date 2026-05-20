@@ -1,7 +1,7 @@
 name: "✨ Codebase improvement"
 description: Suggest a better solution for algorithms, annexes, packages, development tools, etc.
 title: "[dev]: "
-labels: ["enhancement ✨"]
+labels: ["type:maintenance"]
 assignees: ["ss-o"]
 body:
   - type: textarea

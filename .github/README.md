@@ -39,6 +39,10 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 
 | Path                                              | Purpose                                                                                                     |
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| [`AGENTS.md`](../AGENTS.md)                       | Canonical org-wide instructions for AI coding agents and maintainers                                        |
+| [`PATTERNS.md`](../PATTERNS.md)                   | Cross-repo implementation idioms grounded in real repositories                                              |
+| [`decisions/`](../decisions/)                     | Architectural decision records for non-obvious org-wide choices                                             |
+| [`runbooks/`](../runbooks/)                       | Repeatable operational workflows such as org review, triage, ADR drafting, and release coordination         |
 | [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell) |
 | [`actions/`](../actions/)                         | Reusable composite GitHub Actions shared across all org repositories                                        |
 | [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                  |
@@ -49,40 +53,33 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 
 These files in `.github/` act as **organization-wide defaults** — automatically used by any repository that doesn't have its own version:
 
-| File                                             | Purpose                                                       |
-| ------------------------------------------------ | ------------------------------------------------------------- |
-| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)       | Contributor Covenant code of conduct                          |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md)             | Contribution guidelines and requirements                      |
-| [`SECURITY.md`](SECURITY.md)                     | Security vulnerability reporting policy                       |
-| [`GOVERNANCE.md`](GOVERNANCE.md)                 | Project governance roles and decision-making                  |
-| [`CHARTER.md`](CHARTER.md)                       | Organizational charter and mission                            |
-| [`STEERING_COMMITTEE.md`](STEERING_COMMITTEE.md) | Steering committee membership                                 |
-| [`MAINTAINERS.md`](MAINTAINERS.md)               | Project maintainer list                                       |
-| [`AGENT_MEMORY.md`](AGENT_MEMORY.md)             | Cross-agent handoff and progress-tracking protocol            |
-| [`TRADEMARKS.md`](TRADEMARKS.md)                 | Trademark usage policy                                        |
-| [`ANTITRUST.md`](ANTITRUST.md)                   | Antitrust compliance policy                                   |
-| [`ISSUE_TEMPLATE/`](ISSUE_TEMPLATE/)             | Default issue forms (bug reports, features, docs, membership) |
-| [`DISCUSSION_TEMPLATE/`](DISCUSSION_TEMPLATE/)   | Default discussion category forms                             |
+| File                                                 | Purpose                                                       |
+| ---------------------------------------------------- | ------------------------------------------------------------- |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)           | Contributor Covenant code of conduct                          |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)                 | Contribution guidelines and requirements                      |
+| [`SECURITY.md`](SECURITY.md)                         | Security vulnerability reporting policy                       |
+| [`GOVERNANCE.md`](GOVERNANCE.md)                     | Project governance roles and decision-making                  |
+| [`CHARTER.md`](CHARTER.md)                           | Organizational charter and mission                            |
+| [`STEERING_COMMITTEE.md`](STEERING_COMMITTEE.md)     | Steering committee membership                                 |
+| [`MAINTAINERS.md`](MAINTAINERS.md)                   | Project maintainer list                                       |
+| [`AGENT_MEMORY.md`](AGENT_MEMORY.md)                 | Cross-agent handoff and progress-tracking protocol            |
+| [`copilot-instructions.md`](copilot-instructions.md) | Copilot entry point that defers to the canonical `AGENTS.md`  |
+| [`TRADEMARKS.md`](TRADEMARKS.md)                     | Trademark usage policy                                        |
+| [`ANTITRUST.md`](ANTITRUST.md)                       | Antitrust compliance policy                                   |
+| [`ISSUE_TEMPLATE/`](ISSUE_TEMPLATE/)                 | Default issue forms (bug reports, features, docs, membership) |
+| [`DISCUSSION_TEMPLATE/`](DISCUSSION_TEMPLATE/)       | Default discussion category forms                             |
 
 ---
 
 ## Shared Actions
 
-Composite actions available to all repositories via `z-shell/.github/actions/<name>`:
+Composite actions currently available to all repositories via `z-shell/.github/actions/<name>`:
 
-| Action                                                      | Description                        |
-| ----------------------------------------------------------- | ---------------------------------- |
-| [`setup-zsh`](../actions/setup-zsh)                         | Set up Zsh environment for CI      |
-| [`setup-zsh-development`](../actions/setup-zsh-development) | Set up Zsh development environment |
-| [`build-zpmod-module`](../actions/build-zpmod-module)       | Build the Zpmod Zsh module         |
-| [`test-zpmod-module`](../actions/test-zpmod-module)         | Test the Zpmod module              |
-| [`test-zsh-module`](../actions/test-zsh-module)             | Test Zsh modules                   |
-| [`commit`](../actions/commit)                               | Automated commit action            |
-| [`rebase`](../actions/rebase)                               | Automated rebase action            |
-| [`mirror`](../actions/mirror)                               | Repository mirroring               |
-| [`rclone`](../actions/rclone)                               | File sync with rclone              |
-| [`determine-branch`](../actions/determine-branch)           | Determine target branch            |
-| [`verify-pr-labels`](../actions/verify-pr-labels)           | Verify PR label compliance         |
+| Action                              | Description                 |
+| ----------------------------------- | --------------------------- |
+| [`setup-zsh`](../actions/setup-zsh) | Set up Zsh for CI workflows |
+| [`commit`](../actions/commit)       | Commit generated changes    |
+| [`rclone`](../actions/rclone)       | Sync files with rclone      |
 
 **Usage example:**
 
@@ -95,16 +92,15 @@ steps:
 
 Starter workflows available in every org repository under **Actions > New workflow**:
 
-| Template         | Description                  |
-| ---------------- | ---------------------------- |
-| Commit Action    | Automated commit workflow    |
-| Rebase Action    | PR auto-rebase workflow      |
-| Lock Action      | Issue/PR auto-lock           |
-| Stale Action     | Stale issue management       |
-| Trunk            | Trunk.io linting integration |
-| Sync Labels      | Label synchronization        |
-| Verify PR Labels | PR label validation          |
-| Rclone Action    | File sync with rclone        |
+| Template      | Description                 |
+| ------------- | --------------------------- |
+| Trunk         | Trunk code-quality workflow |
+| Zsh CI        | Starter Zsh CI workflow     |
+| Rclone Action | File sync with rclone       |
+
+Label definitions live in [`./lib/labels.yml`](lib/labels.yml) and should be applied through org maintenance scripts or API-driven automation, not via a generic starter workflow template.
+
+Tracker and project automation should be configured at the project or owning-repository level, then documented here when it becomes a shared org convention.
 
 ## Renovate
 
@@ -124,7 +120,11 @@ Shared [Renovate](https://docs.renovatebot.com/) preset for automated dependency
 This repository is the right place for any **organization-level** configuration:
 
 - **Adding a new default issue/PR template** — add it to `.github/ISSUE_TEMPLATE/`
+- **Updating agent instructions, ADRs, runbooks, or patterns** — edit `AGENTS.md`, `decisions/`, `runbooks/`, or `PATTERNS.md`
+- **Defining weekly review, ADR, or release coordination workflows** — add or update the relevant file under `runbooks/`
 - **Recording cross-agent progress** — follow `.github/AGENT_MEMORY.md` and keep active state in issues, PRs, and the Z-Shell Tracker
+- **Updating the shared label set** — edit `.github/lib/labels.yml` and roll it out via the org's maintenance automation
+- **Cleaning legacy labels** — follow `../runbooks/labels.md` before deleting labels from live repositories
 - **Creating a reusable CI action** — add a composite action under `actions/<name>/action.yml`
 - **Providing a starter workflow** — add `.yml` + `.properties.json` to `workflow-templates/`
 - **Updating the organization profile** — edit `profile/README.md` or add assets to `profile/img/`

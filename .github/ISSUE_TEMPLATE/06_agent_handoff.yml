@@ -1,7 +1,7 @@
 name: "🧠 Agent handoff"
 description: Record cross-agent progress, blockers, and next steps for active or deferred work.
 title: "[handoff]: "
-labels: ["maintenance 📈", "triage 📑", "agent-memory 🧠"]
+labels: ["type:handoff", "area:meta"]
 assignees: ["ss-o"]
 body:
   - type: markdown

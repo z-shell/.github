@@ -1,0 +1,101 @@
+# Patterns — z-shell
+
+This file records implementation idioms already observed in multiple z-shell repositories. It exists to reduce drift, not to invent new style rules.
+
+Admission rule:
+
+- only record patterns already present in at least two real repositories
+- prefer linking to the wiki or plugin standard when a deeper explanation already exists
+- supersede patterns by updating this file, not by relying on private memory
+
+## Plugin entry-point skeleton
+
+Observed in:
+
+- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `zsh-plugins/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `zsh-lint/zsh-lint.plugin.zsh`
+
+Pattern:
+
+1. Start `.zsh` entry files with the standard modeline.
+2. Resolve `$0` via the `ZERO`-aware absolute-path pattern.
+3. Keep path-sensitive initialization near the top of the file.
+
+```zsh
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+```
+
+Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
+
+## Register the repository directory in `Plugins`
+
+Observed in:
+
+- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `zsh-plugins/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+
+Pattern:
+
+```zsh
+typeset -gA Plugins
+Plugins[PLUGIN_KEY]="${0:h}"
+```
+
+Use a stable, repo-specific key and treat the registered directory as the root for cleanup and sibling-path resolution.
+
+Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash>
+
+## Guard `fpath` additions
+
+Observed in:
+
+- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `zsh-plugins/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `zsh-lint/zsh-lint.plugin.zsh`
+- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
+
+Pattern:
+
+- add `functions/` only when the plugin manager or current shell setup has not already done so
+- the common Zi-aware form is:
+
+```zsh
+if [[ $PMSPEC != *f* ]]; then
+  fpath+=( "${0:h}/functions" )
+fi
+```
+
+- an explicit membership guard is also acceptable when the entry point must tolerate non-Zi loader paths:
+
+```zsh
+if [[ ${fpath[(r)${0:h}/functions]} != "${0:h}/functions" ]]; then
+  fpath+=( "${0:h}/functions" )
+fi
+```
+
+Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-managed loading.
+
+## Provide an unload function for side-effectful plugins
+
+Observed in:
+
+- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+
+Pattern:
+
+- provide `<plugin-name>_plugin_unload`
+- remove `fpath` additions
+- undo hooks, widgets, aliases, and globals
+- self-destruct with `unfunction`
+
+This keeps plugin behavior reversible and makes side effects explicit.
+
+Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#unload-function>

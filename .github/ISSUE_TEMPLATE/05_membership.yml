@@ -1,6 +1,6 @@
 name: "👥 Community Membership Request"
 description: Request memeber privileges
-labels: ["👥 member"]
+labels: ["type:membership", "area:meta"]
 title: "team: "
 
 body:
