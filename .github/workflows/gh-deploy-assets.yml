@@ -4,7 +4,7 @@ name: "🚀 Deploy Assets"
 on:
   push:
     branches: [main]
-    paths: ["./profile/**"]
+    paths: ["profile/**"]
   workflow_dispatch: {}
 
 permissions: {}

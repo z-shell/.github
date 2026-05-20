@@ -39,5 +39,5 @@ if [[ ! -x "$(command -v rclone)" ]]; then
 fi
 
 echo "::group::rclone output"
-rclone $*
+rclone "$@"
 echo "::endgroup::"
