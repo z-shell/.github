@@ -2,9 +2,9 @@
 
 Use this runbook to decide whether a repository should adopt release automation and to coordinate releases without forcing one model onto every z-shell repository.
 
-## Hard rules
+## Release coordination guidance
 
-1. Conventional Commits are the organization-wide history format.
+1. Conventional Commits are the proposed default history format until the corresponding ADR is accepted.
 2. Release automation is **repo-type-aware**, not universal.
 3. Do not add `release-please` to a repository just because it exists elsewhere.
 
