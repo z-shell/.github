@@ -106,7 +106,7 @@ Add the work to the Z-Shell Tracker when it:
 - has security impact
 - has strategic or roadmap significance
 
-Apply `meta:org-tracked` to issues that should appear on the org-wide tracker. Do not apply it to ordinary single-repository bugs, questions, or cleanup tasks.
+Apply `meta:org-tracked` to issues that should appear on the org-wide tracker. Do not apply it to ordinary single-repository bugs, questions, or cleanup tasks. See `runbooks/project-tracker.md` for auto-add setup and verification.
 
 When the project fields exist, populate:
 
@@ -157,3 +157,4 @@ Do not handle exploit details publicly.
 - `PATTERNS.md`
 - `decisions/`
 - `runbooks/labels.md`
+- `runbooks/project-tracker.md`

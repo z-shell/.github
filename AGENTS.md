@@ -95,6 +95,7 @@ For recurring organization workflows, prefer the runbooks and keep the first pas
 - weekly org review: `runbooks/org-review.md`
 - issue and PR triage: `runbooks/triage.md`
 - label maintenance: `runbooks/labels.md`
+- project tracker automation: `runbooks/project-tracker.md`
 - ADR drafting: `runbooks/adr.md`
 - release coordination and release-model classification: `runbooks/release.md`
 
@@ -137,5 +138,6 @@ Do not silently work around drift. Open or update an issue in `z-shell/.github`,
 - `runbooks/org-review.md`
 - `runbooks/adr.md`
 - `runbooks/labels.md`
+- `runbooks/project-tracker.md`
 - `runbooks/release.md`
 - `runbooks/triage.md`

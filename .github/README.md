@@ -92,15 +92,16 @@ steps:
 
 Starter workflows available in every org repository under **Actions > New workflow**:
 
-| Template      | Description                 |
-| ------------- | --------------------------- |
-| Trunk         | Trunk code-quality workflow |
-| Zsh CI        | Starter Zsh CI workflow     |
-| Rclone Action | File sync with rclone       |
+| Template        | Description                                            |
+| --------------- | ------------------------------------------------------ |
+| Trunk           | Trunk code-quality workflow                            |
+| Zsh CI          | Starter Zsh CI workflow                                |
+| Rclone Action   | File sync with rclone                                  |
+| Project Tracker | Adds `meta:org-tracked` issues to the org-wide tracker |
 
 Label definitions live in [`./lib/labels.yml`](lib/labels.yml) and should be applied through org maintenance scripts or API-driven automation, not via a generic starter workflow template.
 
-Tracker and project automation should be configured at the project or owning-repository level, then documented here when it becomes a shared org convention.
+Tracker and project automation are documented in [`../runbooks/project-tracker.md`](../runbooks/project-tracker.md). Project 28 is the org-wide tracker, and issues labelled `meta:org-tracked` should be added there automatically by either the Project v2 built-in workflow or the repository workflow fallback.
 
 ## Renovate
 
@@ -123,6 +124,7 @@ This repository is the right place for any **organization-level** configuration:
 - **Updating agent instructions, ADRs, runbooks, or patterns** — edit `AGENTS.md`, `decisions/`, `runbooks/`, or `PATTERNS.md`
 - **Defining weekly review, ADR, or release coordination workflows** — add or update the relevant file under `runbooks/`
 - **Recording cross-agent progress** — follow `.github/AGENT_MEMORY.md` and keep active state in issues, PRs, and the Z-Shell Tracker
+- **Configuring tracker auto-add** — follow `../runbooks/project-tracker.md`
 - **Updating the shared label set** — edit `.github/lib/labels.yml` and roll it out via the org's maintenance automation
 - **Cleaning legacy labels** — follow `../runbooks/labels.md` before deleting labels from live repositories
 - **Creating a reusable CI action** — add a composite action under `actions/<name>/action.yml`
