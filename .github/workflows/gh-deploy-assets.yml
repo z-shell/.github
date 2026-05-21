@@ -1,5 +1,5 @@
 ---
-name: "🚀 Deploy Assets"
+name: Deploy Assets
 
 on:
   push:

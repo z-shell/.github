@@ -1,5 +1,5 @@
 ---
-name: "🌀 Z PageSpeed Insights"
+name: Z PageSpeed Insights
 on:
   schedule:
     - cron: "0 3 * * */3"

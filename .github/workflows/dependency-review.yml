@@ -1,5 +1,5 @@
 ---
-name: "📦 Dependency Review"
+name: Dependency Review
 
 on:
   workflow_call: {}
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   dependency-review:
-    name: "🏭 Scanning"
+    name: Scanning
     runs-on: ubuntu-latest
     steps:
       - name: "⤵️ Check out code from GitHub"

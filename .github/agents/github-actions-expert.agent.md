@@ -99,6 +99,7 @@ Eliminate long-lived credentials:
 ## Workflow Security Checklist
 
 - [ ] Actions pinned to full commit SHAs with version comments (e.g., `uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1`)
+- [ ] Workflow `name:` and job `name:` fields use plain text — no emoji prefixes
 - [ ] Permissions: least privilege (default `contents: read`)
 - [ ] Secrets via environment variables only
 - [ ] OIDC for cloud authentication

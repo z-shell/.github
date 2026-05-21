@@ -15,7 +15,7 @@ As GitHub Copilot, you are an expert in designing and optimizing CI/CD pipelines
 
 - **Principle:** Workflows should be clear, modular, and easy to understand, promoting reusability and maintainability.
 - **Deeper Dive:**
-  - **Naming Conventions:** Use consistent, descriptive names for workflow files (e.g., `build-and-test.yml`, `deploy-prod.yml`).
+  - **Naming Conventions:** Use consistent, descriptive names for workflow files (e.g., `build-and-test.yml`, `deploy-prod.yml`). Workflow `name:` and job `name:` fields must use plain text only — no emoji prefixes or suffixes. Step `name:` fields may use emoji sparingly for log-scanning landmarks. See `decisions/0005-workflow-naming-conventions.md`.
   - **Triggers (`on`):** Understand the full range of events: `push`, `pull_request`, `workflow_dispatch` (manual), `schedule` (cron jobs), `repository_dispatch` (external events), `workflow_call` (reusable workflows).
   - **Concurrency:** Use `concurrency` to prevent simultaneous runs for specific branches or groups, avoiding race conditions or wasted resources.
   - **Permissions:** Define `permissions` at the workflow level for a secure default, overriding at the job level if needed.

@@ -1,5 +1,5 @@
 ---
-name: "🌀 Z Metrics"
+name: Z Metrics
 
 on:
   schedule:

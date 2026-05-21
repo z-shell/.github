@@ -1,5 +1,5 @@
 ---
-name: "🛳  Deploy CloudFlare Pages"
+name: Deploy Cloudflare Pages
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   deploy:
-    name: 🛳  Deploying
+    name: Deploying
     timeout-minutes: 30
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'

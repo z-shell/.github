@@ -12,10 +12,10 @@ Admission rule:
 
 Observed in:
 
-- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
-- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
-- `zsh-plugins/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
-- `zsh-lint/zsh-lint.plugin.zsh`
+- `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `repos/tools/zsh-lint/zsh-lint.plugin.zsh`
 
 Pattern:
 
@@ -37,9 +37,9 @@ Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
 
 Observed in:
 
-- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
-- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
-- `zsh-plugins/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
 
 Pattern:
 
@@ -56,10 +56,10 @@ Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugi
 
 Observed in:
 
-- `zsh-plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
-- `zsh-plugins/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
-- `zsh-lint/zsh-lint.plugin.zsh`
-- `zsh-plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
+- `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `repos/tools/zsh-lint/zsh-lint.plugin.zsh`
+- `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
 
 Pattern:
 
@@ -86,11 +86,11 @@ Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-man
 
 Observed in:
 
-- `zd/.github/workflows/`
-- `src/.github/workflows/`
-- `wiki/.github/workflows/`
-- `zunit/.github/workflows/`
-- `zi/.github/workflows/`
+- `repos/env/zd/.github/workflows/`
+- `repos/core/src/.github/workflows/`
+- `repos/docs/wiki/.github/workflows/`
+- `repos/tools/zunit/.github/workflows/`
+- `repos/core/zi/.github/workflows/`
 
 Pattern:
 
@@ -111,9 +111,9 @@ This ensures maximum security against tag-switching attacks and guarantees that 
 
 Observed in:
 
-- `zd/docker/Dockerfile`
-- `src/.github/workflows/`
-- `zunit/.github/workflows/`
+- `repos/env/zd/docker/Dockerfile`
+- `repos/core/src/.github/workflows/`
+- `repos/tools/zunit/.github/workflows/`
 
 Pattern:
 
@@ -126,8 +126,8 @@ This reduces toolchain fragmentation and prevents subtle bugs caused by `musl` l
 
 Observed in:
 
-- `z-shell-dot-github/.github/agents/`
-- `wiki/.github/agents/`
+- `repos/org/z-shell-dot-github/.github/agents/`
+- `repos/docs/wiki/.github/agents/`
 
 Pattern:
 
