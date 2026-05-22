@@ -28,7 +28,7 @@ These boundaries are recorded in the wiki `AGENTS.md` (with `CLAUDE.md` as a sym
 - Authoring instructions gain a Content Root Selection table and an explicit prohibition against maintainer/operational content in `docs/`.
 - The `runbooks/instruction-update.md` runbook keeps instructions in sync when new features or content areas are added.
 
-## Alternatives Considered
+## Alternatives considered
 
 - **Add a fourth `maintainers/` content root.** Rejected: more navbar/config surface for a small amount of content; `community/` already fits operational/community material.
 - **Leave the guide in `docs/` and document an exception.** Rejected: keeps the ambiguity that caused the incident and invites future drift.
