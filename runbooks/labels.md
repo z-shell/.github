@@ -94,13 +94,47 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
 ## Safe cleanup order
 
 1. List labels in the target repository.
-2. Create or update every canonical label from `.github/lib/labels.yml`.
-3. For each legacy label, find open issues and pull requests using it.
-4. Add the canonical replacement to each item before removing the legacy label.
-5. Delete legacy labels only after they are no longer used.
-6. Re-run the label list and compare it with `.github/lib/labels.yml`.
+2. Run a dry-run audit before applying anything:
+
+   ```sh
+   scripts/labels-dry-run.rb --repo z-shell/<repo>
+   ```
+
+   For an org-wide read-only report:
+
+   ```sh
+   scripts/labels-dry-run.rb --all-repos > /tmp/z-shell-labels-dry-run.md
+   ```
+
+3. Create or update every canonical label from `.github/lib/labels.yml`.
+4. For each legacy label, find open issues and pull requests using it.
+5. Add the canonical replacement to each item before removing the legacy label.
+6. Delete legacy labels only after they are no longer used.
+7. Re-run the dry-run audit and compare it with `.github/lib/labels.yml`.
 
 Do not delete unknown labels in bulk. If a repository has a local label that is not obviously legacy, open or update an issue before removing it.
+
+## Dry-run script
+
+`scripts/labels-dry-run.rb` is read-only. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
+
+- canonical labels that would be created
+- canonical labels whose color or description would be updated
+- legacy labels that should be migrated before removal
+- unknown local labels that should be preserved and reviewed manually
+
+Useful examples:
+
+```sh
+# Audit one repository and include clean output.
+scripts/labels-dry-run.rb --repo z-shell/.github --include-clean
+
+# Audit several repositories.
+scripts/labels-dry-run.rb --repo z-shell/zi --repo z-shell/wiki
+
+# Emit machine-readable output for follow-up tooling.
+scripts/labels-dry-run.rb --repo z-shell/zi --json
+```
 
 ## See also
 
