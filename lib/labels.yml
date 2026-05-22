@@ -1,0 +1,156 @@
+---
+# Canonical z-shell organization label set.
+#
+# This file is the source of truth referenced by:
+# - AGENTS.md
+# - runbooks/labels.md
+# - runbooks/triage.md
+# - runbooks/project-tracker.md
+#
+# Intended sync semantics:
+# - create/update these labels in target repositories
+# - migrate open issues/PRs from legacy labels before deleting any legacy label
+# - do not delete unknown local labels automatically
+# - keep automation-owned labels listed here if external tools rely on them
+
+labels:
+  # Work type
+  - name: type:bug
+    color: b60205
+    description: Something is broken or behaving incorrectly.
+  - name: type:feature
+    color: 0e8a16
+    description: A request for new behavior or capability.
+  - name: type:docs
+    color: '0052cc'
+    description: Documentation-only work.
+  - name: type:question
+    color: d4c5f9
+    description: Support, clarification, or usage question.
+  - name: type:maintenance
+    color: '531999'
+    description: Non-feature maintenance, cleanup, or org work.
+  - name: type:membership
+    color: 6f42c1
+    description: Membership and organization-role requests.
+  - name: type:handoff
+    color: '5319e7'
+    description: Cross-agent or cross-maintainer handoff context.
+
+  # Area
+  - name: area:zi
+    color: 1d76db
+    description: Zi core behavior, APIs, or documentation.
+  - name: area:plugin
+    color: 3e16f3
+    description: Plugin behavior or plugin-facing work.
+  - name: area:annex
+    color: 3e16f3
+    description: Annex behavior or annex-facing work.
+  - name: area:package
+    color: 3e16f3
+    description: Package or package-management work.
+  - name: area:docs
+    color: '0052cc'
+    description: Documentation systems, content, or publishing.
+  - name: area:ci
+    color: '5319e7'
+    description: Continuous integration or GitHub Actions work.
+  - name: area:dependencies
+    color: fbca04
+    description: Dependency updates or dependency-management work.
+  - name: area:release
+    color: d93f0b
+    description: Release process, versioning, or changelog work.
+  - name: area:meta
+    color: 1d76db
+    description: Organization-wide policy, templates, or meta-repo work.
+
+  # Severity and workflow modifiers
+  - name: priority:high
+    color: ee0701
+    description: Needs prompt attention.
+  - name: regression
+    color: b60205
+    description: Previously working behavior is broken.
+  - name: security
+    color: ee0701
+    description: Security-sensitive issue or hardening work.
+  - name: breaking-change
+    color: d93f0b
+    description: Breaks backward compatibility or changes a public contract.
+  - name: status:triage
+    color: fbca04
+    description: Awaiting initial review or classification.
+  - name: status:blocked
+    color: e4e669
+    description: Cannot proceed until an external dependency or decision changes.
+  - name: needs-info
+    color: f9d0c4
+    description: Waiting on more detail before work can continue.
+  - name: good first issue
+    color: '7057ff'
+    description: Well-scoped starter task for a new contributor.
+  - name: help wanted
+    color: '008672'
+    description: Maintainers would welcome outside help.
+  - name: invalid
+    color: 0b467f
+    description: Off-topic, incorrect, or not actionable.
+  - name: duplicate
+    color: cfd3d7
+    description: Covered by another issue or pull request.
+  - name: wontfix
+    color: ffffff
+    description: Acknowledged but not planned for implementation.
+  - name: meta:org-tracked
+    color: '5319e7'
+    description: Auto-add this issue to the org-wide Z-Shell Tracker.
+
+  # External automation labels retained for compatibility.
+  # These are not part of the triage taxonomy but appear in z-shell/.github
+  # and are commonly managed by Dependabot / dependency automation.
+  - name: dependencies
+    color: '0366d6'
+    description: Pull requests that update a dependency file
+  - name: github_actions
+    color: '000000'
+    description: Pull requests that update GitHub Actions code
+
+legacy_migrations:
+  bug 🐞: type:bug
+  bug: type:bug
+  feature-request 💡: type:feature
+  new-feature 🎉: type:feature
+  documentation 📝: type:docs
+  documentation: type:docs
+  Q&A ✍️: type:question
+  enhancement ✨: type:maintenance
+  enhancement: type:maintenance
+  maintenance 📈: type:maintenance
+  agent-memory 🧠: type:handoff
+  👥 member: type:membership
+  annex 🌀: area:annex
+  plugin ⚙️: area:plugin
+  package 📦: area:package
+  ci 🤖: area:ci
+  ci ⚙️: area:ci
+  github-actions :octocat:: area:ci
+  dependencies 📦: area:dependencies
+  javascript 📦: area:dependencies
+  renovate 📦: area:dependencies
+  submodules ⚙️: area:dependencies
+  high-priority 🔥: priority:high
+  triage 📑: status:triage
+  priority-low 🔖: status:blocked
+  beginner-friendly: good first issue
+  help-wanted: help wanted
+  breaking-change 💥: breaking-change
+  security 🛡️: security
+  invalid ⚠️: invalid
+
+sync_policy:
+  delete_unknown_labels: false
+  delete_legacy_labels_only_when_unused: true
+  preserve_labels_on_open_items_before_removal: true
+  pilot_before_org_wide_rollout: true
