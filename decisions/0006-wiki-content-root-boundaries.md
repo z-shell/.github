@@ -19,7 +19,8 @@ The three content roots have fixed, non-overlapping scopes:
 1. `docs/` is **Zi plugin-manager user documentation only** — installation, commands, usage guides.
 2. `community/` holds **Z-Shell ecosystem community content only** — contributing, the Zsh handbook/plugin standard, ZUnit.
 3. `ecosystem/` holds the third-party catalog: annexes, packages, plugins.
-4. **Maintainer, operational, and infrastructure runbooks do not belong on the public wiki at all.** They live in `z-shell/.github/runbooks/` (e.g. `runbooks/supabase-knowledge-search.md`), which is the established home for operational documentation. Feature *implementation* (Edge Functions, migrations, scripts) still lives in the owning repository.
+
+Maintainer, operational, and infrastructure runbooks do not belong on the public wiki at all. They live in `z-shell/.github/runbooks/` (e.g. `runbooks/supabase-knowledge-search.md`), which is the established home for operational documentation. Feature *implementation* (Edge Functions, migrations, scripts) still lives in the owning repository.
 
 These boundaries are recorded in the wiki `AGENTS.md` (with `CLAUDE.md` as a symlink to it) and the wiki authoring instructions (`docs-authoring.instructions.md`, `agent-docusaurus-writer.instructions.md`).
 
@@ -33,7 +34,7 @@ These boundaries are recorded in the wiki `AGENTS.md` (with `CLAUDE.md` as a sym
 
 ## Alternatives considered
 
-- **Add a fourth `maintainers/` content root.** Rejected: more navbar/config surface for a small amount of content; `community/` already fits operational/community material.
+- **Add a fourth `maintainers/` content root.** Rejected: more navbar/config surface for a small amount of content, and it would still publish maintainer/operational surface on the public wiki.
 - **Leave the guide in `docs/` and document an exception.** Rejected: keeps the ambiguity that caused the incident and invites future drift.
 - **CI placement guard only (no instruction change).** Deferred: automation without a documented rule is brittle; document first, automate later if manual enforcement proves insufficient.
 
