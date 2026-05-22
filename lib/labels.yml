@@ -135,7 +135,7 @@ legacy_migrations:
   package 📦: area:package
   ci 🤖: area:ci
   ci ⚙️: area:ci
-  github-actions :octocat:: area:ci
+  "github-actions :octocat:": area:ci
   dependencies 📦: area:dependencies
   javascript 📦: area:dependencies
   renovate 📦: area:dependencies
