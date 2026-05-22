@@ -18,7 +18,7 @@ convention.
 
 ## Wiki (`z-shell/wiki`) checklist
 
-- [ ] Pick the correct content root: `docs/` = Zi user docs only; `community/` = community + maintainer/operational; `ecosystem/` = third-party catalog. (See ADR `decisions/0006-wiki-content-root-boundaries.md`.)
+- [ ] Pick the correct content root: `docs/` = Zi user docs only; `community/` = community content only; `ecosystem/` = third-party catalog. Maintainer/operational runbooks go in this repo's `runbooks/`, not the wiki. (See ADR `decisions/0006-wiki-content-root-boundaries.md`.)
 - [ ] Update `AGENTS.md` if scope or conventions changed. `CLAUDE.md` is a symlink to `AGENTS.md`, so it updates automatically.
 - [ ] Update `.github/instructions/docs-authoring.instructions.md` (Content Root Selection, frontmatter, naming).
 - [ ] Update `.github/instructions/agent-docusaurus-writer.instructions.md` (root selection, invocation).
