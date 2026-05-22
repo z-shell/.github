@@ -97,7 +97,7 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
 2. Run a dry-run audit before applying anything:
 
    ```sh
-   scripts/labels-dry-run.rb --repo z-shell/<repo>
+   scripts/labels-dry-run.rb --repo z-shell/REPO
    ```
 
    For an org-wide read-only report:

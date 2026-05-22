@@ -19,6 +19,7 @@ Options = Struct.new(
   :labels_file,
   :org,
   :repos,
+  :all_repos,
   :json,
   :include_clean,
   keyword_init: true
@@ -28,6 +29,7 @@ options = Options.new(
   labels_file: DEFAULT_LABELS_FILE,
   org: "z-shell",
   repos: [],
+  all_repos: false,
   json: false,
   include_clean: false
 )
@@ -48,7 +50,7 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on("--all-repos", "Audit every repository in --org") do
-    options.repos << :all
+    options.all_repos = true
   end
 
   opts.on("--json", "Emit JSON instead of Markdown") do
@@ -67,7 +69,13 @@ end
 
 parser.parse!
 
-if options.repos.empty?
+if options.all_repos && !options.repos.empty?
+  warn parser
+  warn "\nerror: use either --all-repos or one or more --repo values, not both"
+  exit 2
+end
+
+if !options.all_repos && options.repos.empty?
   warn parser
   warn "\nerror: pass at least one --repo OWNER/REPO or --all-repos"
   exit 2
@@ -81,12 +89,23 @@ def gh_json(*args)
   JSON.parse(stdout.empty? ? "[]" : stdout)
 end
 
+def gh_paginated_array(path)
+  stdout, stderr, status = Open3.capture3(
+    "gh", "api", path, "--paginate", "--template", "{{range .}}{{json .}}{{\"\\n\"}}{{end}}"
+  )
+  unless status.success?
+    raise "gh api #{path} failed: #{stderr.strip.empty? ? stdout.strip : stderr.strip}"
+  end
+
+  stdout.lines.reject { |line| line.strip.empty? }.map { |line| JSON.parse(line) }
+end
+
 def repo_list(org)
   gh_json("repo", "list", org, "--limit", "1000", "--json", "nameWithOwner").map { |repo| repo.fetch("nameWithOwner") }
 end
 
 def repo_labels(owner_repo)
-  gh_json("api", "repos/#{owner_repo}/labels", "--paginate").map do |label|
+  gh_paginated_array("repos/#{owner_repo}/labels?per_page=100").map do |label|
     {
       "name" => label.fetch("name"),
       "color" => label.fetch("color").downcase,
@@ -96,8 +115,17 @@ def repo_labels(owner_repo)
 end
 
 def canonical_label_map(labels_file)
-  data = YAML.load_file(labels_file)
+  data = YAML.safe_load(
+    File.read(labels_file),
+    permitted_classes: [],
+    permitted_symbols: [],
+    aliases: false
+  )
+  raise "labels file must contain a mapping" unless data.is_a?(Hash)
+
   labels = data.fetch("labels")
+  raise "labels must be a list" unless labels.is_a?(Array)
+
   label_names = labels.map { |label| label.fetch("name") }
   duplicate_names = label_names.select { |name| label_names.count(name) > 1 }.uniq
   raise "duplicate canonical labels: #{duplicate_names.join(', ')}" unless duplicate_names.empty?
@@ -168,7 +196,7 @@ def clean?(result)
 end
 
 canonical, legacy_migrations, sync_policy = canonical_label_map(options.labels_file)
-repos = options.repos.include?(:all) ? repo_list(options.org) : options.repos
+repos = options.all_repos ? repo_list(options.org) : options.repos
 results = repos.sort.map { |repo| diff_repo(repo, canonical, legacy_migrations) }
 
 payload = {
