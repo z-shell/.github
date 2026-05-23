@@ -1,3 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+set -eu
 
-echo test
+trunk check --show-existing --no-progress

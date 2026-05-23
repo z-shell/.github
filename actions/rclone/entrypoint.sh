@@ -13,11 +13,18 @@ fi
 
 if [[ -z $CONFIG_FILE ]]; then
   # Get default location for the configuration file
-  CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | awk '{print $1}')
+  CONFIG_FILE=$(rclone config file | grep 'rclone.conf' | head -n 1 | awk '{print $NF}')
+fi
+
+if [[ -z $CONFIG_FILE ]]; then
+  # Fallback to a fixed path if rclone config file fails
+  CONFIG_FILE="/github/home/.config/rclone/rclone.conf"
+  mkdir -p "$(dirname "$CONFIG_FILE")"
 fi
 
 if [[ -n $RCLONE_CONF ]]; then
   # Write user set rclone configuration
+  echo "::debug::Writing rclone config to $CONFIG_FILE"
   echo "$RCLONE_CONF" >"$CONFIG_FILE"
 else
   # Unable to proceed if rclone configuration not set
@@ -31,5 +38,6 @@ if [[ ! -x "$(command -v rclone)" ]]; then
   exit 1
 fi
 
-run_rclone=$(sh -c "rclone $*")
-echo "rclone=$run_rclone" >>"$GITHUB_OUTPUT"
+echo "::group::rclone output"
+rclone "$@"
+echo "::endgroup::"

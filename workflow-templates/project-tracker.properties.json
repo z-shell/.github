@@ -1,0 +1,6 @@
+{
+  "name": "Project Tracker",
+  "description": "Adds issues labelled meta:org-tracked to the z-shell org-wide Project v2 tracker.",
+  "iconName": "z-shell",
+  "categories": ["project-management", "automation"]
+}

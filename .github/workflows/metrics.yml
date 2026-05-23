@@ -1,5 +1,6 @@
 ---
-name: "🌀 Z Metrics"
+name: Z Metrics
+
 on:
   schedule:
     - cron: "02 02 * * */2"
@@ -8,11 +9,15 @@ on:
     paths: [.github/workflows/metrics.yml]
   workflow_dispatch: {}
 
+permissions: {}
+
 jobs:
   metrics:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: metrics
+    permissions:
+      contents: write
     concurrency:
       group: ci-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -25,18 +30,20 @@ jobs:
       wiki_followup_svg: metrics/plugin/followup/wiki_followup.svg
       f-sy-h_followup_svg: metrics/plugin/followup/f-sy-h_followup.svg
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
+          committer_branch: metrics
           base: header
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.repositories_metrics_svg }}
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
+          committer_branch: metrics
           base: repositories
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
@@ -44,6 +51,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: ${{ github.repository_owner }}
+          committer_branch: metrics
           plugin_stargazers: true
           plugin_stargazers_charts: no
           plugin_stargazers_worldmap: yes
@@ -54,6 +62,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: ${{ github.repository_owner }}
+          committer_branch: metrics
           plugin_followup: yes
           plugin_followup_indepth: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
@@ -63,6 +72,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: header, activity,community,repositories
+          committer_branch: metrics
           repo: zi
           plugin_followup: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
@@ -72,6 +82,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: header, activity,community,repositories
+          committer_branch: metrics
           repo: wiki
           plugin_followup: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
@@ -81,5 +92,6 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: header, activity,community,repositories
+          committer_branch: metrics
           repo: f-sy-h
           plugin_followup: yes

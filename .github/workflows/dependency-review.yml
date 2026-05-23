@@ -1,8 +1,7 @@
 ---
-name: "📦 Dependency Review"
+name: Dependency Review
 
 on:
-  pull_request: {}
   workflow_call: {}
 
 permissions:
@@ -10,13 +9,13 @@ permissions:
 
 jobs:
   dependency-review:
-    name: "🏭 Scanning"
+    name: Scanning
     runs-on: ubuntu-latest
     steps:
       - name: "⤵️ Check out code from GitHub"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: "🏗 Dependency Review"
-        uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
         with:
           # Possible values: "critical", "high", "moderate", "low"
           fail-on-severity: high

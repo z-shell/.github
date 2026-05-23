@@ -1,5 +1,5 @@
 ---
-name: "🌀 Z Activity"
+name: Z Activity
 
 on:
   schedule:
@@ -9,10 +9,14 @@ on:
     branches: [main]
     paths: [.github/workflows/activity_metrics.yml]
 
+permissions: {}
+
 jobs:
   metrics-activity:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -30,6 +34,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           base: ""
           user: ${{ github.repository_owner }}
+          committer_branch: metrics
           plugin_projects: yes
           plugin_projects_descriptions: yes
           plugin_projects_limit: 10
@@ -39,6 +44,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: ""
+          committer_branch: metrics
           template: repository
           repo: zi
           plugin_people: yes
@@ -49,6 +55,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: ""
+          committer_branch: metrics
           template: repository
           repo: wiki
           plugin_people: yes
@@ -59,6 +66,7 @@ jobs:
           token: ${{ secrets.ORG_TOKEN }}
           user: ${{ github.repository_owner }}
           base: ""
+          committer_branch: metrics
           template: repository
           repo: F-Sy-H
           plugin_people: yes

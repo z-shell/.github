@@ -1,114 +1,94 @@
 ---
-- name: "breaking-change 💥"
-  color: d93f0b
-  description: "A change that changes the API or breaks backward compatibility for users."
-- name: "bug 🐞"
+# Canonical organization label definitions.
+# Apply these through gh/API-based maintenance automation rather than a starter workflow template.
+- name: "type:bug"
   color: b60205
-  description: "Inconsistencies or issues which will cause a problem for users or implementors."
-- name: "documentation 📝"
+  description: "Something is broken or behaving incorrectly."
+- name: "type:feature"
+  color: 0e8a16
+  description: "A request for new behavior or capability."
+- name: "type:docs"
   color: 0052cc
-  description: "Solely about the documentation of the project."
-- name: "i18n 🌐"
-  color: "0052cc"
-  description: "Internationalization"
-- name: "l10n 🗣"
-  color: "0052cc"
-  description: "Localization"
-- name: "enhancement ✨"
-  color: 006b75
-  description: "Enhancement of the code, not introducing new features."
-- name: "refactor ♻️"
-  color: 006b75
-  description: "Simplified code that is easier to understand or more efficient syntax or methods."
-- name: "performance 🚀"
-  color: 1d76db
-  description: "Improving performance of the project, not introducing new features."
-- name: "new-feature 🎉"
-  color: 0e8a16
-  description: "Introduces new feature"
-- name: "security 🛡️"
-  color: ee0701
-  description: "Addressing a vulnerability or security risk in this project."
-- name: "maintenance 📈"
+  description: "Documentation-only work."
+- name: "type:question"
+  color: d4c5f9
+  description: "Support, clarification, or usage question."
+- name: "type:maintenance"
   color: 531999
-  description: "Generic maintenance tasks."
-- name: "ci 🤖"
+  description: "Non-feature maintenance, cleanup, or org work."
+- name: "type:membership"
+  color: 6f42c1
+  description: "Membership and organization-role requests."
+- name: "type:handoff"
   color: 5319e7
-  description: "Work that improves the continuous integration."
-- name: "dependencies 📦"
-  color: fbca04
-  description: "Change in project Javascript dependencies."
-- name: "javascript 📦"
-  color: fbca04
-  description: "Change in project dependencies."
-- name: "submodules ⚙️"
-  color: fbca04
-  description: "Change in project dependencies."
-- name: "github-actions :octocat:"
-  color: 5319E7
-  description: "GitHub Actions"
+  description: "Cross-agent or cross-maintainer handoff context."
 
-- name: "fix ⚡"
-  color: f510f4
-  description: "Has been fixed and is therefore considered resolved."
-- name: "triage 📑"
+- name: "area:zi"
+  color: 1d76db
+  description: "Zi core behavior, APIs, or documentation."
+- name: "area:plugin"
+  color: 3e16f3
+  description: "Plugin behavior or plugin-facing work."
+- name: "area:annex"
+  color: 3e16f3
+  description: "Annex behavior or annex-facing work."
+- name: "area:package"
+  color: 3e16f3
+  description: "Package or package-management work."
+- name: "area:docs"
+  color: 0052cc
+  description: "Documentation systems, content, or publishing."
+- name: "area:ci"
+  color: 5319e7
+  description: "Continuous integration or GitHub Actions work."
+- name: "area:dependencies"
   color: fbca04
-  description: "The issue is awaiting investigation."
-- name: "stale 👻"
-  color: ffffff
-  description: "No activity for quite some time."
-- name: "no-stale 🔒"
-  color: fef2c0
-  description: "This is exempt from the stale bot"
-
-- name: "Q&A ✍️"
-  color: fef2c0
-  description: "Questions and answers."
-- name: "Poll 💌"
-  color: fef2c0
-  description: "Community vote"
-- name: "invalid ⚠️"
-  color: 0b467f
-  description: "This is off-topic or incorrect."
-- name: "beginner-friendly"
-  color: 5319E7
-  description: "Beginner friendy to people wanting to contribute to this project."
-- name: "good first issue"
-  color: 5319E7
-  description: "Good first issue for people wanting to contribute to this project."
-- name: "help-wanted"
-  color: 5319E7
-  description: "We need some extra helping hands or expertise in order to resolve this!"
-- name: "feature-request 💡"
-  color: 0e8a16
-  description: "Suggests new feature."
-- name: "locked ‼️"
+  description: "Dependency updates or dependency-management work."
+- name: "area:release"
   color: d93f0b
-  description: "Spam, inappropriate or otherwise doesn't apply to this project."
-- name: "resolved ☑️"
-  color: 0e8a16
-  description: "The issue has been fixed and is therefore considered resolved."
-- name: "high-priority 🔥"
-  color: ee0701
-  description: "Must be addressed as soon as possible."
-- name: "priority-low 🔖"
-  color: ffffff
-  description: "This issue currently can't be resolved."
+  description: "Release process, versioning, or changelog work."
+- name: "area:meta"
+  color: 1d76db
+  description: "Organization-wide policy, templates, or meta-repo work."
 
-- name: "annex 🌀"
-  color: 3e16f3
-  description: "Related with annex"
-- name: "plugin ⚙️"
-  color: 3e16f3
-  description: "Related with plugin"
-- name: "package 📦"
-  color: 3e16f3
-  description: "Related with package"
-- name: "major 🔺"
+- name: "priority:high"
+  color: ee0701
+  description: "Needs prompt attention."
+- name: "regression"
   color: b60205
-  description: "This PR causes a major bump in the version number."
-- name: "minor 🔸"
+  description: "Previously working behavior is broken."
+- name: "security"
+  color: ee0701
+  description: "Security-sensitive issue or hardening work."
+- name: "breaking-change"
+  color: d93f0b
+  description: "Breaks backward compatibility or changes a public contract."
+
+- name: "status:triage"
+  color: fbca04
+  description: "Awaiting initial review or classification."
+- name: "status:blocked"
+  color: e4e669
+  description: "Cannot proceed until an external dependency or decision changes."
+- name: "needs-info"
+  color: f9d0c4
+  description: "Waiting on more detail before work can continue."
+- name: "good first issue"
+  color: 7057ff
+  description: "Well-scoped starter task for a new contributor."
+- name: "help wanted"
+  color: 008672
+  description: "Maintainers would welcome outside help."
+- name: "invalid"
+  color: 0b467f
+  description: "Off-topic, incorrect, or not actionable."
+- name: "duplicate"
+  color: cfd3d7
+  description: "Covered by another issue or pull request."
+- name: "wontfix"
+  color: ffffff
+  description: "Acknowledged but not planned for implementation."
+
+- name: "meta:org-tracked"
   color: 5319e7
-  description: "This PR causes a minor bump in the version number."
-- name: "misc ⬣"
-  color: 5319e7
+  description: "Auto-add this issue to the org-wide Z-Shell Tracker."

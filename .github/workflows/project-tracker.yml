@@ -1,0 +1,55 @@
+---
+name: Project Tracker
+
+on:
+  issues:
+    types: [opened, labeled, reopened]
+  workflow_call:
+    inputs:
+      issue_url:
+        description: Issue URL to add to the Z-Shell Tracker.
+        required: true
+        type: string
+      project_owner:
+        description: Project owner login.
+        required: false
+        type: string
+        default: z-shell
+      project_number:
+        description: Project number.
+        required: false
+        type: string
+        default: "28"
+    secrets:
+      Z_SHELL_PROJECT_TOKEN:
+        description: Token with write access to the organization Project v2 board.
+        required: false
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.node_id || inputs.issue_url }}
+  cancel-in-progress: true
+
+jobs:
+  add-tracked-issue:
+    name: Add tracked issue
+    if: >-
+      ${{
+        github.event_name == 'workflow_call' ||
+        contains(github.event.issue.labels.*.name, 'meta:org-tracked')
+      }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.Z_SHELL_PROJECT_TOKEN || github.token }}
+      ISSUE_URL: ${{ inputs.issue_url || github.event.issue.html_url }}
+      PROJECT_OWNER: ${{ inputs.project_owner || 'z-shell' }}
+      PROJECT_NUMBER: ${{ inputs.project_number || '28' }}
+    steps:
+      - name: Add issue to project
+        run: |
+          gh project item-add "${PROJECT_NUMBER}" \
+            --owner "${PROJECT_OWNER}" \
+            --url "${ISSUE_URL}"

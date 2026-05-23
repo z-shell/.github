@@ -1,7 +1,7 @@
 name: "📚 Documentation"
 description: The issue request for changes in documentation
 title: "[docs]: "
-labels: ["documentation 📝"]
+labels: ["type:docs", "area:docs"]
 assignees: ["ss-o"]
 body:
   - type: markdown
