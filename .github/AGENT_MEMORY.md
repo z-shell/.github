@@ -8,6 +8,7 @@ Z-Shell uses GitHub-native records as the shared memory between humans and LLM a
 | ---------------------------------------- | ------------------------------------------------------------- |
 | Active work, blockers, and next steps    | GitHub issues, pull requests, and the Z-Shell Tracker project |
 | Deferred or planned work                 | GitHub issues in the owning repository                        |
+| Private organizational heuristics        | `memory/` folder in the root meta-workspace                   |
 | Durable decisions and long-form guidance | Z-Shell wiki                                                  |
 | Local agent recall                       | Optional cache only; must not be the only record              |
 
