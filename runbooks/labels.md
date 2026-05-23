@@ -97,13 +97,13 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
 2. Run a dry-run audit before applying anything:
 
    ```sh
-   scripts/labels-dry-run.rb --repo z-shell/REPO
+   scripts/labels-sync.rb --repo z-shell/REPO
    ```
 
    For an org-wide read-only report:
 
    ```sh
-   scripts/labels-dry-run.rb --all-repos > /tmp/z-shell-labels-dry-run.md
+   scripts/labels-sync.rb --all-repos > /tmp/z-shell-labels-dry-run.md
    ```
 
 3. Create or update every canonical label from `.github/lib/labels.yml`.
@@ -114,9 +114,11 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
 
 Do not delete unknown labels in bulk. If a repository has a local label that is not obviously legacy, open or update an issue before removing it.
 
-## Dry-run script
+## Label sync script
 
-`scripts/labels-dry-run.rb` is read-only by default. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
+`scripts/labels-sync.rb` is the canonical entrypoint. The older `scripts/labels-dry-run.rb` name remains as a compatibility wrapper for existing local commands, but new runbook examples should use `scripts/labels-sync.rb`.
+
+`scripts/labels-sync.rb` is read-only by default. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
 
 - canonical labels that would be created
 - canonical labels whose color or description would be updated
@@ -127,13 +129,13 @@ Useful examples:
 
 ```sh
 # Audit one repository and include clean output.
-scripts/labels-dry-run.rb --repo z-shell/.github --include-clean
+scripts/labels-sync.rb --repo z-shell/.github --include-clean
 
 # Audit several repositories.
-scripts/labels-dry-run.rb --repo z-shell/zi --repo z-shell/wiki
+scripts/labels-sync.rb --repo z-shell/zi --repo z-shell/wiki
 
 # Emit machine-readable output for follow-up tooling.
-scripts/labels-dry-run.rb --repo z-shell/zi --json
+scripts/labels-sync.rb --repo z-shell/zi --json
 ```
 
 ## Apply-mode pilot
@@ -154,20 +156,20 @@ Preview commands:
 
 ```sh
 # Preview canonical create/update operations for one repo.
-scripts/labels-dry-run.rb --repo z-shell/REPO --apply
+scripts/labels-sync.rb --repo z-shell/REPO --apply
 
 # Preview in JSON for artifact comparison.
-scripts/labels-dry-run.rb --repo z-shell/REPO --apply --json
+scripts/labels-sync.rb --repo z-shell/REPO --apply --json
 ```
 
 Confirmed apply commands require maintainer approval because they mutate GitHub labels:
 
 ```sh
 # No-op safety apply on the clean org metadata repo.
-scripts/labels-dry-run.rb --repo z-shell/.github --apply --confirm-apply --include-clean
+scripts/labels-sync.rb --repo z-shell/.github --apply --confirm-apply --include-clean
 
 # Approved pilot outside the temporary allowlist.
-scripts/labels-dry-run.rb \
+scripts/labels-sync.rb \
   --repo z-shell/REPO \
   --apply \
   --confirm-apply \
