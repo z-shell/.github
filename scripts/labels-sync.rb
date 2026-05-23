@@ -338,12 +338,18 @@ def print_label_list(title, labels)
 
   puts title
   labels.each do |label|
-    if label.is_a?(Hash) && label.key?("operation")
-      puts "- [#{label.fetch('operation')}] #{label.fetch('label')}: #{label.fetch('message')}"
-    else
-      name = label.is_a?(Hash) ? label.fetch("name") : label
-      puts "- #{name}"
-    end
+    name = label.is_a?(Hash) ? label.fetch("name") : label
+    puts "- #{name}"
+  end
+  puts
+end
+
+def print_apply_errors(errors)
+  return if errors.empty?
+
+  puts "### Apply errors"
+  errors.each do |error|
+    puts "- #{error.fetch('operation')} #{error.fetch('label')}: #{error.fetch('message')}"
   end
   puts
 end
@@ -383,8 +389,6 @@ if options.json
   puts JSON.pretty_generate(payload)
   exit(apply_failed ? 1 : 0)
 end
-
-exit 1 if apply_failed
 
 heading = options.apply ? "# Label sync apply preview" : "# Label sync dry-run"
 heading = "# Label sync apply result" if options.apply && options.confirm_apply
@@ -446,7 +450,7 @@ results.each do |result|
       applied = result.fetch("applied")
       print_label_list("### Created", applied.fetch("created"))
       print_label_list("### Updated", applied.fetch("updated"))
-      print_label_list("### Apply errors", applied.fetch("errors"))
+      print_apply_errors(applied.fetch("errors"))
     end
     next
   end
@@ -482,3 +486,5 @@ results.each do |result|
     puts
   end
 end
+
+exit(apply_failed ? 1 : 0)
