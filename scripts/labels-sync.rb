@@ -50,7 +50,7 @@ options = Options.new(
 )
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: scripts/labels-sync.rb [options]"
+  opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
 
   opts.on("--labels-file PATH", "Canonical labels file (default: lib/labels.yml)") do |path|
     options.labels_file = path
@@ -338,8 +338,12 @@ def print_label_list(title, labels)
 
   puts title
   labels.each do |label|
-    name = label.is_a?(Hash) ? label.fetch("name") : label
-    puts "- #{name}"
+    if label.is_a?(Hash) && label.key?("operation")
+      puts "- [#{label.fetch('operation')}] #{label.fetch('label')}: #{label.fetch('message')}"
+    else
+      name = label.is_a?(Hash) ? label.fetch("name") : label
+      puts "- #{name}"
+    end
   end
   puts
 end
@@ -379,6 +383,8 @@ if options.json
   puts JSON.pretty_generate(payload)
   exit(apply_failed ? 1 : 0)
 end
+
+exit 1 if apply_failed
 
 heading = options.apply ? "# Label sync apply preview" : "# Label sync dry-run"
 heading = "# Label sync apply result" if options.apply && options.confirm_apply

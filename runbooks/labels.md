@@ -116,7 +116,7 @@ Do not delete unknown labels in bulk. If a repository has a local label that is 
 
 ## Label sync script
 
-`labels-sync.rb` is the canonical entrypoint. The older `scripts/labels-dry-run.rb` name remains as a compatibility wrapper for existing local commands, but new runbook examples should use `scripts/labels-sync.rb`.
+`scripts/labels-sync.rb` is the canonical entrypoint. The older `scripts/labels-dry-run.rb` name remains as a compatibility wrapper for existing local commands, but new runbook examples should use `scripts/labels-sync.rb`.
 
 `scripts/labels-sync.rb` is read-only by default. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
 
