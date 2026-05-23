@@ -116,7 +116,7 @@ Do not delete unknown labels in bulk. If a repository has a local label that is 
 
 ## Dry-run script
 
-`scripts/labels-dry-run.rb` is read-only. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
+`scripts/labels-dry-run.rb` is read-only by default. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
 
 - canonical labels that would be created
 - canonical labels whose color or description would be updated
@@ -134,6 +134,44 @@ scripts/labels-dry-run.rb --repo z-shell/zi --repo z-shell/wiki
 
 # Emit machine-readable output for follow-up tooling.
 scripts/labels-dry-run.rb --repo z-shell/zi --json
+```
+
+## Apply-mode pilot
+
+Apply mode is intentionally limited while #411 is piloted:
+
+- default mode remains read-only;
+- `--apply` previews canonical label create/update operations without mutating anything;
+- `--apply --confirm-apply` may only create missing canonical labels and update canonical label metadata;
+- it does not delete unknown labels;
+- it does not delete legacy labels;
+- it does not migrate labels on issues or pull requests;
+- org-wide apply is disabled during the pilot;
+- confirmed apply requires explicit `--repo` values;
+- confirmed apply is limited to the temporary pilot allowlist unless a maintainer explicitly approves `--allow-non-pilot-repo`.
+
+Preview commands:
+
+```sh
+# Preview canonical create/update operations for one repo.
+scripts/labels-dry-run.rb --repo z-shell/REPO --apply
+
+# Preview in JSON for artifact comparison.
+scripts/labels-dry-run.rb --repo z-shell/REPO --apply --json
+```
+
+Confirmed apply commands require maintainer approval because they mutate GitHub labels:
+
+```sh
+# No-op safety apply on the clean org metadata repo.
+scripts/labels-dry-run.rb --repo z-shell/.github --apply --confirm-apply --include-clean
+
+# Approved pilot outside the temporary allowlist.
+scripts/labels-dry-run.rb \
+  --repo z-shell/REPO \
+  --apply \
+  --confirm-apply \
+  --allow-non-pilot-repo
 ```
 
 ## See also
