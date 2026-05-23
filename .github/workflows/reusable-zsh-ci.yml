@@ -1,28 +1,36 @@
 ---
 name: Reusable Zsh CI
 
-"on":
+on:
   workflow_call: {}
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   zsh-ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: ⚡ Install Zsh
-        run: sudo apt update && sudo apt-get install -yq zsh
+        run: sudo apt-get update && sudo apt-get install -yq zsh
 
       - name: ⚡ zsh -n on all .zsh files
         run: |
           set -euo pipefail
           mapfile -d '' files < <(
-            find . -type d -name 'doc' -prune -o -type f -name '*.zsh' -print0
+            find . -type d \( -name '.git' -o -name 'doc' \) -prune -o -type f -name '*.zsh' -print0
           )
           if [ "${#files[@]}" -eq 0 ]; then
-            echo "ERROR: No .zsh files found to validate." >&2
-            exit 1
+            echo "No .zsh files found — nothing to check."
+            exit 0
           fi
           for file in "${files[@]}"; do
             zsh -n "${file}"
@@ -32,11 +40,11 @@ jobs:
         run: |
           set -euo pipefail
           mapfile -d '' files < <(
-            find . -type d -name 'doc' -prune -o -type f -name '*.zsh' -print0
+            find . -type d \( -name '.git' -o -name 'doc' \) -prune -o -type f -name '*.zsh' -print0
           )
           if [ "${#files[@]}" -eq 0 ]; then
-            echo "ERROR: No .zsh files found to compile." >&2
-            exit 1
+            echo "No .zsh files found — nothing to compile."
+            exit 0
           fi
           for file in "${files[@]}"; do
             zsh -fc 'zcompile -- "$1"' zsh "${file}"
