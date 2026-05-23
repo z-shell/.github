@@ -91,7 +91,7 @@ end
 
 def gh_paginated_array(path)
   stdout, stderr, status = Open3.capture3(
-    "gh", "api", path, "--paginate", "--template", "{{range .}}{{json .}}{{\"\\n\"}}{{end}}"
+    "gh", "api", path, "--paginate", "--jq", ".[]"
   )
   unless status.success?
     raise "gh api #{path} failed: #{stderr.strip.empty? ? stdout.strip : stderr.strip}"
