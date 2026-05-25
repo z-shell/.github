@@ -20,13 +20,13 @@ The three content roots have fixed, non-overlapping scopes:
 2. `community/` holds **Z-Shell ecosystem community content only** — contributing, the Zsh handbook/plugin standard, ZUnit.
 3. `ecosystem/` holds the third-party catalog: annexes, packages, plugins.
 
-Maintainer, operational, and infrastructure runbooks do not belong on the public wiki at all. They live in `z-shell/.github/runbooks/` (e.g. `runbooks/supabase-knowledge-search.md`), which is the established home for operational documentation. Feature *implementation* (Edge Functions, migrations, scripts) still lives in the owning repository.
+Maintainer, operational, and infrastructure runbooks do not belong on the public wiki at all. They live in `z-shell/.github/runbooks/`, which is the established home for operational documentation. Feature *implementation* (Edge Functions, migrations, scripts) still lives in the owning repository.
 
 These boundaries are recorded in the wiki `AGENTS.md` (with `CLAUDE.md` as a symlink to it) and the wiki authoring instructions (`docs-authoring.instructions.md`, `agent-docusaurus-writer.instructions.md`).
 
 ## Consequences
 
-- Maintainer/operational runbooks live in `z-shell/.github/runbooks/`, not anywhere in the public wiki. The Supabase Knowledge Search guide was relocated from `wiki/community/10_maintainers/` to `runbooks/supabase-knowledge-search.md`.
+- Maintainer/operational runbooks live in `z-shell/.github/runbooks/`, not anywhere in the public wiki. (The Supabase Knowledge Search guide that originally motivated this boundary was later removed when the knowledge-search feature was retired.)
 - Authoring instructions gain a Content Root Selection table; `docs/` and `community/` both exclude maintainer/operational content.
 - The `runbooks/instruction-update.md` runbook keeps instructions in sync when new features or content areas are added.
 
