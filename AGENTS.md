@@ -28,6 +28,7 @@ Use the right home for each kind of knowledge:
 | Kind of information                | Source of truth                                       |
 | ---------------------------------- | ----------------------------------------------------- |
 | Active work, blockers, next steps  | GitHub issues, pull requests, and the Z-Shell Tracker |
+| Private organizational heuristics  | `memory/` folder in the root meta-workspace           |
 | Durable architectural decisions    | `decisions/` in this repo                             |
 | Cross-repo operational procedures  | `runbooks/` in this repo                              |
 | Reusable implementation idioms     | `PATTERNS.md` in this repo                            |

@@ -13,8 +13,9 @@ tools:
     "read/problems",
     "execute/testFailure",
     "web/fetch",
-    "web/githubRepo",
     "execute/runTests",
+    "read/readFile",
+    "github/*",
   ]
 ---
 

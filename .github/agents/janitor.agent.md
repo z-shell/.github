@@ -22,7 +22,6 @@ tools:
     read/readFile,
     browser,
     "github/*",
-    "microsoft.docs.mcp/*",
     edit/editFiles,
     search,
     web,
