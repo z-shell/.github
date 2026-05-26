@@ -2,6 +2,12 @@
 
 Use this runbook to decide whether a repository should adopt release automation and to coordinate releases without forcing one model onto every z-shell repository.
 
+> This runbook implements the decision recorded in
+> [`decisions/0007-release-publication-flow.md`](../decisions/0007-release-publication-flow.md)
+> (**ACCEPTED**): semantic tags `vX.Y.Z` are the publication boundary for
+> versioned tools/packages, released via the simple tag-driven `zunit` pattern
+> (not `release-please`). The repo classes below are the authoritative reference.
+
 ## Release coordination guidance
 
 1. Conventional Commits are the proposed default history format until the corresponding ADR is accepted.
