@@ -238,7 +238,7 @@ def diff_repo(owner_repo, canonical, legacy_migrations)
 
   missing = canonical.keys.reject { |name| live_by_name.key?(name) }
 
-  updates = canonical.filter_map do |name, desired|
+  updates = canonical.each_with_object([]) do |(name, desired), items|
     current = live_by_name[name]
     next unless current
 
@@ -249,13 +249,13 @@ def diff_repo(owner_repo, canonical, legacy_migrations)
     if current.fetch("description") != desired.fetch("description")
       changes["description"] = { "current" => current.fetch("description"), "desired" => desired.fetch("description") }
     end
-    changes.empty? ? nil : { "name" => name, "changes" => changes }
+    items << { "name" => name, "changes" => changes } unless changes.empty?
   end
 
-  legacy_present = legacy_migrations.filter_map do |legacy, replacement|
+  legacy_present = legacy_migrations.each_with_object([]) do |(legacy, replacement), items|
     next unless live_by_name.key?(legacy)
 
-    { "legacy" => legacy, "replacement" => replacement }
+    items << { "legacy" => legacy, "replacement" => replacement }
   end
 
   unknown = live_by_name.keys.reject do |name|
