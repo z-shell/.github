@@ -29,37 +29,58 @@ than decided per repo, so the catalog stops drifting at the source.
 
 ## Decision
 
-Branch model follows the ADR-0007 repository class.
+Branch model follows the ADR-0007 repository class, and the **canonical
+per-repo table below is the authoritative source** that `workspace/repos.yml`
+derives from. There is no per-repo discretion: a repo's branch model is whatever
+this table says, and changing it requires editing this ADR (a superseding
+decision), not an ad-hoc branch creation.
 
-1. **Continuously deployed artifacts** (`wiki`, `src`, `zd` images) — use a
-   `next` → `main` integration branch. `next` is the default development branch;
-   merging to `main` is the deploy/publication boundary. Branch names:
-   `feature-<id>`, `bug-<id>`, `hotfix-<id>`; hotfixes branch from `main`, all
-   other work from `next`.
-2. **Versioned tools and packages** (`zunit`, `zsh-lint`, packaged `zsh`) — `main`
-   is continuously validated development output; publication is a `vX.Y.Z` tag
-   (per ADR-0007). A `next` branch is **optional**: adopt it only when the repo's
-   change volume justifies an integration buffer (as `zsh-lint` did for its Go
-   reboot). Trunk-on-`main` is the default for low-volume tools.
-3. **Git-consumed source** (`zi`, most plugins/annexes) — `next` → `main` where an
-   integration branch adds value (`zi`, `zsh-eza`); trunk-on-`main` is acceptable
-   for small, low-churn plugins (`z-a-meta-plugins`, `zsh-fancy-completions`).
-   `main` is always the consumable ref.
-4. **Meta/infrastructure** (`.github`) — trunk-based on `main`. No `next` branch.
+### Canonical branch model
 
-`workspace/repos.yml` records each repo's actual branch model and notes when a
-repo is trunk-only. Whenever a repo adds or removes a `next` branch, the catalog
-entry is updated in the same change.
+| Repo                   | Class | Branch model     | Development branch | Publication boundary        |
+| ---------------------- | ----- | ---------------- | ------------------ | --------------------------- |
+| `wiki`                 | 1     | `next` → `main`  | `next`             | merge to `main` (deploy)    |
+| `src`                  | 1     | `next` → `main`  | `next`             | merge to `main` (deploy)    |
+| `zd`                   | 1     | `next` → `main`  | `next`             | merge to `main` (image)     |
+| `zunit`                | 2     | trunk on `main`  | `main`             | `vX.Y.Z` tag                |
+| `zsh-lint`             | 2     | `next` → `main`  | `next`             | `vX.Y.Z` tag                |
+| packaged `zsh`         | 2     | trunk on `main`  | `main`             | `vX.Y.Z` tag (deferred)     |
+| `zi`                   | 3     | `next` → `main`  | `next`             | `main` is consumable ref    |
+| `zsh-eza`              | 3     | `next` → `main`  | `next`             | `main` is consumable ref    |
+| `z-a-meta-plugins`     | 3     | trunk on `main`  | `main`             | `main` is consumable ref    |
+| `zsh-fancy-completions`| 3     | trunk on `main`  | `main`             | `main` is consumable ref    |
+| `.github`              | 4     | trunk on `main`  | `main`             | n/a                         |
+
+### Rules
+
+- **Class 1 (deploy):** `next` → `main`; merging to `main` is the deploy boundary.
+- **Class 2 (versioned tools):** `main` is continuously validated; publication is a
+  `vX.Y.Z` tag (ADR-0007). A `next` branch is used only where the table assigns it
+  (`zsh-lint`, for its Go reboot); the default is trunk-on-`main`.
+- **Class 3 (git-consumed):** `main` is always the consumable ref. High-churn repos
+  use `next` → `main` (`zi`, `zsh-eza`); low-churn plugins are trunk-on-`main`.
+- **Class 4 (meta):** trunk on `main`; no `next`.
+- **Branch naming (all classes):** `feature-<id>`, `bug-<id>`, `hotfix-<id>`.
+  Hotfixes branch from `main`; other work branches from the repo's development
+  branch (the "Development branch" column). For trunk repos, feature branches
+  also start from `main`.
+
+`workspace/repos.yml` mirrors this table and must match it. A repo's branch model
+is not changed by creating a branch — it is changed by amending this ADR (or a
+superseding ADR) and updating the catalog in the same change.
 
 ## Consequences
 
-- `workspace/repos.yml` has an authoritative rule to validate against, instead of
-  drifting from empirical discovery.
-- New repos inherit a branch model from their ADR-0007 class at creation time.
-- The default-branch and branch-naming guidance in the workspace `CLAUDE.md`
-  ("default development branch `next`") is understood as the *integration-flow*
-  default, not a universal rule — trunk-only repos are explicitly sanctioned by
-  this ADR for classes 2–4 where noted.
+- `workspace/repos.yml` derives from the canonical table above, so drift is
+  structurally prevented: the catalog is validated against an explicit table, not
+  "use judgment."
+- New repos are added to the table (with their ADR-0007 class) as part of repo
+  creation, before the first branch is cut.
+- **Action on acceptance:** the workspace `CLAUDE.md` currently states "default
+  development branch: `next` … all other work branches from `next`" as a universal
+  rule. On acceptance, update that section to reference this ADR's per-repo table
+  so agents do not get conflicting guidance for trunk-only repos. (Not done while
+  this ADR is PROPOSED — `CLAUDE.md` should not cite an unaccepted decision.)
 - Promotion from `next` to `main` is a publication boundary only for class 1
   (deploy) repos; for other classes the merge validates but does not mint a
   release (consistent with ADR-0007).

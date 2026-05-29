@@ -27,12 +27,18 @@ common baseline; higher-risk classes add to it.
 
 ### Baseline (all repos)
 
-- All workflows comply with the org workflow conventions: SHA-pinned actions,
-  top-level least-privilege `permissions:`, `concurrency:` for push/PR triggers,
-  no-emoji workflow/job `name:` (ADR-0005), kebab-case filenames.
+- All workflows comply with the org workflow conventions (SHA-pinned actions,
+  least-privilege `permissions:`, `concurrency:`, no-emoji `name:` per ADR-0005,
+  kebab-case filenames). These conventions are defined in the workspace `CLAUDE.md`
+  and the CI instructions — this ADR references them rather than restating, so
+  there is a single source of truth.
 - Zsh sources pass `zsh -n` (syntax) and `zcompile` (compile) checks.
-- Commit/PR-title lint enforces Conventional Commits (ADR-0003) and rejects the
-  disallowed-trailer pattern.
+- Dependency and secret scanning per `decisions/0004-dependabot-unification.md`.
+- **Target state (not yet a live org-wide control):** Conventional Commits
+  (ADR-0003) and the disallowed-trailer rule enforced in CI. Today the
+  disallowed-trailer check runs via the `DISALLOWED_TRAILER_PATTERN` org secret;
+  Conventional Commits is convention-and-review, not a uniform CI gate. Adding a
+  shared commit/PR-title-lint check is a follow-up, tracked separately.
 
 ### By class
 
@@ -43,7 +49,9 @@ common baseline; higher-risk classes add to it.
 2. **Versioned tools and packages** (`zunit`, `zsh-lint`, packaged `zsh`) — full
    functional test suite is **required** and gates release tags. ZUnit for Zsh
    tools; `go test` for the `zsh-lint` Go CLI. A release tag must not be cut from
-   a commit whose suite is red.
+   a commit whose suite is red. Compiled tools additionally run SAST (CodeQL
+   and/or `gosec` for the `zsh-lint` Go CLI); a release artifact is part of the
+   security surface governed by `decisions/0010-security-incident-response.md`.
 3. **Git-consumed source** (`zi`, most plugins/annexes) — **validation-only**: the
    baseline checks above, plus ZUnit where the plugin ships tests. No release
    automation and no coverage gate; these repos are consumed from source and the
@@ -88,4 +96,6 @@ require the baseline; class-2 repos additionally require the functional suite.
 - `decisions/0007-release-publication-flow.md` — repository classes.
 - `decisions/0008-branching-model.md` — branch model per class.
 - `decisions/0005-workflow-naming-conventions.md` — workflow naming baseline.
+- `decisions/0004-dependabot-unification.md` — dependency scanning baseline.
+- `decisions/0010-security-incident-response.md` — SAST/release security surface.
 - `z-shell/zd` `.github/workflows/test-native.yml` — reusable ZUnit workflow.

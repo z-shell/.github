@@ -22,12 +22,20 @@ them predictably."
 
 ## Decision
 
+### Intake channel
+
+Private reports are received and tracked through **GitHub repository Security
+Advisories** (the "Report a vulnerability" / draft-advisory flow), which provides
+private collaboration, a private fork for the fix, and CVE issuance. Public repos
+have no private issues, so a draft advisory — not an issue — is the tracking
+record. `SECURITY.md` is the reporter-facing entry point.
+
 ### Ownership
 
 An org maintainer is the incident owner for each report. The owner acknowledges,
-triages severity, coordinates the fix, and runs the post-incident review. By
-default the accepting maintainer (**ss-o**) owns incidents unless explicitly
-reassigned.
+triages severity, coordinates the fix, and runs the post-incident review. The
+**security contact** (currently **ss-o**) owns incidents by default unless
+explicitly reassigned.
 
 ### Acknowledgement SLA
 

@@ -23,14 +23,10 @@ private channel immediately and keep them there until a fix is published.
 
 ## Step 2 — Triage severity
 
-Within **5 business days**, assign a severity using impact × exploitability:
-
-| Severity | Examples                                      | Target time-to-fix |
-| -------- | --------------------------------------------- | ------------------ |
-| Critical | RCE, secret/credential exposure, supply-chain | 7 days             |
-| High     | Privilege escalation, auth bypass             | 30 days            |
-| Medium   | Limited-scope info disclosure, DoS            | 90 days            |
-| Low      | Hardening, defense-in-depth                   | Best effort        |
+Within **5 business days**, assign a severity using impact × exploitability and
+apply the time-to-fix target. The canonical severity→target table lives in
+`decisions/0010-security-incident-response.md` ("Severity and remediation
+targets") — use it as the single source rather than duplicating it here.
 
 Record which repos/artifacts are affected and the blast radius (interactive
 shell? CI container? a single plugin?).
