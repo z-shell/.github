@@ -4,6 +4,19 @@ Use this workflow when a discussion, issue, or pull request makes a non-obvious 
 
 **Hard rule:** draft the ADR, but do not silently mark it accepted. New ADRs start as `PROPOSED` until maintainers confirm them.
 
+## Decision authority
+
+Only an org maintainer may flip an ADR from `PROPOSED` to `ACCEPTED`. Agents and
+contributors draft and propose; they never self-accept.
+
+- The maintainer who accepts an ADR records their handle in the `Deciders` field.
+  Never leave `Deciders: TBD` on an `ACCEPTED` ADR.
+- Acceptance happens on `main` (via merged PR), not on a feature branch.
+- Superseding an existing ADR follows the same authority: link the old and new ADRs
+  through `Supersedes` / `Superseded by` and leave the superseded ADR in place.
+
+The current accepting maintainer is **ss-o**.
+
 ## When to use this
 
 Draft an ADR when:

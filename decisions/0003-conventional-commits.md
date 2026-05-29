@@ -1,8 +1,8 @@
 # 3. Adopt Conventional Commits across z-shell repositories
 
-- **Status:** PROPOSED
-- **Date:** 2026-05-19
-- **Deciders:** TBD
+- **Status:** ACCEPTED
+- **Date:** 2026-05-29
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 

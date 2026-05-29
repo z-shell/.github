@@ -1,8 +1,8 @@
 # 2. `zi` is the canonical plugin manager for the z-shell ecosystem
 
-- **Status:** PROPOSED
-- **Date:** 2026-05-19
-- **Deciders:** TBD
+- **Status:** ACCEPTED
+- **Date:** 2026-05-29
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 

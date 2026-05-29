@@ -1,7 +1,7 @@
 # 6. Wiki Content-Root Boundaries
 
-- **Status:** PROPOSED
-- **Date:** 2026-05-22
+- **Status:** ACCEPTED
+- **Date:** 2026-05-29
 - **Deciders:** ss-o, Claude Code
 - **Supersedes:** None
 - **Superseded by:** None
