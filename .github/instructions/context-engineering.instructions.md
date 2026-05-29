@@ -21,7 +21,7 @@ Principles for helping GitHub Copilot understand your codebase and provide bette
 
 ## Working with Copilot
 
-- **Keep relevant files open in tabs**: Copilot uses open tabs as context signals. Working on auth? Open auth-related files.
+- **Provide explicit file context**: If using a CLI agent or non-IDE assistant, provide explicit file paths. If using an IDE assistant, keep relevant files open in tabs. Working on auth? Reference or open auth-related files.
 - **Position cursor intentionally**: Copilot prioritizes code near your cursor. Put cursor where context matters.
 - **Use Copilot Chat for complex tasks**: Inline completions have minimal context. Chat mode sees more files.
 
