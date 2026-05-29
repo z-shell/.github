@@ -9,13 +9,17 @@ private channel immediately and keep them there until a fix is published.
 
 ## Step 1 — Intake and acknowledge
 
-1. Confirm the report arrived through a private channel (security policy contact).
-   If it landed on a public issue/PR, hide exploit details and move it private.
-2. Assign an incident owner — by default the accepting maintainer (**ss-o**),
-   unless reassigned.
+1. Confirm the report arrived through a private channel — prefer GitHub
+   **repository Security Advisories** ("Security" tab → "Report a vulnerability"),
+   which gives a private draft advisory, a private collaboration space and fork,
+   and CVE issuance. If it landed on a public issue/PR, hide exploit details and
+   move it into a draft advisory.
+2. Assign an incident owner — by default the security contact (currently
+   **ss-o**), unless reassigned.
 3. Acknowledge to the reporter within **3 business days**.
-4. Open a private tracking record (private issue or maintainer channel). Do not
-   put exploit details in a public tracker item.
+4. Track the incident in the draft GitHub Security Advisory (GHSA), not a public
+   issue — public repos have no private issues. Keep exploit details in the GHSA
+   only.
 
 ## Step 2 — Triage severity
 
