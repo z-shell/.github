@@ -29,11 +29,15 @@ than decided per repo, so the catalog stops drifting at the source.
 
 ## Decision
 
-Branch model follows the ADR-0007 repository class, and the **canonical
-per-repo table below is the authoritative source** that `workspace/repos.yml`
-derives from. There is no per-repo discretion: a repo's branch model is whatever
-this table says, and changing it requires editing this ADR (a superseding
-decision), not an ad-hoc branch creation.
+The **canonical per-repo table below is the authoritative source** for branch
+model, and `workspace/repos.yml` derives from it. The ADR-0007 repository class
+is an *input* to the choice (it sets the publication boundary and a default), but
+it does **not** by itself determine the branch model — repo churn/scale does.
+Reality confirms this: within class 1, `wiki`/`src` run `next` → `main` while
+`zd` is trunk-only; within class 2, `zsh-lint` uses `next` while `zunit` is
+trunk. So the table, not the class, is binding. There is no ad-hoc per-repo
+discretion: a repo's branch model is whatever this table says, and changing it
+requires amending this ADR (or a superseding one), not creating a branch.
 
 ### Canonical branch model
 
@@ -41,7 +45,7 @@ decision), not an ad-hoc branch creation.
 | ---------------------- | ----- | ---------------- | ------------------ | --------------------------- |
 | `wiki`                 | 1     | `next` → `main`  | `next`             | merge to `main` (deploy)    |
 | `src`                  | 1     | `next` → `main`  | `next`             | merge to `main` (deploy)    |
-| `zd`                   | 1     | `next` → `main`  | `next`             | merge to `main` (image)     |
+| `zd`                   | 1     | trunk on `main`  | `main`             | push to `main` (image)      |
 | `zunit`                | 2     | trunk on `main`  | `main`             | `vX.Y.Z` tag                |
 | `zsh-lint`             | 2     | `next` → `main`  | `next`             | `vX.Y.Z` tag                |
 | packaged `zsh`         | 2     | trunk on `main`  | `main`             | `vX.Y.Z` tag (deferred)     |
@@ -51,23 +55,25 @@ decision), not an ad-hoc branch creation.
 | `zsh-fancy-completions`| 3     | trunk on `main`  | `main`             | `main` is consumable ref    |
 | `.github`              | 4     | trunk on `main`  | `main`             | n/a                         |
 
-### Rules
+### How the class informs the default
 
-- **Class 1 (deploy):** `next` → `main`; merging to `main` is the deploy boundary.
+- **Class 1 (deploy):** `main` is the deploy ref. A `next` → `main` staging buffer
+  is used where deploy traffic justifies it (`wiki`, `src`); `zd` deploys directly
+  from `main`.
 - **Class 2 (versioned tools):** `main` is continuously validated; publication is a
-  `vX.Y.Z` tag (ADR-0007). A `next` branch is used only where the table assigns it
-  (`zsh-lint`, for its Go reboot); the default is trunk-on-`main`.
+  `vX.Y.Z` tag (ADR-0007). Default is trunk-on-`main`; `next` is used only where the
+  table assigns it (`zsh-lint`, for its Go reboot).
 - **Class 3 (git-consumed):** `main` is always the consumable ref. High-churn repos
   use `next` → `main` (`zi`, `zsh-eza`); low-churn plugins are trunk-on-`main`.
 - **Class 4 (meta):** trunk on `main`; no `next`.
 - **Branch naming (all classes):** `feature-<id>`, `bug-<id>`, `hotfix-<id>`.
   Hotfixes branch from `main`; other work branches from the repo's development
-  branch (the "Development branch" column). For trunk repos, feature branches
-  also start from `main`.
+  branch (the "Development branch" column). For trunk repos, feature branches also
+  start from `main`.
 
-`workspace/repos.yml` mirrors this table and must match it. A repo's branch model
-is not changed by creating a branch — it is changed by amending this ADR (or a
-superseding ADR) and updating the catalog in the same change.
+`workspace/repos.yml` mirrors this table and must match it. Adding or removing a
+repo's `next` branch is a decision recorded here first, then reflected in the
+catalog in the same change.
 
 ## Consequences
 
