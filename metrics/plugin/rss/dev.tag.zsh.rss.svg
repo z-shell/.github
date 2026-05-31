@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">I wrapped Claude Code in a zsh function. Here's every decision I almost got wrong.</div>
-                                <div class="date">25 May 2026</div>
+                                <div class="title">I Quit .bashrc.</div>
+                                <div class="date">30 May 2026</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">The git commands I actually run every day</div>
-                                <div class="date">20 May 2026</div>
+                                <div class="title">I wrapped Claude Code in a zsh function. Here's every decision I almost got wrong.</div>
+                                <div class="date">25 May 2026</div>
                             </div>
                         </div>
                     </section>
