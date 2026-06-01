@@ -15,7 +15,6 @@ Observed in:
 - `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
 - `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
 - `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
-- `repos/tools/zsh-lint/zsh-lint.plugin.zsh`
 
 Pattern:
 
@@ -58,7 +57,6 @@ Observed in:
 
 - `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
 - `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
-- `repos/tools/zsh-lint/zsh-lint.plugin.zsh`
 - `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
 
 Pattern:
