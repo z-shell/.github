@@ -11,15 +11,16 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   metrics-activity:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: write
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     env:
       projects_svg: metrics/plugin/projects/projects.svg
       org-people_svg: metrics/plugin/people/org-people.svg

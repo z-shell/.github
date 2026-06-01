@@ -11,6 +11,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   metrics:
     runs-on: ubuntu-latest
@@ -18,9 +22,6 @@ jobs:
     environment: metrics
     permissions:
       contents: write
-    concurrency:
-      group: ci-${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     env:
       metrics_svg: metrics/plugin/metrics.svg
       repositories_metrics_svg: metrics/plugin/repositories_metrics.svg

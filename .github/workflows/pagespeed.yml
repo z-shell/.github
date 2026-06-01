@@ -10,15 +10,16 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pagespeed:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     timeout-minutes: 30
-    concurrency:
-      group: pagespeed-${{ github.ref }}
-      cancel-in-progress: true
     env:
       pagespeed_svg: metrics/plugin/pagespeed/detailed.svg
       pagespeed_url: ${{ secrets.PAGESPEED_TEST_URL }}
