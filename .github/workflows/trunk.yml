@@ -126,7 +126,7 @@ permissions:
 jobs:
   trunk:
     name: Trunk Code Quality
-    runs-on: ${{ inputs.runs-on }}
+    runs-on: ${{ inputs['runs-on'] }}
     permissions:
       actions: read
       checks: write
