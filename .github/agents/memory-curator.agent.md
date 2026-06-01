@@ -21,6 +21,23 @@ You manage two storage tiers:
 - Do not create new memory files inside `repos/org/z-shell-dot-github/memory/` — that directory was removed; write to the meta-workspace `memory/` only.
 - After editing any local memory file (except `user-profile.md`), always sync it to the Gist.
 
+## Content Guidelines (What to Memorize)
+Memory must be extremely high-signal, compact, and durable.
+
+- **DO SAVE:**
+  - **Organizational Heuristics:** Hard rules about file placement, AI usage, or repo boundaries (e.g., "Never use zdharma-continuum").
+  - **Architectural Decisions:** Crucial setups that span the workspace (e.g., "Secrets are loaded via env.secrets.sh chmod 600").
+  - **Cross-Repo Conventions:** Preferred frameworks, mandatory linting rules, or standardized paths.
+  - **User Feedback & Corrections:** Explicit negative feedback ("Don't do X again") or preferences.
+
+- **DO NOT SAVE (Transient Data):**
+  - Task progress, completed-work logs, or session outcomes.
+  - Specific PR numbers, issue numbers, or commit SHAs (unless documenting a permanently closed historical chapter).
+  - Temporary TODO state or next steps for a project.
+  - Artifacts that will be stale in a week.
+
+*If an insight is procedural (a sequence of commands to accomplish a task), it belongs in a shared script or skill, not memory. Keep memory declarative.*
+
 ## Approach
 
 ### Saving a new insight

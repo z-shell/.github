@@ -1,0 +1,69 @@
+# Runbook — Deprecation and Sunset
+
+How to retire a plugin, annex, package, or other artifact without breaking the
+users and tooling that depend on it.
+
+**Hard rule:** never delete a published artifact or break an install path
+silently. Announce, provide a migration, then archive — in that order.
+
+## When to use this
+
+Use this when an artifact is no longer maintained or has been superseded:
+
+- a plugin/annex replaced by another or folded into core
+- a package no longer published
+- a repo that should become read-only
+
+Do not use this for routine workflow-hygiene cleanup (removing a stale CI
+workflow) — that is ordinary maintenance, kept separate from release semantics.
+
+## Step 1 — Decide and record
+
+1. Confirm the artifact's class (ADR-0007) and what consumes it.
+2. File a tracker issue describing the deprecation, the replacement (if any), and
+   the migration path. If the decision is non-obvious or cross-repo, draft an ADR
+   (`runbooks/adr.md`).
+3. Identify every install path: `zi` ice, meta-plugin labels
+   (`z-a-meta-plugins`), wiki references, and the catalog `workspace/repos.yml`.
+
+## Step 2 — Announce
+
+- Add a deprecation notice to the repo README and the wiki page, stating the
+  status, the replacement, and the timeline.
+- Where the artifact loads, prefer a non-fatal warning over a hard break.
+- Label the tracker issue and link the announcement.
+
+## Step 3 — Provide a migration
+
+- Document the replacement and the exact steps to switch (new label, new repo,
+  new ice).
+- Keep the old install path working through a transition window; do not remove it
+  the same day you announce.
+- For git-consumed artifacts (class 3), the consumable ref must keep resolving
+  until the window closes.
+
+## Step 4 — Sunset
+
+After the transition window:
+
+- For a versioned artifact (class 2), cut a final tagged release noting end of
+  support; do not yank prior tags.
+- Remove the artifact from meta-plugin maps, wiki ecosystem listings, and
+  `workspace/repos.yml` (or mark it archived there).
+- Archive the repo (read-only) rather than deleting it, so existing references
+  and history remain resolvable.
+- Close the tracker issue with the final state and links.
+
+## Anti-patterns
+
+- deleting a repo or yanking published tags, breaking existing installs
+- removing an artifact from catalogs while it is still referenced elsewhere
+- announcing and removing in the same change with no transition window
+- mixing deprecation with unrelated release automation work
+
+## See also
+
+- `decisions/0007-release-publication-flow.md`
+- `decisions/0008-branching-model.md`
+- `runbooks/release.md`
+- `runbooks/triage.md`

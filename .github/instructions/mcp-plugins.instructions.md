@@ -1,5 +1,5 @@
 ---
-description: "When and how to use the project MCP plugins (Context7, Cloudflare, Greptile) and Claude Code toolkits (pr-review-toolkit, hookify, security-guidance) across the Z-Shell workspace."
+description: "When and how to use the project MCP plugins (Context7, Cloudflare, Greptile) and CLI Agent toolkits (pr-review-toolkit, hookify, security-guidance) across the Z-Shell workspace."
 applyTo: "**"
 ---
 
@@ -44,9 +44,9 @@ maintainer workspace. Prefer these over guesswork or generic web search.
 - **When NOT to use:** single-file lookups where local grep or Read is faster.
 - **Auth required:** yes (OAuth). Read-only.
 
-## Claude Code toolkits
+## CLI Agent toolkits
 
 - **pr-review-toolkit:** reviewer, silent-failure, type-design, test, and
   comment subagents. Run on a diff before requesting human review.
-- **hookify:** generate Claude Code hooks from recurring conversation mistakes.
+- **hookify:** generate CLI hooks/heuristics from recurring conversation mistakes.
 - **security-guidance:** security review of pending changes before merge.

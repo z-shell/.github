@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Zsh
-        uses: z-shell/.github/actions/setup-zsh@main
+        uses: z-shell/.github/actions/setup-zsh@48e314c59d04b54ae7f05d57570845f1a11a286a # main
         with:
           version: ${{ inputs.zsh-version }}
 
