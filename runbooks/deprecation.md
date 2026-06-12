@@ -14,16 +14,26 @@ Use this when an artifact is no longer maintained or has been superseded:
 - a package no longer published
 - a repo that should become read-only
 
+Quiet repositories are not abandoned by default. Low issue volume, few commits,
+or a stable done state are signals to review maintainer intent, consumer usage,
+and replacement availability; they are not enough on their own to deprecate or
+archive a project.
+
 Do not use this for routine workflow-hygiene cleanup (removing a stale CI
 workflow) — that is ordinary maintenance, kept separate from release semantics.
 
 ## Step 1 — Decide and record
 
-1. Confirm the artifact's class (ADR-0007) and what consumes it.
-2. File a tracker issue describing the deprecation, the replacement (if any), and
+1. Confirm the artifact's class (ADR-0007), what consumes it, and whether it is
+   intentionally stable, actively replaced, or genuinely unmaintained. Use issue
+   activity as context, not as the decision.
+2. Identify maintainer intent and replacement availability. If maintainers intend
+   the project to remain stable, record that state instead of starting the
+   sunset process.
+3. File a tracker issue describing the deprecation, the replacement (if any), and
    the migration path. If the decision is non-obvious or cross-repo, draft an ADR
    (`runbooks/adr.md`).
-3. Identify every install path: `zi` ice, meta-plugin labels
+4. Identify every install path: `zi` ice, meta-plugin labels
    (`z-a-meta-plugins`), wiki references, and the catalog `workspace/repos.yml`.
 
 ## Step 2 — Announce
