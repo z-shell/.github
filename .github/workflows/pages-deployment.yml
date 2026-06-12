@@ -26,16 +26,11 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
-      - name: Prepare deploy directory
-        run: |
-          rm -rf ./build
-          mkdir -p build
-          cp -R profile/. build/
       - name: "🚀 Publish"
         uses: cloudflare/pages-action@f0a1cd58cd66095dee69bfa18fa5efd1dde93bca # v1.5.0
         with:
           projectName: "zsh"
-          directory: "build"
+          directory: "profile"
           apiToken: ${{ secrets.CF_PAGES_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
