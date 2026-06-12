@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
       - name: "🏗  Prepare deploy directory"
         run: |
-          rm -rf build
+          rm -rf ./build
           mkdir -p build
           cp -R profile/. build/
       - name: "🚀 Publish"
