@@ -60,9 +60,3 @@ actions:
     - trunk-upgrade-available
     - trunk-cache-prune
     - trunk-announce
-    - sh-hook
-  definitions:
-    - id: sh-hook
-      triggers:
-        - git_hooks: [pre-push, pre-commit]
-      run: .github/hook.sh
