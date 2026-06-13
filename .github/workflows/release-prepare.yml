@@ -149,24 +149,39 @@ jobs:
           set -euo pipefail
           dir="${RUNNER_TEMP}/release-prepare"
           commits="${dir}/commits.md"
-          range=""
+          cap=200
+          revs="HEAD"
           if [ -n "$PREVIOUS_TAG" ]; then
-            range="${PREVIOUS_TAG}..HEAD"
+            revs="${PREVIOUS_TAG}..HEAD"
           fi
-          if [ -n "$range" ]; then
-            git log --no-merges --format='- %s (%h)' "$range" | head -n 200 > "$commits"
-          else
-            git log --no-merges --format='- %s (%h)' | head -n 200 > "$commits"
+          total="$(git rev-list --no-merges --count "$revs")"
+          truncated=""
+          if [ "$total" -gt "$cap" ]; then
+            truncated="(Note: list truncated to the ${cap} most recent of ${total} commits.)"
           fi
 
-          re_breaking='^- [A-Za-z]+(\([^)]*\))?!:'
+          # Tag commits whose footer declares a breaking change so they group
+          # consistently with the major-bump detection in the semver step.
+          : > "$commits"
+          git rev-list --no-merges --max-count="$cap" "$revs" | while read -r sha; do
+            line="$(git log -1 --no-merges --format='- %s (%h)' "$sha")"
+            if git log -1 --format='%B' "$sha" | grep -qE '^BREAKING[ -]CHANGE:' &&
+              ! printf '%s\n' "$line" | grep -qE '^- [A-Za-z]+(\([^)]*\))?!:'; then
+              line="${line} [breaking]"
+            fi
+            printf '%s\n' "$line" >> "$commits"
+          done
+
+          re_breaking='(^- [A-Za-z]+(\([^)]*\))?!:)|(\[breaking\]$)'
           re_feat='^- feat(\([^)]*\))?:'
           re_fix='^- (fix|perf)(\([^)]*\))?:'
           breaking="$(grep -E "$re_breaking" "$commits" || true)"
-          features="$(grep -E "$re_feat" "$commits" || true)"
-          fixes="$(grep -E "$re_fix" "$commits" || true)"
-          other="$(grep -vE "($re_breaking)|($re_feat)|($re_fix)" "$commits" || true)"
+          nonbreaking="$(grep -vE "$re_breaking" "$commits" || true)"
+          features="$(printf '%s\n' "$nonbreaking" | grep -E "$re_feat" || true)"
+          fixes="$(printf '%s\n' "$nonbreaking" | grep -E "$re_fix" || true)"
+          other="$(printf '%s\n' "$nonbreaking" | grep -vE "($re_feat)|($re_fix)" || true)"
           {
+            [ -n "$truncated" ] && printf '%s\n\n' "$truncated"
             [ -n "$breaking" ] && printf '### Breaking changes\n\n%s\n\n' "$breaking"
             [ -n "$features" ] && printf '### Features\n\n%s\n\n' "$features"
             [ -n "$fixes" ] && printf '### Fixes\n\n%s\n\n' "$fixes"
@@ -181,6 +196,12 @@ jobs:
               echo "Previous release: ${PREVIOUS_TAG}"
             else
               echo "Previous release: none (first release)"
+            fi
+            echo
+            echo "Commits suffixed with [breaking] declare a BREAKING CHANGE footer;"
+            echo "list them under '### Breaking changes'."
+            if [ -n "$truncated" ]; then
+              echo "${truncated} Mention in the notes that older commits are omitted."
             fi
             echo
             echo "Conventional commits to summarize:"
