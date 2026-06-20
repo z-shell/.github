@@ -1,7 +1,7 @@
 ---
 description: "Debug your application to find and fix a bug"
 name: "Debug Mode Instructions"
-tools: ["*"]
+tools: ["github/*", "context7/*", "greptile/*"]
 ---
 
 # Debug Mode Instructions

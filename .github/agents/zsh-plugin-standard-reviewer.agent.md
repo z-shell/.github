@@ -1,7 +1,7 @@
 ---
 name: zsh-plugin-standard-reviewer
 description: Use to audit a Zsh plugin file (or a whole plugin directory) against the Z-Shell Plugin Standard. Trigger when a .plugin.zsh / .zsh entry file is added or changed, or when the user asks to review a plugin for standard compliance. Read-only — reports findings, does not edit.
-tools: ["*"]
+tools: ["github/*", "pr-review-toolkit/*"]
 model: sonnet
 ---
 
