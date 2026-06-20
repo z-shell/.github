@@ -80,6 +80,57 @@ Repositories that should stay out of the first pilot:
 - `.github`
 - `zi`
 
+## Release preparation automation (class 2)
+
+The reusable workflow
+[`release-prepare.yml`](../.github/workflows/release-prepare.yml) automates the
+_preparation_ half of the class-2 flow without moving the publication boundary.
+On every push to the default branch it:
+
+1. computes the next semantic version from Conventional Commits since the last
+   `vX.Y.Z` tag (`feat` → minor, `fix`/`perf` → patch, `!`/`BREAKING CHANGE` →
+   major; no releasable commits → clean no-op)
+2. drafts a changelog with GitHub Models (`actions/ai-inference`), degrading to
+   a grouped commit list when inference is unavailable
+3. opens or updates a single `release-proposal` issue containing the draft
+   notes and the exact annotated-tag commands
+
+The maintainer-pushed annotated tag remains the only publication act, and the
+repository's tag-driven `release.yml` (zunit pattern) still does the
+publishing, so ADR 0007 is unchanged.
+
+Caller snippet for a class-2 repository:
+
+```yaml
+---
+name: Release Prepare
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+  models: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    uses: z-shell/.github/.github/workflows/release-prepare.yml@main
+```
+
+Notes:
+
+- Callers own `concurrency`; the reusable workflow does not set it.
+- `models: read` enables the GitHub Models changelog draft; without it the
+  workflow still opens the proposal with the fallback commit list.
+- Do **not** add this to class-1, class-3, or class-4 repositories — they have
+  no tag boundary to prepare for.
+
 ## Release-automation decision checklist
 
 Before proposing `release-please` for a repository, confirm:
