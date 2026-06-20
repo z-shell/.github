@@ -99,21 +99,21 @@ Do not promise delivery dates.
 
 ## Step 5 — Decide whether it belongs on the tracker
 
-Add the work to the Z-Shell Tracker when it:
+Add the work to Linear when it:
 
 - crosses repositories
 - blocks a release
 - has security impact
 - has strategic or roadmap significance
 
-Apply `meta:org-tracked` to issues that should appear on the org-wide tracker. Do not apply it to ordinary single-repository bugs, questions, or cleanup tasks. See `runbooks/project-tracker.md` for auto-add setup and verification.
+Linear's native GitHub integration will automatically ingest tracking issues based on configuration. Do not apply broad sync to ordinary single-repository bugs, questions, or cleanup tasks. See `runbooks/project-tracker.md`.
 
-When the project fields exist, populate:
+In Linear, populate:
 
-- `Impact`: `low`, `medium`, or `high`
-- `Effort`: `XS`, `S`, `M`, or `L`
-- `Strategic value`: one short sentence explaining why the item matters beyond the source issue
-- `Status`: `Triage`, `Ready`, `In Progress`, `In Review`, or `Done`
+- `Priority`: `Low`, `Medium`, or `High`
+- `Estimate`: e.g. `1`, `2`, `3`
+- `Project`: Assign to relevant strategic project
+- `Status`: `Triage`, `Todo`, `In Progress`, `In Review`, or `Done`
 
 ## Step 6 — Close with an explicit reason
 

@@ -1,14 +1,11 @@
 # Runbook — Project tracker
 
-Use this runbook for the organization-wide Z-Shell Tracker.
+Use this runbook for the organization-wide task tracking in Linear.
 
 ## Tracker identity
 
-- Project: `z-shell — Org-wide`
-- URL: `https://github.com/orgs/z-shell/projects/28`
-- Owner: `z-shell`
-- Project number: `28`
-- Auto-add label: `meta:org-tracked`
+- Workspace: `ss-o`
+- URL: `https://linear.app/ss-o/`
 
 ## What belongs on the tracker
 
@@ -22,83 +19,24 @@ Track issues that need cross-repository or maintainer-level attention:
 
 Do not add ordinary single-repository bugs, support questions, or small cleanup tasks just because they are actionable.
 
-## Auto-add paths
+## Syncing with GitHub
 
-There are two supported auto-add paths.
+Linear natively integrates with GitHub issues and pull requests.
+We rely on Linear's built-in GitHub integration rather than maintaining custom GitHub Actions workflows.
 
-### Preferred: Project v2 built-in workflow
-
-In the GitHub Project UI, enable the Project workflow that auto-adds issues with this filter:
-
-```text
-is:issue label:meta:org-tracked
-```
-
-GitHub's public GraphQL API currently exposes Project v2 workflow names and enabled state, but not the auto-add filter configuration. Verify the filter in the Project UI when auditing this setup.
-
-### Repository workflow fallback
-
-This repository provides `.github/workflows/project-tracker.yml`.
-
-It:
-
-- runs directly for issues in `z-shell/.github`
-- can be reused by other repositories through the Project Tracker workflow template
-- adds issues labelled `meta:org-tracked` to Project 28 with `gh project item-add`
-
-For organization-wide reliability, configure an organization or repository secret named `Z_SHELL_PROJECT_TOKEN` with permission to write to the organization Project v2 board. The workflow falls back to `github.token`, but that token may not have organization-project write access in every repository.
-
-## Installing in another repository
-
-Use the Project Tracker starter workflow from **Actions > New workflow**, or add this caller workflow:
-
-```yaml
----
-name: Project Tracker
-
-on:
-  issues:
-    types: [opened, labeled, reopened]
-
-permissions:
-  contents: read
-  issues: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.issue.node_id }}
-  cancel-in-progress: true
-
-jobs:
-  add-tracked-issue:
-    if: contains(github.event.issue.labels.*.name, 'meta:org-tracked')
-    uses: z-shell/.github/.github/workflows/project-tracker.yml@main
-    with:
-      issue_url: ${{ github.event.issue.html_url }}
-    secrets: inherit
-```
+1. Create or choose a test issue in the repository.
+2. Because of the native integration, any issue matching the configured criteria in Linear will automatically be ingested.
+3. You can manage and prioritize the issue directly from Linear.
 
 ## Verification
 
-To verify auto-add behavior:
+If an issue does not sync to Linear:
 
-1. Create or choose a test issue in the repository.
-2. Apply `meta:org-tracked`.
-3. Wait for either the Project built-in workflow or the repository workflow to run.
-4. Confirm the issue appears on Project 28:
-
-```sh
-gh issue view <issue-number> --repo z-shell/<repo> --json projectItems
-```
-
-If the issue does not appear, add it manually and investigate the project workflow or token:
-
-```sh
-gh project item-add 28 --owner z-shell --url https://github.com/z-shell/<repo>/issues/<issue-number>
-```
+1. Verify the Linear GitHub integration settings are active for the specific repository.
+2. Ensure you have not hit rate limits or permission boundaries.
+3. Contact an organization admin if the repository needs to be manually added to the integration.
 
 ## See also
 
-- `.github/workflows/project-tracker.yml`
-- `workflow-templates/project-tracker.yml`
+- `AGENTS.md`
 - `runbooks/triage.md`
-- `.github/lib/labels.yml`

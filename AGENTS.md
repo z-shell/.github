@@ -27,7 +27,7 @@ Use the right home for each kind of knowledge:
 
 | Kind of information                | Source of truth                                       |
 | ---------------------------------- | ----------------------------------------------------- |
-| Active work, blockers, next steps  | GitHub issues, pull requests, and the Z-Shell Tracker |
+| Active work, blockers, next steps  | GitHub issues, pull requests, and Linear |
 | Private organizational heuristics  | `memory/` folder in the root meta-workspace           |
 | Durable architectural decisions    | `decisions/` in this repo                             |
 | Cross-repo operational procedures  | `runbooks/` in this repo                              |
@@ -87,7 +87,7 @@ Short version:
 - Classify issues by work type, area, and severity.
 - Use the canonical labels from `.github/lib/labels.yml`.
 - Search for prior art across the org before responding.
-- Put cross-repo, release-blocking, security, or strategic work on the Z-Shell Tracker.
+- Put cross-repo, release-blocking, security, or strategic work on Linear.
 
 ## Draft-only workflows
 

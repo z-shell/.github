@@ -19,7 +19,7 @@ Before touching anything, read, in order:
 
 ## Step 2 — Understand the source of truth
 
-- Active progress lives in **GitHub issues, PRs, and the Z-Shell Tracker** — not
+- Active progress lives in **GitHub issues, PRs, and Linear** — not
   in local notes or agent memory.
 - `.gitmodules` is the Git-native source of truth for child-repo paths/remotes;
   the meta-workspace `workspace/repos.yml` is the human/LLM-readable catalog.
