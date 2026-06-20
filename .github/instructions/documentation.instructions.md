@@ -43,6 +43,17 @@ Maintainer/operational guides are **not** end-user docs — do not place them un
 - Never commit secret values or stale secret-key names in docs; reference the
   current canonical names only.
 
+## Zsh plugin READMEs
+
+Use [`templates/readme/zsh-plugin.md`](../../templates/readme/zsh-plugin.md)
+when creating a Zsh plugin repository or substantially restructuring its
+README. Focused corrections do not require an unrelated full rewrite.
+
+The template standardizes required information and visual hierarchy, not
+identical prose or artwork. Zi remains the first installation path. Include a
+screenshot or short demo only when it materially explains behavior, and keep
+long-form ecosystem guidance in the wiki.
+
 ## LLM/agent files
 
 Per the workspace LLM file-placement policy, keep generic agent instructions
