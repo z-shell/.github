@@ -1,4 +1,5 @@
-# Zsh Plugin README Template
+<!--
+Zsh Plugin README Template
 
 Use this template for new Z-Shell Zsh plugins and substantial README
 refactors. Replace every angle-bracketed field and remove instructional
@@ -9,6 +10,7 @@ sections should be included only when they help users understand or operate the
 plugin.
 
 ---
+-->
 
 <!-- markdownlint-disable MD033 -->
 
@@ -16,7 +18,7 @@ plugin.
   <a href="https://github.com/z-shell/<repository>">
     <img
       src="https://raw.githubusercontent.com/z-shell/zi/main/docs/images/logo.svg"
-      alt="<Plugin name> logo"
+      alt="Z-Shell logo"
       width="72"
       height="72"
     />
@@ -49,9 +51,10 @@ plugin.
 <!-- Optional: include a screenshot or short demo only when it makes behavior
 materially easier to understand. Use a repository-owned asset, useful alt text,
 and restrained dimensions. Until Linear ZSH-18 lands, generated visuals are not
-available and the asset must be reviewed manually when output changes. -->
+available and the asset must be reviewed manually when output changes.
 
-![<What the visual demonstrates>](repository-owned-asset-path)
+![<Screenshot alt text describing the visible behavior>](<repository-owned-asset-path>)
+-->
 
 ## Requirements
 
@@ -73,7 +76,8 @@ plugin capability, not merely an alternative spelling of the basic load. -->
 ### Other plugin managers
 
 <List only intentionally supported or verified loading methods. Keep this
-section compact and do not compare competing projects' feature sets.>
+section compact and do not compare competing projects' feature sets. Remove
+this subsection entirely when no additional manager has verified support.>
 
 ## Configuration
 
