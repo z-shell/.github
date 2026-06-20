@@ -1,7 +1,7 @@
 ---
 name: workflow-conventions-auditor
 description: Use to audit GitHub Actions workflow files (.github/workflows/*.yml) against the Z-Shell workflow conventions in AGENTS.md. Trigger when a workflow file is added or changed, or when the user asks to review CI workflows. Read-only — reports findings, does not edit.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: ["*"]
 model: sonnet
 ---
 
