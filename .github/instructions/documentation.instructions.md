@@ -25,7 +25,7 @@ The wiki has three independent content roots. Place content by audience and
 purpose, not by topic:
 
 - **`docs/`** — Zi **end-user** documentation: getting started, usage, guides for
-  people *using* the tools.
+  people _using_ the tools.
 - **`community/`** — community-facing material: standards, contribution norms,
   ecosystem-wide conventions.
 - **`ecosystem/`** — ecosystem catalog: plugins, annexes, and related projects.
