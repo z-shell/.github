@@ -1,7 +1,6 @@
 ---
 description: "Perform janitorial tasks on any codebase including cleanup, simplification, and tech debt remediation."
 name: "Universal Janitor"
-tools: ["github/*", "context7/*", "greptile/*", "pr-review-toolkit/*", "hookify/*", "security-guidance/*"]
 ---
 
 # Universal Janitor
