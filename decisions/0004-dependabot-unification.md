@@ -4,7 +4,7 @@
 - **Date:** 2026-05-20
 - **Deciders:** ss-o, Gemini CLI
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** Proposed: `decisions/0012-hybrid-dependency-management.md`
 
 ## Context
 
