@@ -18,8 +18,8 @@ project-specific behavior.
 3. Add the clone to the private meta-workspace `.gitmodules` and
    `workspace/repos.yml`. Do not put local paths, credentials, or machine facts
    in the public repository.
-4. Apply canonical labels via `runbooks/labels.md` and verify project-tracker
-   enrollment via `runbooks/project-tracker.md`.
+4. Apply canonical labels via `runbooks/labels.md` and configure task tracking
+   through `runbooks/project-tracker.md`.
 
 ## Step 2 — Create the common repository envelope
 
@@ -97,8 +97,6 @@ Start from the organization workflow templates:
 
 - `workflow-templates/zsh-ci.yml` for Zsh syntax and smoke validation
 - `workflow-templates/trunk.yml` for Trunk Code Quality
-- `workflow-templates/project-tracker.yml` when repository issues must be
-  enrolled in the organization tracker
 
 Follow `PATTERNS.md`: pin action and reusable-workflow references to immutable
 commit SHAs with readable version or branch comments. Declare top-level
@@ -107,7 +105,19 @@ permissions and concurrency for push and pull-request workflows.
 Add release automation only when the release class requires it. Plugins and
 annexes consumed directly from Git usually need validation only.
 
-## Step 5 — Verify before publication
+## Step 5 — Configure dependency automation
+
+Follow `runbooks/dependency-management.md`:
+
+1. Grant the Renovate GitHub App access to the repository.
+2. Confirm Renovate discovers `z-shell/.github/renovate-config.json`.
+3. Enable the dependency graph, Dependabot alerts, and Dependabot security
+   updates in GitHub settings.
+4. Add `renovate.json` only for a repository-specific exception such as a
+   `next` target branch.
+5. Do not add `.github/dependabot.yml` for routine version updates.
+
+## Step 6 — Verify before publication
 
 Before opening the bootstrap pull request:
 
@@ -135,6 +145,7 @@ Reusable screenshot and terminal-demo generation is tracked separately in
 
 - `AGENTS.md`
 - `PATTERNS.md`
+- `runbooks/dependency-management.md`
 - `runbooks/labels.md`
 - `runbooks/project-tracker.md`
 - `runbooks/release.md`
