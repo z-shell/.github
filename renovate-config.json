@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Z-Shell organization preset for routine dependency version updates",
+  "extends": [
+    "config:best-practices",
+    ":semanticCommits"
+  ],
+  "timezone": "UTC",
+  "schedule": [
+    "* 0-4 * * 1"
+  ],
+  "minimumReleaseAge": "3 days",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Dependency Dashboard",
+  "labels": [
+    "type:maintenance",
+    "area:dependencies"
+  ],
+  "automerge": false,
+  "packageRules": [
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github actions"
+    },
+    {
+      "description": "Group non-major updates by package manager",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "groupName": "{{manager}} non-major updates",
+      "groupSlug": "{{manager}}-non-major"
+    }
+  ]
+}
