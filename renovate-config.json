@@ -8,6 +8,8 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Dependency Dashboard",
   "labels": ["type:maintenance", "area:dependencies"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
   "automerge": false,
   "packageRules": [
     {
@@ -17,10 +19,11 @@
       "groupSlug": "{{manager}}-non-major"
     },
     {
-      "description": "Group GitHub Actions updates",
+      "description": "Group non-major GitHub Actions updates",
       "matchManagers": ["github-actions"],
-      "groupName": "github actions",
-      "groupSlug": "github-actions"
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "github actions non-major updates",
+      "groupSlug": "github-actions-non-major"
     }
   ]
 }
