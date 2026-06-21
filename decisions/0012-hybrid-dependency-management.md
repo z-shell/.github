@@ -106,6 +106,7 @@ disabling the Dependabot version-update entry.
 
 ## References
 
+- [Issue #452 — Migrate repositories to hybrid Renovate ownership](https://github.com/z-shell/.github/issues/452)
 - `decisions/0004-dependabot-unification.md`
 - `runbooks/dependency-management.md`
 - `renovate-config.json`
