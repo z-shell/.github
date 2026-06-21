@@ -105,7 +105,7 @@ labels:
     description: Acknowledged but not planned for implementation.
   - name: meta:org-tracked
     color: '5319e7'
-    description: Auto-add this issue to the org-wide Z-Shell Tracker.
+    description: Indicates this issue has cross-repository tracking implications (synced to Linear).
 
   # External automation labels retained for compatibility.
   # These are not part of the triage taxonomy but appear in z-shell/.github
