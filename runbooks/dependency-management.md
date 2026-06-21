@@ -16,10 +16,9 @@ Do not configure both services to create routine version updates in the same
 repository. The split avoids duplicate pull requests, lock-file conflicts, and
 unnecessary CI runs.
 
-The governing proposal is
-`decisions/0012-hybrid-dependency-management.md`. Until that ADR is accepted on
-`main`, ADR 0004 remains the accepted policy and rollout changes should stay on
-their feature branch.
+The governing decision is `decisions/0012-hybrid-dependency-management.md`.
+ADR 0004 remains the live policy until the superseding ADR and its
+configuration reach `main`.
 
 ## Required GitHub security settings
 

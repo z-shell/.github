@@ -1,8 +1,8 @@
 # 12. Split Dependency Updates Between Renovate and Dependabot
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-06-21
-- **Deciders:** None until accepted
+- **Deciders:** ss-o
 - **Supersedes:** `decisions/0004-dependabot-unification.md`
 - **Superseded by:** None
 
