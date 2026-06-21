@@ -17,7 +17,7 @@
 
 ## About the `.github` Repository
 
-The `.github` repository is a [special GitHub repository](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file) that serves as the **organization-wide configuration hub**. Files placed here apply as defaults across all repositories in the [Z-Shell](https://github.com/z-shell) organization, without needing to duplicate them into every individual repository.
+The `.github` repository is a [special GitHub repository](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file) and the **organization-wide configuration hub**. GitHub inherits supported community health files and templates from here; reusable actions, workflow templates, Renovate policy, ADRs, and runbooks remain shared resources that repositories or maintainers reference explicitly.
 
 ### What Makes It Special
 
@@ -29,7 +29,7 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 | **Agent Memory Protocol**          | `.github/AGENT_MEMORY.md` defines the GitHub-native handoff workflow used to keep cross-LLM and cross-repository progress visible.                                                                                                        |
 | **Reusable Composite Actions**     | The `actions/` directory hosts [composite actions](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action) that any org repository can reference via `uses: z-shell/.github/actions/<name>@main`.                |
 | **Workflow Templates**             | The `workflow-templates/` directory provides [starter workflows](https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization) available in every org repository under **Actions > New workflow**. |
-| **Shared Dependency Config**       | `renovate-config.json` defines a shared [Renovate](https://docs.renovatebot.com/) preset that org repositories can extend for consistent automated dependency updates.                                                                    |
+| **Shared Dependency Config**       | `renovate-config.json` defines the shared [Renovate](https://docs.renovatebot.com/) preset for routine version updates; GitHub Dependabot retains alerts and security updates.                                                            |
 
 > **Note:** The `.github` repository must be **public** for default community health files to apply across the organization.
 
@@ -46,8 +46,7 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 | [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell) |
 | [`actions/`](../actions/)                         | Reusable composite GitHub Actions shared across all org repositories                                        |
 | [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                  |
-| [`metrics/`](../metrics/)                         | Auto-generated organization metrics and analytics                                                           |
-| [`renovate-config.json`](../renovate-config.json) | Shared Renovate bot preset for dependency updates                                                           |
+| [`renovate-config.json`](../renovate-config.json) | Shared Renovate preset for routine dependency version updates                                               |
 
 ### Community Health Files
 
@@ -92,20 +91,26 @@ steps:
 
 Starter workflows available in every org repository under **Actions > New workflow**:
 
-| Template        | Description                                            |
-| --------------- | ------------------------------------------------------ |
-| Trunk           | Trunk code-quality workflow                            |
-| Zsh CI          | Starter Zsh CI workflow                                |
-| Rclone Action   | File sync with rclone                                  |
-| Project Tracker | Adds `meta:org-tracked` issues to the org-wide tracker |
+| Template      | Description                 |
+| ------------- | --------------------------- |
+| Trunk         | Trunk code-quality workflow |
+| Zsh CI        | Starter Zsh CI workflow     |
+| Rclone Action | File sync with rclone       |
 
 Label definitions live in [`./lib/labels.yml`](lib/labels.yml) and should be applied through org maintenance scripts or API-driven automation, not via a generic starter workflow template.
 
-Tracker and project automation are documented in [`../runbooks/project-tracker.md`](../runbooks/project-tracker.md). Project 28 is the org-wide tracker, and issues labelled `meta:org-tracked` should be added there automatically by either the Project v2 built-in workflow or the repository workflow fallback.
+Task tracking is documented in [`../runbooks/project-tracker.md`](../runbooks/project-tracker.md).
 
-## Renovate
+## Dependency Management
 
-Shared [Renovate](https://docs.renovatebot.com/) preset for automated dependency updates. Reference from any org repository:
+Z-Shell separates routine maintenance from security remediation:
+
+- [Renovate](https://docs.renovatebot.com/) owns routine dependency version updates.
+- GitHub Dependabot owns dependency graph alerts and security update pull requests.
+
+Repositories must not configure both bots for routine version updates. Renovate
+discovers the shared organization preset automatically during onboarding, or a
+repository can reference it explicitly:
 
 ```json
 {
@@ -113,6 +118,9 @@ Shared [Renovate](https://docs.renovatebot.com/) preset for automated dependency
   "extends": ["local>z-shell/.github:renovate-config"]
 }
 ```
+
+See [`../runbooks/dependency-management.md`](../runbooks/dependency-management.md)
+for onboarding, validation, migration, and rollback.
 
 ---
 
@@ -123,17 +131,18 @@ This repository is the right place for any **organization-level** configuration:
 - **Adding a new default issue/PR template** — add it to `.github/ISSUE_TEMPLATE/`
 - **Updating agent instructions, ADRs, runbooks, or patterns** — edit `AGENTS.md`, `decisions/`, `runbooks/`, or `PATTERNS.md`
 - **Defining weekly review, ADR, or release coordination workflows** — add or update the relevant file under `runbooks/`
-- **Recording cross-agent progress** — follow `.github/AGENT_MEMORY.md` and keep active state in issues, PRs, and the Z-Shell Tracker
-- **Configuring tracker auto-add** — follow `../runbooks/project-tracker.md`
+- **Recording cross-agent progress** — follow `.github/AGENT_MEMORY.md` and keep active state in issues, pull requests, and Linear
+- **Managing organization task tracking** — follow `../runbooks/project-tracker.md`
 - **Updating the shared label set** — edit `.github/lib/labels.yml` and roll it out via the org's maintenance automation
 - **Cleaning legacy labels** — follow `../runbooks/labels.md` before deleting labels from live repositories
 - **Creating a reusable CI action** — add a composite action under `actions/<name>/action.yml`
 - **Providing a starter workflow** — add `.yml` + `.properties.json` to `workflow-templates/`
 - **Updating the organization profile** — edit `profile/README.md` or add assets to `profile/img/`
 - **Changing contribution or security policies** — edit the corresponding file in `.github/`
-- **Updating shared Renovate config** — edit `renovate-config.json`
+- **Updating dependency automation** — edit `renovate-config.json` and follow `../runbooks/dependency-management.md`
 
-For repository-specific overrides, add the same file to that repository directly — it will take precedence over the defaults from here.
+For a repository-specific Renovate exception, add a minimal `renovate.json` that
+extends the organization preset and contains only the required override.
 
 ## Links
 

@@ -25,15 +25,15 @@ The broad shapes are:
 
 Use the right home for each kind of knowledge:
 
-| Kind of information                | Source of truth                                       |
-| ---------------------------------- | ----------------------------------------------------- |
-| Active work, blockers, next steps  | GitHub issues, pull requests, and Linear |
-| Private organizational heuristics  | `memory/` folder in the root meta-workspace           |
-| Durable architectural decisions    | `decisions/` in this repo                             |
-| Cross-repo operational procedures  | `runbooks/` in this repo                              |
-| Reusable implementation idioms     | `PATTERNS.md` in this repo                            |
-| Long-form user and maintainer docs | `wiki/` where practical                               |
-| Local LLM memory                   | Optional cache only, never the only record            |
+| Kind of information                | Source of truth                             |
+| ---------------------------------- | ------------------------------------------- |
+| Active work, blockers, next steps  | GitHub issues, pull requests, and Linear    |
+| Private organizational heuristics  | `memory/` folder in the root meta-workspace |
+| Durable architectural decisions    | `decisions/` in this repo                   |
+| Cross-repo operational procedures  | `runbooks/` in this repo                    |
+| Reusable implementation idioms     | `PATTERNS.md` in this repo                  |
+| Long-form user and maintainer docs | `wiki/` where practical                     |
+| Local LLM memory                   | Optional cache only, never the only record  |
 
 For handoffs, follow `.github/AGENT_MEMORY.md`.
 
@@ -54,6 +54,7 @@ When working in z-shell repositories, optimize for:
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
 - **Documentation placement:** keep long-form docs in the wiki when practical; keep repo-local docs focused on policy, workflow, and source-adjacent guidance.
 - **Workflow files:** follow the org workflow conventions and keep permissions explicit, actions pinned, and concurrency defined.
+- **Dependency updates:** Renovate owns routine version updates; GitHub Dependabot owns vulnerability alerts and security updates. See `runbooks/dependency-management.md`.
 
 ## Before editing
 
@@ -96,6 +97,7 @@ For recurring organization workflows, prefer the runbooks and keep the first pas
 - weekly org review: `runbooks/org-review.md`
 - issue and PR triage: `runbooks/triage.md`
 - label maintenance: `runbooks/labels.md`
+- dependency management: `runbooks/dependency-management.md`
 - project tracker automation: `runbooks/project-tracker.md`
 - new-repository bootstrap: `runbooks/new-repository.md`
 - ADR drafting: `runbooks/adr.md`
@@ -139,6 +141,7 @@ Do not silently work around drift. Open or update an issue in `z-shell/.github`,
 - `decisions/`
 - `runbooks/org-review.md`
 - `runbooks/adr.md`
+- `runbooks/dependency-management.md`
 - `runbooks/labels.md`
 - `runbooks/new-repository.md`
 - `runbooks/project-tracker.md`
