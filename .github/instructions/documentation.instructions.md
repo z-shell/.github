@@ -25,7 +25,7 @@ The wiki has three independent content roots. Place content by audience and
 purpose, not by topic:
 
 - **`docs/`** — Zi **end-user** documentation: getting started, usage, guides for
-  people *using* the tools.
+  people _using_ the tools.
 - **`community/`** — community-facing material: standards, contribution norms,
   ecosystem-wide conventions.
 - **`ecosystem/`** — ecosystem catalog: plugins, annexes, and related projects.
@@ -42,6 +42,17 @@ Maintainer/operational guides are **not** end-user docs — do not place them un
   stale secret-key naming. Verify the moved copy matches current code/config.
 - Never commit secret values or stale secret-key names in docs; reference the
   current canonical names only.
+
+## Zsh plugin READMEs
+
+Use [`templates/readme/zsh-plugin.md`](../../templates/readme/zsh-plugin.md)
+when creating a Zsh plugin repository or substantially restructuring its
+README. Focused corrections do not require an unrelated full rewrite.
+
+The template standardizes required information and visual hierarchy, not
+identical prose or artwork. Zi remains the first installation path. Include a
+screenshot or short demo only when it materially explains behavior, and keep
+long-form ecosystem guidance in the wiki.
 
 ## LLM/agent files
 

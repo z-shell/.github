@@ -34,9 +34,13 @@ README.md
   workflows/
 ```
 
-Use the organization-approved license for the artifact. The initial `README.md`
-must state the purpose, install path, supported shell/runtime, verification
-command, release model, and wiki link.
+Use the organization-approved license for the artifact. For a Zsh plugin,
+start from [`templates/readme/zsh-plugin.md`](../templates/readme/zsh-plugin.md).
+The initial README must state the purpose, features, install path, supported
+shell/runtime, public configuration, lifecycle behavior, verification command,
+release model, and wiki link. Preserve the template's accessible visual
+hierarchy, but replace its placeholders and omit optional sections that do not
+serve the plugin.
 
 Do not copy generic `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/agents/`, or
 `.github/instructions/` files into child repositories. Link to the organization
@@ -116,12 +120,16 @@ Before opening the bootstrap pull request:
 6. Link the tracker issue and leave an `Agent handoff` comment for deferred
    template or release work.
 
-## Deferred template assets
+## Deferred scaffold assets
 
-Keep this runbook as the source of truth until repeated bootstrap work proves a
-stable scaffold. Create dedicated template repositories only through separate
-tracked issues; do not grow this public meta-repository into a generated source
-tree prematurely.
+The organization maintains focused templates such as
+`templates/readme/zsh-plugin.md`, but does not maintain a generated repository
+source tree. Create dedicated template repositories only through separate
+tracked issues after repeated bootstrap work proves a stable full-repository
+scaffold.
+
+Reusable screenshot and terminal-demo generation is tracked separately in
+[Linear ZSH-18](https://linear.app/ss-o/issue/ZSH-18/automate-readme-screenshots-and-terminal-demos-for-zsh-plugins).
 
 ## See also
 
