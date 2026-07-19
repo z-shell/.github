@@ -102,13 +102,21 @@ func validateAltText(value string) error {
 	if len(value) > limits.V1().AltTextBytes {
 		return invalidManifest(errors.New("alt text exceeds byte limit"))
 	}
-	if !utf8.ValidString(value) || strings.TrimSpace(value) == "" {
-		return invalidManifest(errors.New("alt text must be non-empty plain UTF-8 text"))
+	if !utf8.ValidString(value) {
+		return invalidManifest(errors.New("alt text must be valid UTF-8"))
 	}
+	hasContent := false
 	for _, character := range value {
 		if unicode.IsControl(character) || character == '\u2028' || character == '\u2029' {
 			return invalidManifest(errors.New("alt text must be a single line without control characters"))
 		}
+		if !unicode.IsSpace(character) &&
+			!unicode.In(character, unicode.Zs, unicode.Zl, unicode.Zp, unicode.Cf) {
+			hasContent = true
+		}
+	}
+	if !hasContent {
+		return invalidManifest(errors.New("alt text must contain visible content"))
 	}
 	return nil
 }

@@ -61,6 +61,9 @@ func Decode(r io.Reader, maxBytes int64) (Manifest, error) {
 	if err := preflightYAML(&document, contractLimits); err != nil {
 		return Manifest{}, invalidManifest(err)
 	}
+	if err := validateManifestNodeShape(&document); err != nil {
+		return Manifest{}, invalidManifest(err)
+	}
 
 	typed := yaml.NewDecoder(bytes.NewReader(data))
 	typed.KnownFields(true)
@@ -171,6 +174,9 @@ func inspectYAMLNode(node *yaml.Node, depth int, nodes *int, bounds limits.Limit
 			if key.Kind != yaml.ScalarNode {
 				return errors.New("YAML mapping keys must be scalars")
 			}
+			if key.ShortTag() != "!!str" {
+				return errors.New("manifest mapping keys must be strings")
+			}
 			fingerprint := key.ShortTag() + "\x00" + key.Value
 			if _, exists := keys[fingerprint]; exists {
 				return errors.New("duplicate YAML mapping key")
@@ -182,6 +188,72 @@ func inspectYAMLNode(node *yaml.Node, depth int, nodes *int, bounds limits.Limit
 		if err := inspectYAMLNode(child, depth, nodes, bounds); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func validateManifestNodeShape(document *yaml.Node) error {
+	if document.Kind != yaml.DocumentNode || len(document.Content) != 1 {
+		return errors.New("manifest must contain one YAML document node")
+	}
+	root := document.Content[0]
+	if err := requireMappingNode(root, "manifest root"); err != nil {
+		return err
+	}
+	for index := 0; index < len(root.Content); index += 2 {
+		key, value := root.Content[index], root.Content[index+1]
+		switch key.Value {
+		case "version":
+			if err := requireScalarTag(value, "!!int", "version"); err != nil {
+				return err
+			}
+		case "scenario", "fixtures":
+			if err := requireScalarTag(value, "!!str", key.Value); err != nil {
+				return err
+			}
+		case "outputs":
+			if err := validateStringMapping(value, "outputs", "gif", "png"); err != nil {
+				return err
+			}
+		case "readme":
+			if err := validateStringMapping(value, "readme", "path", "alt"); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func validateStringMapping(node *yaml.Node, name string, stringFields ...string) error {
+	if err := requireMappingNode(node, name); err != nil {
+		return err
+	}
+	wanted := make(map[string]struct{}, len(stringFields))
+	for _, field := range stringFields {
+		wanted[field] = struct{}{}
+	}
+	for index := 0; index < len(node.Content); index += 2 {
+		key, value := node.Content[index], node.Content[index+1]
+		if _, ok := wanted[key.Value]; !ok {
+			continue
+		}
+		if err := requireScalarTag(value, "!!str", name+"."+key.Value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func requireMappingNode(node *yaml.Node, name string) error {
+	if node.Kind != yaml.MappingNode || node.ShortTag() != "!!map" {
+		return fmt.Errorf("%s must be a mapping", name)
+	}
+	return nil
+}
+
+func requireScalarTag(node *yaml.Node, tag, name string) error {
+	if node.Kind != yaml.ScalarNode || node.ShortTag() != tag {
+		return fmt.Errorf("%s must use YAML tag %s", name, tag)
 	}
 	return nil
 }

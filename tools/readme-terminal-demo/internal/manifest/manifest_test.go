@@ -171,6 +171,64 @@ func TestDecodeRejectsNestedAndWrongShapes(t *testing.T) {
 	}
 }
 
+func TestDecodeRejectsWrongManifestScalarTags(t *testing.T) {
+	t.Run("version", func(t *testing.T) {
+		tests := map[string]string{
+			"fractional":         "1.9",
+			"explicit float one": "!!float 1.0",
+		}
+		for name, replacement := range tests {
+			t.Run(name, func(t *testing.T) {
+				input := strings.Replace(validManifestYAML, "version: 1", "version: "+replacement, 1)
+				_, err := Decode(strings.NewReader(input), limits.V1().ManifestBytes)
+				requireManifestFailure(t, err, failure.InvalidContract)
+			})
+		}
+	})
+
+	fields := []struct {
+		name   string
+		line   string
+		prefix string
+	}{
+		{name: "scenario", line: "scenario: .github/demos/readme.tape", prefix: "scenario: "},
+		{name: "fixtures", line: "fixtures: .github/demos/fixtures", prefix: "fixtures: "},
+		{name: "outputs.gif", line: "  gif: docs/assets/readme-demo.gif", prefix: "  gif: "},
+		{name: "outputs.png", line: "  png: docs/assets/readme-demo.png", prefix: "  png: "},
+		{name: "readme.path", line: "  path: docs/README.md", prefix: "  path: "},
+		{name: "readme.alt", line: "  alt: Short description of the behavior shown in the terminal demo.", prefix: "  alt: "},
+	}
+	wrongValues := map[string]string{
+		"bool":   "true",
+		"number": "42",
+		"null":   "null",
+	}
+	for _, field := range fields {
+		for kind, replacement := range wrongValues {
+			t.Run(field.name+"/"+kind, func(t *testing.T) {
+				input := strings.Replace(validManifestYAML, field.line, field.prefix+replacement, 1)
+				_, err := Decode(strings.NewReader(input), limits.V1().ManifestBytes)
+				requireManifestFailure(t, err, failure.InvalidContract)
+			})
+		}
+	}
+
+	for name, input := range map[string]string{
+		"non-string root key": strings.Replace(validManifestYAML, "version: 1", "!!int 1: 1", 1),
+		"readme is not a mapping": strings.Replace(
+			validManifestYAML,
+			"readme:\n  path: docs/README.md\n  alt: Short description of the behavior shown in the terminal demo.",
+			"readme: true",
+			1,
+		),
+	} {
+		t.Run(name, func(t *testing.T) {
+			_, err := Decode(strings.NewReader(input), limits.V1().ManifestBytes)
+			requireManifestFailure(t, err, failure.InvalidContract)
+		})
+	}
+}
+
 func TestDecodeEnforcesExactByteBoundsAndV1Clamp(t *testing.T) {
 	if _, err := Decode(strings.NewReader(validManifestYAML), int64(len(validManifestYAML))); err != nil {
 		t.Fatalf("Decode(exact caller byte bound) error = %v", err)
@@ -333,6 +391,25 @@ func TestValidateRejectsEveryAltControlClass(t *testing.T) {
 			value.Readme.Alt = alt
 			requireManifestFailure(t, Validate(value), failure.InvalidContract)
 		})
+	}
+}
+
+func TestValidateRequiresVisibleAltContent(t *testing.T) {
+	for name, alt := range map[string]string{
+		"format only":      "\u200b",
+		"bidi format only": "\u202e",
+	} {
+		t.Run(name, func(t *testing.T) {
+			value := validManifest()
+			value.Readme.Alt = alt
+			requireManifestFailure(t, Validate(value), failure.InvalidContract)
+		})
+	}
+
+	value := validManifest()
+	value.Readme.Alt = "Visible\u200dtext"
+	if err := Validate(value); err != nil {
+		t.Fatalf("Validate(visible text with ZWJ) error = %v", err)
 	}
 }
 
@@ -580,13 +657,21 @@ func compileManifestSchema(t *testing.T) *jsonschema.Schema {
 			if len(text) > limits.V1().AltTextBytes {
 				return errors.New("alt text exceeds UTF-8 byte limit")
 			}
-			if !utf8.ValidString(text) || strings.TrimSpace(text) == "" {
-				return errors.New("alt text must be non-empty plain UTF-8 text")
+			if !utf8.ValidString(text) {
+				return errors.New("alt text must be valid UTF-8")
 			}
+			hasContent := false
 			for _, character := range text {
 				if unicode.IsControl(character) || character == '\u2028' || character == '\u2029' {
 					return errors.New("alt text must be one line without controls")
 				}
+				if !unicode.IsSpace(character) &&
+					!unicode.In(character, unicode.Zs, unicode.Zl, unicode.Zp, unicode.Cf) {
+					hasContent = true
+				}
+			}
+			if !hasContent {
+				return errors.New("alt text must contain visible content")
 			}
 			return nil
 		},

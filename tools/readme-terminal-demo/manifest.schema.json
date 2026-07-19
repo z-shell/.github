@@ -71,7 +71,7 @@
           "$ref": "#/$defs/normalizedPath"
         },
         {
-          "pattern": "^\\.github/demos/.+\\.tape$"
+          "pattern": "^\\.github/demos/([^/]+/)*[^/]+\\.tape$"
         }
       ]
     },
@@ -91,7 +91,7 @@
           "$ref": "#/$defs/normalizedPath"
         },
         {
-          "pattern": "^docs/assets/.+\\.gif$"
+          "pattern": "^docs/assets/([^/]+/)*[^/]+\\.gif$"
         }
       ]
     },
@@ -101,7 +101,7 @@
           "$ref": "#/$defs/normalizedPath"
         },
         {
-          "pattern": "^docs/assets/.+\\.png$"
+          "pattern": "^docs/assets/([^/]+/)*[^/]+\\.png$"
         }
       ]
     },
@@ -111,7 +111,7 @@
           "$ref": "#/$defs/normalizedPath"
         },
         {
-          "pattern": "^(README\\.md|docs/.+\\.(md|markdown))$"
+          "pattern": "^(README\\.md|docs/([^/]+/)*[^/]+\\.(md|markdown))$"
         }
       ]
     }
