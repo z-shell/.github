@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://z-shell.github.io/schemas/readme-terminal-demo/manifest-v1.schema.json",
+  "title": "Z-Shell README terminal demo manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "scenario", "fixtures", "outputs", "readme"],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "scenario": {
+      "$ref": "#/$defs/scenarioPath"
+    },
+    "fixtures": {
+      "$ref": "#/$defs/fixturesPath"
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gif", "png"],
+      "properties": {
+        "gif": {
+          "$ref": "#/$defs/gifPath"
+        },
+        "png": {
+          "$ref": "#/$defs/pngPath"
+        }
+      }
+    },
+    "readme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "alt"],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/readmePath"
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "format": "z-shell-alt-bytes",
+          "pattern": "^[^\\x00-\\x1F\\x7F]*\\S[^\\x00-\\x1F\\x7F]*$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "normalizedPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "format": "z-shell-path-bytes",
+      "allOf": [
+        {
+          "not": {
+            "pattern": "(^|/)\\.\\.?(/|$)"
+          }
+        },
+        {
+          "not": {
+            "pattern": "//|\\\\|/$|[\\x00-\\x1F\\x7F]"
+          }
+        }
+      ]
+    },
+    "scenarioPath": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/normalizedPath"
+        },
+        {
+          "pattern": "^\\.github/demos/.+\\.tape$"
+        }
+      ]
+    },
+    "fixturesPath": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/normalizedPath"
+        },
+        {
+          "pattern": "^\\.github/demos/.+$"
+        }
+      ]
+    },
+    "gifPath": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/normalizedPath"
+        },
+        {
+          "pattern": "^docs/assets/.+\\.gif$"
+        }
+      ]
+    },
+    "pngPath": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/normalizedPath"
+        },
+        {
+          "pattern": "^docs/assets/.+\\.png$"
+        }
+      ]
+    },
+    "readmePath": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/normalizedPath"
+        },
+        {
+          "pattern": "^(README\\.md|docs/.+\\.(md|markdown))$"
+        }
+      ]
+    }
+  }
+}

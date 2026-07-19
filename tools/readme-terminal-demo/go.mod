@@ -10,4 +10,7 @@ require (
 	golang.org/x/sys v0.40.0
 )
 
-require kernel.org/pub/linux/libs/security/libcap/psx v1.2.77 // indirect
+require (
+	golang.org/x/text v0.14.0 // indirect
+	kernel.org/pub/linux/libs/security/libcap/psx v1.2.77 // indirect
+)
