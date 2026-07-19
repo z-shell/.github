@@ -11,13 +11,18 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/z-shell/.github/tools/readme-terminal-demo/internal/failure"
 	"github.com/z-shell/.github/tools/readme-terminal-demo/internal/sandbox"
 	"golang.org/x/sys/unix"
 )
 
-const testUnsupportedLandlockCapture = "README_TERMINAL_DEMO_TEST_UNSUPPORTED_CAPTURE"
+const (
+	testUnsupportedLandlockCapture = "README_TERMINAL_DEMO_TEST_UNSUPPORTED_CAPTURE"
+	testBrowserResolutionChroot    = "README_TERMINAL_DEMO_TEST_BROWSER_CHROOT"
+	testBrowserResolutionRoot      = "README_TERMINAL_DEMO_TEST_BROWSER_ROOT"
+)
 
 func TestReservedChildExitMapping(t *testing.T) {
 	tests := reservedChildOutcomeCases()
@@ -439,6 +444,21 @@ func TestCapturePreparesAndEntersDemoBeforeRestrictedExec(t *testing.T) {
 			if want := []string{"/trusted/vhs", "/trusted/readme.tape"}; !reflect.DeepEqual(spec.Args, want) {
 				t.Fatalf("restricted argv = %#v, want %#v", spec.Args, want)
 			}
+			if !spec.Policy.AllowPrivateDevptsPTY {
+				t.Fatal("capture policy did not opt into the verified private-devpts PTY rule")
+			}
+			devReadOnly := false
+			for _, path := range spec.Policy.ReadOnlyPaths {
+				devReadOnly = devReadOnly || path == "/dev"
+			}
+			if !devReadOnly {
+				t.Fatal("capture policy did not retain /dev as read-only")
+			}
+			for _, path := range spec.Policy.ReadWritePaths {
+				if path == "/" || path == "/dev/pts" || strings.HasPrefix("/dev/pts", path+"/") || strings.HasPrefix(path, "/dev/pts/") {
+					t.Fatalf("capture policy broadens /dev/pts through writable path %q", path)
+				}
+			}
 			return nil
 		},
 	})
@@ -605,6 +625,134 @@ func TestRodLinuxBrowserCandidatesThroughChromiumMatchPinnedOrder(t *testing.T) 
 	}
 	if !reflect.DeepEqual(rodLinuxBrowserCandidatesThroughChromium, want) {
 		t.Fatalf("Rod Linux candidates through Chromium = %#v, want %#v", rodLinuxBrowserCandidatesThroughChromium, want)
+	}
+}
+
+func TestBrowserResolutionUsesPinnedChromiumWithoutDownloader(t *testing.T) {
+	launcher := []byte("pinned chromium launcher\n")
+	if os.Getenv(testBrowserResolutionChroot) != "child" {
+		dependencies, err := os.ReadFile(filepath.Join("..", "..", "dependencies.env"))
+		if err != nil {
+			t.Fatalf("read dependencies.env: %v", err)
+		}
+		for _, pin := range []string{
+			"DEBIAN_CHROMIUM_VERSION=150.0.7871.124-1~deb13u1\n",
+			"CHROMIUM_LAUNCHER_SHA256=2c8d32d29dc6781c35ae196ea83299d507ac88fc339301abe74672feda299779\n",
+			"VHS_VERSION=v0.11.0\n",
+		} {
+			if got := strings.Count(string(dependencies), pin); got != 1 {
+				t.Fatalf("dependencies.env pin %q count = %d, want 1", strings.TrimSpace(pin), got)
+			}
+		}
+
+		root := t.TempDir()
+		for _, directory := range []string{"usr/local/bin", "usr/bin", "bin"} {
+			if err := os.MkdirAll(filepath.Join(root, directory), 0o755); err != nil {
+				t.Fatalf("create isolated renderer PATH: %v", err)
+			}
+		}
+		path := filepath.Join(root, strings.TrimPrefix(chromiumLauncherPath, "/"))
+		if err := os.WriteFile(path, launcher, 0o755); err != nil {
+			t.Fatalf("write isolated pinned Chromium: %v", err)
+		}
+		if err := os.Chmod(path, 0o755); err != nil {
+			t.Fatalf("set isolated Chromium mode: %v", err)
+		}
+
+		command := exec.Command(os.Args[0], "-test.run=^TestBrowserResolutionUsesPinnedChromiumWithoutDownloader$")
+		command.Env = []string{
+			testBrowserResolutionChroot + "=child",
+			testBrowserResolutionRoot + "=" + root,
+		}
+		if output, err := command.CombinedOutput(); err != nil {
+			t.Fatalf("isolated browser-resolution probe: %v\n%s", err, output)
+		}
+		return
+	}
+
+	root := os.Getenv(testBrowserResolutionRoot)
+	if root == "" {
+		t.Fatal("isolated browser root is empty")
+	}
+	if err := unix.Chroot(root); err != nil {
+		t.Fatalf("enter isolated browser root: %v", err)
+	}
+	if err := os.Chdir("/"); err != nil {
+		t.Fatalf("enter isolated browser working directory: %v", err)
+	}
+
+	var preflightCandidates []string
+	preflightComplete := false
+	rawExecReached := false
+	downloaderReached := false
+	resolvedByVHS := ""
+
+	err := captureWith("/trusted/readme.tape", captureDependencies{
+		browserPreflight: func() error {
+			err := validateBrowser(browserPreflightConfig{
+				target:         chromiumLauncherPath,
+				expectedSHA256: sha256Hex(launcher),
+				lookPath: func(candidate string) (string, error) {
+					preflightCandidates = append(preflightCandidates, candidate)
+					return lookPathInRendererPath(candidate)
+				},
+			})
+			preflightComplete = err == nil
+			return err
+		},
+		prepareRuntime:  func() error { return nil },
+		changeDirectory: func(string) error { return nil },
+		vhsPath:         "/usr/local/bin/vhs",
+		execRestricted: func(spec sandbox.ExecSpec) error {
+			rawExecReached = true
+			if !preflightComplete {
+				t.Fatal("raw VHS exec reached before Chromium preflight completed")
+			}
+
+			pathValue := ""
+			for _, value := range spec.Env {
+				if strings.HasPrefix(value, "PATH=") {
+					pathValue = strings.TrimPrefix(value, "PATH=")
+					break
+				}
+			}
+			if pathValue != restrictedRendererPATH {
+				t.Fatalf("VHS PATH = %q, want %q", pathValue, restrictedRendererPATH)
+			}
+
+			// VHS v0.11.0 embeds Rod v0.116.2. Walk its pinned Linux
+			// candidates through the production resolver at the raw-exec seam;
+			// downloader fallback is guarded behind exhaustion of this walk.
+			for _, candidate := range rodLinuxBrowserCandidatesThroughChromium {
+				resolved, resolveErr := lookPathInRendererPath(candidate)
+				if resolveErr == nil {
+					resolvedByVHS = resolved
+					break
+				}
+				if !errors.Is(resolveErr, exec.ErrNotFound) {
+					return resolveErr
+				}
+			}
+			if resolvedByVHS == "" {
+				downloaderReached = true
+			}
+			return nil
+		},
+	})
+	if err != nil {
+		t.Fatalf("captureWith() error = %v", err)
+	}
+	if !reflect.DeepEqual(preflightCandidates, rodLinuxBrowserCandidatesThroughChromium) {
+		t.Fatalf("preflight candidates = %#v, want exact Rod order %#v", preflightCandidates, rodLinuxBrowserCandidatesThroughChromium)
+	}
+	if !rawExecReached {
+		t.Fatal("raw VHS exec seam was not reached after successful Chromium preflight")
+	}
+	if resolvedByVHS != "/usr/bin/chromium" {
+		t.Fatalf("VHS browser resolution = %q, want /usr/bin/chromium", resolvedByVHS)
+	}
+	if downloaderReached {
+		t.Fatal("guarded Rod downloader sentinel was reached")
 	}
 }
 
@@ -829,6 +977,131 @@ RUN set -eu; \
 	}
 	if strings.Contains(docker[:testStage], "TestPinnedVHSExitStatusContract") {
 		t.Fatal("VHS exit-status contract appears before the final runtime test stage")
+	}
+}
+
+func TestSmokeTapeMatchesNormativePresentation(t *testing.T) {
+	tape, err := os.ReadFile(filepath.Join("..", "..", "testdata", "smoke", "readme.tape"))
+	if err != nil {
+		t.Fatalf("read smoke tape: %v", err)
+	}
+	content := string(tape)
+
+	for _, old := range []string{
+		"Set FontSize 24",
+		"Set Width 800",
+		"Set Height 300",
+	} {
+		if strings.Contains(content, old) {
+			t.Errorf("smoke tape retains obsolete presentation setting %q", old)
+		}
+	}
+
+	wantLines := []string{
+		`Output "/work/smoke.gif"`,
+		`Set Shell "zsh"`,
+		`Set FontFamily "JetBrains Mono"`,
+		"Set FontSize 18",
+		"Set Width 960",
+		"Set Height 540",
+		`Set Theme "Catppuccin Mocha"`,
+		"Set Framerate 30",
+		"Set TypingSpeed 35ms",
+		"Set CursorBlink false",
+		`Type "printf 'readme-terminal-demo smoke\\n'"`,
+		"Enter",
+		"Sleep 1s",
+		`Type "exit"`,
+		"Enter",
+	}
+	var gotLines []string
+	for _, line := range strings.Split(content, "\n") {
+		if strings.TrimSpace(line) != "" {
+			gotLines = append(gotLines, line)
+		}
+	}
+	if !reflect.DeepEqual(gotLines, wantLines) {
+		t.Errorf("smoke tape directives = %#v, want exact normative presentation %#v", gotLines, wantLines)
+	}
+}
+
+func TestSelfTestNetworkAndRuntimeContract(t *testing.T) {
+	var events []string
+	probes := selfTestRuntimeProbes{
+		defaultRoutes: func() (bool, bool, error) {
+			events = append(events, "routes")
+			return false, false, nil
+		},
+		loopbackRoundTrip: func(timeout time.Duration) error {
+			events = append(events, "loopback")
+			if timeout != time.Second {
+				t.Fatalf("loopback timeout = %v, want 1s", timeout)
+			}
+			return nil
+		},
+		dialTimeout: func(network, address string, timeout time.Duration) error {
+			events = append(events, "external")
+			if network != "tcp" || address != "192.0.2.1:443" || timeout != time.Second {
+				t.Fatalf("external probe = %q %q %v, want tcp 192.0.2.1:443 1s", network, address, timeout)
+			}
+			return errors.New("network unreachable")
+		},
+		processIdentity: func() (int, int, error) {
+			events = append(events, "process-group")
+			return 4242, 4242, nil
+		},
+		fileLimits: func() (uint64, uint64, error) {
+			events = append(events, "nofile")
+			return 256, 256, nil
+		},
+		handledAccessNet: func() uint64 {
+			events = append(events, "handled-access-net")
+			return 0
+		},
+		landlockABI: func() (int, error) {
+			events = append(events, "abi")
+			return 9, nil
+		},
+		landlockInherited: func() error {
+			events = append(events, "inheritance")
+			return nil
+		},
+	}
+
+	abi, err := probeSelfTestNetworkAndRuntime(probes)
+	if err != nil {
+		t.Fatalf("probeSelfTestNetworkAndRuntime() error = %v", err)
+	}
+	if abi != 9 {
+		t.Fatalf("detected Landlock ABI = %d, want 9", abi)
+	}
+	wantEvents := []string{"routes", "loopback", "external", "process-group", "nofile", "handled-access-net", "abi", "inheritance"}
+	if !reflect.DeepEqual(events, wantEvents) {
+		t.Fatalf("runtime probe events = %#v, want %#v", events, wantEvents)
+	}
+
+	for _, limits := range [][2]uint64{{255, 256}, {256, 512}} {
+		wrongLimits := probes
+		wrongLimits.fileLimits = func() (uint64, uint64, error) {
+			return limits[0], limits[1], nil
+		}
+		if _, err := probeSelfTestNetworkAndRuntime(wrongLimits); err == nil {
+			t.Fatalf("probeSelfTestNetworkAndRuntime() accepted nofile soft/hard %d/%d", limits[0], limits[1])
+		}
+	}
+	limitError := probes
+	limitError.fileLimits = func() (uint64, uint64, error) {
+		return 0, 0, errors.New("rlimit unavailable")
+	}
+	if _, err := probeSelfTestNetworkAndRuntime(limitError); err == nil {
+		t.Fatal("probeSelfTestNetworkAndRuntime() accepted an RLIMIT_NOFILE query failure")
+	}
+}
+
+func TestIPv6RejectDefaultRouteIsNotUsable(t *testing.T) {
+	const routes = "00000000000000000000000000000000 00 00000000000000000000000000000000 00 00000000000000000000000000000000 ffffffff 00000001 00000000 00200200       lo\n"
+	if hasIPv6DefaultRoute([]byte(routes)) {
+		t.Fatal("network-none IPv6 reject route was classified as a usable default route")
 	}
 }
 

@@ -330,8 +330,9 @@ func TestPrepareV3BuildsExactABIV3Ruleset(t *testing.T) {
 		t.Run("abi-"+strconv.Itoa(abi), func(t *testing.T) {
 			fake := newPrepareV3Fake(abi)
 			prepared, err := prepareV3WithOps(Policy{
-				ReadOnlyPaths:  []string{"/z-ro", "/a-ro"},
-				ReadWritePaths: []string{"/z-rw", "/a-rw"},
+				ReadOnlyPaths:         []string{"/z-ro", "/a-ro"},
+				ReadWritePaths:        []string{"/z-rw", "/a-rw"},
+				AllowPrivateDevptsPTY: true,
 			}, fake.ops())
 			if err != nil {
 				t.Fatalf("prepareV3WithOps() error = %v", err)
@@ -357,6 +358,7 @@ func TestPrepareV3BuildsExactABIV3Ruleset(t *testing.T) {
 				{path: "/z-ro", allowed: readOnlyV3Access},
 				{path: "/a-rw", allowed: readWriteV3Access},
 				{path: "/z-rw", allowed: readWriteV3Access},
+				{path: "/dev/pts", allowed: llsyscall.AccessFSWriteFile},
 				{path: "/dev/null", allowed: nullDeviceV3Access},
 			}
 			if !reflect.DeepEqual(fake.rules, wantRules) {
@@ -371,20 +373,168 @@ func TestPrepareV3BuildsExactABIV3Ruleset(t *testing.T) {
 			if nullDeviceV3Access != llsyscall.AccessFSExecute|llsyscall.AccessFSReadFile|llsyscall.AccessFSWriteFile|llsyscall.AccessFSTruncate {
 				t.Fatalf("null-device access = %#x", nullDeviceV3Access)
 			}
+			if privateDevptsPTYV3Access != llsyscall.AccessFSWriteFile {
+				t.Fatalf("private-devpts PTY access = %#x, want only WRITE_FILE", privateDevptsPTYV3Access)
+			}
+			if privateDevptsPTYV3Access&(llsyscall.AccessFSMakeChar|llsyscall.AccessFSMakeDir|llsyscall.AccessFSRemoveDir|llsyscall.AccessFSRemoveFile|llsyscall.AccessFSTruncate|llsyscall.AccessFSRefer) != 0 {
+				t.Fatalf("private-devpts PTY access contains creation, removal, truncate, or refer rights: %#x", privateDevptsPTYV3Access)
+			}
 
-			wantOpenFlags := unix.O_PATH | unix.O_CLOEXEC | unix.O_NOFOLLOW
 			for _, opened := range fake.opened {
-				if opened.flags != wantOpenFlags || opened.mode != 0 {
-					t.Fatalf("open %q flags=%#x mode=%#o, want %#x mode=0", opened.path, opened.flags, opened.mode, wantOpenFlags)
+				wantFlags := unix.O_PATH | unix.O_CLOEXEC | unix.O_NOFOLLOW
+				if opened.path == "/dev/pts" {
+					wantFlags = unix.O_RDONLY | unix.O_DIRECTORY | unix.O_CLOEXEC | unix.O_NOFOLLOW
+				}
+				if opened.flags != wantFlags || opened.mode != 0 {
+					t.Fatalf("open %q flags=%#x mode=%#o, want %#x mode=0", opened.path, opened.flags, opened.mode, wantFlags)
 				}
 			}
-			if got, want := fake.closed, []int{10, 11, 12, 13, 14}; !reflect.DeepEqual(got, want) {
+			if got, want := fake.closed, []int{11, 12, 13, 14, 15, 10, 16}; !reflect.DeepEqual(got, want) {
 				t.Fatalf("closed source descriptors = %#v, want %#v", got, want)
 			}
 			if !fake.cloexecSet || !fake.cloexecRead {
 				t.Fatalf("CLOEXEC set/read = %t/%t, want both true", fake.cloexecSet, fake.cloexecRead)
 			}
 		})
+	}
+}
+
+func TestPrepareV3RejectsUnverifiedPrivateDevptsPTY(t *testing.T) {
+	tests := []struct {
+		name       string
+		fault      string
+		wantClosed []int
+	}{
+		{name: "open-directory", fault: "open-devpts", wantClosed: []int{7}},
+		{name: "inspect-directory", fault: "fstat-devpts", wantClosed: []int{10, 7}},
+		{name: "directory-type", fault: "regular-devpts", wantClosed: []int{10, 7}},
+		{name: "inspect-filesystem", fault: "fstatfs-devpts", wantClosed: []int{10, 7}},
+		{name: "filesystem-type", fault: "wrong-devpts-filesystem", wantClosed: []int{10, 7}},
+		{name: "inspect-parent", fault: "fstatat-devpts-parent", wantClosed: []int{10, 7}},
+		{name: "mount-boundary", fault: "same-devpts-parent", wantClosed: []int{10, 7}},
+		{name: "inspect-root", fault: "fstatat-devpts-root", wantClosed: []int{10, 7}},
+		{name: "root-type", fault: "regular-devpts-root", wantClosed: []int{10, 7}},
+		{name: "read-topology", fault: "readdir-devpts", wantClosed: []int{10, 7}},
+		{name: "unexpected-slave", fault: "unexpected-devpts-entry", wantClosed: []int{10, 7}},
+		{name: "open-ptmx-relative", fault: "open-ptmx", wantClosed: []int{10, 7}},
+		{name: "inspect-ptmx", fault: "fstat-ptmx", wantClosed: []int{11, 10, 7}},
+		{name: "ptmx-symlink", fault: "symlink-ptmx", wantClosed: []int{11, 10, 7}},
+		{name: "ptmx-filesystem", fault: "wrong-ptmx-filesystem", wantClosed: []int{11, 10, 7}},
+		{name: "ptmx-identity", fault: "wrong-ptmx-device", wantClosed: []int{11, 10, 7}},
+		{name: "close-ptmx", fault: "close-ptmx", wantClosed: []int{11, 10, 7}},
+		{name: "add-rule", fault: "add-devpts", wantClosed: []int{11, 10, 7}},
+		{name: "close-directory", fault: "close-devpts", wantClosed: []int{11, 10, 7}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			fake := newPrepareV3Fake(3)
+			fake.fault = test.fault
+			_, err := prepareV3WithOps(Policy{AllowPrivateDevptsPTY: true}, fake.ops())
+			if !errors.Is(err, ErrLandlockV3Unavailable) {
+				t.Fatalf("prepareV3WithOps() error = %v, want ErrLandlockV3Unavailable", err)
+			}
+			if !reflect.DeepEqual(fake.closed, test.wantClosed) {
+				t.Fatalf("closed descriptors = %#v, want %#v; events=%#v", fake.closed, test.wantClosed, fake.events)
+			}
+			if len(fake.openFDs) != 0 {
+				t.Fatalf("private-devpts failure leaked open FDs: %#v", fake.openFDs)
+			}
+		})
+	}
+}
+
+func TestPrepareV3RejectsBroadDevptsPolicyOverlap(t *testing.T) {
+	for _, policy := range []Policy{
+		{ReadOnlyPaths: []string{"/dev/pts"}, AllowPrivateDevptsPTY: true},
+		{ReadWritePaths: []string{"/"}, AllowPrivateDevptsPTY: true},
+		{ReadWritePaths: []string{"/dev"}, AllowPrivateDevptsPTY: true},
+		{ReadWritePaths: []string{"/dev/pts"}, AllowPrivateDevptsPTY: true},
+		{ReadWritePaths: []string{"/dev/pts/injected"}, AllowPrivateDevptsPTY: true},
+	} {
+		fake := newPrepareV3Fake(3)
+		_, err := prepareV3WithOps(policy, fake.ops())
+		if !errors.Is(err, ErrLandlockV3Unavailable) {
+			t.Fatalf("prepareV3WithOps(%#v) error = %v, want ErrLandlockV3Unavailable", policy, err)
+		}
+		if !reflect.DeepEqual(fake.events, []string{"abi"}) {
+			t.Fatalf("overlapping policy operations = %#v, want only ABI query", fake.events)
+		}
+	}
+}
+
+func TestPrepareV3RejectsNonCanonicalPolicyPathsBeforeCreatingRuleset(t *testing.T) {
+	for _, path := range []string{
+		"/dev/../dev/pts",
+		"/tmp/../dev/pts",
+		"//dev/pts",
+		"/dev/./pts",
+		"/dev//pts",
+	} {
+		fake := newPrepareV3Fake(3)
+		_, err := prepareV3WithOps(Policy{
+			ReadWritePaths:        []string{path},
+			AllowPrivateDevptsPTY: true,
+		}, fake.ops())
+		if !errors.Is(err, ErrLandlockV3Unavailable) {
+			t.Fatalf("prepareV3WithOps(%q) error = %v, want ErrLandlockV3Unavailable", path, err)
+		}
+		if !reflect.DeepEqual(fake.events, []string{"abi"}) {
+			t.Fatalf("non-canonical policy %q operations = %#v, want only ABI query", path, fake.events)
+		}
+	}
+}
+
+func TestPrepareV3RejectsPhysicalDevptsWriteAliases(t *testing.T) {
+	for _, path := range []string{"/bind/devpts", "/bind/dev", "/bind/root"} {
+		fake := newPrepareV3Fake(3)
+		_, err := prepareV3WithOps(Policy{
+			ReadWritePaths:        []string{path},
+			AllowPrivateDevptsPTY: true,
+		}, fake.ops())
+		if !errors.Is(err, ErrLandlockV3Unavailable) {
+			t.Fatalf("prepareV3WithOps(%q) error = %v, want ErrLandlockV3Unavailable", path, err)
+		}
+		for _, rule := range fake.rules {
+			if rule.path == path {
+				t.Fatalf("physical alias %q received generic writable rule %#x", path, rule.allowed)
+			}
+		}
+		if got, want := fake.closed, []int{11, 12, 10, 7}; !reflect.DeepEqual(got, want) {
+			t.Fatalf("physical alias %q closed descriptors = %#v, want %#v", path, got, want)
+		}
+		if len(fake.openFDs) != 0 {
+			t.Fatalf("physical alias %q leaked open FDs: %#v", path, fake.openFDs)
+		}
+	}
+}
+
+func TestOpenRulePathRejectsIntermediateMagicLink(t *testing.T) {
+	fd, err := openRulePath(
+		"/proc/self/root/dev/pts",
+		unix.O_PATH|unix.O_CLOEXEC|unix.O_NOFOLLOW,
+		0,
+	)
+	if err == nil {
+		_ = unix.Close(fd)
+		t.Fatal("openRulePath() followed /proc/self/root magic link")
+	}
+	if !errors.Is(err, unix.ELOOP) {
+		t.Fatalf("openRulePath() error = %v, want ELOOP", err)
+	}
+}
+
+func TestPrepareV3PrivateDevptsAllowsDisjointDevWritePath(t *testing.T) {
+	fake := newPrepareV3Fake(3)
+	prepared, err := prepareV3WithOps(Policy{
+		ReadWritePaths:        []string{"/dev/shm"},
+		AllowPrivateDevptsPTY: true,
+	}, fake.ops())
+	if err != nil {
+		t.Fatalf("prepareV3WithOps() error = %v", err)
+	}
+	if prepared.rulesetFD != fake.rulesetFD {
+		t.Fatalf("prepared ruleset FD = %d, want %d", prepared.rulesetFD, fake.rulesetFD)
 	}
 }
 
@@ -1004,7 +1154,8 @@ type prepareV3Fake struct {
 	createFlags int
 	cloexecSet  bool
 	cloexecRead bool
-	lastFstatFD int
+	fstatSeen   map[int]bool
+	openFDs     map[int]bool
 }
 
 func newPrepareV3Fake(abi int) *prepareV3Fake {
@@ -1013,6 +1164,8 @@ func newPrepareV3Fake(abi int) *prepareV3Fake {
 		rulesetFD: 7,
 		nextFD:    10,
 		fdPaths:   make(map[int]string),
+		fstatSeen: make(map[int]bool),
+		openFDs:   make(map[int]bool),
 	}
 }
 
@@ -1033,26 +1186,45 @@ func (fake *prepareV3Fake) ops() prepareV3Ops {
 		},
 		openPath: func(path string, flags int, mode uint32) (int, error) {
 			fake.events = append(fake.events, "open:"+path)
-			if fake.fault == "open" {
+			if fake.fault == "open" || fake.fault == "open-devpts" && path == "/dev/pts" {
 				return -1, unix.EIO
 			}
 			fd := fake.nextFD
 			fake.nextFD++
 			fake.fdPaths[fd] = path
+			fake.openFDs[fd] = true
 			fake.opened = append(fake.opened, fakeOpen{path: path, flags: flags, mode: mode})
+			return fd, nil
+		},
+		openPathAt: func(dirFD int, path string, flags int, mode uint32) (int, error) {
+			fake.events = append(fake.events, "openat:"+strconv.Itoa(dirFD)+":"+path)
+			if fake.fault == "open-ptmx" {
+				return -1, unix.EIO
+			}
+			if fake.fdPaths[dirFD] != "/dev/pts" || path != "ptmx" {
+				return -1, unix.EINVAL
+			}
+			fd := fake.nextFD
+			fake.nextFD++
+			fullPath := "/dev/pts/ptmx"
+			fake.fdPaths[fd] = fullPath
+			fake.openFDs[fd] = true
+			fake.opened = append(fake.opened, fakeOpen{path: fullPath, flags: flags, mode: mode})
 			return fd, nil
 		},
 		fstat: func(fd int, stat *unix.Stat_t) error {
 			fake.events = append(fake.events, "fstat:"+strconv.Itoa(fd))
-			fake.lastFstatFD = fd
-			if fake.fault == "fstat" {
+			fake.fstatSeen[fd] = true
+			path := fake.fdPaths[fd]
+			if fake.fault == "fstat" || fake.fault == "fstat-devpts" && path == "/dev/pts" || fake.fault == "fstat-ptmx" && path == "/dev/pts/ptmx" {
 				return unix.EIO
 			}
-			path := fake.fdPaths[fd]
 			switch {
 			case fake.fault == "symlink":
 				stat.Mode = unix.S_IFLNK | 0o777
-			case fake.fault == "regular":
+			case fake.fault == "symlink-ptmx" && path == "/dev/pts/ptmx":
+				stat.Mode = unix.S_IFLNK | 0o777
+			case fake.fault == "regular" || fake.fault == "regular-devpts" && path == "/dev/pts":
 				stat.Mode = unix.S_IFREG | 0o644
 			case path == "/dev/null":
 				stat.Mode = unix.S_IFCHR | 0o666
@@ -1060,18 +1232,95 @@ func (fake *prepareV3Fake) ops() prepareV3Ops {
 				if fake.fault == "wrong-device" {
 					stat.Rdev = unix.Mkdev(1, 5)
 				}
+			case path == "/dev/pts/ptmx":
+				stat.Mode = unix.S_IFCHR | 0o666
+				stat.Rdev = unix.Mkdev(5, 2)
+				stat.Dev = 183
+				if fake.fault == "wrong-ptmx-device" {
+					stat.Rdev = unix.Mkdev(1, 5)
+				}
+				if fake.fault == "wrong-ptmx-filesystem" {
+					stat.Dev = 999
+				}
+			case path == "/bind/devpts":
+				stat.Mode = unix.S_IFDIR | 0o755
+				stat.Dev = 183
+				stat.Ino = 1
+			case path == "/bind/dev":
+				stat.Mode = unix.S_IFDIR | 0o755
+				stat.Dev = 182
+				stat.Ino = 2
+			case path == "/bind/root":
+				stat.Mode = unix.S_IFDIR | 0o755
+				stat.Dev = 181
+				stat.Ino = 3
 			default:
 				stat.Mode = unix.S_IFDIR | 0o755
+				if path == "/dev/pts" {
+					stat.Dev = 183
+					stat.Ino = 1
+				}
 			}
 			return nil
 		},
+		fstatfs: func(fd int, stat *unix.Statfs_t) error {
+			fake.events = append(fake.events, "fstatfs:"+strconv.Itoa(fd))
+			if fake.fault == "fstatfs-devpts" {
+				return unix.EIO
+			}
+			stat.Type = devptsSuperMagic
+			if fake.fault == "wrong-devpts-filesystem" {
+				stat.Type = unix.TMPFS_MAGIC
+			}
+			return nil
+		},
+		fstatAt: func(dirFD int, path string, stat *unix.Stat_t, flags int) error {
+			fake.events = append(fake.events, "fstatat:"+strconv.Itoa(dirFD)+":"+path)
+			if fake.fdPaths[dirFD] != "/dev/pts" || flags != unix.AT_SYMLINK_NOFOLLOW {
+				return unix.EINVAL
+			}
+			if fake.fault == "fstatat-devpts-parent" && path == ".." || fake.fault == "fstatat-devpts-root" && path == "../.." {
+				return unix.EIO
+			}
+			stat.Mode = unix.S_IFDIR | 0o755
+			switch path {
+			case "..":
+				stat.Dev = 182
+				stat.Ino = 2
+				if fake.fault == "same-devpts-parent" {
+					stat.Dev = 183
+				}
+			case "../..":
+				stat.Dev = 181
+				stat.Ino = 3
+				if fake.fault == "regular-devpts-root" {
+					stat.Mode = unix.S_IFREG | 0o644
+				}
+			default:
+				return unix.EINVAL
+			}
+			return nil
+		},
+		readDirNames: func(fd int) ([]string, error) {
+			fake.events = append(fake.events, "readdir:"+strconv.Itoa(fd))
+			if fake.fdPaths[fd] != "/dev/pts" {
+				return nil, unix.EINVAL
+			}
+			if fake.fault == "readdir-devpts" {
+				return nil, unix.EIO
+			}
+			if fake.fault == "unexpected-devpts-entry" {
+				return []string{"0", "ptmx"}, nil
+			}
+			return []string{"ptmx"}, nil
+		},
 		addPathRule: func(rulesetFD int, attr *llsyscall.PathBeneathAttr, flags int) error {
 			fake.events = append(fake.events, "add:"+strconv.Itoa(attr.ParentFd))
-			if rulesetFD != fake.rulesetFD || flags != 0 || attr.ParentFd != fake.lastFstatFD {
+			if rulesetFD != fake.rulesetFD || flags != 0 || !fake.fstatSeen[attr.ParentFd] || !fake.openFDs[attr.ParentFd] {
 				return unix.EINVAL
 			}
 			fake.rules = append(fake.rules, fakePathRule{path: fake.fdPaths[attr.ParentFd], allowed: attr.AllowedAccess})
-			if fake.fault == "add" {
+			if fake.fault == "add" || fake.fault == "add-devpts" && fake.fdPaths[attr.ParentFd] == "/dev/pts" {
 				return unix.EIO
 			}
 			return nil
@@ -1095,7 +1344,14 @@ func (fake *prepareV3Fake) ops() prepareV3Ops {
 		closeFD: func(fd int) error {
 			fake.events = append(fake.events, "close:"+strconv.Itoa(fd))
 			fake.closed = append(fake.closed, fd)
+			delete(fake.openFDs, fd)
 			if fake.fault == "close-source" && fd >= 10 {
+				return unix.EIO
+			}
+			if fake.fault == "close-ptmx" && fake.fdPaths[fd] == "/dev/pts/ptmx" {
+				return unix.EIO
+			}
+			if fake.fault == "close-devpts" && fake.fdPaths[fd] == "/dev/pts" {
 				return unix.EIO
 			}
 			return nil

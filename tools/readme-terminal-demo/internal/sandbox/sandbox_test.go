@@ -30,10 +30,13 @@ func TestRunRestrictedChildCleansGroupAfterEveryOutcome(t *testing.T) {
 ulimit -c 0
 printf '%s\n' "$$" > "$1"
 (
-  sleep 0.25
+  IFS=' ' read -r descendant_pid _ < /proc/self/stat
+  printf '%s\n' "$descendant_pid" > "$3"
+  while [ ! -e "$4" ]; do sleep 0.01; done
   printf staged > "$2"
 ) &
-case "$3" in
+while [ ! -s "$3" ]; do sleep 0.01; done
+case "$5" in
   exit-0) exit 0 ;;
   exit-1) exit 1 ;;
   exit-4) exit 4 ;;
@@ -64,13 +67,15 @@ exit 99
 			directory := t.TempDir()
 			pidPath := filepath.Join(directory, "direct.pid")
 			stagingPath := filepath.Join(directory, "staging-byte")
+			descendantPIDPath := filepath.Join(directory, "descendant.pid")
+			gatePath := filepath.Join(directory, "descendant.gate")
 			timeout := test.timeout
 			if timeout == 0 {
 				timeout = 2 * time.Second
 			}
 			outcome, err := sandbox.RunRestrictedChild(context.Background(), sandbox.Child{
 				Path:    "/bin/sh",
-				Args:    []string{"-c", childScript, "sh", pidPath, stagingPath, test.mode},
+				Args:    []string{"-c", childScript, "sh", pidPath, stagingPath, descendantPIDPath, gatePath, test.mode},
 				Timeout: timeout,
 			})
 			if test.wantErr == nil {
@@ -88,11 +93,57 @@ exit 99
 			if err := unix.Kill(pid, 0); !errors.Is(err, unix.ESRCH) {
 				t.Fatalf("direct child PID %d remains after wait/reap: %v", pid, err)
 			}
-			time.Sleep(400 * time.Millisecond)
+			descendantPID := readProcessID(t, descendantPIDPath, time.Second)
+			t.Cleanup(func() {
+				_ = os.WriteFile(gatePath, []byte("release"), 0o600)
+				_ = unix.Kill(descendantPID, unix.SIGKILL)
+			})
+			if err := waitForProcessTermination(descendantPID, time.Second); err != nil {
+				t.Fatalf("descendant cleanup: %v", err)
+			}
+			if err := os.WriteFile(gatePath, []byte("release"), 0o600); err != nil {
+				t.Fatalf("release descendant gate: %v", err)
+			}
+			time.Sleep(100 * time.Millisecond)
 			if _, err := os.Stat(stagingPath); !errors.Is(err, os.ErrNotExist) {
-				t.Fatalf("staging witness was read before group cleanup completed: %v", err)
+				t.Fatalf("descendant survived group cleanup and crossed its gate: %v", err)
 			}
 		})
+	}
+}
+
+func waitForProcessTermination(pid int, timeout time.Duration) error {
+	deadline := time.Now().Add(timeout)
+	for {
+		err := unix.Kill(pid, 0)
+		if errors.Is(err, unix.ESRCH) {
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf("inspect PID %d: %w", pid, err)
+		}
+		stat, readErr := os.ReadFile(fmt.Sprintf("/proc/%d/stat", pid))
+		if errors.Is(readErr, os.ErrNotExist) {
+			return nil
+		}
+		if readErr != nil {
+			return fmt.Errorf("read PID %d state: %w", pid, readErr)
+		}
+		stateStart := strings.LastIndex(string(stat), ") ")
+		if stateStart < 0 {
+			return fmt.Errorf("parse PID %d state %q", pid, stat)
+		}
+		fields := strings.Fields(string(stat[stateStart+2:]))
+		if len(fields) == 0 {
+			return fmt.Errorf("parse PID %d state %q", pid, stat)
+		}
+		if fields[0] == "Z" {
+			return nil
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("PID %d remains live in state %q after group cleanup", pid, fields[0])
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
@@ -202,6 +253,35 @@ func TestRawExecDeviceBoundary(t *testing.T) {
 		if err := writeDevice("/dev/null"); err != nil {
 			t.Fatal(err)
 		}
+		masterFD, err := unix.Open("/dev/pts/ptmx", unix.O_RDWR|unix.O_CLOEXEC|unix.O_NOFOLLOW, 0)
+		if err != nil {
+			t.Fatalf("open PTY master after raw exec: %v", err)
+		}
+		defer unix.Close(masterFD)
+		if err := unix.IoctlSetPointerInt(masterFD, unix.TIOCSPTLCK, 0); err != nil {
+			t.Fatalf("unlock PTY after raw exec: %v", err)
+		}
+		ptyNumber, err := unix.IoctlGetInt(masterFD, unix.TIOCGPTN)
+		if err != nil {
+			t.Fatalf("read PTY number after raw exec: %v", err)
+		}
+		slavePath := "/dev/pts/" + strconv.Itoa(ptyNumber)
+		slaveFD, err := unix.Open(slavePath, unix.O_RDWR|unix.O_CLOEXEC|unix.O_NOFOLLOW, 0)
+		if err != nil {
+			t.Fatalf("open dynamic PTY slave after raw exec: %v", err)
+		}
+		var slaveStat unix.Stat_t
+		if err := unix.Fstat(slaveFD, &slaveStat); err != nil {
+			_ = unix.Close(slaveFD)
+			t.Fatalf("inspect dynamic PTY slave: %v", err)
+		}
+		if slaveStat.Mode&unix.S_IFMT != unix.S_IFCHR {
+			_ = unix.Close(slaveFD)
+			t.Fatalf("dynamic PTY slave mode = %#o, want character device", slaveStat.Mode)
+		}
+		if err := unix.Close(slaveFD); err != nil {
+			t.Fatalf("close dynamic PTY slave: %v", err)
+		}
 		fd, err := unix.Open("/dev/zero", unix.O_WRONLY|unix.O_CLOEXEC|unix.O_NOFOLLOW, 0)
 		if err == nil {
 			_ = unix.Close(fd)
@@ -218,6 +298,9 @@ func TestRawExecDeviceBoundary(t *testing.T) {
 		if err := requireCharacterDevice("/dev/zero", 1, 5); err != nil {
 			t.Fatal(err)
 		}
+		if err := requireCharacterDevice("/dev/pts/ptmx", 5, 2); err != nil {
+			t.Fatal(err)
+		}
 		if err := writeDevice("/dev/zero"); err != nil {
 			t.Fatal(err)
 		}
@@ -229,9 +312,12 @@ func TestRawExecDeviceBoundary(t *testing.T) {
 			Path: executable,
 			Args: []string{executable, "-test.run=^TestRawExecDeviceBoundary$"},
 			Env:  []string{rawDeviceBoundaryMode + "=target"},
-			Policy: sandbox.Policy{ReadOnlyPaths: existingDirectories(
-				"/usr", "/etc", "/proc", "/sys", "/dev", filepath.Dir(executable),
-			)},
+			Policy: sandbox.Policy{
+				ReadOnlyPaths: existingDirectories(
+					"/usr", "/etc", "/proc", "/sys", "/dev", filepath.Dir(executable),
+				),
+				AllowPrivateDevptsPTY: true,
+			},
 		})
 		t.Fatal("ExecRestricted returned after successful preflight")
 	}

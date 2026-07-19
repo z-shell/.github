@@ -11,9 +11,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
+	llsyscall "github.com/landlock-lsm/go-landlock/landlock/syscall"
 	"github.com/z-shell/.github/tools/readme-terminal-demo/internal/failure"
 	"github.com/z-shell/.github/tools/readme-terminal-demo/internal/sandbox"
 	"golang.org/x/sys/unix"
@@ -65,6 +67,17 @@ type captureDependencies struct {
 	changeDirectory  func(string) error
 	vhsPath          string
 	execRestricted   func(sandbox.ExecSpec) error
+}
+
+type selfTestRuntimeProbes struct {
+	defaultRoutes     func() (bool, bool, error)
+	loopbackRoundTrip func(time.Duration) error
+	dialTimeout       func(string, string, time.Duration) error
+	processIdentity   func() (int, int, error)
+	fileLimits        func() (uint64, uint64, error)
+	handledAccessNet  func() uint64
+	landlockABI       func() (int, error)
+	landlockInherited func() error
 }
 
 type restrictedChildRunner func(context.Context, sandbox.Child) (sandbox.Outcome, error)
@@ -120,8 +133,9 @@ func captureWith(tape string, dependencies captureDependencies) error {
 		Args: []string{dependencies.vhsPath, tape},
 		Env:  vhsExecEnvironment(),
 		Policy: sandbox.Policy{
-			ReadOnlyPaths:  existingDirectories("/usr", "/etc", "/proc", "/sys", "/dev"),
-			ReadWritePaths: existingDirectories("/tmp", "/work", "/dev/shm"),
+			ReadOnlyPaths:         existingDirectories("/usr", "/etc", "/proc", "/sys", "/dev"),
+			ReadWritePaths:        existingDirectories("/tmp", "/work", "/dev/shm"),
+			AllowPrivateDevptsPTY: true,
 		},
 	}
 	if err := dependencies.execRestricted(spec); err != nil {
@@ -270,6 +284,176 @@ func validatePinnedLauncher(path, expectedSHA256 string) error {
 	return nil
 }
 
+func probeSelfTestNetworkAndRuntime(probes selfTestRuntimeProbes) (int, error) {
+	if probes.defaultRoutes == nil || probes.loopbackRoundTrip == nil || probes.dialTimeout == nil ||
+		probes.processIdentity == nil || probes.fileLimits == nil || probes.handledAccessNet == nil || probes.landlockABI == nil ||
+		probes.landlockInherited == nil {
+		return 0, errors.New("incomplete self-test runtime probes")
+	}
+
+	hasIPv4Default, hasIPv6Default, err := probes.defaultRoutes()
+	if err != nil {
+		return 0, fmt.Errorf("inspect default routes: %w", err)
+	}
+	if hasIPv4Default || hasIPv6Default {
+		return 0, errors.New("default network route available")
+	}
+	if err := probes.loopbackRoundTrip(time.Second); err != nil {
+		return 0, fmt.Errorf("verify loopback round trip: %w", err)
+	}
+	if err := probes.dialTimeout("tcp", "192.0.2.1:443", time.Second); err == nil {
+		return 0, errors.New("external network connection succeeded")
+	}
+	pid, processGroup, err := probes.processIdentity()
+	if err != nil {
+		return 0, fmt.Errorf("inspect process group: %w", err)
+	}
+	if pid <= 0 || processGroup <= 0 {
+		return 0, errors.New("invalid process-group membership")
+	}
+	softLimit, hardLimit, err := probes.fileLimits()
+	if err != nil {
+		return 0, fmt.Errorf("inspect RLIMIT_NOFILE: %w", err)
+	}
+	if softLimit != 256 || hardLimit != 256 {
+		return 0, fmt.Errorf("RLIMIT_NOFILE soft/hard=%d/%d, want 256/256", softLimit, hardLimit)
+	}
+	if handledAccessNet := probes.handledAccessNet(); handledAccessNet != 0 {
+		return 0, fmt.Errorf("handled_access_net=%d, want 0", handledAccessNet)
+	}
+	abi, err := probes.landlockABI()
+	if err != nil {
+		return 0, fmt.Errorf("detect Landlock ABI: %w", err)
+	}
+	if abi < 3 {
+		return 0, fmt.Errorf("detected Landlock ABI %d, want at least 3", abi)
+	}
+	if err := probes.landlockInherited(); err != nil {
+		return 0, fmt.Errorf("verify Landlock inheritance prerequisite: %w", err)
+	}
+	return abi, nil
+}
+
+func productionSelfTestRuntimeProbes() selfTestRuntimeProbes {
+	return selfTestRuntimeProbes{
+		defaultRoutes:     defaultRoutePresence,
+		loopbackRoundTrip: loopbackRoundTrip,
+		dialTimeout: func(network, address string, timeout time.Duration) error {
+			connection, err := net.DialTimeout(network, address, timeout)
+			if err == nil {
+				_ = connection.Close()
+			}
+			return err
+		},
+		processIdentity: func() (int, int, error) {
+			processGroup, err := unix.Getpgid(0)
+			return os.Getpid(), processGroup, err
+		},
+		fileLimits: func() (uint64, uint64, error) {
+			var limits unix.Rlimit
+			err := unix.Getrlimit(unix.RLIMIT_NOFILE, &limits)
+			return limits.Cur, limits.Max, err
+		},
+		handledAccessNet: func() uint64 { return 0 },
+		landlockABI:      llsyscall.LandlockGetABIVersion,
+		landlockInherited: func() error {
+			_, err := os.ReadFile("/landlock-denied/readable")
+			return err
+		},
+	}
+}
+
+func defaultRoutePresence() (bool, bool, error) {
+	ipv4Routes, err := os.ReadFile("/proc/net/route")
+	if err != nil {
+		return false, false, err
+	}
+	ipv6Routes, err := os.ReadFile("/proc/net/ipv6_route")
+	if err != nil {
+		return false, false, err
+	}
+	return hasIPv4DefaultRoute(ipv4Routes), hasIPv6DefaultRoute(ipv6Routes), nil
+}
+
+func hasIPv4DefaultRoute(routes []byte) bool {
+	for _, line := range strings.Split(string(routes), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 8 || fields[1] != "00000000" || fields[7] != "00000000" {
+			continue
+		}
+		flags, err := strconv.ParseUint(fields[3], 16, 32)
+		if err == nil && flags&0x1 != 0 && flags&0x200 == 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func hasIPv6DefaultRoute(routes []byte) bool {
+	const (
+		zeroAddress     = "00000000000000000000000000000000"
+		rejectRouteFlag = 0x0200 // Linux UAPI RTF_REJECT.
+	)
+	for _, line := range strings.Split(string(routes), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 10 || fields[0] != zeroAddress || fields[1] != "00" {
+			continue
+		}
+		flags, err := strconv.ParseUint(fields[8], 16, 32)
+		if err == nil && flags&rejectRouteFlag == 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func loopbackRoundTrip(timeout time.Duration) error {
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		return err
+	}
+	defer listener.Close()
+
+	serverResult := make(chan error, 1)
+	go func() {
+		connection, acceptErr := listener.Accept()
+		if acceptErr != nil {
+			serverResult <- acceptErr
+			return
+		}
+		defer connection.Close()
+		_ = connection.SetDeadline(time.Now().Add(timeout))
+		request := []byte{0}
+		if _, readErr := io.ReadFull(connection, request); readErr != nil {
+			serverResult <- readErr
+			return
+		}
+		_, writeErr := connection.Write(request)
+		serverResult <- writeErr
+	}()
+
+	connection, err := net.DialTimeout("tcp4", listener.Addr().String(), timeout)
+	if err != nil {
+		return err
+	}
+	defer connection.Close()
+	_ = connection.SetDeadline(time.Now().Add(timeout))
+	if _, err := connection.Write([]byte{0x5a}); err != nil {
+		return err
+	}
+	response := []byte{0}
+	if _, err := io.ReadFull(connection, response); err != nil {
+		return err
+	}
+	if err := <-serverResult; err != nil {
+		return err
+	}
+	if response[0] != 0x5a {
+		return errors.New("loopback response mismatch")
+	}
+	return nil
+}
+
 func selfTest(stdout io.Writer) error {
 	if os.Geteuid() == 0 {
 		return failure.E(failure.RendererUnavailable, failure.StageRuntime, "", failure.RuleRuntimeUnavailable, errors.New("root runtime"))
@@ -283,13 +467,12 @@ func selfTest(stdout io.Writer) error {
 	if err != nil || !bytes.Contains(bytes.ToLower(font), []byte("jetbrains")) {
 		return failure.E(failure.RendererUnavailable, failure.StageRuntime, "", failure.RuleRuntimeUnavailable, errors.New("font unavailable"))
 	}
-	if connection, err := net.DialTimeout("tcp", "1.1.1.1:443", 500*time.Millisecond); err == nil {
-		_ = connection.Close()
-		return failure.E(failure.RendererUnavailable, failure.StageRuntime, "", failure.RuleRuntimeUnavailable, errors.New("network egress available"))
-	}
-	if _, err := os.ReadFile("/landlock-denied/readable"); err != nil {
+
+	abi, err := probeSelfTestNetworkAndRuntime(productionSelfTestRuntimeProbes())
+	if err != nil {
 		return failure.E(failure.RendererUnavailable, failure.StageRuntime, "", failure.RuleRuntimeUnavailable, err)
 	}
+	fmt.Fprintf(stdout, "detected Landlock ABI: %d\n", abi)
 
 	executable, err := os.Executable()
 	if err != nil {
