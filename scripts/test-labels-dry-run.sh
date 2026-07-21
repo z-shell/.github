@@ -103,4 +103,187 @@ set -e
 grep -q '^### Apply errors' "$OUT" || fail "expected markdown apply errors section"
 grep -q '^- create test-label: .*forced create failure' "$OUT" || fail "expected formatted apply error in markdown"
 
+# Migrate and delete guardrails: confirm flags require their preview flag.
+assert_exit 2 "$SCRIPT" --repo z-shell/.github --confirm-migrate-legacy
+assert_exit 2 "$SCRIPT" --repo z-shell/.github --confirm-delete-unused-legacy
+
+# Neither destructive mode may run against --all-repos.
+assert_exit 2 "$SCRIPT" --all-repos --migrate-legacy
+assert_exit 2 "$SCRIPT" --all-repos --delete-unused-legacy
+assert_exit 2 "$SCRIPT" --all-repos --migrate-legacy --confirm-migrate-legacy
+assert_exit 2 "$SCRIPT" --all-repos --delete-unused-legacy --confirm-delete-unused-legacy
+
+# Confirmed destructive runs stay inside the pilot allowlist.
+assert_exit 2 "$SCRIPT" --repo z-shell/zi --migrate-legacy --confirm-migrate-legacy
+assert_exit 2 "$SCRIPT" --repo z-shell/zi --delete-unused-legacy --confirm-delete-unused-legacy
+
+# Preview modes are read-only and must report their own mode.
+assert_json_field migrate-preview "$SCRIPT" --repo z-shell/.github --migrate-legacy --json
+assert_json_field delete-preview "$SCRIPT" --repo z-shell/.github --delete-unused-legacy --json
+
+# sync_policy is the source of truth: a policy that forbids the operation refuses
+# it even when every flag is supplied correctly.
+POLICY_OFF="$TEST_TMP/policy-off.yml"
+cat >"$POLICY_OFF" <<'YAML'
+labels:
+  - name: type:bug
+    color: ff0000
+    description: Bug
+legacy_migrations:
+  "bug 🐞": type:bug
+sync_policy:
+  delete_unknown_labels: false
+  delete_legacy_labels_only_when_unused: false
+  preserve_labels_on_open_items_before_removal: true
+YAML
+assert_exit 2 "$SCRIPT" --labels-file "$POLICY_OFF" --repo z-shell/.github \
+  --delete-unused-legacy --confirm-delete-unused-legacy
+
+# A legacy label that is still in use must never be deleted directly. The fake gh
+# reports one carrying item, so the delete path has to refuse it.
+INUSE_BIN="$TEST_TMP/inuse-bin"
+DELETE_MARKER="$TEST_TMP/delete-attempted"
+export DELETE_MARKER
+mkdir -p "$INUSE_BIN"
+cat >"$INUSE_BIN/gh" <<'GH'
+#!/usr/bin/env sh
+set -eu
+case "$*" in
+  *"/labels?per_page=100"*)
+    printf '{"name":"bug 🐞","color":"d73a4a","description":"legacy"}\n'
+    exit 0
+    ;;
+  *"issues?state=all"*)
+    printf '{"number":7,"labels":[{"name":"bug 🐞"}]}\n'
+    exit 0
+    ;;
+  *--method\ DELETE*)
+    # Record out-of-band: the script captures our stderr, so a message there
+    # would never reach the test.
+    printf 'delete attempted\n' >>"$DELETE_MARKER"
+    exit 90
+    ;;
+esac
+printf '\n'
+exit 0
+GH
+chmod +x "$INUSE_BIN/gh"
+
+INUSE_LABELS="$TEST_TMP/inuse.yml"
+cat >"$INUSE_LABELS" <<'YAML'
+labels:
+  - name: type:bug
+    color: d73a4a
+    description: Bug
+legacy_migrations:
+  "bug 🐞": type:bug
+sync_policy:
+  delete_unknown_labels: false
+  delete_legacy_labels_only_when_unused: true
+  preserve_labels_on_open_items_before_removal: true
+YAML
+
+set +e
+PATH="$INUSE_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" \
+  --repo z-shell/.github \
+  --delete-unused-legacy \
+  --confirm-delete-unused-legacy \
+  --json >"$OUT" 2>"$ERR"
+code=$?
+set -e
+
+# The guard: an in-use legacy label must never reach the delete path.
+if [ -e "$DELETE_MARKER" ]; then
+  fail "delete path issued DELETE for an in-use legacy label"
+fi
+
+# ...and it must be routed to migration instead, with nothing queued for deletion.
+ruby -rjson -e '
+  data = JSON.parse(File.read(ARGV.fetch(0)))
+  ops = data.fetch("results").fetch(0).fetch("legacy_operations")
+  unless ops.fetch("would_delete_unused").empty?
+    abort "in-use legacy label was queued for deletion: #{ops.fetch('"'"'would_delete_unused'"'"').inspect}"
+  end
+  migrating = ops.fetch("would_migrate").map { |m| m.fetch("legacy") }
+  unless migrating.include?("bug 🐞")
+    abort "in-use legacy label was not queued for migration: #{migrating.inspect}"
+  end
+' "$OUT" || fail "in-use legacy label was not handled correctly"
+
+[ "$code" = 0 ] || fail "expected clean exit for in-use legacy preview, got $code"
+
+# Migration order is load-bearing: the canonical label must be added to every
+# carrying item BEFORE the legacy label is deleted. Deleting first would strip
+# the association with nothing to replace it. This stub logs call order.
+ORDER_BIN="$TEST_TMP/order-bin"
+ORDER_LOG="$TEST_TMP/order.log"
+export ORDER_LOG
+mkdir -p "$ORDER_BIN"
+: >"$ORDER_LOG"
+cat >"$ORDER_BIN/gh" <<'GH'
+#!/usr/bin/env sh
+set -eu
+case "$*" in
+  *"/labels?per_page=100"*)
+    printf '{"name":"bug 🐞","color":"d73a4a","description":"legacy"}\n'
+    exit 0
+    ;;
+  *"issues?state=all"*)
+    # After the relabel has been recorded, report the canonical label as present
+    # so the script's own verification step can succeed.
+    if grep -q '^ADD' "$ORDER_LOG" 2>/dev/null; then
+      printf '{"number":7,"labels":[{"name":"bug 🐞"},{"name":"type:bug"}]}\n'
+    else
+      printf '{"number":7,"labels":[{"name":"bug 🐞"}]}\n'
+    fi
+    exit 0
+    ;;
+  *"/issues/7/labels"*--method\ POST*)
+    printf 'ADD\n' >>"$ORDER_LOG"
+    printf '\n'
+    exit 0
+    ;;
+  *--method\ DELETE*)
+    printf 'DELETE\n' >>"$ORDER_LOG"
+    printf '\n'
+    exit 0
+    ;;
+esac
+printf '\n'
+exit 0
+GH
+chmod +x "$ORDER_BIN/gh"
+
+assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" \
+  --repo z-shell/.github \
+  --migrate-legacy \
+  --confirm-migrate-legacy \
+  --json
+
+grep -q '^ADD' "$ORDER_LOG" || fail "migration never added the canonical label"
+grep -q '^DELETE' "$ORDER_LOG" || fail "migration never removed the legacy label"
+[ "$(head -n 1 "$ORDER_LOG")" = "ADD" ] || {
+  cat "$ORDER_LOG" >&2
+  fail "migration deleted the legacy label before relabelling items"
+}
+
+# Preview modes must be read-only: no POST, no DELETE, for either mode.
+: >"$ORDER_LOG"
+assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" --repo z-shell/.github --migrate-legacy --json
+[ -s "$ORDER_LOG" ] && {
+  cat "$ORDER_LOG" >&2
+  fail "--migrate-legacy preview issued write calls"
+}
+
+: >"$ORDER_LOG"
+assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" --repo z-shell/.github --delete-unused-legacy --json
+[ -s "$ORDER_LOG" ] && {
+  cat "$ORDER_LOG" >&2
+  fail "--delete-unused-legacy preview issued write calls"
+}
+
 printf 'labels-sync smoke tests passed\n'
