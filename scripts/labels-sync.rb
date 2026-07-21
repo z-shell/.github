@@ -171,6 +171,16 @@ DESTRUCTIVE_MODES = {
   "delete-unused-legacy" => %i[delete_unused_legacy confirm_delete_unused_legacy]
 }.freeze
 
+# One destructive operation per invocation. Both modes can run in the same
+# process, but a single run reports a single mode, and migrate-then-delete is an
+# ordering an operator should carry out deliberately rather than have inferred.
+if options.migrate_legacy && options.delete_unused_legacy
+  warn parser
+  warn "\nerror: use either --migrate-legacy or --delete-unused-legacy, not both"
+  warn "run them as separate invocations so each reports its own mode and is confirmed on its own"
+  exit 2
+end
+
 DESTRUCTIVE_MODES.each do |name, (preview_flag, confirm_flag)|
   preview = options.public_send(preview_flag)
   confirm = options.public_send(confirm_flag)
@@ -660,8 +670,16 @@ if options.json
   exit(apply_failed || legacy_failed ? 1 : 0)
 end
 
-heading = options.apply ? "# Label sync apply preview" : "# Label sync dry-run"
-heading = "# Label sync apply result" if options.apply && options.confirm_apply
+heading =
+  case mode
+  when "migrate" then "# Label sync migration result"
+  when "migrate-preview" then "# Label sync migration preview"
+  when "delete" then "# Label sync deletion result"
+  when "delete-preview" then "# Label sync deletion preview"
+  when "apply" then "# Label sync apply result"
+  when "apply-preview" then "# Label sync apply preview"
+  else "# Label sync dry-run"
+  end
 puts heading
 puts
 puts "Mode: #{payload.fetch('mode')}"
@@ -672,9 +690,18 @@ puts "Repos scanned: #{results.length}"
 puts "Repos with drift: #{payload.fetch('repos_with_drift')}"
 puts
 
-if options.apply && options.confirm_apply
+case mode
+when "migrate"
+  puts "Confirmed migration: items were relabelled and migrated legacy labels were removed."
+when "migrate-preview"
+  puts "Migration preview only. Pass --confirm-migrate-legacy to relabel items and remove legacy labels."
+when "delete"
+  puts "Confirmed deletion: unused legacy labels were removed."
+when "delete-preview"
+  puts "Deletion preview only. Pass --confirm-delete-unused-legacy to remove unused legacy labels."
+when "apply"
   puts "Confirmed apply mode: canonical labels may have been created or updated."
-elsif options.apply
+when "apply-preview"
   puts "Apply preview only. Pass --confirm-apply to create/update canonical labels."
 else
   puts "This is a read-only dry run. No labels or issues were changed."

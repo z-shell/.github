@@ -269,6 +269,32 @@ grep -q '^DELETE' "$ORDER_LOG" || fail "migration never removed the legacy label
   fail "migration deleted the legacy label before relabelling items"
 }
 
+# One destructive operation per invocation: the two legacy modes are exclusive.
+assert_exit 2 "$SCRIPT" --repo z-shell/.github --migrate-legacy --delete-unused-legacy
+
+# Confirmed destructive runs must never describe themselves as a read-only dry
+# run in the Markdown output; that would misrepresent what happened in logs.
+: >"$ORDER_LOG"
+assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" --repo z-shell/.github \
+  --migrate-legacy --confirm-migrate-legacy
+grep -q 'read-only dry run' "$OUT" && {
+  cat "$OUT" >&2
+  fail "confirmed migration described itself as a read-only dry run"
+}
+grep -q '^# Label sync migration result' "$OUT" || {
+  cat "$OUT" >&2
+  fail "confirmed migration did not use the migration heading"
+}
+
+: >"$ORDER_LOG"
+assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" --repo z-shell/.github --delete-unused-legacy
+grep -q 'read-only dry run' "$OUT" && {
+  cat "$OUT" >&2
+  fail "deletion preview described itself as a read-only dry run"
+}
+
 # Preview modes must be read-only: no POST, no DELETE, for either mode.
 : >"$ORDER_LOG"
 assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
