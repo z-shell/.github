@@ -44,8 +44,8 @@ Grant only what the role requires; record the grant:
   clone.
 - Configure commit signing: commits are signed (`gpg.format=ssh`); set a
   `user.signingkey`. Never add a `Co-authored-by` trailer — this is org policy,
-  and note that no default-branch CI currently enforces it, so it is author's
-  responsibility, not a gate that will catch a mistake.
+  and note that no default-branch CI currently enforces it, so it is the
+  author's responsibility, not a gate that will catch a mistake.
 - Follow Conventional Commits and the branch model for the repo's class
   (ADR-0008).
 
