@@ -4,7 +4,7 @@ Use this runbook when cleaning or syncing labels across z-shell repositories.
 
 ## Source of truth
 
-`.github/lib/labels.yml` is the canonical organization label set.
+`lib/labels.yml` is the canonical organization label set.
 
 Use compact namespace names:
 
@@ -108,11 +108,11 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
    scripts/labels-sync.rb --all-repos > /tmp/z-shell-labels-dry-run.md
    ```
 
-3. Create or update every canonical label from `.github/lib/labels.yml`.
+3. Create or update every canonical label from `lib/labels.yml`.
 4. For each legacy label, find open issues and pull requests using it.
 5. Add the canonical replacement to each item before removing the legacy label.
 6. Delete legacy labels only after they are no longer used.
-7. Re-run the dry-run audit and compare it with `.github/lib/labels.yml`.
+7. Re-run the dry-run audit and compare it with `lib/labels.yml`.
 
 Do not delete unknown labels in bulk. If a repository has a local label that is not obviously legacy, open or update an issue before removing it.
 
@@ -180,6 +180,6 @@ scripts/labels-sync.rb \
 
 ## See also
 
-- `.github/lib/labels.yml`
+- `lib/labels.yml`
 - `runbooks/triage.md`
 - `runbooks/org-review.md`

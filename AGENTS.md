@@ -86,7 +86,7 @@ Use `runbooks/triage.md` for the full process.
 Short version:
 
 - Classify issues by work type, area, and severity.
-- Use the canonical labels from `.github/lib/labels.yml`.
+- Use the canonical labels from `lib/labels.yml`.
 - Search for prior art across the org before responding.
 - Put cross-repo, release-blocking, security, or strategic work on Linear.
 
