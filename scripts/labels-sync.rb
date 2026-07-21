@@ -24,6 +24,10 @@ PILOT_APPLY_REPOS = [
   "z-shell/.github"
 ].freeze
 
+# Relabel passes allowed before a migration gives up rather than delete a legacy
+# label that is still gaining items.
+MAX_MIGRATION_PASSES = 5
+
 Options = Struct.new(
   :labels_file,
   :org,
@@ -440,20 +444,32 @@ def migrate_legacy_labels(owner_repo, operations)
     relabelled = []
 
     begin
-      migration.fetch("items").each do |number|
-        add_label_to_item(owner_repo, number, replacement)
-        relabelled << number
+      # Relabel every item that currently carries the legacy label, then look
+      # again, until a pass finds nothing left to do. The planned item list is
+      # only a preview: deleting a label strips it from every holder at that
+      # moment, so anything that acquires the legacy label between planning and
+      # deletion would lose it with no replacement. Converging here closes that
+      # window instead of trusting the plan.
+      passes = 0
+      loop do
+        passes += 1
+        pending = repo_items(owner_repo).select do |item|
+          item.fetch("labels").include?(legacy) && !item.fetch("labels").include?(replacement)
+        end
+        break if pending.empty?
+
+        if passes > MAX_MIGRATION_PASSES
+          raise "#{legacy} kept gaining items across #{MAX_MIGRATION_PASSES} passes; " \
+                "aborting before delete so nothing loses its labelling"
+        end
+
+        pending.each do |item|
+          add_label_to_item(owner_repo, item.fetch("number"), replacement)
+          relabelled << item.fetch("number")
+        end
       end
 
-      still_missing = repo_items(owner_repo).select do |item|
-        migration.fetch("items").include?(item.fetch("number")) &&
-          !item.fetch("labels").include?(replacement)
-      end
-
-      unless still_missing.empty?
-        raise "#{replacement} did not land on items #{still_missing.map { |i| i.fetch('number') }.join(', ')}"
-      end
-
+      relabelled.uniq!
       delete_label(owner_repo, legacy)
       result.fetch("removed") << legacy
       result.fetch("relabelled") << { "legacy" => legacy, "replacement" => replacement, "items" => relabelled }

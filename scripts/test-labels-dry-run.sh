@@ -286,4 +286,61 @@ assert_success env PATH="$ORDER_BIN:$PATH" "$SCRIPT" \
   fail "--delete-unused-legacy preview issued write calls"
 }
 
+# An item that acquires the legacy label between planning and deletion must not
+# lose it. Deleting a label strips it from every holder at that moment, so the
+# migration has to re-check for late arrivals before it deletes.
+RACE_BIN="$TEST_TMP/race-bin"
+RACE_LOG="$TEST_TMP/race.log"
+export RACE_LOG
+mkdir -p "$RACE_BIN"
+: >"$RACE_LOG"
+cat >"$RACE_BIN/gh" <<'GH'
+#!/usr/bin/env sh
+set -eu
+case "$*" in
+  *"/labels?per_page=100"*)
+    printf '{"name":"bug 🐞","color":"d73a4a","description":"legacy"}\n'
+    exit 0
+    ;;
+  *"issues?state=all"*)
+    # Item 7 is known at plan time. Item 8 shows up carrying the legacy label
+    # only after the first relabel — the race this guards against.
+    if grep -q '^ADD 7' "$RACE_LOG" 2>/dev/null; then
+      printf '{"number":7,"labels":[{"name":"bug 🐞"},{"name":"type:bug"}]}\n'
+      if grep -q '^ADD 8' "$RACE_LOG" 2>/dev/null; then
+        printf '{"number":8,"labels":[{"name":"bug 🐞"},{"name":"type:bug"}]}\n'
+      else
+        printf '{"number":8,"labels":[{"name":"bug 🐞"}]}\n'
+      fi
+    else
+      printf '{"number":7,"labels":[{"name":"bug 🐞"}]}\n'
+    fi
+    exit 0
+    ;;
+  *"/issues/7/labels"*--method\ POST*) printf 'ADD 7\n' >>"$RACE_LOG"; printf '\n'; exit 0 ;;
+  *"/issues/8/labels"*--method\ POST*) printf 'ADD 8\n' >>"$RACE_LOG"; printf '\n'; exit 0 ;;
+  *--method\ DELETE*) printf 'DELETE\n' >>"$RACE_LOG"; printf '\n'; exit 0 ;;
+esac
+printf '\n'
+exit 0
+GH
+chmod +x "$RACE_BIN/gh"
+
+assert_success env PATH="$RACE_BIN:$PATH" "$SCRIPT" \
+  --labels-file "$INUSE_LABELS" \
+  --repo z-shell/.github \
+  --migrate-legacy \
+  --confirm-migrate-legacy \
+  --json
+
+grep -q '^ADD 8' "$RACE_LOG" || {
+  cat "$RACE_LOG" >&2
+  fail "late-arriving item 8 never received the canonical label"
+}
+[ "$(grep -n '^DELETE' "$RACE_LOG" | head -n 1 | cut -d: -f1)" -gt \
+  "$(grep -n '^ADD 8' "$RACE_LOG" | head -n 1 | cut -d: -f1)" ] || {
+  cat "$RACE_LOG" >&2
+  fail "legacy label was deleted before the late-arriving item was relabelled"
+}
+
 printf 'labels-sync smoke tests passed\n'
