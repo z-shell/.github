@@ -22,19 +22,19 @@ labels:
     color: 0e8a16
     description: A request for new behavior or capability.
   - name: type:docs
-    color: '0052cc'
+    color: "0052cc"
     description: Documentation-only work.
   - name: type:question
     color: d4c5f9
     description: Support, clarification, or usage question.
   - name: type:maintenance
-    color: '531999'
+    color: "531999"
     description: Non-feature maintenance, cleanup, or org work.
   - name: type:membership
     color: 6f42c1
     description: Membership and organization-role requests.
   - name: type:handoff
-    color: '5319e7'
+    color: "5319e7"
     description: Cross-agent or cross-maintainer handoff context.
 
   # Area
@@ -51,10 +51,10 @@ labels:
     color: 3e16f3
     description: Package or package-management work.
   - name: area:docs
-    color: '0052cc'
+    color: "0052cc"
     description: Documentation systems, content, or publishing.
   - name: area:ci
-    color: '5319e7'
+    color: "5319e7"
     description: Continuous integration or GitHub Actions work.
   - name: area:dependencies
     color: fbca04
@@ -76,6 +76,9 @@ labels:
   - name: security
     color: ee0701
     description: Security-sensitive issue or hardening work.
+  - name: performance
+    color: "006b75"
+    description: Performance-sensitive work or a measured regression in speed or memory.
   - name: breaking-change
     color: d93f0b
     description: Breaks backward compatibility or changes a public contract.
@@ -89,10 +92,10 @@ labels:
     color: f9d0c4
     description: Waiting on more detail before work can continue.
   - name: good first issue
-    color: '7057ff'
+    color: "7057ff"
     description: Well-scoped starter task for a new contributor.
   - name: help wanted
-    color: '008672'
+    color: "008672"
     description: Maintainers would welcome outside help.
   - name: invalid
     color: 0b467f
@@ -104,17 +107,17 @@ labels:
     color: ffffff
     description: Acknowledged but not planned for implementation.
   - name: meta:org-tracked
-    color: '5319e7'
+    color: "5319e7"
     description: Indicates this issue has cross-repository tracking implications (synced to Linear).
 
   # External automation labels retained for compatibility.
   # These are not part of the triage taxonomy but appear in z-shell/.github
   # and are commonly managed by Dependabot / dependency automation.
   - name: dependencies
-    color: '0366d6'
+    color: "0366d6"
     description: Pull requests that update a dependency file
   - name: github_actions
-    color: '000000'
+    color: "000000"
     description: Pull requests that update GitHub Actions code
 
 legacy_migrations:
@@ -147,6 +150,7 @@ legacy_migrations:
   help-wanted: help wanted
   breaking-change 💥: breaking-change
   security 🛡️: security
+  performance 🚀: performance
   invalid ⚠️: invalid
 
 sync_policy:

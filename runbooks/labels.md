@@ -44,6 +44,7 @@ The org tracker auto-add label is `meta:org-tracked`.
 - `priority:high`
 - `regression`
 - `security`
+- `performance`
 - `breaking-change`
 - `status:triage`
 - `status:blocked`
@@ -87,6 +88,7 @@ Common legacy labels:
 | `help-wanted`              | `help wanted`       |
 | `breaking-change 💥`       | `breaking-change`   |
 | `security 🛡️`              | `security`          |
+| `performance 🚀`           | `performance`       |
 | `invalid ⚠️`               | `invalid`           |
 
 Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priority: high`, and `status: triage`.
