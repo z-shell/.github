@@ -76,6 +76,9 @@ labels:
   - name: security
     color: ee0701
     description: Security-sensitive issue or hardening work.
+  - name: performance
+    color: "006b75"
+    description: Performance-sensitive work or a measured regression in speed or memory.
   - name: breaking-change
     color: d93f0b
     description: Breaks backward compatibility or changes a public contract.
@@ -147,6 +150,7 @@ legacy_migrations:
   help-wanted: help wanted
   breaking-change 💥: breaking-change
   security 🛡️: security
+  performance 🚀: performance
   invalid ⚠️: invalid
 
 sync_policy:

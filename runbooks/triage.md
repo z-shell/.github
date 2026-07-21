@@ -62,6 +62,7 @@ The organization label set in `.github/lib/labels.yml` is the source of truth. A
 | high priority          | `priority:high`    |
 | breaking change        | `breaking-change`  |
 | security-sensitive     | `security`         |
+| performance-sensitive  | `performance`      |
 | good first issue       | `good first issue` |
 | help wanted            | `help wanted`      |
 | invalid                | `invalid`          |
