@@ -112,9 +112,10 @@ migrated, expect its behavior to reflect both systems at once.
 
 ### Repositories with no CI
 
-23 repositories have no workflow files. "Required status checks" is unsatisfiable
-there. Those repositories are conformant on every other row and are reported as
-`n/a` for that row rather than as failures.
+23 repositories have no workflow files, so the **Required status checks** row is
+unsatisfiable there — there is no check to require. Those repositories are
+conformant on every other row and are reported as `n/a` for that row rather than
+as failures.
 
 ## Rollout and rollback
 
