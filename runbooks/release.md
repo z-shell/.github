@@ -80,6 +80,87 @@ Repositories that should stay out of the first pilot:
 - `.github`
 - `zi`
 
+## Post-promotion branch reconcile (class 1)
+
+Applies to class-1 repositories that promote a development branch to a deployed
+branch, such as `wiki` promoting `next` to `main`.
+
+### Why this is routine, not an incident
+
+When the deployed branch requires both pull requests and linear history, every
+merge method GitHub offers — squash or rebase — creates **new commits on the
+deployed branch that the development branch does not have**. A merge commit,
+which would keep the branches related, is exactly what linear history forbids.
+
+So the development branch diverges after *every* promotion, by construction.
+There is no branch-protection configuration that avoids it. Reconciling is a
+step in the release, not a sign that something went wrong.
+
+### Do not reconcile with a merge
+
+A `git merge` creates a merge commit, which violates `required_linear_history`.
+An administrator's push is **not refused** — it silently reports
+`Bypassed rule violations` and succeeds anyway. Check the branch's rules before
+choosing a strategy:
+
+```sh
+gh api repos/OWNER/REPO/rules/branches/BRANCH -q '[.[].type]|join(", ")'
+```
+
+Note that rulesets and classic branch protection are **independent** systems and
+the effective rule is their union. Classic protection can report
+`required_linear_history: false` for a branch that a ruleset separately
+enforces it on, so check both before concluding a merge commit is allowed.
+
+### Procedure
+
+Immediately after the promotion merges, when everything on the development
+branch has shipped:
+
+```sh
+git fetch origin
+
+# 1. Safety gate. The trees must be identical — that is what makes this
+#    content-neutral. If they differ, the development branch has unmerged
+#    work and must not be reset.
+[ "$(git rev-parse origin/main^{tree})" = "$(git rev-parse origin/next^{tree})" ] \
+  && echo SAFE || echo "STOP: next has unmerged content"
+
+# 2. Realign the development branch onto the deployed branch.
+git checkout next
+git reset --hard origin/main
+
+# 3. Publish. A force is required: history is being replaced, not extended.
+git push --force-with-lease origin next
+```
+
+Use `--force-with-lease`, never `--force`, so the push aborts if anyone else
+has pushed to the branch since the fetch.
+
+### What to expect, and what to check
+
+- **This push bypasses a rule and cannot avoid it.** A direct push carries no
+  prior status check, so the branch reports
+  `Required status check "Trunk Check" is expected`. There is no
+  pull-request route to this operation — a pull request can only add commits,
+  and realignment rewrites history. Read the push output rather than silencing
+  it, and confirm the only bypass reported is the expected status check.
+- **Never run `git push -q` or pipe push output through `tail` on a protected
+  branch.** The `Bypassed rule violations` warning arrives at push time and is
+  easily truncated away.
+- Afterwards the two branches should be the *same commit*, not merely the same
+  content:
+
+  ```sh
+  [ "$(git rev-parse origin/next)" = "$(git rev-parse origin/main)" ] && echo reconciled
+  ```
+
+### If the safety gate fails
+
+Do not reset. Differing trees mean the development branch carries work that the
+promotion did not include. Promote that work first, or rebase it onto the
+deployed branch, and only then realign.
+
 ## Release preparation automation (class 2)
 
 The reusable workflow
