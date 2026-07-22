@@ -74,7 +74,7 @@ table stays readable:
 
 | Setting | Class 1 | Class 2 | Class 3 | Class 4 |
 | --- | --- | --- | --- | --- |
-| Default branch named `main` | R | R | R | R |
+| Default branch named `main` (audit only, never auto-applied) | R | R | R | R |
 | Pull request required to the default branch | R | R | R | R |
 | Deletion of the default branch blocked | R | R | R | R |
 | Force push to the default branch blocked | R | R | R | R |
@@ -127,8 +127,26 @@ as failures.
    mode behind both `--apply` and `--confirm-apply`, and a pilot allowlist.
 4. Apply per repository, deliberately, starting with class 1 and class 2.
 
-Rollback is per repository and immediate: rulesets can be deleted without
-touching repository contents. Nothing in this ADR is irreversible.
+Rollback differs by setting, and the distinction matters.
+
+Every row except the first is expressed as a ruleset. Those are reversible per
+repository and immediately: deleting the ruleset restores the prior state without
+touching repository contents.
+
+**Renaming a default branch is not in that category** and must not be treated as
+one. It is not a ruleset, so deleting rulesets does not undo it. GitHub retargets
+open pull requests and installs a redirect, but existing clones keep tracking the
+old name, and anything referencing the branch by name — workflow triggers in
+other repositories, documentation links, external CI, `uses:` references pinned
+to a branch — is not updated. Reverting means renaming back and repairing the
+same references twice.
+
+The default-branch row is therefore **excluded from any automated apply**. Only
+`z-shell/web` is currently non-conformant, and it should be migrated as a
+deliberate one-off with its references audited first, not swept up in a
+conformance run.
+
+With that row excluded, nothing the audit applies is irreversible.
 
 ## Consequences
 
