@@ -61,9 +61,18 @@ the reference that repositories are configured against and audited for.
 
 ### Baseline by class
 
-`R` = required. `S` = recommended, not required. `—` = not required.
+Classes are exactly those defined in
+`decisions/0007-release-publication-flow.md`, referred to here by number so the
+table stays readable:
 
-| Setting | 1. Deployed | 2. Versioned | 3. Git-consumed | 4. Meta |
+1. **Continuously deployed artifacts** — `wiki`, `src`, `zd` images
+2. **Versioned tools and packages** — `zunit`, `zsh-lint`, packaged `zsh`
+3. **Git-consumed source** — `zi`, most plugins and annexes
+4. **Meta/infrastructure** — `.github`
+
+`R` = required. `S` = recommended, not required.
+
+| Setting | Class 1 | Class 2 | Class 3 | Class 4 |
 | --- | --- | --- | --- | --- |
 | Default branch named `main` | R | R | R | R |
 | Pull request required to the default branch | R | R | R | R |
