@@ -145,11 +145,18 @@ if [ "$(git rev-parse "origin/$DEPLOY^{tree}")" != "$(git rev-parse "origin/$DEV
 fi
 
 # 2. Realign the development branch onto the deployed branch.
-git checkout "$DEV"
-git reset --hard "origin/$DEPLOY"
+#    -B with an explicit remote-tracking start point creates or resets the
+#    branch in one step. A bare `git checkout "$DEV"` lands in detached HEAD
+#    when a tag shares the branch name, and the reset would then move a
+#    detached HEAD instead of the branch. --no-track stops the branch from
+#    silently tracking the deployed branch afterwards.
+git checkout -B "$DEV" --no-track "origin/$DEPLOY"
+git branch --set-upstream-to "origin/$DEV" "$DEV"
 
 # 3. Publish. A force is required: history is being replaced, not extended.
-git push --force-with-lease "origin" "$DEV"
+#    Use a fully-qualified refspec: a short name fails with
+#    "src refspec matches more than one" when a tag shares it.
+git push --force-with-lease origin "refs/heads/$DEV:refs/heads/$DEV"
 ```
 
 Use `--force-with-lease`, never `--force`, so the push aborts if anyone else
