@@ -42,7 +42,7 @@ automation without ever configuring protection. Settings have therefore been set
 per repository, by hand, at different times, against no shared reference.
 
 Two mechanisms are in play simultaneously. Classic branch protection and
-repository rulesets are **independent** systems whose effective behaviour is
+repository rulesets are **independent** systems whose effective behavior is
 their union. `z-shell/wiki` reports `required_linear_history: false` under
 classic protection while a ruleset enforces it on the same branch. Reading
 either source alone gives a wrong answer, and 19 repositories still carry
@@ -99,7 +99,7 @@ deleted, not merely once a ruleset exists alongside it.
 
 Migration of the 19 classic-only repositories is not required by this ADR and
 should not be bundled with adopting the baseline. Until a repository is
-migrated, expect its behaviour to reflect both systems at once.
+migrated, expect its behavior to reflect both systems at once.
 
 ### Repositories with no CI
 
