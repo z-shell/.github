@@ -85,6 +85,10 @@ Repositories that should stay out of the first pilot:
 Applies to class-1 repositories that promote a development branch to a deployed
 branch, such as `wiki` promoting `next` to `main`.
 
+Branch names differ between repositories. The procedure below takes them as
+`DEPLOY` and `DEV` variables — set them for the repository you are working on
+rather than assuming `main` and `next`.
+
 ### Why this is routine, not an incident
 
 When the deployed branch requires both pull requests and linear history, every
@@ -99,8 +103,9 @@ step in the release, not a sign that something went wrong.
 ### Do not reconcile with a merge
 
 A `git merge` creates a merge commit, which violates `required_linear_history`.
-An administrator's push is **not refused** — it silently reports
-`Bypassed rule violations` and succeeds anyway. Check the branch's rules before
+An administrator's push is **not refused** — it prints `Bypassed rule
+violations` and succeeds anyway. The push is not silent; it is simply not
+stopped, and the warning is easy to miss. Check the branch's rules before
 choosing a strategy:
 
 ```sh
@@ -115,23 +120,36 @@ enforces it on, so check both before concluding a merge commit is allowed.
 ### Procedure
 
 Immediately after the promotion merges, when everything on the development
-branch has shipped:
+branch has shipped.
+
+Save this as a script and run it — do not paste the lines individually. Steps 2
+and 3 reset a branch and force-push it, so the safety gate has to be able to
+abort the run, which it cannot do when each line is pasted separately.
 
 ```sh
+#!/usr/bin/env sh
+set -eu
+
+# Branch names for the repository being reconciled.
+DEPLOY=main
+DEV=next
+
 git fetch origin
 
-# 1. Safety gate. The trees must be identical — that is what makes this
-#    content-neutral. If they differ, the development branch has unmerged
-#    work and must not be reset.
-[ "$(git rev-parse origin/main^{tree})" = "$(git rev-parse origin/next^{tree})" ] \
-  && echo SAFE || echo "STOP: next has unmerged content"
+# 1. Safety gate. The trees must be identical — that is what makes the reset
+#    content-neutral. Differing trees mean the development branch carries work
+#    the promotion did not include, so abort rather than destroy it.
+if [ "$(git rev-parse "origin/$DEPLOY^{tree}")" != "$(git rev-parse "origin/$DEV^{tree}")" ]; then
+  echo "STOP: $DEV has content not present in $DEPLOY; do not reset" >&2
+  exit 1
+fi
 
 # 2. Realign the development branch onto the deployed branch.
-git checkout next
-git reset --hard origin/main
+git checkout "$DEV"
+git reset --hard "origin/$DEPLOY"
 
 # 3. Publish. A force is required: history is being replaced, not extended.
-git push --force-with-lease origin next
+git push --force-with-lease "origin" "$DEV"
 ```
 
 Use `--force-with-lease`, never `--force`, so the push aborts if anyone else
@@ -152,7 +170,7 @@ has pushed to the branch since the fetch.
   content:
 
   ```sh
-  [ "$(git rev-parse origin/next)" = "$(git rev-parse origin/main)" ] && echo reconciled
+  [ "$(git rev-parse "origin/$DEV")" = "$(git rev-parse "origin/$DEPLOY")" ] && echo reconciled
   ```
 
 ### If the safety gate fails
