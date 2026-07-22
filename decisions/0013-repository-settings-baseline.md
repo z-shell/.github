@@ -88,9 +88,18 @@ Rationale for the differences:
 ### Expressed as rulesets, not classic protection
 
 New configuration uses repository rulesets. Classic branch protection is treated
-as legacy: it is not extended, and where both exist the ruleset is authoritative.
+as legacy and is not extended.
+
+Where both exist, **neither one is authoritative**: the two systems apply
+simultaneously and the effective rule is their union. A ruleset does not
+override, disable, or supersede classic protection — the classic settings keep
+applying until they are explicitly removed. Any audit must therefore read both
+sources, and a repository is only fully migrated once its classic protection is
+deleted, not merely once a ruleset exists alongside it.
+
 Migration of the 19 classic-only repositories is not required by this ADR and
-should not be bundled with adopting the baseline.
+should not be bundled with adopting the baseline. Until a repository is
+migrated, expect its behaviour to reflect both systems at once.
 
 ### Repositories with no CI
 
