@@ -1481,8 +1481,22 @@ class PublicRepositoryTests(unittest.TestCase):
         adr = (
             PUBLIC_ROOT / "decisions/0014-portable-agent-instruction-architecture.md"
         ).read_text()
-        self.assertIn("**Status:** PROPOSED", adr)
+        self.assertIn("**Status:** ACCEPTED", adr)
+        self.assertIn("**Deciders:** ss-o", adr)
+        self.assertNotIn("remains a proposal", adr)
+        self.assertNotIn("Upon acceptance", adr)
         self.assertIn("z-shell/.github#475", adr)
+
+        superseded_adr = (
+            PUBLIC_ROOT / "decisions/0001-meta-repo-and-agents-md.md"
+        ).read_text()
+        self.assertIn("**Status:** ACCEPTED", superseded_adr)
+        self.assertIn(
+            "**Superseded by:** "
+            "`decisions/0014-portable-agent-instruction-architecture.md` "
+            "for the vendor-entry-point layout",
+            superseded_adr,
+        )
 
         runbook = (PUBLIC_ROOT / "runbooks/instruction-update.md").read_text()
         for question in REQUIRED_IMPACT_QUESTIONS:

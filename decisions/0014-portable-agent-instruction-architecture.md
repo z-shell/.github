@@ -1,9 +1,9 @@
 # 14. Adopt portable agent-instruction delivery
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-07-23
-- **Deciders:** Pending maintainer acceptance
-- **Supersedes:** ADR-0001's vendor-entry-point layout upon acceptance
+- **Deciders:** ss-o
+- **Supersedes:** `decisions/0001-meta-repo-and-agents-md.md` vendor-entry-point layout
 - **Superseded by:** None
 
 ## Context
@@ -21,15 +21,16 @@ that keeps public policy standalone, permits a private overlay without copying
 policy by hand, and makes every material instruction change reviewable across
 all supported runtimes and repository contexts.
 
-This ADR remains a proposal. ADR 0001 stays accepted and is not superseded
-unless a maintainer accepts and merges this decision.
+The maintainer accepted this ADR on 2026-07-23. ADR 0001 remains the historical
+basis for the organization meta-repository, while this decision supersedes its
+vendor-entry-point layout.
 
 ADR number 0013 is reserved by the separate repository-settings proposal and is
 not modified here.
 
 ## Decision
 
-Upon acceptance, adopt the following instruction architecture:
+Adopt the following instruction architecture:
 
 1. The public `AGENTS.md` is the canonical organization baseline. It is a
    standalone instruction document and does not require another repository,
