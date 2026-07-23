@@ -14,6 +14,7 @@ from pathlib import Path
 
 SCRIPT_PATH = Path(__file__).with_name("validate-agent-policy.py")
 PUBLIC_ROOT = SCRIPT_PATH.parents[1]
+PUBLIC_POLICY_BYTE_LIMIT = 32_768
 REQUIRED_IMPACT_QUESTIONS = (
     "Is this shared policy, scoped guidance, runtime-only behavior, or enforcement?",
     "Which runtimes and repository contexts must receive it?",
@@ -177,6 +178,51 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             "invalid JSON",
         )
 
+    def test_rejects_manifest_symlink_to_outside_file(self) -> None:
+        with tempfile.TemporaryDirectory() as outside_directory:
+            outside_manifest = Path(outside_directory) / "instruction-surfaces.json"
+            outside_manifest.write_text(
+                json.dumps(self.manifest, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            manifest_path = self.root / ".github/instruction-surfaces.json"
+            manifest_path.unlink()
+            manifest_path.symlink_to(outside_manifest)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "symlink",
+        )
+
+    def test_rejects_forbidden_reference_in_manifest_metadata(self) -> None:
+        self.manifest["metadata"] = {
+            "maintainer_note": "Read workspace/repos.yml before editing."
+        }
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "workspace/repos.yml",
+        )
+
+    def test_rejects_forbidden_reference_in_manifest_metadata_key(self) -> None:
+        self.manifest["metadata"] = {"workspace/repos.yml": "private source"}
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "workspace/repos.yml",
+        )
+
     def test_rejects_unknown_schema_version(self) -> None:
         self.manifest["version"] = 2
         write_manifest(self.root, self.manifest)
@@ -209,6 +255,72 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
                     self.assert_error_contains(
                         errors, "organization-policy", invalid_value
+                    )
+
+    def test_rejects_kind_mismatch_for_inventoried_paths(self) -> None:
+        cases = (
+            ("AGENTS.md", "shared-policy", "# Agent policy\n"),
+            ("PATTERNS.md", "shared-policy", "# Patterns\n"),
+            (".github/AGENT_MEMORY.md", "runbook", "# Memory\n"),
+            (".github/README.md", "runbook", "# Catalog\n"),
+            (".github/copilot-instructions.md", "adapter", "@../AGENTS.md\n"),
+            (
+                ".github/instructions/example.instructions.md",
+                "scoped-guidance",
+                '---\napplyTo: "**"\n---\n\n# Example\n',
+            ),
+            (".github/agents/example.agent.md", "agent", "# Example agent\n"),
+            (".github/skills/example/SKILL.md", "skill", "# Example skill\n"),
+            ("runbooks/example.md", "runbook", "# Example runbook\n"),
+            ("decisions/0001-example.md", "decision", "# Example decision\n"),
+            (
+                ".github/workflows/agent-instructions.yml",
+                "enforcement",
+                "name: Agent Instructions\n",
+            ),
+            (
+                "scripts/validate-agent-policy.py",
+                "enforcement",
+                "# Validator fixture\n",
+            ),
+        )
+        for relative_path, expected_kind, content in cases:
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    surface = next(
+                        (
+                            item
+                            for item in manifest["surfaces"]
+                            if item["path"] == relative_path
+                        ),
+                        None,
+                    )
+                    wrong_kind = (
+                        "runbook" if expected_kind == "decision" else "decision"
+                    )
+                    if surface is None:
+                        surface = make_surface(
+                            f"fixture-{expected_kind}",
+                            relative_path,
+                            kind=wrong_kind,
+                            authority="canonical-detail",
+                            consumers=["human"],
+                        )
+                        manifest["surfaces"].append(surface)
+                        write_file(root, relative_path, content)
+                    else:
+                        surface["kind"] = wrong_kind
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        f"declared kind {wrong_kind!r}",
+                        f"inventory kind {expected_kind!r}",
                     )
 
     def test_rejects_non_string_enum_values_without_traceback(self) -> None:
@@ -391,6 +503,38 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
         self.assert_error_contains(errors, "AGENTS.md", "workspace/repos.yml")
 
+    def test_rejects_private_reference_when_active_surface_is_relabeled_decision(
+        self,
+    ) -> None:
+        self.manifest["surfaces"][1]["kind"] = "decision"
+        write_file(self.root, "PATTERNS.md", "Read workspace/repos.yml.\n")
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "PATTERNS.md", "workspace/repos.yml")
+
+    def test_exempts_historical_decision_by_path(self) -> None:
+        decision_path = "decisions/0001-historical.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "historical-decision",
+                decision_path,
+                kind="decision",
+                authority="canonical-detail",
+                consumers=["human"],
+                tasks=["history"],
+            )
+        )
+        write_file(
+            self.root,
+            decision_path,
+            "The historical process used workspace/repos.yml.\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        self.assertEqual(validator.validate(self.root), [])
+
     def test_rejects_private_reference_in_declared_enforcement_surface(self) -> None:
         workflow_path = ".github/workflows/agent-instructions.yml"
         self.manifest["surfaces"].append(
@@ -437,6 +581,34 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             )
 
         self.assertEqual(validator.validate(self.root), [])
+
+    def test_allows_agents_at_exact_byte_limit(self) -> None:
+        policy = self.root / "AGENTS.md"
+        policy.write_text(
+            "\N{LATIN SMALL LETTER E WITH ACUTE}" * (PUBLIC_POLICY_BYTE_LIMIT // 2),
+            encoding="utf-8",
+        )
+        self.assertEqual(len(policy.read_bytes()), PUBLIC_POLICY_BYTE_LIMIT)
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_agents_one_byte_over_limit(self) -> None:
+        policy = self.root / "AGENTS.md"
+        policy.write_text(
+            "\N{LATIN SMALL LETTER E WITH ACUTE}" * (PUBLIC_POLICY_BYTE_LIMIT // 2)
+            + "a",
+            encoding="utf-8",
+        )
+        self.assertEqual(len(policy.read_bytes()), PUBLIC_POLICY_BYTE_LIMIT + 1)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            "AGENTS.md",
+            "32,769 bytes",
+            "32,768",
+        )
 
     def test_does_not_scan_historical_unrouted_file(self) -> None:
         write_file(
@@ -649,6 +821,31 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                 kind="skill",
                 authority="canonical-detail",
                 consumers=["codex", "claude-code"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            resource_path,
+            "Load workspace/repos.yml before continuing.\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, resource_path, "workspace/repos.yml")
+
+    def test_scans_skill_resources_when_surface_is_relabeled_decision(self) -> None:
+        skill_path = "./.github/skills/example/SKILL.md"
+        resource_path = ".github/skills/example/references/private.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="decision",
+                authority="canonical-detail",
+                consumers=["codex"],
                 tasks=["example"],
             )
         )

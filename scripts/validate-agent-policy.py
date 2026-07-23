@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import stat
 from pathlib import Path
 from typing import cast
 
@@ -51,6 +52,7 @@ FORBIDDEN_PUBLIC_PATH = re.compile(
 )
 
 MANIFEST_PATH = ".github/instruction-surfaces.json"
+PUBLIC_POLICY_BYTE_LIMIT = 32_768
 REQUIRED_SURFACE_FIELDS = (
     "id",
     "path",
@@ -64,30 +66,21 @@ REQUIRED_SURFACE_FIELDS = (
     "canonical_for",
 )
 BASE_INVENTORY = {
-    "AGENTS.md",
-    "PATTERNS.md",
-    ".github/AGENT_MEMORY.md",
-    ".github/README.md",
-    ".github/copilot-instructions.md",
+    "AGENTS.md": "shared-policy",
+    "PATTERNS.md": "shared-policy",
+    ".github/AGENT_MEMORY.md": "runbook",
+    ".github/README.md": "runbook",
+    ".github/copilot-instructions.md": "adapter",
 }
 FLAT_INVENTORY = (
-    (".github/instructions", ".instructions.md"),
-    (".github/agents", ".agent.md"),
-    ("runbooks", ".md"),
-    ("decisions", ".md"),
+    (".github/instructions", ".instructions.md", "scoped-guidance"),
+    (".github/agents", ".agent.md", "agent"),
+    ("runbooks", ".md", "runbook"),
+    ("decisions", ".md", "decision"),
 )
-ENFORCEMENT_INVENTORY = (
-    ".github/workflows/agent-instructions.yml",
-    "scripts/validate-agent-policy.py",
-)
-SCANNED_KINDS = {
-    "shared-policy",
-    "scoped-guidance",
-    "runbook",
-    "agent",
-    "skill",
-    "adapter",
-    "enforcement",
+ENFORCEMENT_INVENTORY = {
+    ".github/workflows/agent-instructions.yml": "enforcement",
+    "scripts/validate-agent-policy.py": "enforcement",
 }
 PUBLIC_SCAN_EXEMPTIONS = {"scripts/validate-agent-policy.py"}
 
@@ -125,8 +118,59 @@ def _invalid_discovered_path_error(path: str) -> str:
     )
 
 
-def load_manifest(root: Path) -> dict[str, object]:
-    with (root / MANIFEST_PATH).open(encoding="utf-8") as manifest_file:
+def _validated_manifest_path(root: Path) -> tuple[Path | None, list[str]]:
+    manifest_path = root / MANIFEST_PATH
+    try:
+        file_status = manifest_path.lstat()
+    except OSError as exc:
+        return None, [
+            error(
+                MANIFEST_PATH,
+                f"manifest must exist as a contained regular file: {exc}",
+                f"restore a regular file at {MANIFEST_PATH}",
+            )
+        ]
+
+    if stat.S_ISLNK(file_status.st_mode):
+        return None, [
+            error(
+                MANIFEST_PATH,
+                "manifest must be a contained regular file, not a symlink",
+                f"replace {MANIFEST_PATH} with a regular file inside the repository",
+            )
+        ]
+    if not stat.S_ISREG(file_status.st_mode):
+        return None, [
+            error(
+                MANIFEST_PATH,
+                "manifest must be a contained regular file",
+                f"replace {MANIFEST_PATH} with a regular file inside the repository",
+            )
+        ]
+
+    try:
+        resolved = manifest_path.resolve(strict=True)
+    except (OSError, RuntimeError, ValueError) as exc:
+        return None, [
+            error(
+                MANIFEST_PATH,
+                f"cannot resolve manifest path: {exc}",
+                f"restore a regular file at {MANIFEST_PATH}",
+            )
+        ]
+    if not resolved.is_relative_to(root):
+        return None, [
+            error(
+                MANIFEST_PATH,
+                "manifest path escapes repository",
+                f"move {MANIFEST_PATH} inside the repository",
+            )
+        ]
+    return resolved, []
+
+
+def _load_manifest(manifest_path: Path) -> dict[str, object]:
+    with manifest_path.open(encoding="utf-8") as manifest_file:
         try:
             return cast(dict[str, object], json.load(manifest_file))
         except json.JSONDecodeError:
@@ -171,6 +215,27 @@ def _surface_path(surface: dict[str, object]) -> str | None:
     path = surface.get("path")
     if _non_empty_string(path):
         return cast(str, path)
+    return None
+
+
+def _inventory_path(relative_path: str) -> str:
+    return Path(os.path.normpath(relative_path)).as_posix()
+
+
+def _expected_inventory_kind(relative_path: str) -> str | None:
+    inventory_path = _inventory_path(relative_path)
+    exact_kind = BASE_INVENTORY.get(inventory_path) or ENFORCEMENT_INVENTORY.get(
+        inventory_path
+    )
+    if exact_kind is not None:
+        return exact_kind
+
+    path = Path(inventory_path)
+    for relative_directory, suffix, kind in FLAT_INVENTORY:
+        if path.parent.as_posix() == relative_directory and path.name.endswith(suffix):
+            return kind
+    if re.fullmatch(r"\.github/skills/[^/]+/SKILL\.md", inventory_path):
+        return "skill"
     return None
 
 
@@ -269,7 +334,7 @@ def _scan_skill_inventory(root: Path) -> tuple[set[str], list[str]]:
 def _required_inventory(root: Path) -> tuple[set[str], list[str]]:
     paths = set(BASE_INVENTORY)
     errors: list[str] = []
-    for relative_directory, suffix in FLAT_INVENTORY:
+    for relative_directory, suffix, _kind in FLAT_INVENTORY:
         discovered, scan_errors = _scan_flat_inventory(root, relative_directory, suffix)
         paths.update(discovered)
         errors.extend(scan_errors)
@@ -525,8 +590,18 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
             )
             continue
 
-        inventory_path = Path(os.path.normpath(relative_path)).as_posix()
+        inventory_path = _inventory_path(relative_path)
         declared_inventory.add(inventory_path)
+        expected_kind = _expected_inventory_kind(relative_path)
+        if expected_kind is not None and kind != expected_kind:
+            errors.append(
+                error(
+                    relative_path,
+                    f"declared kind {kind!r} does not match inventory kind "
+                    f"{expected_kind!r}",
+                    f"set kind to {expected_kind!r} for surface {name!r}",
+                )
+            )
         if resolved in seen_paths:
             errors.append(
                 error(
@@ -688,13 +763,14 @@ def _files_for_public_scan(
     errors: list[str] = []
     root = root.resolve()
     for surface in _declared_surfaces(manifest):
-        kind = surface.get("kind")
-        if not isinstance(kind, str) or kind not in SCANNED_KINDS:
-            continue
         relative_path = _surface_path(surface)
         if relative_path is None:
             continue
-        if relative_path in PUBLIC_SCAN_EXEMPTIONS:
+        inventory_path = _inventory_path(relative_path)
+        expected_kind = _expected_inventory_kind(relative_path)
+        if expected_kind == "decision":
+            continue
+        if inventory_path in PUBLIC_SCAN_EXEMPTIONS:
             continue
         resolved = _resolve_declared_path(root, relative_path)
         if resolved is None:
@@ -706,7 +782,7 @@ def _files_for_public_scan(
             continue
         files[relative_path] = resolved
 
-        if kind != "skill":
+        if expected_kind != "skill":
             continue
         skill_files, skill_errors = _walk_skill_resources(root, resolved.parent)
         files.update(skill_files)
@@ -714,33 +790,78 @@ def _files_for_public_scan(
     return files, errors
 
 
+def _manifest_string_values(manifest: object) -> list[str]:
+    strings: list[str] = []
+    pending = [manifest]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, str):
+            strings.append(value)
+        elif isinstance(value, dict):
+            pending.extend(value.keys())
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+    return strings
+
+
+def _public_reference_errors(relative_path: str, text: str) -> list[str]:
+    errors: list[str] = []
+    casefolded_text = text.casefold()
+    for token in FORBIDDEN_PUBLIC_TOKENS:
+        if token.casefold() in casefolded_text:
+            errors.append(
+                error(
+                    relative_path,
+                    f"forbidden public token {token!r}",
+                    f"remove {token!r} from {relative_path}",
+                )
+            )
+    for match in FORBIDDEN_PUBLIC_PATH.finditer(text):
+        forbidden_path = match.group(0)
+        errors.append(
+            error(
+                relative_path,
+                f"forbidden workspace path {forbidden_path!r}",
+                f"replace {forbidden_path!r} with a public repository reference",
+            )
+        )
+    return errors
+
+
 def validate_public_references(root: Path, manifest: dict[str, object]) -> list[str]:
     files, errors = _files_for_public_scan(root, manifest)
+    for value in _manifest_string_values(manifest):
+        errors.extend(_public_reference_errors(MANIFEST_PATH, value))
     for relative_path, path in files.items():
         text, read_errors = _read_utf8(path, relative_path)
         errors.extend(read_errors)
         if text is None:
             continue
-        casefolded_text = text.casefold()
-        for token in FORBIDDEN_PUBLIC_TOKENS:
-            if token.casefold() in casefolded_text:
-                errors.append(
-                    error(
-                        relative_path,
-                        f"forbidden public token {token!r}",
-                        f"remove {token!r} from {relative_path}",
-                    )
-                )
-        for match in FORBIDDEN_PUBLIC_PATH.finditer(text):
-            forbidden_path = match.group(0)
-            errors.append(
-                error(
-                    relative_path,
-                    f"forbidden workspace path {forbidden_path!r}",
-                    f"replace {forbidden_path!r} with a public repository reference",
-                )
-            )
+        errors.extend(_public_reference_errors(relative_path, text))
     return errors
+
+
+def validate_public_policy_size(root: Path, _manifest: dict[str, object]) -> list[str]:
+    policy_path = _resolve_declared_path(root, "AGENTS.md")
+    if policy_path is None:
+        return []
+    try:
+        if not policy_path.is_file():
+            return []
+        byte_size = policy_path.stat().st_size
+    except OSError:
+        return []
+    if byte_size <= PUBLIC_POLICY_BYTE_LIMIT:
+        return []
+    return [
+        error(
+            "AGENTS.md",
+            f"public policy is {byte_size:,} bytes; maximum is "
+            f"{PUBLIC_POLICY_BYTE_LIMIT:,} bytes",
+            f"reduce AGENTS.md to at most {PUBLIC_POLICY_BYTE_LIMIT:,} bytes",
+        )
+    ]
 
 
 def _parse_apply_to_scalar(value: str) -> str | None:
@@ -951,8 +1072,11 @@ def validate_adapters(root: Path, manifest: dict[str, object]) -> list[str]:
 
 def validate(root: Path) -> list[str]:
     root = root.resolve()
+    manifest_path, manifest_path_errors = _validated_manifest_path(root)
+    if manifest_path is None:
+        return manifest_path_errors
     try:
-        manifest = load_manifest(root)
+        manifest = _load_manifest(manifest_path)
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         return [
             error(
@@ -967,6 +1091,7 @@ def validate(root: Path) -> list[str]:
     for validator in (
         validate_manifest,
         validate_public_references,
+        validate_public_policy_size,
         validate_scoped_instructions,
         validate_adapters,
     ):
