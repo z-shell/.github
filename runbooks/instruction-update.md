@@ -63,10 +63,10 @@ answers is not an impact review.
 ## Other repositories
 
 - [ ] Update the repository's `AGENTS.md`, any required runtime adapter, and any
-  scoped `.github/instructions/*.instructions.md` that describes the changed
-  area.
+      scoped `.github/instructions/*.instructions.md` that describes the changed
+      area.
 - [ ] Prefer linking to canonical organization or wiki guidance over duplicating
-  it.
+      it.
 
 ## Validation commands
 

@@ -25,16 +25,16 @@ The broad shapes are:
 
 Use the right home for each kind of knowledge:
 
-| Kind of information                | Source of truth                             |
-| ---------------------------------- | ------------------------------------------- |
-| Active work, blockers, next steps  | GitHub issues, pull requests, and Linear    |
-| Organization policy                | AGENTS.md in this repository                |
+| Kind of information                   | Source of truth                                                      |
+| ------------------------------------- | -------------------------------------------------------------------- |
+| Active work, blockers, next steps     | GitHub issues, pull requests, and Linear                             |
+| Organization policy                   | AGENTS.md in this repository                                         |
 | Instruction routing and impact review | .github/instruction-surfaces.json and runbooks/instruction-update.md |
-| Durable architectural decisions    | `decisions/` in this repo                   |
-| Cross-repo operational procedures  | `runbooks/` in this repo                    |
-| Reusable implementation idioms     | `PATTERNS.md` in this repo                  |
-| Long-form user and maintainer docs | `wiki/` where practical                     |
-| Local LLM memory                   | Optional cache only, never the only record  |
+| Durable architectural decisions       | `decisions/` in this repo                                            |
+| Cross-repo operational procedures     | `runbooks/` in this repo                                             |
+| Reusable implementation idioms        | `PATTERNS.md` in this repo                                           |
+| Long-form user and maintainer docs    | `wiki/` where practical                                              |
+| Local LLM memory                      | Optional cache only, never the only record                           |
 
 For handoffs, follow `.github/AGENT_MEMORY.md`.
 

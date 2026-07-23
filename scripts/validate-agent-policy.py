@@ -3,20 +3,33 @@
 import argparse
 import json
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import cast
 
-
 ALLOWED_KINDS = {
-    "shared-policy", "scoped-guidance", "runbook", "decision",
-    "agent", "skill", "adapter", "enforcement",
+    "shared-policy",
+    "scoped-guidance",
+    "runbook",
+    "decision",
+    "agent",
+    "skill",
+    "adapter",
+    "enforcement",
 }
 ALLOWED_AUTHORITIES = {
-    "canonical", "canonical-detail", "adapter-only", "advisory",
+    "canonical",
+    "canonical-detail",
+    "adapter-only",
+    "advisory",
 }
 ALLOWED_CONSUMERS = {
-    "codex", "claude-code", "copilot", "gemini-cli", "human", "ci",
+    "codex",
+    "claude-code",
+    "copilot",
+    "gemini-cli",
+    "human",
+    "ci",
 }
 COPILOT_ADAPTER = "@../AGENTS.md\n"
 FORBIDDEN_PUBLIC_TOKENS = (
@@ -34,8 +47,7 @@ FORBIDDEN_PUBLIC_TOKENS = (
     ".gitmodules",
 )
 FORBIDDEN_PUBLIC_PATH = re.compile(
-    r"(?<![A-Za-z0-9_{])repos/"
-    r"(?:annexes|core|docs|env|org|packages|plugins|tools)/"
+    r"(?<![A-Za-z0-9_{])repos/" r"(?:annexes|core|docs|env|org|packages|plugins|tools)/"
 )
 
 MANIFEST_PATH = ".github/instruction-surfaces.json"
@@ -80,20 +92,20 @@ def error(path: str, rule: str, fix: str) -> str:
 
 def _invalid_single_line_character(character: str) -> bool:
     codepoint = ord(character)
-    return (
-        codepoint < 32
-        or 127 <= codepoint <= 159
-        or codepoint in {0x2028, 0x2029}
-    )
+    return codepoint < 32 or 127 <= codepoint <= 159 or codepoint in {0x2028, 0x2029}
 
 
 def _one_line_path(path: str) -> str:
     return "".join(
-        "\\\\"
-        if character == "\\"
-        else f"\\x{ord(character):02x}"
-        if _invalid_single_line_character(character)
-        else character
+        (
+            "\\\\"
+            if character == "\\"
+            else (
+                f"\\x{ord(character):02x}"
+                if _invalid_single_line_character(character)
+                else character
+            )
+        )
         for character in path
     )
 
@@ -252,9 +264,7 @@ def _required_inventory(root: Path) -> tuple[set[str], list[str]]:
     paths = set(BASE_INVENTORY)
     errors: list[str] = []
     for relative_directory, suffix in FLAT_INVENTORY:
-        discovered, scan_errors = _scan_flat_inventory(
-            root, relative_directory, suffix
-        )
+        discovered, scan_errors = _scan_flat_inventory(root, relative_directory, suffix)
         paths.update(discovered)
         errors.extend(scan_errors)
     discovered_skills, skill_errors = _scan_skill_inventory(root)
@@ -289,7 +299,7 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
             error(
                 MANIFEST_PATH,
                 "repository must be a non-empty string",
-                f"set repository to \"z-shell/.github\" in {MANIFEST_PATH}",
+                f'set repository to "z-shell/.github" in {MANIFEST_PATH}',
             )
         )
 
@@ -470,9 +480,7 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
                         )
                     )
 
-        if kind == "adapter" and (
-            authority != "adapter-only" or canonical_for != []
-        ):
+        if kind == "adapter" and (authority != "adapter-only" or canonical_for != []):
             errors.append(
                 error(
                     MANIFEST_PATH,
@@ -587,7 +595,9 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
     return errors
 
 
-def _walk_skill_resources(root: Path, skill_directory: Path) -> tuple[dict[str, Path], list[str]]:
+def _walk_skill_resources(
+    root: Path, skill_directory: Path
+) -> tuple[dict[str, Path], list[str]]:
     files: dict[str, Path] = {}
     errors: list[str] = []
     directories = [skill_directory]
@@ -673,9 +683,7 @@ def _files_for_public_scan(
     return files, errors
 
 
-def validate_public_references(
-    root: Path, manifest: dict[str, object]
-) -> list[str]:
+def validate_public_references(root: Path, manifest: dict[str, object]) -> list[str]:
     files, errors = _files_for_public_scan(root, manifest)
     for relative_path, path in files.items():
         text, read_errors = _read_utf8(path, relative_path)
@@ -724,7 +732,11 @@ def _frontmatter_apply_to(text: str) -> list[str]:
     if not lines or lines[0].strip() != "---":
         return []
     closing_index = next(
-        (index for index, line in enumerate(lines[1:], start=1) if line.strip() == "---"),
+        (
+            index
+            for index, line in enumerate(lines[1:], start=1)
+            if line.strip() == "---"
+        ),
         None,
     )
     if closing_index is None:
@@ -740,9 +752,7 @@ def _frontmatter_apply_to(text: str) -> list[str]:
     return values
 
 
-def validate_scoped_instructions(
-    root: Path, manifest: dict[str, object]
-) -> list[str]:
+def validate_scoped_instructions(root: Path, manifest: dict[str, object]) -> list[str]:
     errors: list[str] = []
     root = root.resolve()
     for surface in _declared_surfaces(manifest):
@@ -934,7 +944,9 @@ def validate(root: Path) -> list[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate public agent policy surfaces")
+    parser = argparse.ArgumentParser(
+        description="Validate public agent policy surfaces"
+    )
     parser.add_argument(
         "--root",
         type=Path,

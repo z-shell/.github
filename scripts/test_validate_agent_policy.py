@@ -4,12 +4,13 @@ import copy
 import importlib.util
 import json
 import os
-from pathlib import Path
-import subprocess
+
+# CLI tests invoke only the repository-local validator with fixed arguments.
+import subprocess  # nosec B404
 import sys
 import tempfile
 import unittest
-
+from pathlib import Path
 
 SCRIPT_PATH = Path(__file__).with_name("validate-agent-policy.py")
 PUBLIC_ROOT = SCRIPT_PATH.parents[1]
@@ -182,7 +183,9 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
         errors = validator.validate(self.root)
 
-        self.assert_error_contains(errors, ".github/instruction-surfaces.json", "version")
+        self.assert_error_contains(
+            errors, ".github/instruction-surfaces.json", "version"
+        )
 
     def test_rejects_unknown_enum_values(self) -> None:
         cases = (
@@ -204,7 +207,9 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
                     errors = validator.validate(root)
 
-                    self.assert_error_contains(errors, "organization-policy", invalid_value)
+                    self.assert_error_contains(
+                        errors, "organization-policy", invalid_value
+                    )
 
     def test_rejects_non_string_enum_values_without_traceback(self) -> None:
         cases = (("kind", ["adapter"]), ("authority", {"name": "canonical"}))
@@ -733,7 +738,8 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                     )
 
     def test_cli_exit_codes(self) -> None:
-        valid = subprocess.run(
+        # The argv uses the current interpreter and repository-local validator.
+        valid = subprocess.run(  # nosec B603
             [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
             check=False,
             capture_output=True,
@@ -744,7 +750,8 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
         self.manifest["version"] = 2
         write_manifest(self.root, self.manifest)
-        invalid = subprocess.run(
+        # The argv uses the current interpreter and repository-local validator.
+        invalid = subprocess.run(  # nosec B603
             [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
             check=False,
             capture_output=True,
@@ -760,7 +767,8 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             '{"version": ' + ("9" * 5000) + "}\n",
         )
 
-        completed = subprocess.run(
+        # The argv uses the current interpreter and repository-local validator.
+        completed = subprocess.run(  # nosec B603
             [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
             check=False,
             capture_output=True,
@@ -785,7 +793,8 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                     manifest["surfaces"][3]["path"] = f"bad{separator}INJECTED"
                     write_manifest(root, manifest)
 
-                    completed = subprocess.run(
+                    # The argv runs only the local validator against a temp root.
+                    completed = subprocess.run(  # nosec B603
                         [sys.executable, str(SCRIPT_PATH), "--root", str(root)],
                         check=False,
                         capture_output=True,
@@ -844,7 +853,8 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                         write_manifest(root, manifest)
 
                     expected_errors = validator.validate(root)
-                    completed = subprocess.run(
+                    # The argv runs only the local validator against a temp root.
+                    completed = subprocess.run(  # nosec B603
                         [sys.executable, str(SCRIPT_PATH), "--root", str(root)],
                         check=False,
                         capture_output=True,
@@ -942,9 +952,7 @@ class PublicRepositoryTests(unittest.TestCase):
     def test_public_repository_uses_only_the_copilot_adapter(self) -> None:
         self.assertFalse((PUBLIC_ROOT / "CLAUDE.md").exists())
         self.assertFalse((PUBLIC_ROOT / "GEMINI.md").exists())
-        self.assertFalse(
-            (PUBLIC_ROOT / ".github/copilot-instructions.md").is_symlink()
-        )
+        self.assertFalse((PUBLIC_ROOT / ".github/copilot-instructions.md").is_symlink())
         self.assertEqual(
             (PUBLIC_ROOT / ".github/copilot-instructions.md").read_text(),
             "@../AGENTS.md\n",
