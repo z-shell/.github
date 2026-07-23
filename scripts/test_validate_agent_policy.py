@@ -884,6 +884,58 @@ class PublicRepositoryTests(unittest.TestCase):
         for question in REQUIRED_IMPACT_QUESTIONS:
             self.assertIn(question, runbook)
 
+    def test_public_repository_validates_agent_policy_in_ci(self) -> None:
+        workflow = (
+            PUBLIC_ROOT / ".github/workflows/agent-instructions.yml"
+        ).read_text()
+        required_fragments = (
+            "name: Agent Instruction Validation\n",
+            "on:\n  pull_request:\n    paths:\n",
+            "  push:\n    branches:\n      - main\n    paths:\n",
+            "permissions:\n  contents: read\n",
+            "concurrency:\n"
+            "  group: ${{ github.workflow }}-${{ github.ref }}\n"
+            "  cancel-in-progress: true\n",
+            "jobs:\n  validate:\n"
+            "    name: Validate Agent Instructions\n"
+            "    runs-on: ubuntu-latest\n",
+            "      - name: Check out repository\n"
+            "        uses: actions/checkout@"
+            "df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3\n",
+            "      - name: Set up Python\n"
+            "        uses: actions/setup-python@"
+            "a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0\n"
+            "        with:\n"
+            '          python-version: "3.10"\n',
+            "      - name: Run agent policy unit tests\n"
+            "        run: python3 -m unittest "
+            "scripts/test_validate_agent_policy.py -v\n",
+            "      - name: Validate agent policy\n"
+            "        run: python3 scripts/validate-agent-policy.py\n",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, workflow)
+
+        filtered_paths = (
+            "AGENTS.md",
+            "PATTERNS.md",
+            "CLAUDE.md",
+            "GEMINI.md",
+            ".github/AGENT_MEMORY.md",
+            ".github/copilot-instructions.md",
+            ".github/instruction-surfaces.json",
+            ".github/agents/**",
+            ".github/instructions/**",
+            ".github/skills/**",
+            ".github/workflows/agent-instructions.yml",
+            "decisions/**",
+            "runbooks/**",
+            "scripts/validate-agent-policy.py",
+            "scripts/test_validate_agent_policy.py",
+        )
+        for path in filtered_paths:
+            self.assertEqual(workflow.count(f'      - "{path}"'), 2, path)
+
     def test_public_repository_has_no_validation_errors(self) -> None:
         self.assertEqual(validator.validate(PUBLIC_ROOT), [])
 

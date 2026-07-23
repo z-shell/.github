@@ -662,6 +662,18 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["public-policy-validation"]
+    },
+    {
+      "id": "agent-instruction-workflow",
+      "path": ".github/workflows/agent-instructions.yml",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["ci"],
+      "tasks": ["instruction-change"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["public-policy-ci"]
     }
   ]
 }

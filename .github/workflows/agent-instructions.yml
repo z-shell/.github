@@ -1,0 +1,65 @@
+name: Agent Instruction Validation
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "PATTERNS.md"
+      - "CLAUDE.md"
+      - "GEMINI.md"
+      - ".github/AGENT_MEMORY.md"
+      - ".github/copilot-instructions.md"
+      - ".github/instruction-surfaces.json"
+      - ".github/agents/**"
+      - ".github/instructions/**"
+      - ".github/skills/**"
+      - ".github/workflows/agent-instructions.yml"
+      - "decisions/**"
+      - "runbooks/**"
+      - "scripts/validate-agent-policy.py"
+      - "scripts/test_validate_agent_policy.py"
+  push:
+    branches:
+      - main
+    paths:
+      - "AGENTS.md"
+      - "PATTERNS.md"
+      - "CLAUDE.md"
+      - "GEMINI.md"
+      - ".github/AGENT_MEMORY.md"
+      - ".github/copilot-instructions.md"
+      - ".github/instruction-surfaces.json"
+      - ".github/agents/**"
+      - ".github/instructions/**"
+      - ".github/skills/**"
+      - ".github/workflows/agent-instructions.yml"
+      - "decisions/**"
+      - "runbooks/**"
+      - "scripts/validate-agent-policy.py"
+      - "scripts/test_validate_agent_policy.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate Agent Instructions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.10"
+
+      - name: Run agent policy unit tests
+        run: python3 -m unittest scripts/test_validate_agent_policy.py -v
+
+      - name: Validate agent policy
+        run: python3 scripts/validate-agent-policy.py
