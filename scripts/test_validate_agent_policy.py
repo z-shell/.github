@@ -767,22 +767,34 @@ class AgentPolicyValidatorTests(unittest.TestCase):
         )
 
     def test_cli_errors_remain_one_line_for_control_character_path(self) -> None:
-        self.manifest["surfaces"][3]["path"] = "bad\nINJECTED"
-        write_manifest(self.root, self.manifest)
+        for separator in ("\n", "\u0085", "\u2028", "\u2029"):
+            with self.subTest(separator=repr(separator)):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"][3]["path"] = f"bad{separator}INJECTED"
+                    write_manifest(root, manifest)
 
-        completed = subprocess.run(
-            [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
+                    completed = subprocess.run(
+                        [sys.executable, str(SCRIPT_PATH), "--root", str(root)],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
 
-        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
-        self.assertTrue(completed.stdout.splitlines())
-        self.assertTrue(
-            all(line.startswith("ERROR: ") for line in completed.stdout.splitlines()),
-            completed.stdout,
-        )
+                    self.assertEqual(
+                        completed.returncode,
+                        1,
+                        completed.stdout + completed.stderr,
+                    )
+                    self.assertTrue(completed.stdout.splitlines())
+                    self.assertTrue(
+                        all(
+                            line.startswith("ERROR: ")
+                            for line in completed.stdout.splitlines()
+                        ),
+                        completed.stdout,
+                    )
 
     def test_cli_escapes_control_characters_in_discovered_paths(self) -> None:
         cases = (
@@ -836,6 +848,14 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                         completed.stdout + completed.stderr,
                     )
                     self.assertEqual(len(output_lines), len(expected_errors))
+                    self.assertTrue(expected_errors)
+                    self.assertTrue(
+                        all(
+                            "; fix: rename or remove the invalid path " in message
+                            for message in expected_errors
+                        ),
+                        expected_errors,
+                    )
                     self.assertTrue(
                         all(line.startswith("ERROR: ") for line in output_lines),
                         completed.stdout,

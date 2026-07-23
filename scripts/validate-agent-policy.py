@@ -78,16 +78,32 @@ def error(path: str, rule: str, fix: str) -> str:
     return f"{path}: {rule}; fix: {fix}"
 
 
+def _invalid_single_line_character(character: str) -> bool:
+    codepoint = ord(character)
+    return (
+        codepoint < 32
+        or 127 <= codepoint <= 159
+        or codepoint in {0x2028, 0x2029}
+    )
+
+
 def _one_line_path(path: str) -> str:
     return "".join(
         "\\\\"
         if character == "\\"
         else f"\\x{ord(character):02x}"
-        if ord(character) < 32
-        or 127 <= ord(character) <= 159
-        or ord(character) in {0x2028, 0x2029}
+        if _invalid_single_line_character(character)
         else character
         for character in path
+    )
+
+
+def _invalid_discovered_path_error(path: str) -> str:
+    display_path = _one_line_path(path)
+    return error(
+        display_path,
+        "discovered path cannot be represented safely in one-line diagnostics",
+        f"rename or remove the invalid path {display_path}",
     )
 
 
@@ -114,7 +130,7 @@ def _non_empty_string(value: object) -> bool:
     return (
         isinstance(value, str)
         and bool(value.strip())
-        and not any(ord(character) < 32 or ord(character) == 127 for character in value)
+        and not any(_invalid_single_line_character(character) for character in value)
     )
 
 
@@ -173,6 +189,8 @@ def _read_utf8(path: Path, display_path: str) -> tuple[str | None, list[str]]:
 
 def _inventory_scan_error(relative_path: str, exc: OSError) -> str:
     display_path = _one_line_path(relative_path)
+    if display_path != relative_path:
+        return _invalid_discovered_path_error(relative_path)
     return error(
         display_path,
         f"cannot scan inventory directory: {exc}",
@@ -526,6 +544,9 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
 
     for missing_path in sorted(required_inventory - declared_inventory):
         display_path = _one_line_path(missing_path)
+        if display_path != missing_path:
+            errors.append(_invalid_discovered_path_error(missing_path))
+            continue
         errors.append(
             error(
                 display_path,
@@ -572,12 +593,20 @@ def _walk_skill_resources(root: Path, skill_directory: Path) -> tuple[dict[str, 
     directories = [skill_directory]
     while directories:
         directory = directories.pop()
-        display_directory = _one_line_path(directory.relative_to(root).as_posix())
+        raw_display_directory = directory.relative_to(root).as_posix()
+        display_directory = _one_line_path(raw_display_directory)
+        if display_directory != raw_display_directory:
+            errors.append(_invalid_discovered_path_error(raw_display_directory))
+            continue
         try:
             with os.scandir(directory) as entries:
                 for entry in entries:
                     path = Path(entry.path)
-                    display_path = _one_line_path(path.relative_to(root).as_posix())
+                    raw_display_path = path.relative_to(root).as_posix()
+                    display_path = _one_line_path(raw_display_path)
+                    if display_path != raw_display_path:
+                        errors.append(_invalid_discovered_path_error(raw_display_path))
+                        continue
                     try:
                         if entry.is_file(follow_symlinks=True):
                             resolved = path.resolve(strict=False)
