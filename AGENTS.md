@@ -9,6 +9,14 @@ This file is intentionally short. It complements, not replaces:
 - `decisions/` for ADRs and durable architectural choices
 - `runbooks/` for repeatable operational workflows
 
+## Required instruction routing
+
+Before non-trivial work, inspect `.github/instruction-surfaces.json`. This applies to every supported runtime. Match the current task categories and repository-relative file patterns against each manifest surface. When a surface declares both task and path dimensions, both dimensions must match before selecting it. Read every matched required surface before acting. If a runtime does not auto-load scoped guidance, open each matched required surface explicitly. Repeat this selection whenever the task, path, or repository scope changes.
+
+## Agent-file placement
+
+Organization repository roots use `AGENTS.md` and permitted `.github/*` instruction surfaces. They must not contain root `CLAUDE.md` or `GEMINI.md`.
+
 ## What z-shell is
 
 z-shell is an ecosystem of tools, plugins, annexes, modules, and documentation centered on Zsh and the `zi` plugin manager.

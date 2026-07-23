@@ -325,6 +325,25 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                         "canonical_policy",
                     )
 
+    def test_rejects_relocated_canonical_policy(self) -> None:
+        organization_policy = self.manifest["surfaces"][0]
+        organization_patterns = self.manifest["surfaces"][1]
+        organization_policy["authority"] = "canonical-detail"
+        organization_policy["canonical_for"] = []
+        organization_patterns["authority"] = "canonical"
+        organization_patterns["canonical_for"] = ["organization-policy"]
+        self.manifest["canonical_policy"] = "PATTERNS.md"
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "canonical_policy",
+            "AGENTS.md",
+        )
+
     def test_rejects_missing_declared_path(self) -> None:
         cases = (("AGENTS.md", True), (".github/README.md", False))
         for relative_path, required in cases:
@@ -371,6 +390,29 @@ class AgentPolicyValidatorTests(unittest.TestCase):
         errors = validator.validate(self.root)
 
         self.assert_error_contains(errors, "AGENTS.md", "workspace/repos.yml")
+
+    def test_rejects_private_reference_in_declared_enforcement_surface(self) -> None:
+        workflow_path = ".github/workflows/agent-instructions.yml"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "agent-instruction-workflow",
+                workflow_path,
+                kind="enforcement",
+                authority="canonical-detail",
+                consumers=["ci"],
+                tasks=["validation"],
+            )
+        )
+        write_file(
+            self.root,
+            workflow_path,
+            "run: cat workspace/repos.yml\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, workflow_path, "workspace/repos.yml")
 
     def test_rejects_invalid_utf8_active_surface(self) -> None:
         (self.root / "PATTERNS.md").write_bytes(b"# Patterns\n\xff\n")
@@ -560,8 +602,10 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             ".github/instructions/unlisted.instructions.md",
             ".github/agents/unlisted.agent.md",
             ".github/skills/unlisted/SKILL.md",
+            ".github/workflows/agent-instructions.yml",
             "runbooks/unlisted.md",
             "decisions/unlisted.md",
+            "scripts/validate-agent-policy.py",
         )
         for omitted_path in omitted_paths:
             with self.subTest(path=omitted_path):
@@ -619,6 +663,72 @@ class AgentPolicyValidatorTests(unittest.TestCase):
         errors = validator.validate(self.root)
 
         self.assert_error_contains(errors, resource_path, "workspace/repos.yml")
+
+    def test_rejects_in_repository_skill_directory_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        target_path = self.root / ".github/skills/example/resource-target"
+        link_path = self.root / ".github/skills/example/references"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            ".github/skills/example/resource-target/example.md",
+            "# Example resource\n",
+        )
+        link_path.symlink_to(target_path, target_is_directory=True)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references",
+            "directory symlink",
+            "; fix:",
+            "regular directory",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
+    def test_rejects_outside_skill_directory_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        with tempfile.TemporaryDirectory() as outside_directory:
+            link_path = self.root / ".github/skills/example/references"
+            link_path.symlink_to(
+                Path(outside_directory),
+                target_is_directory=True,
+            )
+            write_manifest(self.root, self.manifest)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references",
+            "directory symlink",
+            "; fix:",
+            "regular directory",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
 
     def test_rejects_unreadable_inventory_directory(self) -> None:
         instructions = self.root / ".github/instructions"
@@ -894,6 +1004,35 @@ class PublicRepositoryTests(unittest.TestCase):
         for question in REQUIRED_IMPACT_QUESTIONS:
             self.assertIn(question, runbook)
 
+    def test_public_repository_requires_manifest_routing_for_all_runtimes(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        required_fragments = (
+            "Before non-trivial work, inspect " "`.github/instruction-surfaces.json`.",
+            "This applies to every supported runtime.",
+            "current task categories and repository-relative file patterns",
+            "both dimensions must match",
+            "Read every matched required surface before acting.",
+            "does not auto-load scoped guidance, open each matched required "
+            "surface explicitly.",
+            "Repeat this selection whenever the task, path, or repository scope "
+            "changes.",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, policy)
+
+    def test_public_repository_prohibits_vendor_root_instruction_files(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        self.assertIn(
+            "Organization repository roots use `AGENTS.md` and permitted "
+            "`.github/*` instruction surfaces.",
+            policy,
+        )
+        self.assertIn(
+            "They must not contain root `CLAUDE.md` or `GEMINI.md`.",
+            policy,
+        )
+        self.assertNotIn("private meta-workspace", policy.casefold())
+
     def test_public_repository_validates_agent_policy_in_ci(self) -> None:
         workflow = (
             PUBLIC_ROOT / ".github/workflows/agent-instructions.yml"
@@ -932,6 +1071,7 @@ class PublicRepositoryTests(unittest.TestCase):
             "CLAUDE.md",
             "GEMINI.md",
             ".github/AGENT_MEMORY.md",
+            ".github/README.md",
             ".github/copilot-instructions.md",
             ".github/instruction-surfaces.json",
             ".github/agents/**",

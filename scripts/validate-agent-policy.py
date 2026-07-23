@@ -76,6 +76,10 @@ FLAT_INVENTORY = (
     ("runbooks", ".md"),
     ("decisions", ".md"),
 )
+ENFORCEMENT_INVENTORY = (
+    ".github/workflows/agent-instructions.yml",
+    "scripts/validate-agent-policy.py",
+)
 SCANNED_KINDS = {
     "shared-policy",
     "scoped-guidance",
@@ -83,7 +87,9 @@ SCANNED_KINDS = {
     "agent",
     "skill",
     "adapter",
+    "enforcement",
 }
+PUBLIC_SCAN_EXEMPTIONS = {"scripts/validate-agent-policy.py"}
 
 
 def error(path: str, rule: str, fix: str) -> str:
@@ -270,6 +276,11 @@ def _required_inventory(root: Path) -> tuple[set[str], list[str]]:
     discovered_skills, skill_errors = _scan_skill_inventory(root)
     paths.update(discovered_skills)
     errors.extend(skill_errors)
+    paths.update(
+        relative_path
+        for relative_path in ENFORCEMENT_INVENTORY
+        if os.path.lexists(root / relative_path)
+    )
     return paths, errors
 
 
@@ -564,6 +575,14 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
         )
 
     canonical_policy = manifest.get("canonical_policy")
+    if canonical_policy != "AGENTS.md":
+        errors.append(
+            error(
+                MANIFEST_PATH,
+                "canonical_policy must be exactly 'AGENTS.md'",
+                f"set canonical_policy to 'AGENTS.md' in {MANIFEST_PATH}",
+            )
+        )
     canonical_surface: dict[str, object] | None = None
     if _non_empty_string(canonical_policy):
         canonical_path = _resolve_declared_path(root, cast(str, canonical_policy))
@@ -618,6 +637,16 @@ def _walk_skill_resources(
                         errors.append(_invalid_discovered_path_error(raw_display_path))
                         continue
                     try:
+                        if entry.is_symlink() and entry.is_dir(follow_symlinks=True):
+                            errors.append(
+                                error(
+                                    display_path,
+                                    "skill resource directory symlink is not allowed",
+                                    f"replace {display_path} with a regular directory "
+                                    "below the repository root",
+                                )
+                            )
+                            continue
                         if entry.is_file(follow_symlinks=True):
                             resolved = path.resolve(strict=False)
                             if not resolved.is_relative_to(root):
@@ -664,6 +693,8 @@ def _files_for_public_scan(
             continue
         relative_path = _surface_path(surface)
         if relative_path is None:
+            continue
+        if relative_path in PUBLIC_SCAN_EXEMPTIONS:
             continue
         resolved = _resolve_declared_path(root, relative_path)
         if resolved is None:
