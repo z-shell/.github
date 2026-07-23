@@ -78,6 +78,19 @@ def error(path: str, rule: str, fix: str) -> str:
     return f"{path}: {rule}; fix: {fix}"
 
 
+def _one_line_path(path: str) -> str:
+    return "".join(
+        "\\\\"
+        if character == "\\"
+        else f"\\x{ord(character):02x}"
+        if ord(character) < 32
+        or 127 <= ord(character) <= 159
+        or ord(character) in {0x2028, 0x2029}
+        else character
+        for character in path
+    )
+
+
 def load_manifest(root: Path) -> dict[str, object]:
     with (root / MANIFEST_PATH).open(encoding="utf-8") as manifest_file:
         try:
@@ -159,10 +172,11 @@ def _read_utf8(path: Path, display_path: str) -> tuple[str | None, list[str]]:
 
 
 def _inventory_scan_error(relative_path: str, exc: OSError) -> str:
+    display_path = _one_line_path(relative_path)
     return error(
-        relative_path,
+        display_path,
         f"cannot scan inventory directory: {exc}",
-        f"restore readable directory permissions for {relative_path}",
+        f"restore readable directory permissions for {display_path}",
     )
 
 
@@ -415,6 +429,16 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
                             f"set required to true for surface {name!r}",
                         )
                     )
+                if isinstance(kind, str) and kind in {"agent", "skill"}:
+                    errors.append(
+                        error(
+                            MANIFEST_PATH,
+                            f"{kind} surface {name!r} cannot own canonical_for "
+                            f"domain {domain!r}",
+                            f"move {domain!r} ownership to a policy surface and set "
+                            f"canonical_for to [] for {name!r}",
+                        )
+                    )
                 if not isinstance(authority, str) or authority not in {
                     "canonical",
                     "canonical-detail",
@@ -501,11 +525,12 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
     errors.extend(inventory_errors)
 
     for missing_path in sorted(required_inventory - declared_inventory):
+        display_path = _one_line_path(missing_path)
         errors.append(
             error(
-                missing_path,
+                display_path,
                 "surface is missing from manifest inventory",
-                f"declare {missing_path} in {MANIFEST_PATH}",
+                f"declare {display_path} in {MANIFEST_PATH}",
             )
         )
 
@@ -547,12 +572,12 @@ def _walk_skill_resources(root: Path, skill_directory: Path) -> tuple[dict[str, 
     directories = [skill_directory]
     while directories:
         directory = directories.pop()
-        display_directory = directory.relative_to(root).as_posix()
+        display_directory = _one_line_path(directory.relative_to(root).as_posix())
         try:
             with os.scandir(directory) as entries:
                 for entry in entries:
                     path = Path(entry.path)
-                    display_path = path.relative_to(root).as_posix()
+                    display_path = _one_line_path(path.relative_to(root).as_posix())
                     try:
                         if entry.is_file(follow_symlinks=True):
                             resolved = path.resolve(strict=False)
@@ -650,6 +675,21 @@ def validate_public_references(
     return errors
 
 
+def _parse_apply_to_scalar(value: str) -> str | None:
+    if value.startswith('"'):
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            return None
+        return parsed if _non_empty_string(parsed) else None
+    if value.startswith("'"):
+        if re.fullmatch(r"'(?:[^']|'')*'", value) is None:
+            return None
+        parsed = value[1:-1].replace("''", "'")
+        return parsed if _non_empty_string(parsed) else None
+    return None
+
+
 def _frontmatter_apply_to(text: str) -> list[str]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -666,19 +706,8 @@ def _frontmatter_apply_to(text: str) -> list[str]:
         match = re.match(r"^applyTo\s*:\s*(.*?)\s*$", line)
         if match is None:
             continue
-        value = match.group(1)
-        if value.startswith(("'", '"')):
-            if len(value) < 2 or value[-1] != value[0]:
-                values.append("")
-                continue
-            value = value[1:-1]
-        elif value.endswith(("'", '"')):
-            values.append("")
-            continue
-        if not value or value[0] in "[{|>":
-            values.append("")
-        else:
-            values.append(value)
+        parsed = _parse_apply_to_scalar(match.group(1))
+        values.append(parsed or "")
     return values
 
 

@@ -242,6 +242,38 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
         self.assert_error_contains(errors, "organization-policy", "duplicate")
 
+    def test_rejects_agent_or_skill_canonical_owner(self) -> None:
+        cases = (
+            ("agent", ".github/agents/policy.agent.md"),
+            ("skill", ".github/skills/policy/SKILL.md"),
+        )
+        for kind, path in cases:
+            with self.subTest(kind=kind):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"].append(
+                        make_surface(
+                            f"canonical-{kind}",
+                            path,
+                            kind=kind,
+                            authority="canonical-detail",
+                            consumers=["codex"],
+                            canonical_for=["mandatory-policy"],
+                        )
+                    )
+                    write_file(root, path, f"# Canonical {kind}\n")
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        f"canonical-{kind}",
+                        kind,
+                        "mandatory-policy",
+                    )
+
     def test_rejects_adapter_as_canonical(self) -> None:
         self.manifest["surfaces"][4]["authority"] = "canonical"
         write_manifest(self.root, self.manifest)
@@ -465,6 +497,43 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                         )
                     )
                     write_file(root, path, content)
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(errors, path, "applyTo")
+
+    def test_rejects_ambiguous_apply_to_yaml_syntax(self) -> None:
+        cases = (
+            ("alias", "*patterns", "*patterns"),
+            ("anchor", '&patterns "**/*.py"', '&patterns "**/*.py"'),
+            ("tag", '!glob "**/*.py"', '!glob "**/*.py"'),
+            ("flow-sequence", '["**/*.py"]', '["**/*.py"]'),
+            ("implicit-boolean", "true", "true"),
+            ("invalid-double-escape", r'"**/\q.py"', r"**/\q.py"),
+            ("invalid-single-quote", "'**/*.py'junk'", "**/*.py'junk"),
+        )
+        for variant, apply_to_source, manifest_pattern in cases:
+            with self.subTest(variant=variant):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    path = ".github/instructions/python.instructions.md"
+                    manifest["surfaces"].append(
+                        make_surface(
+                            "python-guidance",
+                            path,
+                            kind="scoped-guidance",
+                            authority="canonical-detail",
+                            consumers=["copilot"],
+                            file_patterns=[manifest_pattern],
+                        )
+                    )
+                    write_file(
+                        root,
+                        path,
+                        f"---\napplyTo: {apply_to_source}\n---\n\n# Python\n",
+                    )
                     write_manifest(root, manifest)
 
                     errors = validator.validate(root)
@@ -714,6 +783,63 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             all(line.startswith("ERROR: ") for line in completed.stdout.splitlines()),
             completed.stdout,
         )
+
+    def test_cli_escapes_control_characters_in_discovered_paths(self) -> None:
+        cases = (
+            ("inventory", "\n"),
+            ("skill-resource", "\n"),
+            ("inventory", "\u0085"),
+            ("skill-resource", "\u2028"),
+        )
+        for variant, separator in cases:
+            with self.subTest(variant=variant, separator=repr(separator)):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    if variant == "inventory":
+                        write_file(
+                            root,
+                            f".github/instructions/bad{separator}name.instructions.md",
+                            "# Undeclared guidance\n",
+                        )
+                    else:
+                        skill_path = ".github/skills/example/SKILL.md"
+                        manifest["surfaces"].append(
+                            make_surface(
+                                "example-skill",
+                                skill_path,
+                                kind="skill",
+                                authority="canonical-detail",
+                                consumers=["codex"],
+                            )
+                        )
+                        write_file(root, skill_path, "# Example skill\n")
+                        write_file(
+                            root,
+                            f".github/skills/example/bad{separator}resource.md",
+                            "Read workspace/repos.yml.\n",
+                        )
+                        write_manifest(root, manifest)
+
+                    expected_errors = validator.validate(root)
+                    completed = subprocess.run(
+                        [sys.executable, str(SCRIPT_PATH), "--root", str(root)],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
+
+                    output_lines = completed.stdout.splitlines()
+                    self.assertEqual(
+                        completed.returncode,
+                        1,
+                        completed.stdout + completed.stderr,
+                    )
+                    self.assertEqual(len(output_lines), len(expected_errors))
+                    self.assertTrue(
+                        all(line.startswith("ERROR: ") for line in output_lines),
+                        completed.stdout,
+                    )
 
 
 if __name__ == "__main__":
