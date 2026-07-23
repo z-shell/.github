@@ -27,7 +27,7 @@ Principles for helping GitHub Copilot understand your codebase and provide bette
 
 ## Context Hints
 
-- **Add a COPILOT.md file**: Document architecture decisions, patterns, and conventions Copilot should follow.
+- Use root AGENTS.md for repository policy and .github/instructions/*.instructions.md only for matching scoped detail; explicitly open routed files when the runtime does not auto-load them.
 - **Use strategic comments**: At the top of complex modules, briefly describe the flow or purpose.
 - **Reference patterns explicitly**: "Follow the same pattern as `src/api/users.ts`" gives Copilot a concrete example.
 

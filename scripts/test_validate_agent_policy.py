@@ -12,6 +12,7 @@ import unittest
 
 
 SCRIPT_PATH = Path(__file__).with_name("validate-agent-policy.py")
+PUBLIC_ROOT = SCRIPT_PATH.parents[1]
 SPEC = importlib.util.spec_from_file_location("validate_agent_policy", SCRIPT_PATH)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError(f"cannot load validator from {SCRIPT_PATH}")
@@ -860,6 +861,22 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                         all(line.startswith("ERROR: ") for line in output_lines),
                         completed.stdout,
                     )
+
+
+class PublicRepositoryTests(unittest.TestCase):
+    def test_public_repository_has_no_validation_errors(self) -> None:
+        self.assertEqual(validator.validate(PUBLIC_ROOT), [])
+
+    def test_public_repository_uses_only_the_copilot_adapter(self) -> None:
+        self.assertFalse((PUBLIC_ROOT / "CLAUDE.md").exists())
+        self.assertFalse((PUBLIC_ROOT / "GEMINI.md").exists())
+        self.assertFalse(
+            (PUBLIC_ROOT / ".github/copilot-instructions.md").is_symlink()
+        )
+        self.assertEqual(
+            (PUBLIC_ROOT / ".github/copilot-instructions.md").read_text(),
+            "@../AGENTS.md\n",
+        )
 
 
 if __name__ == "__main__":

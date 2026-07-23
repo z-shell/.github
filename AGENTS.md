@@ -1,6 +1,6 @@
 # Agent instructions — z-shell
 
-This file is the canonical instruction set for AI coding agents working in the z-shell organization. Read it before doing non-trivial work. If repository-local instructions conflict with this file, follow the repo-local file for repo-specific detail and raise the mismatch in an issue or handoff.
+This file is the canonical instruction set for AI coding agents working in the z-shell organization. Read it before doing non-trivial work. Repository-local guidance may narrow implementation details, but it must not silently contradict organization policy; raise any mismatch in an issue or handoff.
 
 This file is intentionally short. It complements, not replaces:
 
@@ -28,7 +28,8 @@ Use the right home for each kind of knowledge:
 | Kind of information                | Source of truth                             |
 | ---------------------------------- | ------------------------------------------- |
 | Active work, blockers, next steps  | GitHub issues, pull requests, and Linear    |
-| Private organizational heuristics  | `memory/` folder in the root meta-workspace |
+| Organization policy                | AGENTS.md in this repository                |
+| Instruction routing and impact review | .github/instruction-surfaces.json and runbooks/instruction-update.md |
 | Durable architectural decisions    | `decisions/` in this repo                   |
 | Cross-repo operational procedures  | `runbooks/` in this repo                    |
 | Reusable implementation idioms     | `PATTERNS.md` in this repo                  |
@@ -52,6 +53,8 @@ When working in z-shell repositories, optimize for:
 - **Naming:** plugins use `zsh-<name>`, annexes use `z-a-<name>`, modules keep short descriptive names.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
+- **Commit trailers:** Never include a `Co-authored-by` trailer. This organization-wide ban is author-enforced until [z-shell/.github#464](https://github.com/z-shell/.github/issues/464) lands.
+- **Branch selection:** Follow `decisions/0008-branching-model.md` and verify the live state of the owning repository; do not assume one universal default branch.
 - **Documentation placement:** keep long-form docs in the wiki when practical; keep repo-local docs focused on policy, workflow, and source-adjacent guidance.
 - **Workflow files:** follow the org workflow conventions and keep permissions explicit, actions pinned, and concurrency defined.
 - **Dependency updates:** Renovate owns routine version updates; GitHub Dependabot owns vulnerability alerts and security updates. See `runbooks/dependency-management.md`.
@@ -137,12 +140,14 @@ Do not silently work around drift. Open or update an issue in `z-shell/.github`,
 ## See also
 
 - `.github/AGENT_MEMORY.md`
+- `.github/instruction-surfaces.json`
 - `PATTERNS.md`
 - `decisions/`
 - `runbooks/org-review.md`
 - `runbooks/adr.md`
 - `runbooks/dependency-management.md`
 - `runbooks/labels.md`
+- `runbooks/instruction-update.md`
 - `runbooks/new-repository.md`
 - `runbooks/project-tracker.md`
 - `runbooks/release.md`

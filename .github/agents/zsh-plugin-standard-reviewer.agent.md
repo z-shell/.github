@@ -51,5 +51,5 @@ Run through this checklist for the plugin entry file and supporting files. Repor
 
 - Use Glob/Grep to locate the entry file and supporting files; Read them fully.
 - Run `zsh -n` via Bash for syntax verification.
-- Cross-reference an existing compliant plugin in the workspace (e.g. `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`) when a pattern is ambiguous.
+- Cross-reference an existing compliant plugin (e.g. `z-shell/zsh-eza:zsh-eza.plugin.zsh`) when a pattern is ambiguous.
 - Output a single compact report: a checklist table, then a numbered list of concrete fixes ordered by severity (standard-breaking first, style last).

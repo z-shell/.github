@@ -10,8 +10,10 @@ it. Never share credentials or org secrets directly.
 
 Before touching anything, read, in order:
 
-1. `AGENTS.md` (org-level instructions) and the workspace `CLAUDE.md`.
-2. `decisions/` — the accepted ADRs. These are the durable rules:
+1. `AGENTS.md` (organization policy).
+2. `decisions/` and `runbooks/` in this public `z-shell/.github` repository —
+   the organization source for durable decisions and operational guidance.
+   The accepted ADRs include:
    - 0001 meta-repo pattern, 0002 zi canonical, 0003 Conventional Commits,
      0005 workflow naming, 0006 wiki content roots, 0007 release flow,
      0008 branching model, 0009 testing/CI, 0010 security response.
@@ -21,8 +23,10 @@ Before touching anything, read, in order:
 
 - Active progress lives in **GitHub issues, PRs, and Linear** — not
   in local notes or agent memory.
-- `.gitmodules` is the Git-native source of truth for child-repo paths/remotes;
-  the meta-workspace `workspace/repos.yml` is the human/LLM-readable catalog.
+- This public repository's `AGENTS.md`, ADRs, and runbooks are the organization
+  source for policy and operational guidance.
+- Live source, repository-specific instructions, and active project state live
+  in the owning repository.
 - Durable decisions go in `decisions/`; long-form docs go in the wiki.
 
 ## Step 3 — Permissions (least privilege)
@@ -39,9 +43,8 @@ Grant only what the role requires; record the grant:
 
 ## Step 4 — Local environment
 
-- Clone via the meta-workspace; child repos are submodules. Note that **git
-  worktrees do not check out submodules** — child-repo work happens in the main
-  clone.
+- Clone the owning repository directly. Separate multi-repository tooling is
+  optional and outside this public runbook.
 - Configure commit signing: commits are signed (`gpg.format=ssh`); set a
   `user.signingkey`. Never add a `Co-authored-by` trailer — this is org policy,
   and note that no default-branch CI currently enforces it, so it is the

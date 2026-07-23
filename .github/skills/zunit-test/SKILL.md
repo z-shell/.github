@@ -1,12 +1,12 @@
 ---
 name: zunit-test
-description: Write and run ZUnit tests for Zsh plugins in this workspace. Use when the user asks to add tests for a plugin, write a .zunit test, or run the ZUnit suite. Covers ZUnit test syntax, the run/assert helpers, and the native test runner.
+description: Write and run z-shell/zunit tests for Zsh plugins. Use when the user asks to add tests for a plugin, write a .zunit test, or run the ZUnit suite. Covers ZUnit test syntax, the run/assert helpers, and the native test runner.
 disable-model-invocation: true
 ---
 
 # Write and run ZUnit tests
 
-ZUnit (`repos/tools/zunit`) is the Zsh unit-testing framework used across the workspace. Tests live in a plugin's `tests/` directory as `*.zunit` files and run via the `zunit` CLI or the `test-native.yml` workflow.
+ZUnit (`z-shell/zunit`) is the Zsh unit-testing framework used across Z-Shell repositories. Tests live in a plugin's `tests/` directory as `*.zunit` files and run via the `zunit` CLI or the `test-native.yml` workflow.
 
 ## Test file shape
 
@@ -38,7 +38,7 @@ ZUnit (`repos/tools/zunit`) is the Zsh unit-testing framework used across the wo
 - Lifecycle blocks: `@setup`, `@teardown`, plus file-level `@setup`/`@teardown` if defined once.
 - Result helpers tests can assert against: `pass`, `fail '<msg>'` (state 1), `error '<msg>'` (state 78), `skip '<msg>'` (state 48).
 
-Cross-reference real examples in `repos/tools/zunit/tests/` and `repos/plugins/zsh-eza/tests/zsh-eza.zunit`.
+Cross-reference real examples in `z-shell/zunit:tests/` and `z-shell/zsh-eza:tests/zsh-eza.zunit`.
 
 ## Running tests
 
