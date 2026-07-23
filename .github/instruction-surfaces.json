@@ -640,6 +640,18 @@
       "canonical_for": []
     },
     {
+      "id": "portable-agent-architecture",
+      "path": "decisions/0014-portable-agent-instruction-architecture.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["instruction-change"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "agent-policy-validator",
       "path": "scripts/validate-agent-policy.py",
       "kind": "enforcement",

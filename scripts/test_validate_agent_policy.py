@@ -13,6 +13,15 @@ import unittest
 
 SCRIPT_PATH = Path(__file__).with_name("validate-agent-policy.py")
 PUBLIC_ROOT = SCRIPT_PATH.parents[1]
+REQUIRED_IMPACT_QUESTIONS = (
+    "Is this shared policy, scoped guidance, runtime-only behavior, or enforcement?",
+    "Which runtimes and repository contexts must receive it?",
+    "Is the canonical owner still correct?",
+    "Does another surface now duplicate or contradict it?",
+    "Does either manifest need an added, changed, or removed route?",
+    "Can each supported runtime still receive the mandatory rule without relying on an optional hook or skill?",
+    "Do generated output and size limits still pass?",
+)
 SPEC = importlib.util.spec_from_file_location("validate_agent_policy", SCRIPT_PATH)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError(f"cannot load validator from {SCRIPT_PATH}")
@@ -864,6 +873,17 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_public_repository_documents_instruction_governance(self) -> None:
+        adr = (
+            PUBLIC_ROOT / "decisions/0014-portable-agent-instruction-architecture.md"
+        ).read_text()
+        self.assertIn("**Status:** PROPOSED", adr)
+        self.assertIn("z-shell/.github#475", adr)
+
+        runbook = (PUBLIC_ROOT / "runbooks/instruction-update.md").read_text()
+        for question in REQUIRED_IMPACT_QUESTIONS:
+            self.assertIn(question, runbook)
+
     def test_public_repository_has_no_validation_errors(self) -> None:
         self.assertEqual(validator.validate(PUBLIC_ROOT), [])
 
