@@ -53,6 +53,7 @@ FORBIDDEN_PUBLIC_PATH = re.compile(
 
 MANIFEST_PATH = ".github/instruction-surfaces.json"
 PUBLIC_POLICY_BYTE_LIMIT = 32_768
+EXPECTED_REPOSITORY = "z-shell/.github"
 REQUIRED_SURFACE_FIELDS = (
     "id",
     "path",
@@ -72,11 +73,11 @@ BASE_INVENTORY = {
     ".github/README.md": "runbook",
     ".github/copilot-instructions.md": "adapter",
 }
-FLAT_INVENTORY = (
-    (".github/instructions", ".instructions.md", "scoped-guidance"),
-    (".github/agents", ".agent.md", "agent"),
-    ("runbooks", ".md", "runbook"),
-    ("decisions", ".md", "decision"),
+INVENTORY_RULES = (
+    (".github/instructions", ".instructions.md", "scoped-guidance", True),
+    (".github/agents", ".md", "agent", False),
+    ("runbooks", ".md", "runbook", False),
+    ("decisions", ".md", "decision", False),
 )
 ENFORCEMENT_INVENTORY = {
     ".github/workflows/agent-instructions.yml": "enforcement",
@@ -169,10 +170,27 @@ def _validated_manifest_path(root: Path) -> tuple[Path | None, list[str]]:
     return resolved, []
 
 
+def _reject_duplicate_json_keys(
+    pairs: list[tuple[str, object]],
+) -> dict[str, object]:
+    parsed: dict[str, object] = {}
+    for key, value in pairs:
+        if key in parsed:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        parsed[key] = value
+    return parsed
+
+
 def _load_manifest(manifest_path: Path) -> dict[str, object]:
     with manifest_path.open(encoding="utf-8") as manifest_file:
         try:
-            return cast(dict[str, object], json.load(manifest_file))
+            return cast(
+                dict[str, object],
+                json.load(
+                    manifest_file,
+                    object_pairs_hook=_reject_duplicate_json_keys,
+                ),
+            )
         except json.JSONDecodeError:
             raise
         except (ValueError, RecursionError) as exc:
@@ -231,8 +249,13 @@ def _expected_inventory_kind(relative_path: str) -> str | None:
         return exact_kind
 
     path = Path(inventory_path)
-    for relative_directory, suffix, kind in FLAT_INVENTORY:
-        if path.parent.as_posix() == relative_directory and path.name.endswith(suffix):
+    for relative_directory, suffix, kind, recursive in INVENTORY_RULES:
+        within_directory = inventory_path.startswith(f"{relative_directory}/")
+        if (
+            path.name.endswith(suffix)
+            and within_directory
+            and (recursive or path.parent.as_posix() == relative_directory)
+        ):
             return kind
     if re.fullmatch(r"\.github/skills/[^/]+/SKILL\.md", inventory_path):
         return "skill"
@@ -281,45 +304,91 @@ def _inventory_scan_error(relative_path: str, exc: OSError) -> str:
     )
 
 
-def _scan_flat_inventory(
-    root: Path, relative_directory: str, suffix: str
-) -> tuple[set[str], list[str]]:
+def _validated_inventory_directory(
+    root: Path, relative_directory: str
+) -> tuple[Path | None, list[str]]:
     directory = root / relative_directory
-    if not os.path.lexists(directory):
-        return set(), []
-    paths: set[str] = set()
     try:
-        with os.scandir(directory) as entries:
-            for entry in entries:
-                if entry.name.endswith(suffix):
-                    paths.add(f"{relative_directory}/{entry.name}")
+        if not os.path.lexists(directory):
+            return None, []
+        directory_status = directory.lstat()
     except OSError as exc:
-        return set(), [_inventory_scan_error(relative_directory, exc)]
-    return paths, []
+        return None, [_inventory_scan_error(relative_directory, exc)]
+    if stat.S_ISLNK(directory_status.st_mode):
+        return None, [
+            error(
+                relative_directory,
+                "inventory directory symlink is not allowed",
+                f"replace {relative_directory} with a regular directory "
+                "inside the repository",
+            )
+        ]
+    return directory, []
+
+
+def _scan_flat_inventory(
+    root: Path, relative_directory: str, suffix: str, recursive: bool
+) -> tuple[set[str], list[str]]:
+    directory, errors = _validated_inventory_directory(root, relative_directory)
+    if directory is None:
+        return set(), errors
+    paths: set[str] = set()
+    pending = [(directory, relative_directory)]
+    while pending:
+        current_directory, current_relative_directory = pending.pop()
+        try:
+            entries_context = os.scandir(current_directory)
+        except OSError as exc:
+            errors.append(_inventory_scan_error(current_relative_directory, exc))
+            continue
+        try:
+            with entries_context as entries:
+                for entry in entries:
+                    relative_path = f"{current_relative_directory}/{entry.name}"
+                    if entry.name.endswith(suffix):
+                        paths.add(relative_path)
+                    if not recursive:
+                        continue
+                    try:
+                        if entry.is_dir(follow_symlinks=False):
+                            pending.append((Path(entry.path), relative_path))
+                    except OSError as exc:
+                        errors.append(_inventory_scan_error(relative_path, exc))
+        except OSError as exc:
+            errors.append(_inventory_scan_error(current_relative_directory, exc))
+    return paths, errors
+
+
+def _skill_resource_symlink_error(relative_path: str) -> str:
+    return error(
+        relative_path,
+        "skill resource symlink is not allowed (file or directory symlink)",
+        f"replace {relative_path} with a regular file or regular directory "
+        "below the repository root",
+    )
 
 
 def _scan_skill_inventory(root: Path) -> tuple[set[str], list[str]]:
     relative_directory = ".github/skills"
-    directory = root / relative_directory
-    if not os.path.lexists(directory):
-        return set(), []
+    directory, errors = _validated_inventory_directory(root, relative_directory)
+    if directory is None:
+        return set(), errors
     paths: set[str] = set()
-    errors: list[str] = []
     try:
         with os.scandir(directory) as skill_entries:
             for skill_entry in skill_entries:
+                skill_path = f"{relative_directory}/{skill_entry.name}"
                 try:
-                    is_directory = skill_entry.is_dir(follow_symlinks=True)
+                    if skill_entry.is_symlink():
+                        errors.append(_skill_resource_symlink_error(skill_path))
+                        continue
+                    is_directory = skill_entry.is_dir(follow_symlinks=False)
                 except OSError as exc:
-                    errors.append(
-                        _inventory_scan_error(
-                            f"{relative_directory}/{skill_entry.name}", exc
-                        )
-                    )
+                    errors.append(_inventory_scan_error(skill_path, exc))
                     continue
                 if not is_directory:
                     continue
-                skill_directory = f"{relative_directory}/{skill_entry.name}"
+                skill_directory = skill_path
                 try:
                     with os.scandir(root / skill_directory) as files:
                         if any(entry.name == "SKILL.md" for entry in files):
@@ -334,8 +403,13 @@ def _scan_skill_inventory(root: Path) -> tuple[set[str], list[str]]:
 def _required_inventory(root: Path) -> tuple[set[str], list[str]]:
     paths = set(BASE_INVENTORY)
     errors: list[str] = []
-    for relative_directory, suffix, _kind in FLAT_INVENTORY:
-        discovered, scan_errors = _scan_flat_inventory(root, relative_directory, suffix)
+    for relative_directory, suffix, _kind, recursive in INVENTORY_RULES:
+        discovered, scan_errors = _scan_flat_inventory(
+            root,
+            relative_directory,
+            suffix,
+            recursive,
+        )
         paths.update(discovered)
         errors.extend(scan_errors)
     discovered_skills, skill_errors = _scan_skill_inventory(root)
@@ -370,12 +444,12 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
             )
         )
 
-    if not _non_empty_string(manifest.get("repository")):
+    if manifest.get("repository") != EXPECTED_REPOSITORY:
         errors.append(
             error(
                 MANIFEST_PATH,
-                "repository must be a non-empty string",
-                f'set repository to "z-shell/.github" in {MANIFEST_PATH}',
+                f"repository must be exactly {EXPECTED_REPOSITORY!r}",
+                f"set repository to {EXPECTED_REPOSITORY!r} in {MANIFEST_PATH}",
             )
         )
 
@@ -712,17 +786,10 @@ def _walk_skill_resources(
                         errors.append(_invalid_discovered_path_error(raw_display_path))
                         continue
                     try:
-                        if entry.is_symlink() and entry.is_dir(follow_symlinks=True):
-                            errors.append(
-                                error(
-                                    display_path,
-                                    "skill resource directory symlink is not allowed",
-                                    f"replace {display_path} with a regular directory "
-                                    "below the repository root",
-                                )
-                            )
+                        if entry.is_symlink():
+                            errors.append(_skill_resource_symlink_error(display_path))
                             continue
-                        if entry.is_file(follow_symlinks=True):
+                        if entry.is_file(follow_symlinks=False):
                             resolved = path.resolve(strict=False)
                             if not resolved.is_relative_to(root):
                                 errors.append(
@@ -754,6 +821,73 @@ def _walk_skill_resources(
                 )
             )
     return files, errors
+
+
+def _codex_guidance_scan_error(root: Path, exc: OSError) -> str:
+    path = Path(exc.filename) if exc.filename else root
+    try:
+        relative_path = path.relative_to(root).as_posix() or "."
+    except ValueError:
+        relative_path = "."
+    display_path = _one_line_path(relative_path)
+    if display_path != relative_path:
+        return _invalid_discovered_path_error(relative_path)
+    return error(
+        display_path,
+        f"cannot scan for Codex guidance: {exc}",
+        f"restore readable directory permissions for {display_path}",
+    )
+
+
+def validate_codex_guidance_layout(
+    root: Path, _manifest: dict[str, object]
+) -> list[str]:
+    errors: list[str] = []
+    root = root.resolve()
+    scan_errors: list[OSError] = []
+
+    for directory, directory_names, file_names in os.walk(
+        root,
+        topdown=True,
+        followlinks=False,
+        onerror=scan_errors.append,
+    ):
+        directory_names[:] = [name for name in directory_names if name != ".git"]
+        directory_path = Path(directory)
+        for filename in file_names:
+            if filename not in {"AGENTS.md", "AGENTS.override.md"}:
+                continue
+            path = directory_path / filename
+            relative_path = path.relative_to(root).as_posix()
+            display_path = _one_line_path(relative_path)
+            if display_path != relative_path:
+                errors.append(_invalid_discovered_path_error(relative_path))
+                continue
+            if filename == "AGENTS.override.md":
+                errors.append(
+                    error(
+                        display_path,
+                        "AGENTS.override.md is unsupported by the root-only "
+                        "public policy layout",
+                        f"remove {display_path} and move scoped guidance to a "
+                        "manifest-declared .github/instructions/**/*.instructions.md "
+                        "surface",
+                    )
+                )
+            elif relative_path != "AGENTS.md":
+                errors.append(
+                    error(
+                        display_path,
+                        "nested AGENTS.md is unsupported by the root-only "
+                        "public policy layout",
+                        f"remove {display_path} and move scoped guidance to a "
+                        "manifest-declared .github/instructions/**/*.instructions.md "
+                        "surface",
+                    )
+                )
+
+    errors.extend(_codex_guidance_scan_error(root, exc) for exc in scan_errors)
+    return errors
 
 
 def _files_for_public_scan(
@@ -1090,6 +1224,7 @@ def validate(root: Path) -> list[str]:
     errors: list[str] = []
     for validator in (
         validate_manifest,
+        validate_codex_guidance_layout,
         validate_public_references,
         validate_public_policy_size,
         validate_scoped_instructions,

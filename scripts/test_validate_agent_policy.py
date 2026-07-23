@@ -178,6 +178,49 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             "invalid JSON",
         )
 
+    def test_rejects_duplicate_top_level_json_keys(self) -> None:
+        manifest_text = json.dumps(self.manifest, indent=2) + "\n"
+        manifest_text = manifest_text.replace(
+            '  "repository": "z-shell/.github",',
+            '  "repository": "workspace/repos.yml",\n'
+            '  "repository": "z-shell/.github",',
+            1,
+        )
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            manifest_text,
+        )
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "duplicate JSON key 'repository'",
+        )
+
+    def test_rejects_duplicate_nested_json_keys(self) -> None:
+        manifest_text = json.dumps(self.manifest, indent=2) + "\n"
+        manifest_text = manifest_text.replace(
+            '      "path": "AGENTS.md",',
+            '      "path": "workspace/repos.yml",\n' '      "path": "AGENTS.md",',
+            1,
+        )
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            manifest_text,
+        )
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "duplicate JSON key 'path'",
+        )
+
     def test_rejects_manifest_symlink_to_outside_file(self) -> None:
         with tempfile.TemporaryDirectory() as outside_directory:
             outside_manifest = Path(outside_directory) / "instruction-surfaces.json"
@@ -233,6 +276,18 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             errors, ".github/instruction-surfaces.json", "version"
         )
 
+    def test_rejects_wrong_repository_identity(self) -> None:
+        self.manifest["repository"] = "z-shell/wiki"
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "repository must be exactly 'z-shell/.github'",
+        )
+
     def test_rejects_unknown_enum_values(self) -> None:
         cases = (
             ("kind", "unknown-kind"),
@@ -269,7 +324,13 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                 "scoped-guidance",
                 '---\napplyTo: "**"\n---\n\n# Example\n',
             ),
+            (
+                ".github/instructions/nested/example.instructions.md",
+                "scoped-guidance",
+                '---\napplyTo: "**"\n---\n\n# Nested example\n',
+            ),
             (".github/agents/example.agent.md", "agent", "# Example agent\n"),
+            (".github/agents/example.md", "agent", "# Example custom agent\n"),
             (".github/skills/example/SKILL.md", "skill", "# Example skill\n"),
             ("runbooks/example.md", "runbook", "# Example runbook\n"),
             ("decisions/0001-example.md", "decision", "# Example decision\n"),
@@ -636,6 +697,60 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
                         self.assert_error_contains(errors, filename, "vendor root")
 
+    def test_rejects_nested_agents_md_even_when_declared(self) -> None:
+        nested_path = "packages/example/config/AGENTS.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "nested-agent-policy",
+                nested_path,
+                kind="shared-policy",
+                authority="canonical-detail",
+                consumers=["codex"],
+                file_patterns=["packages/example/config/**"],
+            )
+        )
+        write_file(self.root, nested_path, "# Nested policy\n")
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            nested_path,
+            "nested AGENTS.md is unsupported",
+            ".github/instructions",
+        )
+
+    def test_rejects_agents_override_files_at_any_depth(self) -> None:
+        for relative_path in (
+            "AGENTS.override.md",
+            "packages/example/config/AGENTS.override.md",
+        ):
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    write_file(root, relative_path, "# Override policy\n")
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        "AGENTS.override.md is unsupported",
+                        ".github/instructions",
+                    )
+
+    def test_ignores_codex_guidance_names_below_git_metadata(self) -> None:
+        write_file(self.root, ".git/private/AGENTS.md", "# Git metadata\n")
+        write_file(
+            self.root,
+            ".git/private/AGENTS.override.md",
+            "# Git metadata override\n",
+        )
+
+        self.assertEqual(validator.validate(self.root), [])
+
     def test_rejects_wrong_copilot_adapter(self) -> None:
         with (self.root / ".github/copilot-instructions.md").open(
             "a", encoding="utf-8"
@@ -772,7 +887,9 @@ class AgentPolicyValidatorTests(unittest.TestCase):
     def test_rejects_inventory_omission(self) -> None:
         omitted_paths = (
             ".github/instructions/unlisted.instructions.md",
+            ".github/instructions/nested/unlisted.instructions.md",
             ".github/agents/unlisted.agent.md",
+            ".github/agents/unlisted.md",
             ".github/skills/unlisted/SKILL.md",
             ".github/workflows/agent-instructions.yml",
             "runbooks/unlisted.md",
@@ -789,6 +906,49 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                     errors = validator.validate(root)
 
                     self.assert_error_contains(errors, omitted_path, "inventory")
+
+    def test_scans_declared_recursive_instruction_and_direct_agent_markdown(
+        self,
+    ) -> None:
+        cases = (
+            (
+                ".github/instructions/nested/private.instructions.md",
+                "scoped-guidance",
+                '---\napplyTo: "**/*.py"\n---\n\nRead workspace/repos.yml.\n',
+                ["**/*.py"],
+            ),
+            (
+                ".github/agents/private.md",
+                "agent",
+                "Read workspace/repos.yml.\n",
+                ["**"],
+            ),
+        )
+        for relative_path, kind, content, file_patterns in cases:
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"].append(
+                        make_surface(
+                            f"private-{kind}",
+                            relative_path,
+                            kind=kind,
+                            authority="canonical-detail",
+                            consumers=["codex"],
+                            file_patterns=file_patterns,
+                        )
+                    )
+                    write_file(root, relative_path, content)
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        "workspace/repos.yml",
+                    )
 
     def test_inventory_requires_the_actual_surface_path(self) -> None:
         instruction_path = ".github/instructions/unlisted.instructions.md"
@@ -927,6 +1087,71 @@ class AgentPolicyValidatorTests(unittest.TestCase):
         )
         self.assertTrue(all("\n" not in message for message in errors), errors)
 
+    def test_rejects_in_repository_skill_file_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        target_path = self.root / ".github/skills/example/resource-target.md"
+        link_path = self.root / ".github/skills/example/references/example.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            ".github/skills/example/resource-target.md",
+            "# Example resource\n",
+        )
+        link_path.parent.mkdir(parents=True, exist_ok=True)
+        link_path.symlink_to(target_path)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references/example.md",
+            "skill resource symlink",
+            "; fix:",
+            "regular file",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
+    def test_rejects_broken_absolute_skill_resource_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        with tempfile.TemporaryDirectory() as outside_directory:
+            link_path = self.root / ".github/skills/example/references/missing.md"
+            link_path.parent.mkdir(parents=True, exist_ok=True)
+            link_path.symlink_to(Path(outside_directory) / "missing.md")
+            write_manifest(self.root, self.manifest)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references/missing.md",
+            "skill resource symlink",
+            "; fix:",
+            "regular file",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
     def test_rejects_unreadable_inventory_directory(self) -> None:
         instructions = self.root / ".github/instructions"
         write_file(
@@ -941,6 +1166,40 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             instructions.chmod(0o700)
 
         self.assert_error_contains(errors, ".github/instructions", "inventory")
+
+    def test_rejects_external_empty_inventory_directory_symlinks(self) -> None:
+        for relative_directory in (
+            ".github/instructions",
+            ".github/agents",
+            "runbooks",
+            "decisions",
+            ".github/skills",
+        ):
+            with self.subTest(path=relative_directory):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    with tempfile.TemporaryDirectory() as outside_directory:
+                        link_path = root / relative_directory
+                        link_path.parent.mkdir(parents=True, exist_ok=True)
+                        link_path.symlink_to(
+                            Path(outside_directory),
+                            target_is_directory=True,
+                        )
+
+                        errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_directory,
+                        "inventory directory symlink is not allowed",
+                        "; fix:",
+                        "regular directory",
+                    )
+                    self.assertTrue(
+                        all("\n" not in message for message in errors),
+                        errors,
+                    )
 
     def test_rejects_unreadable_skill_resource_directory(self) -> None:
         skill_path = ".github/skills/example/SKILL.md"
@@ -1090,6 +1349,34 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             "invalid JSON",
             "fix:",
         )
+
+    def test_cli_rejects_duplicate_json_keys_on_one_line(self) -> None:
+        manifest_text = json.dumps(self.manifest, indent=2) + "\n"
+        manifest_text = manifest_text.replace(
+            '      "path": "AGENTS.md",',
+            '      "path": "workspace/repos.yml",\n' '      "path": "AGENTS.md",',
+            1,
+        )
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            manifest_text,
+        )
+
+        # The argv uses the current interpreter and repository-local validator.
+        completed = subprocess.run(  # nosec B603
+            [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        output_lines = completed.stdout.splitlines()
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        self.assertEqual(len(output_lines), 1, completed.stdout)
+        self.assertIn("duplicate JSON key 'path'", output_lines[0])
+        self.assertIn("; fix:", output_lines[0])
+        self.assertNotIn("Traceback", completed.stdout + completed.stderr)
 
     def test_cli_errors_remain_one_line_for_control_character_path(self) -> None:
         for separator in ("\n", "\u0085", "\u2028", "\u2029"):
@@ -1274,6 +1561,8 @@ class PublicRepositoryTests(unittest.TestCase):
             ".github/agents/**",
             ".github/instructions/**",
             ".github/skills/**",
+            "**/AGENTS.md",
+            "**/AGENTS.override.md",
             ".github/workflows/agent-instructions.yml",
             "decisions/**",
             "runbooks/**",
