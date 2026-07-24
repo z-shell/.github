@@ -9,7 +9,7 @@ PROPOSED
 ## Context
 
 `zsh-lint` is a standalone Go semantic analyzer for Zsh. Its parser front end
-produces an `mvdan/sh/syntax` tree, and its semantic engine must support rules
+produces an `mvdan.cc/sh/v3/syntax` tree, and its semantic engine must support rules
 that need only the current syntax node as well as rules that need declarations
 collected from the complete file.
 
