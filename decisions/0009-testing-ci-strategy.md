@@ -39,8 +39,13 @@ than copied into this ADR as a transient workflow inventory.
   ADR-0012. ADR-0012 does **not** establish organization-wide secret-scanning
   coverage; that requires separately configured and verified controls.
 - Under the target policy, Conventional Commits (ADR-0003), PR-title validation,
-  and the disallowed-trailer rule would be enforced in CI. This is not a claim
-  of uniform live enforcement.
+  and the disallowed-trailer rule would be enforced in CI. Neither is a live
+  org-wide gate today: a sweep of the default branches of all 86 active,
+  non-fork, non-archived repositories found no workflow that runs the
+  `DISALLOWED_TRAILER_PATTERN` check or validates commit messages. Non-default
+  branches were not swept. The only implementation is a `commit-lint` workflow
+  on the `next` branch of `z-shell/zi`, which has never reached a default
+  branch. This is not a claim of uniform live enforcement.
 
 ### By class
 

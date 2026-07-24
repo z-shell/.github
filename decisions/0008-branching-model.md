@@ -21,7 +21,7 @@ GitHub default branch. Only `src`, `wiki`, `zi`, `zsh-lint`, and `zsh-eza` have
 a live `next` branch for development or integration. In this ADR, **GitHub
 default branch** and **development branch** are therefore separate concepts.
 
-The private meta-workspace catalog (`workspace/repos.yml`) is still drifted. Its
+The private meta-workspace catalog (`workspace/repos.yml`) is still out of date. Its
 `default_branch` field conflates those concepts, and some entries name `next`
 for repositories that do not have that branch. The catalog has not yet been
 reconciled; that is a separate meta-workspace change after a maintainer decides
