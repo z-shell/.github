@@ -64,7 +64,7 @@ exception, such as a non-default target branch:
 Custom managers and specialized package grouping also belong in the repository
 that needs them.
 
-For any repository whose `decisions/0008-branching-model.md` row is `next` ->
+For any repository whose `decisions/0008-branching-model.md` row is `next` →
 `main`, this `baseBranches` override is not optional: without it Renovate
 opens routine update PRs against `main` directly, bypassing `next`. This was
 found live (not theoretical) in two repositories — see

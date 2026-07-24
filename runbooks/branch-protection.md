@@ -1,7 +1,7 @@
-# Runbook — Branch Protection for `next` -> `main` Repositories
+# Runbook — Branch Protection for `next` → `main` Repositories
 
 Use this runbook when provisioning or auditing branch rulesets and repository
-settings for a repository that uses the `next` -> `main` branch model
+settings for a repository that uses the `next` → `main` branch model
 (`decisions/0008-branching-model.md`). It exists because `z-shell/src` and
 `z-shell/zsh-eza` were both found, independently, with the same three gaps
 during an audit — none of them were visible from the ruleset UI alone.
@@ -35,11 +35,11 @@ rulesets do not cover. Two incidents motivated this runbook:
 ## Checklist
 
 Run every item below for a repository whose `decisions/0008-branching-model.md`
-row is `next` -> `main`. Skip repositories that are trunk-on-`main`.
+row is `next` → `main`. Skip repositories that are trunk-on-`main`.
 
 - [ ] **`delete_branch_on_merge` is `false` at the repository level.**
       `gh api repos/<org>/<repo> --jq .delete_branch_on_merge`. If `true`,
-      any PR that uses `next` as its head branch (i.e. every `next` -> `main`
+      any PR that uses `next` as its head branch (i.e. every `next` → `main`
       promotion) risks GitHub deleting `next` right after merge, regardless of
       the ruleset's `deletion` rule. Disable it:
       `gh api -X PATCH repos/<org>/<repo> --field delete_branch_on_merge=false`.
@@ -73,7 +73,7 @@ row is `next` -> `main`. Skip repositories that are trunk-on-`main`.
 
 ## Squash-merge trailers
 
-When squash-merging a `next` -> `main` promotion PR without an explicit
+When squash-merging a `next` → `main` promotion PR without an explicit
 `--body`, GitHub synthesizes one by aggregating the squashed commits'
 trailers — which reliably reintroduces `Co-authored-by` and `Signed-off-by`
 trailers even when no individual commit you authored had one, violating the
