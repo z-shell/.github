@@ -640,6 +640,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0013",
+      "path": "decisions/0013-repository-settings-baseline.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "portable-agent-architecture",
       "path": "decisions/0014-portable-agent-instruction-architecture.md",
       "kind": "decision",
