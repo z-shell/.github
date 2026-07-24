@@ -18,7 +18,7 @@ inconsistency is real, not cosmetic:
 
 The meta-workspace catalog (`workspace/repos.yml`) had drifted from this reality
 and had to be reconciled by inspecting live remotes. The root cause is that no
-decision says *which class of repo uses a `next` branch and which does not*, so
+decision says _which class of repo uses a `next` branch and which does not_, so
 each repo's model is discovered empirically rather than governed. `zsh-lint`
 recently gained a `next` branch during its Go reboot, which re-surfaced the
 ambiguity.
@@ -31,7 +31,7 @@ than decided per repo, so the catalog stops drifting at the source.
 
 The **canonical per-repo table below is the authoritative source** for branch
 model, and `workspace/repos.yml` derives from it. The ADR-0007 repository class
-is an *input* to the choice (it sets the publication boundary and a default), but
+is an _input_ to the choice (it sets the publication boundary and a default), but
 it does **not** by itself determine the branch model — repo churn/scale does.
 Reality confirms this: within class 1, `wiki`/`src` run `next` → `main` while
 `zd` is trunk-only; within class 2, `zsh-lint` uses `next` while `zunit` is
@@ -41,19 +41,19 @@ requires amending this ADR (or a superseding one), not creating a branch.
 
 ### Canonical branch model
 
-| Repo                   | Class | Branch model     | Development branch | Publication boundary        |
-| ---------------------- | ----- | ---------------- | ------------------ | --------------------------- |
-| `wiki`                 | 1     | `next` → `main`  | `next`             | merge to `main` (deploy)    |
-| `src`                  | 1     | `next` → `main`  | `next`             | merge to `main` (deploy)    |
-| `zd`                   | 1     | trunk on `main`  | `main`             | push to `main` (image)      |
-| `zunit`                | 2     | trunk on `main`  | `main`             | `vX.Y.Z` tag                |
-| `zsh-lint`             | 2     | `next` → `main`  | `next`             | `vX.Y.Z` tag                |
-| packaged `zsh`         | 2     | trunk on `main`  | `main`             | `vX.Y.Z` tag (deferred)     |
-| `zi`                   | 3     | `next` → `main`  | `next`             | `main` is consumable ref    |
-| `zsh-eza`              | 3     | `next` → `main`  | `next`             | `main` is consumable ref    |
-| `z-a-meta-plugins`     | 3     | trunk on `main`  | `main`             | `main` is consumable ref    |
-| `zsh-fancy-completions`| 3     | trunk on `main`  | `main`             | `main` is consumable ref    |
-| `.github`              | 4     | trunk on `main`  | `main`             | n/a                         |
+| Repo                    | Class | Branch model    | Development branch | Publication boundary     |
+| ----------------------- | ----- | --------------- | ------------------ | ------------------------ |
+| `wiki`                  | 1     | `next` → `main` | `next`             | merge to `main` (deploy) |
+| `src`                   | 1     | `next` → `main` | `next`             | merge to `main` (deploy) |
+| `zd`                    | 1     | trunk on `main` | `main`             | push to `main` (image)   |
+| `zunit`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag             |
+| `zsh-lint`              | 2     | `next` → `main` | `next`             | `vX.Y.Z` tag             |
+| packaged `zsh`          | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag (deferred)  |
+| `zi`                    | 3     | `next` → `main` | `next`             | `main` is consumable ref |
+| `zsh-eza`               | 3     | `next` → `main` | `next`             | `main` is consumable ref |
+| `z-a-meta-plugins`      | 3     | trunk on `main` | `main`             | `main` is consumable ref |
+| `zsh-fancy-completions` | 3     | trunk on `main` | `main`             | `main` is consumable ref |
+| `.github`               | 4     | trunk on `main` | `main`             | n/a                      |
 
 ### How the class informs the default
 
@@ -90,6 +90,9 @@ catalog in the same change.
 - Promotion from `next` to `main` is a publication boundary only for class 1
   (deploy) repos; for other classes the merge validates but does not mint a
   release (consistent with ADR-0007).
+- This ADR sets the policy; `runbooks/branch-protection.md` covers the
+  repository-settings and ruleset provisioning that enforces it (added after
+  an audit found `src` and `zsh-eza` both missing parts of it).
 
 ## Alternatives considered
 
@@ -107,3 +110,4 @@ catalog in the same change.
 - `decisions/0007-release-publication-flow.md` — repository classes this builds on.
 - `workspace/repos.yml` (meta-workspace) — per-repo branch model catalog.
 - `decisions/0003-conventional-commits.md` — commit/branch naming conventions.
+- `runbooks/branch-protection.md` — enforcement checklist for this model.

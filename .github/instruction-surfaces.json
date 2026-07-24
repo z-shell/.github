@@ -424,6 +424,18 @@
       "canonical_for": ["repository-bootstrap"]
     },
     {
+      "id": "runbook-branch-protection",
+      "path": "runbooks/branch-protection.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["repository-bootstrap", "branch-protection"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["branch-protection"]
+    },
+    {
       "id": "runbook-onboarding",
       "path": "runbooks/onboarding.md",
       "kind": "runbook",
