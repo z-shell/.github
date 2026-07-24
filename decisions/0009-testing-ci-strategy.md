@@ -32,8 +32,11 @@ than copied into this ADR as a transient workflow inventory.
 
 - Workflows comply with the org workflow conventions (SHA-pinned actions,
   least-privilege `permissions:`, `concurrency:`, no-emoji `name:` per ADR-0005,
-  kebab-case filenames). These conventions are defined in `AGENTS.md` and the CI
-  instructions; this ADR references them rather than duplicating their details.
+  kebab-case filenames). These conventions are defined in
+  `.github/instructions/github-actions-ci-cd-best-practices.instructions.md`
+  and `decisions/0005-workflow-naming-conventions.md`; `AGENTS.md` only
+  summarizes them. This ADR references the concrete sources rather than
+  duplicating their details.
 - Zsh sources pass `zsh -n` (syntax) and `zcompile` (compile) checks.
 - Dependency-update and vulnerability-remediation ownership follows accepted
   ADR-0012. ADR-0012 does **not** establish organization-wide secret-scanning
@@ -103,7 +106,10 @@ Before acceptance, a maintainer must:
   discouraging release machinery in class-3 repositories (consistent with
   ADR-0007).
 - The testing instruction file (`.github/instructions/testing.instructions.md`)
-  would be reconciled after acceptance; it is not changed by this draft.
+  currently reads as present-tense enforcement (for example, it states
+  Conventional Commits and the disallowed-trailer check "are enforced"). That
+  is target-state language, not evidence of current conformance, and the file
+  would be reconciled after acceptance. It is not changed by this draft.
 
 ## Alternatives considered
 
