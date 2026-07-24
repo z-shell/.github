@@ -48,6 +48,25 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 | [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                  |
 | [`renovate-config.json`](../renovate-config.json) | Shared Renovate preset for routine dependency version updates                                               |
 
+## Instruction Architecture
+
+The organization uses a portable, manifest-backed instruction architecture:
+
+- [`AGENTS.md`](../AGENTS.md) is the standalone canonical organization policy.
+- [`instruction-surfaces.json`](instruction-surfaces.json) records instruction
+  ownership, routing, and inventory metadata.
+- [`copilot-instructions.md`](copilot-instructions.md) is a regular import-only
+  adapter to `AGENTS.md`; it is not a policy owner.
+- [`instruction-update.md`](../runbooks/instruction-update.md) is the required
+  impact review for every material instruction change.
+- [`validate-agent-policy.py`](../scripts/validate-agent-policy.py) and
+  [`agent-instructions.yml`](workflows/agent-instructions.yml) enforce the public
+  instruction contract.
+
+Root `CLAUDE.md` and `GEMINI.md` are intentionally absent. Supported runtimes
+receive mandatory policy through the canonical baseline or an explicitly
+routed adapter, not through duplicate root policy files.
+
 ### Community Health Files
 
 These files in `.github/` act as **organization-wide defaults** — automatically used by any repository that doesn't have its own version:
@@ -97,7 +116,7 @@ Starter workflows available in every org repository under **Actions > New workfl
 | Zsh CI        | Starter Zsh CI workflow     |
 | Rclone Action | File sync with rclone       |
 
-Label definitions live in [`./lib/labels.yml`](lib/labels.yml) and should be applied through org maintenance scripts or API-driven automation, not via a generic starter workflow template.
+Label definitions live in [`lib/labels.yml`](../lib/labels.yml) and should be applied through org maintenance scripts or API-driven automation, not via a generic starter workflow template.
 
 Task tracking is documented in [`../runbooks/project-tracker.md`](../runbooks/project-tracker.md).
 
@@ -133,7 +152,7 @@ This repository is the right place for any **organization-level** configuration:
 - **Defining weekly review, ADR, or release coordination workflows** — add or update the relevant file under `runbooks/`
 - **Recording cross-agent progress** — follow `.github/AGENT_MEMORY.md` and keep active state in issues, pull requests, and Linear
 - **Managing organization task tracking** — follow `../runbooks/project-tracker.md`
-- **Updating the shared label set** — edit `.github/lib/labels.yml` and roll it out via the org's maintenance automation
+- **Updating the shared label set** — edit `lib/labels.yml` and roll it out via the org's maintenance automation
 - **Cleaning legacy labels** — follow `../runbooks/labels.md` before deleting labels from live repositories
 - **Creating a reusable CI action** — add a composite action under `actions/<name>/action.yml`
 - **Providing a starter workflow** — add `.yml` + `.properties.json` to `workflow-templates/`

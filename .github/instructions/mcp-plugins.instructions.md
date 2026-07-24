@@ -1,24 +1,29 @@
 ---
-description: "When and how to use the project MCP plugins (Context7, Cloudflare, Greptile) and CLI Agent toolkits (pr-review-toolkit, hookify, security-guidance) across the Z-Shell workspace."
+description: "Capability-conditional guidance for optional tool integrations across Z-Shell repositories; discover available tools before use and fall back to official documentation or local search."
 applyTo: "**"
 ---
 
-# Project MCP Plugins
+# Optional Tool Integrations
 
-Guidance for the MCP servers and Claude Code plugins enabled in the Z-Shell
-maintainer workspace. Prefer these over guesswork or generic web search.
+Guidance for optional MCP servers and agent toolkits. Availability varies by
+runtime: discover available tools first, use a named tool only when present,
+and otherwise consult official documentation or search the local repository.
 
 ## General rules
 
-- Prefer Context7 over web search for any library, framework, or API documentation.
-- Treat every OAuth-gated plugin (Cloudflare, Greptile) as touching a
-  **live external service**. Read-only by default; confirm with the user before
-  any write, deploy, secret change, or other outward-facing action.
+- Discover the current runtime's capabilities before selecting an integration.
+- Use Context7 for library, framework, or API documentation only when it is
+  available; otherwise use official documentation or local search.
+- Treat every available OAuth-gated integration (including Cloudflare and
+  Greptile) as touching a **live external service**. Read-only by default;
+  confirm with the user before any write, deploy, secret change, or other
+  outward-facing action.
 - GitHub, the wiki, and the Z-Shell Tracker remain the source of truth. Record
-  plugin-derived findings in PRs and issues, not only in local agent memory.
+  tool-derived findings in PRs and issues, not only in local agent memory.
 
 ## Context7 (no auth)
 
+- **Availability:** optional; use only when present.
 - **Purpose:** current docs and code examples for libraries and frameworks
   (Docusaurus, React, wrangler, etc.).
 - **When to use:** before assuming API or config behavior; version migrations;
@@ -28,6 +33,7 @@ maintainer workspace. Prefer these over guesswork or generic web search.
 
 ## Cloudflare (OAuth)
 
+- **Availability:** optional; use only when present.
 - **Purpose:** Pages, Workers, R2, and observability for the wiki, which
   continuously deploys from `main`.
 - **When to use:** verify Pages deployments, inspect logs, R2 work (see the
@@ -38,7 +44,8 @@ maintainer workspace. Prefer these over guesswork or generic web search.
 
 ## Greptile (OAuth)
 
-- **Purpose:** semantic code search across the **multi-repo** workspace.
+- **Availability:** optional; use only when present.
+- **Purpose:** semantic code search across multiple repositories.
 - **When to use:** cross-repo reference scans before moves or renames; locating
   patterns that span repositories.
 - **When NOT to use:** single-file lookups where local grep or Read is faster.
@@ -46,6 +53,8 @@ maintainer workspace. Prefer these over guesswork or generic web search.
 
 ## CLI Agent toolkits
 
+- Use each toolkit only when the current runtime exposes it. Otherwise perform
+  the equivalent review with repository files and official documentation.
 - **pr-review-toolkit:** reviewer, silent-failure, type-design, test, and
   comment subagents. Run on a diff before requesting human review.
 - **hookify:** generate CLI hooks/heuristics from recurring conversation mistakes.

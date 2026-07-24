@@ -80,6 +80,112 @@ Repositories that should stay out of the first pilot:
 - `.github`
 - `zi`
 
+## Post-promotion branch reconcile (class 1)
+
+Applies to class-1 repositories that promote a development branch to a deployed
+branch, such as `wiki` promoting `next` to `main`.
+
+Branch names differ between repositories. The procedure below takes them as
+`DEPLOY` and `DEV` variables — set them for the repository you are working on
+rather than assuming `main` and `next`.
+
+### Why this is routine, not an incident
+
+When the deployed branch requires both pull requests and linear history, every
+merge method GitHub offers — squash or rebase — creates **new commits on the
+deployed branch that the development branch does not have**. A merge commit,
+which would keep the branches related, is exactly what linear history forbids.
+
+So the development branch diverges after *every* promotion, by construction.
+There is no branch-protection configuration that avoids it. Reconciling is a
+step in the release, not a sign that something went wrong.
+
+### Do not reconcile with a merge
+
+A `git merge` creates a merge commit, which violates `required_linear_history`.
+An administrator's push is **not refused** — it prints `Bypassed rule
+violations` and succeeds anyway. The push is not silent; it is simply not
+stopped, and the warning is easy to miss. Check the branch's rules before
+choosing a strategy:
+
+```sh
+gh api repos/OWNER/REPO/rules/branches/BRANCH -q '[.[].type]|join(", ")'
+```
+
+Note that rulesets and classic branch protection are **independent** systems and
+the effective rule is their union. Classic protection can report
+`required_linear_history: false` for a branch that a ruleset separately
+enforces it on, so check both before concluding a merge commit is allowed.
+
+### Procedure
+
+Immediately after the promotion merges, when everything on the development
+branch has shipped.
+
+Save this as a script and run it — do not paste the lines individually. Steps 2
+and 3 reset a branch and force-push it, so the safety gate has to be able to
+abort the run, which it cannot do when each line is pasted separately.
+
+```sh
+#!/usr/bin/env sh
+set -eu
+
+# Branch names for the repository being reconciled.
+DEPLOY=main
+DEV=next
+
+git fetch origin
+
+# 1. Safety gate. The trees must be identical — that is what makes the reset
+#    content-neutral. Differing trees mean the development branch carries work
+#    the promotion did not include, so abort rather than destroy it.
+if [ "$(git rev-parse "origin/$DEPLOY^{tree}")" != "$(git rev-parse "origin/$DEV^{tree}")" ]; then
+  echo "STOP: $DEV has content not present in $DEPLOY; do not reset" >&2
+  exit 1
+fi
+
+# 2. Realign the development branch onto the deployed branch.
+#    -B with an explicit remote-tracking start point creates or resets the
+#    branch in one step. A bare `git checkout "$DEV"` lands in detached HEAD
+#    when a tag shares the branch name, and the reset would then move a
+#    detached HEAD instead of the branch. --no-track stops the branch from
+#    silently tracking the deployed branch afterwards.
+git checkout -B "$DEV" --no-track "origin/$DEPLOY"
+git branch --set-upstream-to "origin/$DEV" "$DEV"
+
+# 3. Publish. A force is required: history is being replaced, not extended.
+#    Use a fully-qualified refspec: a short name fails with
+#    "src refspec matches more than one" when a tag shares it.
+git push --force-with-lease origin "refs/heads/$DEV:refs/heads/$DEV"
+```
+
+Use `--force-with-lease`, never `--force`, so the push aborts if anyone else
+has pushed to the branch since the fetch.
+
+### What to expect, and what to check
+
+- **This push bypasses a rule and cannot avoid it.** A direct push carries no
+  prior status check, so the branch reports
+  `Required status check "Trunk Check" is expected`. There is no
+  pull-request route to this operation — a pull request can only add commits,
+  and realignment rewrites history. Read the push output rather than silencing
+  it, and confirm the only bypass reported is the expected status check.
+- **Never run `git push -q` or pipe push output through `tail` on a protected
+  branch.** The `Bypassed rule violations` warning arrives at push time and is
+  easily truncated away.
+- Afterwards the two branches should be the *same commit*, not merely the same
+  content:
+
+  ```sh
+  [ "$(git rev-parse "origin/$DEV")" = "$(git rev-parse "origin/$DEPLOY")" ] && echo reconciled
+  ```
+
+### If the safety gate fails
+
+Do not reset. Differing trees mean the development branch carries work that the
+promotion did not include. Promote that work first, or rebase it onto the
+deployed branch, and only then realign.
+
 ## Release preparation automation (class 2)
 
 The reusable workflow

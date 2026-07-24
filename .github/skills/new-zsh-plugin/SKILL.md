@@ -6,19 +6,20 @@ disable-model-invocation: true
 
 # Create a new Zsh plugin
 
-Scaffold a plugin that conforms to the [Z-Shell Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) and this workspace's `CLAUDE.md` conventions.
+Scaffold a plugin that conforms to the [Z-Shell Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard), `z-shell/.github/AGENTS.md`, and the owning repository's local `AGENTS.md` when present.
 
 ## Steps
 
 1. **Gather inputs** (ask only if not supplied):
+   - An explicit target repository root. The caller must supply it; do not infer
+     or default to a multi-repository checkout path.
    - Plugin name in kebab-case, e.g. `zsh-foo` → entry file `zsh-foo.plugin.zsh`.
-   - A target directory (default: `repos/plugins/<name>/`).
    - Derive `PLUGIN_KEY` = upper-snake of the name without a `zsh-` prefix, e.g. `zsh-foo` → `ZSH_FOO`.
 
 2. **Create the layout**:
 
    ```
-   <name>/
+   <target-repository-root>/
      <name>.plugin.zsh
      functions/
      lib/

@@ -56,14 +56,10 @@ long-form ecosystem guidance in the wiki.
 
 ## LLM/agent files
 
-Per the workspace LLM file-placement policy, keep generic agent instructions
-centralized in the meta-workspace root or `z-shell/.github`. Child repos keep
-`AGENTS.md` / `.github/instructions/` only for repo-specific workflows that
-cannot be expressed centrally, and those should link back rather than repeat
-shared policy.
+Keep shared organization guidance in z-shell/.github. Keep child-repository AGENTS.md or .github/instructions files only for concise repository-specific behavior, and link to public canonical guidance rather than duplicating it.
 
 ## See also
 
 - `decisions/0006-wiki-content-root-boundaries.md`
-- `repos/docs/wiki/.github/copilot-instructions.md` (wiki-local authoring rules)
-- `repos/docs/wiki/.github/instructions/docs-authoring.instructions.md`
+- `z-shell/wiki:.github/copilot-instructions.md` (wiki-local authoring rules)
+- `z-shell/wiki:.github/instructions/docs-authoring.instructions.md`
