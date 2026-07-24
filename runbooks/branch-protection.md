@@ -76,8 +76,10 @@ row is `next` → `main`. Skip repositories that are trunk-on-`main`.
 When squash-merging a `next` → `main` promotion PR without an explicit
 `--body`, GitHub synthesizes one by aggregating the squashed commits'
 trailers — which reliably reintroduces `Co-authored-by` and `Signed-off-by`
-trailers even when no individual commit you authored had one, violating the
-organization's no-trailer policy. Always pass both `--subject` and an explicit
+trailers even when no individual commit you authored had one. Only
+`Co-authored-by` is organization-disallowed (`AGENTS.md`); letting a
+synthesized body reintroduce it violates that policy regardless of which
+squashed commit it came from. Always pass both `--subject` and an explicit
 one-line `--body` (e.g. `gh pr merge <n> --squash --subject "..." --body "..."`) to suppress
 the synthesized body. Verify with
 `gh api repos/<org>/<repo>/commits/<sha> --jq .commit.message` before
