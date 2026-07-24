@@ -56,9 +56,11 @@ type ScopeAwareRule interface {
 }
 ```
 
-`ScopeAwareRule` is an opt-in capability, not a requirement for all rules.
-Scope-dependent rules may query the declaration index, but they must account
-for its approximate, non-flow-sensitive model when defining their semantics.
+`ScopeAwareRule` is an opt-in capability that a registered `Rule`
+implementation may additionally satisfy; it is not a replacement for `Rule`
+and has no standalone registration path. Scope-dependent rules may query the
+declaration index, but they must account for its approximate,
+non-flow-sensitive model when defining their semantics.
 
 The semantic pipeline produces the common diagnostic model. Suppression
 semantics and the versioned JSON envelope remain product contracts in the
