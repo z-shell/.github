@@ -78,7 +78,7 @@ When squash-merging a `next` -> `main` promotion PR without an explicit
 trailers — which reliably reintroduces `Co-authored-by` and `Signed-off-by`
 trailers even when no individual commit you authored had one, violating the
 organization's no-trailer policy. Always pass both `--subject` and an explicit
-one-line `--body` (e.g. `gh pr merge <n> --squash --body "..."`) to suppress
+one-line `--body` (e.g. `gh pr merge <n> --squash --subject "..." --body "..."`) to suppress
 the synthesized body. Verify with
 `gh api repos/<org>/<repo>/commits/<sha> --jq .commit.message` before
 considering the promotion done.
