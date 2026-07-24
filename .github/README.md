@@ -48,6 +48,25 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 | [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                  |
 | [`renovate-config.json`](../renovate-config.json) | Shared Renovate preset for routine dependency version updates                                               |
 
+## Instruction Architecture
+
+The organization uses a portable, manifest-backed instruction architecture:
+
+- [`AGENTS.md`](../AGENTS.md) is the standalone canonical organization policy.
+- [`instruction-surfaces.json`](instruction-surfaces.json) records instruction
+  ownership, routing, and inventory metadata.
+- [`copilot-instructions.md`](copilot-instructions.md) is a regular import-only
+  adapter to `AGENTS.md`; it is not a policy owner.
+- [`instruction-update.md`](../runbooks/instruction-update.md) is the required
+  impact review for every material instruction change.
+- [`validate-agent-policy.py`](../scripts/validate-agent-policy.py) and
+  [`agent-instructions.yml`](workflows/agent-instructions.yml) enforce the public
+  instruction contract.
+
+Root `CLAUDE.md` and `GEMINI.md` are intentionally absent. Supported runtimes
+receive mandatory policy through the canonical baseline or an explicitly
+routed adapter, not through duplicate root policy files.
+
 ### Community Health Files
 
 These files in `.github/` act as **organization-wide defaults** — automatically used by any repository that doesn't have its own version:

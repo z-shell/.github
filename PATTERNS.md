@@ -12,9 +12,9 @@ Admission rule:
 
 Observed in:
 
-- `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
-- `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
-- `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `z-shell/zsh-eza:zsh-eza.plugin.zsh`
+- `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
+- `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 
 Pattern:
 
@@ -36,9 +36,9 @@ Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
 
 Observed in:
 
-- `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
-- `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
-- `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
+- `z-shell/zsh-eza:zsh-eza.plugin.zsh`
+- `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
+- `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 
 Pattern:
 
@@ -55,9 +55,9 @@ Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugi
 
 Observed in:
 
-- `repos/plugins/zsh-fancy-completions/zsh-fancy-completions.plugin.zsh`
-- `repos/annexes/z-a-meta-plugins/z-a-meta-plugins.plugin.zsh`
-- `repos/plugins/zsh-eza/zsh-eza.plugin.zsh`
+- `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
+- `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
+- `z-shell/zsh-eza:zsh-eza.plugin.zsh`
 
 Pattern:
 
@@ -84,11 +84,11 @@ Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-man
 
 Observed in:
 
-- `repos/env/zd/.github/workflows/`
-- `repos/core/src/.github/workflows/`
-- `repos/docs/wiki/.github/workflows/`
-- `repos/tools/zunit/.github/workflows/`
-- `repos/core/zi/.github/workflows/`
+- `z-shell/zd:.github/workflows/`
+- `z-shell/src:.github/workflows/`
+- `z-shell/wiki:.github/workflows/`
+- `z-shell/zunit:.github/workflows/`
+- `z-shell/zi:.github/workflows/`
 
 Pattern:
 
@@ -109,9 +109,9 @@ This ensures maximum security against tag-switching attacks and guarantees that 
 
 Observed in:
 
-- `repos/env/zd/docker/Dockerfile`
-- `repos/core/src/.github/workflows/`
-- `repos/tools/zunit/.github/workflows/`
+- `z-shell/zd:docker/Dockerfile`
+- `z-shell/src:.github/workflows/`
+- `z-shell/zunit:.github/workflows/`
 
 Pattern:
 
@@ -124,11 +124,13 @@ This reduces toolchain fragmentation and prevents subtle bugs caused by `musl` l
 
 Observed in:
 
-- `repos/org/z-shell-dot-github/.github/agents/`
-- `repos/docs/wiki/.github/agents/`
+- `z-shell/.github:.github/agents/`
+- `z-shell/wiki:.github/agents/`
 
 Pattern:
 
-- Place general-purpose engineering personas, global skills, and cross-repository instructions exclusively in the central `z-shell-dot-github` meta-repository.
+- Place general-purpose engineering personas, global skills, and cross-repository instructions exclusively in the public `z-shell/.github` repository.
 - Place domain-specific agents or instructions (e.g., Docusaurus documentation writers) directly in the repository where that specialized context applies (e.g., `wiki/`).
-- Do not store AI boilerplate (agents, instructions, `.cursorrules`) in standard plugins. If a skill applies to more than one plugin, it belongs in the central meta-repository.
+- Do not store AI boilerplate (agents, instructions, `.cursorrules`) in standard
+  plugins. If a skill applies to more than one plugin, it belongs in the public
+  `z-shell/.github` repository.

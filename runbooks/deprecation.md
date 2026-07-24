@@ -33,8 +33,9 @@ workflow) — that is ordinary maintenance, kept separate from release semantics
 3. File a tracker issue describing the deprecation, the replacement (if any), and
    the migration path. If the decision is non-obvious or cross-repo, draft an ADR
    (`runbooks/adr.md`).
-4. Identify every install path: `zi` ice, meta-plugin labels
-   (`z-a-meta-plugins`), wiki references, and the catalog `workspace/repos.yml`.
+4. Identify every public dependency: the GitHub repository, `zi` ice,
+   meta-plugin labels (`z-a-meta-plugins`), wiki references, package records,
+   and other documented install paths.
 
 ## Step 2 — Announce
 
@@ -58,10 +59,12 @@ After the transition window:
 
 - For a versioned artifact (class 2), cut a final tagged release noting end of
   support; do not yank prior tags.
-- Remove the artifact from meta-plugin maps, wiki ecosystem listings, and
-  `workspace/repos.yml` (or mark it archived there).
-- Archive the repo (read-only) rather than deleting it, so existing references
-  and history remain resolvable.
+- Remove the artifact from meta-plugin maps, wiki ecosystem listings, package
+  indexes, and public install documentation as applicable.
+- Archive the GitHub repository (read-only) rather than deleting it, so existing
+  references and history remain resolvable.
+- Treat any maintainer-local catalog cleanup as a separate local operation
+  governed by that tool's own instructions.
 - Close the tracker issue with the final state and links.
 
 ## Anti-patterns
