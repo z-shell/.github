@@ -24,6 +24,10 @@ PILOT_APPLY_REPOS = [
   "z-shell/.github"
 ].freeze
 
+# Relabel passes allowed before a migration gives up rather than delete a legacy
+# label that is still gaining items.
+MAX_MIGRATION_PASSES = 5
+
 Options = Struct.new(
   :labels_file,
   :org,
@@ -34,6 +38,10 @@ Options = Struct.new(
   :apply,
   :confirm_apply,
   :allow_non_pilot_repo,
+  :migrate_legacy,
+  :confirm_migrate_legacy,
+  :delete_unused_legacy,
+  :confirm_delete_unused_legacy,
   keyword_init: true
 )
 
@@ -46,7 +54,11 @@ options = Options.new(
   include_clean: false,
   apply: false,
   confirm_apply: false,
-  allow_non_pilot_repo: false
+  allow_non_pilot_repo: false,
+  migrate_legacy: false,
+  confirm_migrate_legacy: false,
+  delete_unused_legacy: false,
+  confirm_delete_unused_legacy: false
 )
 
 parser = OptionParser.new do |opts|
@@ -86,6 +98,22 @@ parser = OptionParser.new do |opts|
 
   opts.on("--allow-non-pilot-repo", "Allow confirmed apply outside the temporary pilot allowlist") do
     options.allow_non_pilot_repo = true
+  end
+
+  opts.on("--migrate-legacy", "Preview migrating in-use legacy labels onto their canonical replacement") do
+    options.migrate_legacy = true
+  end
+
+  opts.on("--confirm-migrate-legacy", "Actually relabel items and remove the migrated legacy labels") do
+    options.confirm_migrate_legacy = true
+  end
+
+  opts.on("--delete-unused-legacy", "Preview deleting legacy labels that are attached to nothing") do
+    options.delete_unused_legacy = true
+  end
+
+  opts.on("--confirm-delete-unused-legacy", "Actually delete the unused legacy labels") do
+    options.confirm_delete_unused_legacy = true
   end
 
   opts.on("-h", "--help", "Show this help") do
@@ -133,6 +161,50 @@ if options.apply && options.confirm_apply && !options.allow_non_pilot_repo
     warn "rerun with --allow-non-pilot-repo only after maintainer approval"
     exit 2
   end
+end
+
+# Destructive modes reuse the apply guardrails: a confirm flag is inert without
+# its preview flag, neither mode may fan out across the whole org, and a
+# confirmed run stays inside the pilot allowlist unless explicitly waived.
+DESTRUCTIVE_MODES = {
+  "migrate-legacy" => %i[migrate_legacy confirm_migrate_legacy],
+  "delete-unused-legacy" => %i[delete_unused_legacy confirm_delete_unused_legacy]
+}.freeze
+
+# One destructive operation per invocation. Both modes can run in the same
+# process, but a single run reports a single mode, and migrate-then-delete is an
+# ordering an operator should carry out deliberately rather than have inferred.
+if options.migrate_legacy && options.delete_unused_legacy
+  warn parser
+  warn "\nerror: use either --migrate-legacy or --delete-unused-legacy, not both"
+  warn "run them as separate invocations so each reports its own mode and is confirmed on its own"
+  exit 2
+end
+
+DESTRUCTIVE_MODES.each do |name, (preview_flag, confirm_flag)|
+  preview = options.public_send(preview_flag)
+  confirm = options.public_send(confirm_flag)
+
+  if confirm && !preview
+    warn parser
+    warn "\nerror: --confirm-#{name} requires --#{name}"
+    exit 2
+  end
+
+  if preview && options.all_repos
+    warn parser
+    warn "\nerror: --#{name} is only allowed with explicit --repo values"
+    exit 2
+  end
+
+  next unless preview && confirm && !options.allow_non_pilot_repo
+
+  outside_pilot = options.repos.reject { |repo| PILOT_APPLY_REPOS.include?(repo) }
+  next if outside_pilot.empty?
+
+  warn "error: --#{name} pilot is limited to: #{PILOT_APPLY_REPOS.join(', ')}"
+  warn "rerun with --allow-non-pilot-repo only after maintainer approval"
+  exit 2
 end
 
 def gh_json(*args)
@@ -184,6 +256,39 @@ def update_label(owner_repo, label)
     "-f", "color=#{label.fetch('color')}",
     "-f", "description=#{label.fetch('description')}"
   )
+end
+
+def delete_label(owner_repo, name)
+  gh_api_mutation(
+    "repos/#{owner_repo}/labels/#{label_path_segment(name)}",
+    "--method", "DELETE"
+  )
+end
+
+def add_label_to_item(owner_repo, number, name)
+  gh_api_mutation(
+    "repos/#{owner_repo}/issues/#{number}/labels",
+    "--method", "POST",
+    "-f", "labels[]=#{name}"
+  )
+end
+
+# Every issue and pull request in any state, with the labels each one carries.
+# Closed items count: deleting a label strips it from them too.
+def repo_items(owner_repo)
+  gh_paginated_array("repos/#{owner_repo}/issues?state=all&per_page=100").map do |item|
+    {
+      "number" => item.fetch("number"),
+      "labels" => (item["labels"] || []).map { |label| label.is_a?(Hash) ? label.fetch("name") : label }
+    }
+  end
+end
+
+# name => number of items carrying it. Absent names are unused.
+def label_usage(items)
+  items.each_with_object(Hash.new(0)) do |item, counts|
+    item.fetch("labels").each { |name| counts[name] += 1 }
+  end
 end
 
 def repo_list(org)
@@ -289,6 +394,129 @@ def planned_label_operations(result, canonical)
   }
 end
 
+# Plan the destructive work for one repo. Reads live usage rather than any
+# cached audit, so a label that gained an item since the last scan is seen as
+# in use. Unknown labels are never planned for deletion.
+def planned_legacy_operations(result, canonical, items)
+  usage = label_usage(items)
+
+  migrations = []
+  deletions = []
+  blocked = []
+
+  result.fetch("legacy_present").each do |entry|
+    legacy = entry.fetch("legacy")
+    replacement = entry.fetch("replacement")
+    count = usage[legacy]
+
+    unless canonical.key?(replacement)
+      blocked << {
+        "legacy" => legacy,
+        "reason" => "replacement #{replacement} is not a canonical label"
+      }
+      next
+    end
+
+    if count.zero?
+      deletions << { "legacy" => legacy, "items" => 0 }
+      next
+    end
+
+    carrying = items.select { |item| item.fetch("labels").include?(legacy) }
+                    .map { |item| item.fetch("number") }
+                    .sort
+
+    migrations << {
+      "legacy" => legacy,
+      "replacement" => replacement,
+      "items" => carrying,
+      "count" => carrying.length
+    }
+  end
+
+  {
+    "would_migrate" => migrations.sort_by { |item| item.fetch("legacy") },
+    "would_delete_unused" => deletions.sort_by { |item| item.fetch("legacy") },
+    "blocked" => blocked.sort_by { |item| item.fetch("legacy") },
+    "protected_unknown" => result.fetch("unknown")
+  }
+end
+
+# Order is load-bearing. The canonical label goes onto every carrying item and is
+# verified to have landed before the legacy label is removed; deleting first
+# would strip the association with nothing to replace it.
+def migrate_legacy_labels(owner_repo, operations)
+  result = { "relabelled" => [], "removed" => [], "errors" => [] }
+
+  operations.fetch("would_migrate").each do |migration|
+    legacy = migration.fetch("legacy")
+    replacement = migration.fetch("replacement")
+    relabelled = []
+
+    begin
+      # Relabel every item that currently carries the legacy label, then look
+      # again, until a pass finds nothing left to do. The planned item list is
+      # only a preview: deleting a label strips it from every holder at that
+      # moment, so anything that acquires the legacy label between planning and
+      # deletion would lose it with no replacement. Converging here closes that
+      # window instead of trusting the plan.
+      passes = 0
+      loop do
+        passes += 1
+        pending = repo_items(owner_repo).select do |item|
+          item.fetch("labels").include?(legacy) && !item.fetch("labels").include?(replacement)
+        end
+        break if pending.empty?
+
+        if passes > MAX_MIGRATION_PASSES
+          raise "#{legacy} kept gaining items across #{MAX_MIGRATION_PASSES} passes; " \
+                "aborting before delete so nothing loses its labelling"
+        end
+
+        pending.each do |item|
+          add_label_to_item(owner_repo, item.fetch("number"), replacement)
+          relabelled << item.fetch("number")
+        end
+      end
+
+      relabelled.uniq!
+      delete_label(owner_repo, legacy)
+      result.fetch("removed") << legacy
+      result.fetch("relabelled") << { "legacy" => legacy, "replacement" => replacement, "items" => relabelled }
+    rescue StandardError => e
+      result.fetch("errors") << {
+        "operation" => "migrate",
+        "label" => legacy,
+        "message" => e.message
+      }
+      return result
+    end
+  end
+
+  result
+end
+
+def delete_unused_legacy_labels(owner_repo, operations)
+  result = { "deleted" => [], "errors" => [] }
+
+  operations.fetch("would_delete_unused").each do |entry|
+    legacy = entry.fetch("legacy")
+    begin
+      delete_label(owner_repo, legacy)
+      result.fetch("deleted") << legacy
+    rescue StandardError => e
+      result.fetch("errors") << {
+        "operation" => "delete",
+        "label" => legacy,
+        "message" => e.message
+      }
+      return result
+    end
+  end
+
+  result
+end
+
 def apply_label_operations(owner_repo, operations)
   result = {
     "created" => [],
@@ -355,12 +583,36 @@ def print_apply_errors(errors)
 end
 
 canonical, legacy_migrations, sync_policy = canonical_label_map(options.labels_file)
+
+# sync_policy is the source of truth for what the destructive modes may do. The
+# script only ever implements delete-when-unused, so a false value for that key
+# disables the mode outright rather than widening it.
+if options.delete_unused_legacy && !sync_policy.fetch("delete_legacy_labels_only_when_unused", false)
+  warn "error: sync_policy.delete_legacy_labels_only_when_unused is not enabled in #{options.labels_file}"
+  warn "the delete mode implements unused-only deletion and refuses to run without it"
+  exit 2
+end
+
+if options.migrate_legacy && !sync_policy.fetch("preserve_labels_on_open_items_before_removal", false)
+  warn "error: sync_policy.preserve_labels_on_open_items_before_removal is not enabled in #{options.labels_file}"
+  warn "migration exists to preserve labelling before removal and refuses to run without it"
+  exit 2
+end
+
 repos = options.all_repos ? repo_list(options.org) : options.repos
 results = repos.sort.map { |repo| diff_repo(repo, canonical, legacy_migrations) }
 
 if options.apply
   results.each do |result|
     result["operations"] = planned_label_operations(result, canonical)
+  end
+end
+
+legacy_mode = options.migrate_legacy || options.delete_unused_legacy
+if legacy_mode
+  results.each do |result|
+    items = repo_items(result.fetch("repo"))
+    result["legacy_operations"] = planned_legacy_operations(result, canonical, items)
   end
 end
 
@@ -372,9 +624,37 @@ if options.apply && options.confirm_apply
   end
 end
 
+legacy_failed = false
+if options.migrate_legacy && options.confirm_migrate_legacy
+  results.each do |result|
+    outcome = migrate_legacy_labels(result.fetch("repo"), result.fetch("legacy_operations"))
+    result["migrated"] = outcome
+    legacy_failed ||= !outcome.fetch("errors").empty?
+  end
+end
+
+if options.delete_unused_legacy && options.confirm_delete_unused_legacy
+  results.each do |result|
+    outcome = delete_unused_legacy_labels(result.fetch("repo"), result.fetch("legacy_operations"))
+    result["deleted"] = outcome
+    legacy_failed ||= !outcome.fetch("errors").empty?
+  end
+end
+
+mode =
+  if options.migrate_legacy
+    options.confirm_migrate_legacy ? "migrate" : "migrate-preview"
+  elsif options.delete_unused_legacy
+    options.confirm_delete_unused_legacy ? "delete" : "delete-preview"
+  elsif options.apply
+    options.confirm_apply ? "apply" : "apply-preview"
+  else
+    "dry-run"
+  end
+
 payload = {
-  "mode" => options.apply ? (options.confirm_apply ? "apply" : "apply-preview") : "dry-run",
-  "confirmed" => options.confirm_apply,
+  "mode" => mode,
+  "confirmed" => options.confirm_apply || options.confirm_migrate_legacy || options.confirm_delete_unused_legacy,
   "labels_file" => options.labels_file,
   "canonical_labels" => canonical.length,
   "legacy_migrations" => legacy_migrations.length,
@@ -387,11 +667,19 @@ payload = {
 
 if options.json
   puts JSON.pretty_generate(payload)
-  exit(apply_failed ? 1 : 0)
+  exit(apply_failed || legacy_failed ? 1 : 0)
 end
 
-heading = options.apply ? "# Label sync apply preview" : "# Label sync dry-run"
-heading = "# Label sync apply result" if options.apply && options.confirm_apply
+heading =
+  case mode
+  when "migrate" then "# Label sync migration result"
+  when "migrate-preview" then "# Label sync migration preview"
+  when "delete" then "# Label sync deletion result"
+  when "delete-preview" then "# Label sync deletion preview"
+  when "apply" then "# Label sync apply result"
+  when "apply-preview" then "# Label sync apply preview"
+  else "# Label sync dry-run"
+  end
 puts heading
 puts
 puts "Mode: #{payload.fetch('mode')}"
@@ -402,14 +690,29 @@ puts "Repos scanned: #{results.length}"
 puts "Repos with drift: #{payload.fetch('repos_with_drift')}"
 puts
 
-if options.apply && options.confirm_apply
+case mode
+when "migrate"
+  puts "Confirmed migration: items were relabelled and migrated legacy labels were removed."
+when "migrate-preview"
+  puts "Migration preview only. Pass --confirm-migrate-legacy to relabel items and remove legacy labels."
+when "delete"
+  puts "Confirmed deletion: unused legacy labels were removed."
+when "delete-preview"
+  puts "Deletion preview only. Pass --confirm-delete-unused-legacy to remove unused legacy labels."
+when "apply"
   puts "Confirmed apply mode: canonical labels may have been created or updated."
-elsif options.apply
+when "apply-preview"
   puts "Apply preview only. Pass --confirm-apply to create/update canonical labels."
 else
   puts "This is a read-only dry run. No labels or issues were changed."
 end
-puts "Legacy and unknown labels are skipped/preserved; no labels are deleted."
+if legacy_mode
+  puts "Unknown labels are never deleted. Legacy labels are removed only after " \
+       "their canonical replacement is verified on every carrying item, or when " \
+       "they are attached to nothing."
+else
+  puts "Legacy and unknown labels are skipped/preserved; no labels are deleted."
+end
 puts
 
 puts "## Sync policy"
@@ -485,6 +788,35 @@ results.each do |result|
     result.fetch("unknown").each { |name| puts "- #{name}" }
     puts
   end
+
+  next unless legacy_mode
+
+  legacy_operations = result.fetch("legacy_operations")
+
+  unless legacy_operations.fetch("would_migrate").empty?
+    puts "### Would migrate (relabel items, then remove legacy)"
+    legacy_operations.fetch("would_migrate").each do |item|
+      puts "- #{item.fetch('legacy')} -> #{item.fetch('replacement')} (#{item.fetch('count')} item(s))"
+    end
+    puts
+  end
+
+  unless legacy_operations.fetch("would_delete_unused").empty?
+    puts "### Would delete (unused legacy labels)"
+    legacy_operations.fetch("would_delete_unused").each { |item| puts "- #{item.fetch('legacy')}" }
+    puts
+  end
+
+  unless legacy_operations.fetch("blocked").empty?
+    puts "### Blocked"
+    legacy_operations.fetch("blocked").each do |item|
+      puts "- #{item.fetch('legacy')}: #{item.fetch('reason')}"
+    end
+    puts
+  end
+
+  print_apply_errors(result.dig("migrated", "errors") || [])
+  print_apply_errors(result.dig("deleted", "errors") || [])
 end
 
-exit(apply_failed ? 1 : 0)
+exit(apply_failed || legacy_failed ? 1 : 0)

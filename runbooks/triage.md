@@ -23,7 +23,7 @@ If classification takes more than a few minutes, mark it for investigation and m
 
 ## Step 2 — Apply the canonical labels
 
-The organization label set in `.github/lib/labels.yml` is the source of truth. Apply at least one work-type label and one area label when the area is known.
+The organization label set in `lib/labels.yml` is the source of truth. Apply at least one work-type label and one area label when the area is known.
 
 ### Work type
 
@@ -62,6 +62,7 @@ The organization label set in `.github/lib/labels.yml` is the source of truth. A
 | high priority          | `priority:high`    |
 | breaking change        | `breaking-change`  |
 | security-sensitive     | `security`         |
+| performance-sensitive  | `performance`      |
 | good first issue       | `good first issue` |
 | help wanted            | `help wanted`      |
 | invalid                | `invalid`          |
