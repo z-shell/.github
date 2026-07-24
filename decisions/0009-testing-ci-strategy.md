@@ -35,10 +35,16 @@ common baseline; higher-risk classes add to it.
 - Zsh sources pass `zsh -n` (syntax) and `zcompile` (compile) checks.
 - Dependency and secret scanning per `decisions/0004-dependabot-unification.md`.
 - **Target state (not yet a live org-wide control):** Conventional Commits
-  (ADR-0003) and the disallowed-trailer rule enforced in CI. Today the
-  disallowed-trailer check runs via the `DISALLOWED_TRAILER_PATTERN` org secret;
-  Conventional Commits is convention-and-review, not a uniform CI gate. Adding a
-  shared commit/PR-title-lint check is a follow-up, tracked separately.
+  (ADR-0003) and the disallowed-trailer rule enforced in CI. Neither is a live
+  org-wide gate today: a sweep of the default branches of all 86 active,
+  non-fork, non-archived repositories found no workflow that runs the
+  `DISALLOWED_TRAILER_PATTERN` check or validates commit messages. Non-default
+  branches were not swept. The only implementation is a `commit-lint` workflow
+  on the `next`
+  branch of `z-shell/zi`, which has never reached a default branch. Both the
+  trailer ban and Conventional Commits are convention-and-review until a shared
+  commit/PR-title-lint check is promoted into a reusable workflow here and rolled
+  out; that work is tracked separately.
 
 ### By class
 

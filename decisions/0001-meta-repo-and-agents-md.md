@@ -4,7 +4,7 @@
 - **Date:** 2026-05-29
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** `decisions/0014-portable-agent-instruction-architecture.md` for the vendor-entry-point layout
 
 ## Context
 

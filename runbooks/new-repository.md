@@ -9,17 +9,18 @@ project-specific behavior.
 
 ## Step 1 — Classify and record the repository
 
-1. Open a tracker issue describing the artifact, owner, consumers, and release
-   class from `runbooks/release.md`.
+1. Open an owning issue describing the artifact, owner, and consumers.
 2. Choose the repository name:
    - plugin: `zsh-<name>`
    - annex: `z-a-<name>`
    - compiled module: a short descriptive name
-3. Add the clone to the private meta-workspace `.gitmodules` and
-   `workspace/repos.yml`. Do not put local paths, credentials, or machine facts
-   in the public repository.
+3. Record the owning issue, repository classification, canonical labels, and
+   release class from `runbooks/release.md` in GitHub-visible project state.
 4. Apply canonical labels via `runbooks/labels.md` and configure task tracking
    through `runbooks/project-tracker.md`.
+
+Any maintainer-local inventory update is a separate local operation governed by
+that tool's own instructions; it is not a public bootstrap dependency.
 
 ## Step 2 — Create the common repository envelope
 

@@ -1,0 +1,46 @@
+---
+name: Labels Sync Tests
+on:
+  workflow_call: {}
+  push:
+    paths:
+      - "scripts/labels-sync.rb"
+      - "scripts/labels-dry-run.rb"
+      - "scripts/test-labels-dry-run.sh"
+      - "lib/labels.yml"
+      - ".github/workflows/labels-sync-test.yml"
+  pull_request:
+    paths:
+      - "scripts/labels-sync.rb"
+      - "scripts/labels-dry-run.rb"
+      - "scripts/test-labels-dry-run.sh"
+      - "lib/labels.yml"
+      - ".github/workflows/labels-sync-test.yml"
+  workflow_dispatch: {}
+
+# The suite runs read-only previews against this repository, so it needs to read
+# labels and issues. It never passes a --confirm-* flag, and the script refuses
+# every destructive path without one.
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  labels-sync-test:
+    name: Labels Sync Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: "⤵️ Check out code from GitHub"
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: "⚙️ Report Ruby version"
+        run: ruby --version
+
+      - name: "🧪 Run labels-sync smoke tests"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sh scripts/test-labels-dry-run.sh
