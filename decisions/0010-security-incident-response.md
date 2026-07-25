@@ -43,16 +43,16 @@ affected repository and advisory is required before escalation is operational.
 
 ### Acknowledgement SLA
 
-The proposed targets, subject to maintainer confirmation, are:
+Confirmed 2026-07-25 (ss-o):
 
 - Acknowledge a security report within **3 business days** of receipt.
 - Triage to a severity within **5 business days**.
 
 ### Severity and remediation targets
 
-Severity uses CVSS-style judgment (impact × exploitability). The proposed
-time-to-fix or documented-mitigation targets from triage, also subject to
-maintainer confirmation, are:
+Severity uses CVSS-style judgment (impact × exploitability). Confirmed
+2026-07-25 (ss-o), the time-to-fix or documented-mitigation targets from
+triage are:
 
 | Severity | Examples                                      | Target      |
 | -------- | --------------------------------------------- | ----------- |
@@ -103,16 +103,22 @@ verified. This ADR does not claim that those controls are enabled.
 
 ## Decision review required
 
-Before acceptance, a maintainer must:
+This ADR remains **PROPOSED**. Before acceptance, a maintainer must:
 
-1. Confirm the proposed 3/5-business-day acknowledgement and triage targets and
-   the 7/30/90-day remediation targets.
-2. Name a backup incident contact and verify that contact's repository and
-   advisory permissions.
-3. Confirm where private vulnerability reporting, notifications, and release
-   immutability are enabled or required.
-4. Accept, amend, supersede, or reject this proposal and record the decider and
-   decision date.
+1. [x] Confirm the proposed 3/5-business-day acknowledgement and triage
+       targets and the 7/30/90-day remediation targets. Confirmed 2026-07-25
+       (ss-o); see the SLA and severity sections above.
+2. [ ] Name a backup incident contact and verify that contact's repository and
+       advisory permissions.
+3. [ ] Confirm where private vulnerability reporting, notifications, and
+       release immutability are enabled or required.
+4. [ ] Accept, amend, supersede, or reject this proposal and record the
+       decider and decision date.
+
+Items 2 and 3 are unresolved, so this ADR is deliberately kept proposed rather
+than accepted with those as rollout gaps: an incident-response process without
+a verified escalation route or verified reporting/notification settings would
+overstate what the org can actually deliver.
 
 ## Consequences
 

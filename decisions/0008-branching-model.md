@@ -1,8 +1,8 @@
 # 8. Branching Model
 
-- **Status:** PROPOSED
-- **Date:** 2026-05-29
-- **Deciders:** TBD
+- **Status:** ACCEPTED
+- **Date:** 2026-07-25
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -24,8 +24,7 @@ default branch** and **development branch** are therefore separate concepts.
 The private meta-workspace catalog (`workspace/repos.yml`) is still out of date. Its
 `default_branch` field conflates those concepts, and some entries name `next`
 for repositories that do not have that branch. The catalog has not yet been
-reconciled; that is a separate meta-workspace change after a maintainer decides
-whether to accept this proposal.
+reconciled; that is a separate meta-workspace change tracked outside this ADR.
 
 `decisions/0007-release-publication-flow.md` already defines four repository
 classes by delivery model. Those classes constrain publication behavior, but
@@ -34,14 +33,14 @@ development branch.
 
 ## Decision
 
-If accepted, the **canonical per-repo table below becomes the authoritative
-source** for the development branch and branch model. The ADR-0007 repository
-class is an _input_ to the choice because it sets the publication boundary and
-a default, but it does **not** by itself determine the branch model — repo
-churn/scale does. Within class 1, `wiki`/`src` use `next` → `main` while `zd` is
-trunk-only; within class 2, `zsh-lint` uses `next` while `zunit` is trunk. Under
-this proposal, changing a repository's assigned model requires amending this
-ADR (or a superseding one), not merely creating or deleting a branch.
+The **canonical per-repo table below is the authoritative source** for the
+development branch and branch model. The ADR-0007 repository class is an
+_input_ to the choice because it sets the publication boundary and a default,
+but it does **not** by itself determine the branch model — repo churn/scale
+does. Within class 1, `wiki`/`src` use `next` → `main` while `zd` is
+trunk-only; within class 2, `zsh-lint` uses `next` while `zunit` is trunk.
+Changing a repository's assigned model requires amending this ADR (or a
+superseding one), not merely creating or deleting a branch.
 
 ### Canonical branch model
 
@@ -59,11 +58,12 @@ ADR (or a superseding one), not merely creating or deleting a branch.
 | `zsh-fancy-completions` | 3     | trunk on `main` | `main`             | `main` is consumable ref |
 | `.github`               | 4     | trunk on `main` | `main`             | n/a                      |
 
-The publication-boundary column states the proposed policy, not a complete
-inventory of live workflow triggers. At the 2026-07-18 audit, `src` and `zd`
-also had semantic-tag publication triggers that the table does not capture.
-Whether those triggers remain accepted class-1 exceptions is a maintainer
-decision.
+The publication-boundary column states the policy, not a complete inventory of
+live workflow triggers. At the 2026-07-18 audit, `src` and `zd` also had
+semantic-tag publication triggers that the table does not capture. Those
+triggers are accepted class-1 compatibility publication paths that run
+alongside the table's `main`-based boundary, not a deviation from it; they are
+not scheduled for removal by this decision.
 
 ### How the class informs the default
 
@@ -81,37 +81,26 @@ decision.
   branch (the "Development branch" column). For trunk repos, feature branches also
   start from `main`.
 
-If this ADR is accepted, the private catalog/schema and root agent guidance need
-a separate meta-workspace reconciliation. They are deliberately not changed by
-this public factual-reconciliation draft.
-
-## Decision review required
-
-Before acceptance, a maintainer must:
-
-1. Confirm that GitHub defaults remain `main` while the table's development
-   branch identifies the normal integration base.
-2. Decide whether the live `src` and `zd` semantic-tag publication triggers are
-   accepted exceptions or whether the proposed publication wording must change.
-3. Accept, amend, supersede, or reject this proposal and record the decider and
-   decision date.
+The private catalog/schema and root agent guidance need a separate
+meta-workspace reconciliation. They are deliberately not changed by this
+public factual-reconciliation change.
 
 ## Consequences
 
-- If accepted, the table gives branch-policy audits an explicit public
-  comparison point; the ADR alone does not prevent catalog or repository drift.
-- New repositories would be added to the table (with their ADR-0007 class) as
-  part of repository creation, before the first branch is cut.
-- **Action on acceptance:** the private meta-workspace root guidance currently
+- The table gives branch-policy audits an explicit public comparison point;
+  the ADR alone does not prevent catalog or repository drift.
+- New repositories are added to the table (with their ADR-0007 class) as part
+  of repository creation, before the first branch is cut.
+- **Pending action:** the private meta-workspace root guidance currently
   states "default development branch: `next` … all other work branches from
-  `next`" as a universal rule. On acceptance, update that guidance to reference
+  `next`" as a universal rule. That guidance should be updated to reference
   this ADR's per-repository table so agents do not get conflicting instructions
-  for trunk-only repositories. This separate meta-workspace change is not made
-  while the ADR remains proposed.
+  for trunk-only repositories. This separate meta-workspace change has not yet
+  been made.
 - Promotion from `next` to `main` is a publication trigger for class-1 deploy
-  repositories; the live tag-trigger exceptions above remain under review. For
-  other classes the merge validates but does not mint a release (consistent
-  with ADR-0007).
+  repositories; the live tag-trigger exceptions above are accepted alongside
+  it. For other classes the merge validates but does not mint a release
+  (consistent with ADR-0007).
 
 ## Alternatives considered
 
