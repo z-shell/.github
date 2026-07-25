@@ -1,0 +1,6 @@
+version: 1
+scenario: .github/demos/readme.tape
+fixtures: .github/demos/fixtures
+readme:
+  path: docs/README.md
+  alt: Missing outputs object.

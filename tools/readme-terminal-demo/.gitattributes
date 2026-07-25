@@ -1,0 +1,2 @@
+*.go whitespace=-tab-in-indent
+go.mod whitespace=-tab-in-indent

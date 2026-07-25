@@ -1,0 +1,9 @@
+version: 1
+scenario: .github/demos/readme.tape
+fixtures: fixtures
+outputs:
+  gif: docs/assets/readme-demo.gif
+  png: docs/assets/readme-demo.png
+readme:
+  path: docs/README.md
+  alt: Fixtures use the wrong root.
