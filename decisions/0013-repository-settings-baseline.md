@@ -23,8 +23,9 @@ default branch reports:
 ```
 
 The requirement is real policy and is enforced by nothing. This is the same
-failure recorded in #464, where two documents described a commit-trailer check
-that no workflow ran, generalized from CI to repository configuration.
+failure recorded in [issue #464](https://github.com/z-shell/.github/issues/464),
+where two documents described a commit-trailer check that no workflow ran,
+generalized from CI to repository configuration.
 
 A survey of all 86 active, public, non-fork repositories found:
 
@@ -99,7 +100,8 @@ Rationale for the differences:
   not a disposable feature branch once. Squash and rebase both mint commits
   the development branch does not have, so requiring linear history on the
   deployed branch forces the two branches to diverge after every promotion,
-  by construction. Issue #473 hit this on `z-shell/wiki` today: the only
+  by construction. [Issue #473](https://github.com/z-shell/.github/issues/473)
+  hit this on `z-shell/wiki` today: the only
   available fix was a direct, admin-bypassing push to realign `next`, and a
   bypass warning was once silently truncated by piping the push through
   `tail`. A merge commit is the one merge strategy that preserves ancestry
@@ -225,3 +227,7 @@ With that row excluded, nothing the audit applies is irreversible.
   independent systems whose effective rule is their union.
 - `scripts/labels-sync.rb` — the audit-then-gated-apply pattern the eventual
   settings audit should follow.
+- [Issue #464](https://github.com/z-shell/.github/issues/464) — the declared-but-
+  unenforced-control pattern this ADR generalizes from CI to repository settings.
+- [Issue #473](https://github.com/z-shell/.github/issues/473) — the class-1
+  linear-history divergence this ADR's baseline table now excludes.
