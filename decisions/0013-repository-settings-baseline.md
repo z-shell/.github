@@ -1,7 +1,7 @@
 # 13. Repository Settings Baseline by Class
 
-- **Status:** PROPOSED
-- **Date:** 2026-07-22
+- **Status:** ACCEPTED
+- **Date:** 2026-07-25
 - **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
