@@ -34,6 +34,22 @@ func TestReservedChildExitMapping(t *testing.T) {
 	}
 }
 
+func TestMapChildOutcomeDistinguishesEscapedPipeHolder(t *testing.T) {
+	normalExit := sandbox.Outcome{Exited: true, ExitCode: 0}
+
+	waitDelayErr := mapChildOutcome(normalExit, fmt.Errorf("wait restricted child: %w", exec.ErrWaitDelay))
+	assertChildOutcomeMapping(t, waitDelayErr, failure.ExecutionFailed, "execution-failed: capture (capture.failed)")
+	if got := errors.Unwrap(waitDelayErr); got == nil || got.Error() != "restricted child exited but an escaped descendant held stdio open past the wait delay" {
+		t.Fatalf("wait-delay unwrapped error = %v, want the escaped-pipe-holder message", got)
+	}
+
+	otherErr := mapChildOutcome(normalExit, errors.New("observe restricted child: boom"))
+	assertChildOutcomeMapping(t, otherErr, failure.ExecutionFailed, "execution-failed: capture (capture.failed)")
+	if got := errors.Unwrap(otherErr); got == nil || got.Error() != "restricted child cleanup failed" {
+		t.Fatalf("generic cleanup unwrapped error = %v, want the generic cleanup-failed message", got)
+	}
+}
+
 func TestSelfTestMapsChildOutcome(t *testing.T) {
 	wantChild := sandbox.Child{
 		Path: "/trusted/readme-terminal-demo",

@@ -579,30 +579,36 @@ func TestSchemaParityFixtures(t *testing.T) {
 func TestSchemaAndTypedValidationUseUTF8ByteLimits(t *testing.T) {
 	schema := compileManifestSchema(t)
 	tests := []struct {
-		name   string
-		mutate func(*Manifest)
-		class  failure.Class
+		name      string
+		mutate    func(*Manifest)
+		class     failure.Class
+		wantField string
 	}{
 		{
 			name: "alt text",
 			mutate: func(value *Manifest) {
 				value.Readme.Alt = strings.Repeat("é", limits.V1().AltTextBytes/2+1)
 			},
-			class: failure.InvalidContract,
+			class:     failure.InvalidContract,
+			wantField: "readme.alt",
 		},
 		{
 			name: "path",
 			mutate: func(value *Manifest) {
 				value.Scenario = ".github/demos/" + strings.Repeat("é", limits.V1().PathBytes/2) + ".tape"
 			},
-			class: failure.UnsafePath,
+			class:     failure.UnsafePath,
+			wantField: "scenario",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			value := validManifest()
 			test.mutate(&value)
-			requireManifestFailure(t, Validate(value), test.class)
+			structured := requireManifestFailure(t, Validate(value), test.class)
+			if structured.Field != test.wantField {
+				t.Fatalf("failure field = %q, want %q", structured.Field, test.wantField)
+			}
 			if err := schema.Validate(manifestDocument(value)); err == nil {
 				t.Fatal("schema accepted a value over its UTF-8 byte limit")
 			}

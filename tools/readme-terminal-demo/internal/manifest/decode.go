@@ -25,10 +25,10 @@ var coreYAMLTags = map[string]struct{}{
 // Decode parses one bounded manifest document through a strict YAML preflight.
 func Decode(r io.Reader, maxBytes int64) (Manifest, error) {
 	if r == nil {
-		return Manifest{}, invalidManifest(errors.New("manifest reader is nil"))
+		return Manifest{}, invalidManifest("", errors.New("manifest reader is nil"))
 	}
 	if maxBytes <= 0 {
-		return Manifest{}, invalidManifest(errors.New("manifest byte limit is invalid"))
+		return Manifest{}, invalidManifest("", errors.New("manifest byte limit is invalid"))
 	}
 	contractLimits := limits.V1()
 	if maxBytes > contractLimits.ManifestBytes {
@@ -37,39 +37,39 @@ func Decode(r io.Reader, maxBytes int64) (Manifest, error) {
 
 	data, err := io.ReadAll(io.LimitReader(r, maxBytes+1))
 	if err != nil {
-		return Manifest{}, invalidManifest(fmt.Errorf("read manifest: %w", err))
+		return Manifest{}, invalidManifest("", fmt.Errorf("read manifest: %w", err))
 	}
 	if int64(len(data)) > maxBytes {
-		return Manifest{}, invalidManifest(errors.New("manifest exceeds byte limit"))
+		return Manifest{}, invalidManifest("", errors.New("manifest exceeds byte limit"))
 	}
 
 	decoder := yaml.NewDecoder(bytes.NewReader(data))
 	var document yaml.Node
 	if err := decoder.Decode(&document); err != nil {
-		return Manifest{}, invalidManifest(fmt.Errorf("decode YAML node: %w", err))
+		return Manifest{}, invalidManifest("", fmt.Errorf("decode YAML node: %w", err))
 	}
 	if len(document.Content) == 0 {
-		return Manifest{}, invalidManifest(errors.New("manifest document is empty"))
+		return Manifest{}, invalidManifest("", errors.New("manifest document is empty"))
 	}
 	var extra yaml.Node
 	if err := decoder.Decode(&extra); err == nil {
-		return Manifest{}, invalidManifest(errors.New("multiple YAML documents are not allowed"))
+		return Manifest{}, invalidManifest("", errors.New("multiple YAML documents are not allowed"))
 	} else if !errors.Is(err, io.EOF) {
-		return Manifest{}, invalidManifest(fmt.Errorf("decode trailing YAML document: %w", err))
+		return Manifest{}, invalidManifest("", fmt.Errorf("decode trailing YAML document: %w", err))
 	}
 
 	if err := preflightYAML(&document, contractLimits); err != nil {
-		return Manifest{}, invalidManifest(err)
+		return Manifest{}, invalidManifest("", err)
 	}
 	if err := validateManifestNodeShape(&document); err != nil {
-		return Manifest{}, invalidManifest(err)
+		return Manifest{}, invalidManifest("", err)
 	}
 
 	typed := yaml.NewDecoder(bytes.NewReader(data))
 	typed.KnownFields(true)
 	var value Manifest
 	if err := typed.Decode(&value); err != nil {
-		return Manifest{}, invalidManifest(fmt.Errorf("decode typed manifest: %w", err))
+		return Manifest{}, invalidManifest("", fmt.Errorf("decode typed manifest: %w", err))
 	}
 	return value, nil
 }
@@ -77,7 +77,7 @@ func Decode(r io.Reader, maxBytes int64) (Manifest, error) {
 // Load opens, decodes, validates, and proves all declared repository inputs exist.
 func Load(root Reader, manifestPath string) (Manifest, error) {
 	if root == nil {
-		return Manifest{}, invalidManifest(errors.New("repository reader is nil"))
+		return Manifest{}, invalidManifest("", errors.New("repository reader is nil"))
 	}
 	manifestFile, err := openInput(root, "manifest", manifestPath, false)
 	if err != nil {
@@ -89,7 +89,7 @@ func Load(root Reader, manifestPath string) (Manifest, error) {
 		return Manifest{}, decodeErr
 	}
 	if closeErr != nil {
-		return Manifest{}, invalidManifest(fmt.Errorf("close manifest: %w", closeErr))
+		return Manifest{}, invalidManifest("manifest", fmt.Errorf("close manifest: %w", closeErr))
 	}
 	if err := Validate(value); err != nil {
 		return Manifest{}, err
@@ -110,7 +110,7 @@ func Load(root Reader, manifestPath string) (Manifest, error) {
 			return Manifest{}, err
 		}
 		if err := file.Close(); err != nil {
-			return Manifest{}, invalidManifest(fmt.Errorf("close %s input: %w", input.field, err))
+			return Manifest{}, invalidManifest(input.field, fmt.Errorf("close %s input: %w", input.field, err))
 		}
 	}
 	return value, nil
@@ -268,28 +268,28 @@ func openInput(root Reader, field, path string, wantDirectory bool) (*os.File, e
 		if errors.As(err, &structured) {
 			return nil, structured
 		}
-		return nil, invalidManifest(fmt.Errorf("open %s input: %w", field, err))
+		return nil, invalidManifest(field, fmt.Errorf("open %s input: %w", field, err))
 	}
 	if file == nil {
-		return nil, invalidManifest(fmt.Errorf("open %s input: nil file", field))
+		return nil, invalidManifest(field, fmt.Errorf("open %s input: nil file", field))
 	}
 	info, err := file.Stat()
 	if err != nil {
 		_ = file.Close()
-		return nil, invalidManifest(fmt.Errorf("inspect %s input: %w", field, err))
+		return nil, invalidManifest(field, fmt.Errorf("inspect %s input: %w", field, err))
 	}
 	if wantDirectory != info.IsDir() || (!wantDirectory && !info.Mode().IsRegular()) {
 		_ = file.Close()
-		return nil, invalidManifest(fmt.Errorf("%s input has the wrong file type", field))
+		return nil, invalidManifest(field, fmt.Errorf("%s input has the wrong file type", field))
 	}
 	return file, nil
 }
 
-func invalidManifest(err error) error {
+func invalidManifest(field string, err error) error {
 	return failure.E(
 		failure.InvalidContract,
 		failure.StageManifest,
-		"",
+		field,
 		failure.RuleManifestInvalid,
 		err,
 	)

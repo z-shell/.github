@@ -14,11 +14,11 @@ import (
 // Validate checks only the structural manifest contract; it does not open paths.
 func Validate(value Manifest) error {
 	if value.Version != 1 {
-		return invalidManifest(errors.New("manifest version must be 1"))
+		return invalidManifest("version", errors.New("manifest version must be 1"))
 	}
 	if value.Scenario == "" || value.Fixtures == "" || value.Outputs.GIF == "" ||
 		value.Outputs.PNG == "" || value.Readme.Path == "" || value.Readme.Alt == "" {
-		return invalidManifest(errors.New("manifest field is required"))
+		return invalidManifest("", errors.New("manifest field is required"))
 	}
 
 	if err := validateRootedPath("scenario", value.Scenario, ".github/demos", ".tape"); err != nil {
@@ -100,15 +100,15 @@ func validateRepositoryPath(field, value string) error {
 
 func validateAltText(value string) error {
 	if len(value) > limits.V1().AltTextBytes {
-		return invalidManifest(errors.New("alt text exceeds byte limit"))
+		return invalidManifest("readme.alt", errors.New("alt text exceeds byte limit"))
 	}
 	if !utf8.ValidString(value) {
-		return invalidManifest(errors.New("alt text must be valid UTF-8"))
+		return invalidManifest("readme.alt", errors.New("alt text must be valid UTF-8"))
 	}
 	hasContent := false
 	for _, character := range value {
 		if unicode.IsControl(character) || character == '\u2028' || character == '\u2029' {
-			return invalidManifest(errors.New("alt text must be a single line without control characters"))
+			return invalidManifest("readme.alt", errors.New("alt text must be a single line without control characters"))
 		}
 		if !unicode.IsSpace(character) &&
 			!unicode.In(character, unicode.Zs, unicode.Zl, unicode.Zp, unicode.Cf) {
@@ -116,7 +116,7 @@ func validateAltText(value string) error {
 		}
 	}
 	if !hasContent {
-		return invalidManifest(errors.New("alt text must contain visible content"))
+		return invalidManifest("readme.alt", errors.New("alt text must contain visible content"))
 	}
 	return nil
 }

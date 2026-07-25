@@ -156,6 +156,9 @@ func mapChildOutcome(outcome sandbox.Outcome, childErr error) error {
 	if outcome.TimedOut || errors.Is(childErr, sandbox.ErrProcessTimeout) {
 		return failure.E(failure.ExecutionFailed, failure.StageCapture, "", failure.RuleCaptureTimeout, errors.New("restricted child timed out"))
 	}
+	if errors.Is(childErr, exec.ErrWaitDelay) {
+		return failure.E(failure.ExecutionFailed, failure.StageCapture, "", failure.RuleCaptureFailed, errors.New("restricted child exited but an escaped descendant held stdio open past the wait delay"))
+	}
 	if childErr != nil {
 		return failure.E(failure.ExecutionFailed, failure.StageCapture, "", failure.RuleCaptureFailed, errors.New("restricted child cleanup failed"))
 	}
