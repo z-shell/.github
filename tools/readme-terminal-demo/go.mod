@@ -1,6 +1,8 @@
 module github.com/z-shell/.github/tools/readme-terminal-demo
 
-go 1.26.5
+go 1.26
+
+toolchain go1.26.5
 
 require (
 	github.com/landlock-lsm/go-landlock v0.9.0

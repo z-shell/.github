@@ -648,6 +648,7 @@ func TestPrepareExecVectors(t *testing.T) {
 		t.Fatalf("environment storage aliased caller slice: %q", got)
 	}
 
+	traversalPath := filepath.Dir(executable) + "/./" + filepath.Base(executable)
 	invalid := []struct {
 		name string
 		spec ExecSpec
@@ -656,6 +657,7 @@ func TestPrepareExecVectors(t *testing.T) {
 		{name: "argv-NUL", spec: ExecSpec{Path: executable, Args: []string{executable, "bad\x00arg"}}},
 		{name: "environment-NUL", spec: ExecSpec{Path: executable, Args: []string{executable}, Env: []string{"BAD=bad\x00value"}}},
 		{name: "duplicate-environment", spec: ExecSpec{Path: executable, Args: []string{executable}, Env: []string{"DUP=one", "DUP=two"}}},
+		{name: "path-not-normalized", spec: ExecSpec{Path: traversalPath, Args: []string{traversalPath}}},
 	}
 	for _, test := range invalid {
 		t.Run(test.name, func(t *testing.T) {

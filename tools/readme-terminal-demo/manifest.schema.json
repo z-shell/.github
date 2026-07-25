@@ -41,7 +41,7 @@
           "minLength": 1,
           "maxLength": 512,
           "format": "z-shell-alt-bytes",
-          "pattern": "^[^\\x00-\\x1F\\x7F]*\\S[^\\x00-\\x1F\\x7F]*$"
+          "pattern": "^[^\\x00-\\x1F\\x7F\u0080-\u009f\u2028\u2029]*\\S[^\\x00-\\x1F\\x7F\u0080-\u009f\u2028\u2029]*$"
         }
       }
     }
@@ -60,7 +60,7 @@
         },
         {
           "not": {
-            "pattern": "//|\\\\|/$|[\\x00-\\x1F\\x7F]"
+            "pattern": "//|\\\\|/$|[\\x00-\\x1F\\x7F\u0080-\u009f]"
           }
         }
       ]

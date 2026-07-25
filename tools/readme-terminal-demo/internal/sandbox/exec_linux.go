@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"fmt"
+	"path"
 	"runtime"
 	"strings"
 	"unsafe"
@@ -101,12 +102,15 @@ func ownedCStringVector(values []string) ([][]byte, []*byte) {
 	return storage, vector
 }
 
-func validateExecPath(path string) error {
-	if path == "" || strings.ContainsRune(path, 0) || !strings.HasPrefix(path, "/") || path != strings.TrimSuffix(path, "/") {
+func validateExecPath(target string) error {
+	if target == "" || strings.ContainsRune(target, 0) || !strings.HasPrefix(target, "/") || target != strings.TrimSuffix(target, "/") {
 		return fmt.Errorf("%w: invalid target path", ErrRestrictedExec)
 	}
+	if path.Clean(target) != target {
+		return fmt.Errorf("%w: target path is not normalized", ErrRestrictedExec)
+	}
 	var stat unix.Stat_t
-	if err := unix.Fstatat(unix.AT_FDCWD, path, &stat, unix.AT_SYMLINK_NOFOLLOW); err != nil {
+	if err := unix.Fstatat(unix.AT_FDCWD, target, &stat, unix.AT_SYMLINK_NOFOLLOW); err != nil {
 		return fmt.Errorf("%w: inspect target", ErrRestrictedExec)
 	}
 	if stat.Mode&unix.S_IFMT != unix.S_IFREG || stat.Mode&0o111 == 0 {
