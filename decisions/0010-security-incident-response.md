@@ -37,9 +37,24 @@ request are optional GitHub capabilities, not guaranteed outcomes.
 
 An organization maintainer is the incident owner for each report. The owner
 acknowledges, triages severity, coordinates the fix, and runs the post-incident
-review. **ss-o** is currently the only documented maintainer and therefore the
-proposed default incident owner. A named backup with verified access to the
-affected repository and advisory is required before escalation is operational.
+review. **ss-o** is the default incident owner. **wicoop** (named 2026-07-25) is
+the backup incident owner.
+
+Named 2026-07-25 (ss-o): backup access is granted per incident rather than
+held standing. wicoop is an active org member as of 2026-07-25, with read
+access on most repositories and admin access on `wiki`, but is not a member of
+the `tsc` GitHub team that CODEOWNERS assigns as reviewer for this
+organization. When the primary owner is available, they add wicoop as a
+collaborator on the affected repository's draft security advisory at
+escalation time, matching how GitHub advisory collaboration actually works
+and avoiding standing access that would sit unused between incidents.
+
+This has a real limit worth stating plainly: **as of 2026-07-25, ss-o is the
+organization's only admin.** If ss-o specifically is the one who is
+unreachable, there is no second admin to perform the access-grant step above,
+and escalation is bounded by whatever access wicoop already holds until the
+org has a second admin. This ADR does not claim that gap is closed; see
+Escalation below for what that means in practice.
 
 ### Acknowledgement SLA
 
@@ -66,9 +81,13 @@ slips.
 
 ### Escalation
 
-If the owner cannot act within the acknowledgement SLA, use the named,
-permission-verified backup route. Until that route exists, escalation is an
-acknowledged rollout gap rather than an operational promise.
+If the owner cannot act within the acknowledgement SLA, escalate to wicoop.
+The owner grants wicoop collaborator access on the affected repository's
+draft security advisory at that time (see Ownership above). If the owner
+cannot act specifically because ss-o (the org's only admin as of 2026-07-25)
+is unreachable, no one else in the org can perform that grant, and wicoop
+responds using whatever access they already hold until the org has a second
+admin.
 
 Critical incidents are worked immediately. Before the full fix, prefer a
 coordinated private mitigation, disabling or pinning affected functionality,
@@ -97,9 +116,25 @@ tracker.
 
 ### Administrative verification
 
-As of the 2026-07-18 audit, private vulnerability reporting, advisory
-notifications, backup access, and release immutability were not administratively
-verified. This ADR does not claim that those controls are enabled.
+Verified 2026-07-25 (ss-o), via the GitHub API:
+
+- **Private vulnerability reporting:** enabled on all 86 public, non-fork
+  repositories in the org. Not applicable to the 2 private repositories
+  (`.github-private`, `.trunk`); GitHub only exposes this feature on public
+  repositories, since its purpose is letting reporters without write access
+  report privately.
+- **Release immutability:** not enabled anywhere sampled. The two repositories
+  that have actually cut a release (`zsh-lint`, packaged `zsh`) both show
+  `immutable: false` on their only release (`v1.0.0`, 2022). This is a real
+  gap, not an oversight in this ADR: if the org wants immutable releases, it
+  needs to be turned on, most usefully before the next tag on a release-cutting
+  repository.
+- **Advisory/backup-access notifications:** not verifiable through the
+  repository or organization API; these are the incident owner's personal
+  GitHub notification settings, not an administrative setting this ADR can
+  audit. Confirming them is a manual step for whoever holds the role.
+- **Backup incident contact:** named 2026-07-25 (ss-o); see the Ownership
+  section above and checklist item 2 below.
 
 ## Decision review required
 
@@ -109,16 +144,27 @@ This ADR remains **PROPOSED**. Before acceptance, a maintainer must:
        targets and the 7/30/90-day remediation targets. Confirmed 2026-07-25
        (ss-o); see the SLA and severity sections above.
 2. [ ] Name a backup incident contact and verify that contact's repository and
-       advisory permissions.
-3. [ ] Confirm where private vulnerability reporting, notifications, and
-       release immutability are enabled or required.
+       advisory permissions. Named 2026-07-25 (ss-o): wicoop, an active org
+       member. Left open rather than checked: standing permissions were
+       deliberately not pre-verified (access is granted per incident instead,
+       see Ownership above), and that model has a real gap when ss-o, the
+       only admin, is the one who is unreachable. "Verify permissions" as
+       written implies a pre-check this ADR does not claim to have done.
+3. [x] Confirm where private vulnerability reporting, notifications, and
+       release immutability are enabled or required. Confirmed 2026-07-25
+       (ss-o); see the Administrative verification section above. Private
+       vulnerability reporting is fully enabled; release immutability is
+       verified off in both release-cutting repositories sampled (`zsh-lint`,
+       packaged `zsh`) and remains a rollout gap if the org wants it;
+       notifications are a personal setting outside this ADR's audit scope.
 4. [ ] Accept, amend, supersede, or reject this proposal and record the
        decider and decision date.
 
-Items 2 and 3 are unresolved, so this ADR is deliberately kept proposed rather
-than accepted with those as rollout gaps: an incident-response process without
-a verified escalation route or verified reporting/notification settings would
-overstate what the org can actually deliver.
+Items 1 and 3 are resolved. Item 2 is named but deliberately left open: the
+backup contact exists and the access model is decided, but standing
+permissions were never verified and the single-admin gap means escalation is
+not fully operational yet. Item 4, the actual accept, amend, or reject
+decision, is a maintainer call this ADR cannot make for itself.
 
 ## Consequences
 
