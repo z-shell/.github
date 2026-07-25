@@ -40,13 +40,21 @@ acknowledges, triages severity, coordinates the fix, and runs the post-incident
 review. **ss-o** is the default incident owner. **wicoop** (named 2026-07-25) is
 the backup incident owner.
 
-Named 2026-07-25 (ss-o): backup access is granted per incident, not held
-standing. wicoop is an active org member today with read access on most repos
-and admin on `wiki`, not TSC-team access. When an incident is escalated, the
-owner adds wicoop as a collaborator on that repository's draft security
-advisory at that time, matching how GitHub advisory collaboration actually
-works; this avoids granting broad standing access that would sit unused
-between incidents.
+Named 2026-07-25 (ss-o): backup access is granted per incident rather than
+held standing. wicoop is an active org member as of 2026-07-25, with read
+access on most repositories and admin access on `wiki`, but is not a member of
+the `tsc` GitHub team that CODEOWNERS assigns as reviewer for this
+organization. When the primary owner is available, they add wicoop as a
+collaborator on the affected repository's draft security advisory at
+escalation time, matching how GitHub advisory collaboration actually works
+and avoiding standing access that would sit unused between incidents.
+
+This has a real limit worth stating plainly: **ss-o is currently the
+organization's only admin.** If ss-o specifically is the one who is
+unreachable, there is no second admin to perform the access-grant step above,
+and escalation is bounded by whatever access wicoop already holds until the
+org has a second admin. This ADR does not claim that gap is closed; see
+Escalation below for what that means in practice.
 
 ### Acknowledgement SLA
 
@@ -73,9 +81,12 @@ slips.
 
 ### Escalation
 
-If the owner cannot act within the acknowledgement SLA, escalate to wicoop and
-add them as a collaborator on the affected repository's draft security
-advisory, per the Ownership section above.
+If the owner cannot act within the acknowledgement SLA, escalate to wicoop.
+The owner grants wicoop collaborator access on the affected repository's
+draft security advisory at that time (see Ownership above). If the owner
+cannot act specifically because ss-o, the only org admin, is unreachable, no
+one else in the org can currently perform that grant, and wicoop responds
+using whatever access they already hold until the org has a second admin.
 
 Critical incidents are worked immediately. Before the full fix, prefer a
 coordinated private mitigation, disabling or pinning affected functionality,
@@ -131,24 +142,28 @@ This ADR remains **PROPOSED**. Before acceptance, a maintainer must:
 1. [x] Confirm the proposed 3/5-business-day acknowledgement and triage
        targets and the 7/30/90-day remediation targets. Confirmed 2026-07-25
        (ss-o); see the SLA and severity sections above.
-2. [x] Name a backup incident contact and verify that contact's repository and
+2. [ ] Name a backup incident contact and verify that contact's repository and
        advisory permissions. Named 2026-07-25 (ss-o): wicoop, an active org
-       member. Access is granted per incident (added as a draft-advisory
-       collaborator when escalation actually happens) rather than held
-       standing; see the Ownership section above for why.
+       member. Left open rather than checked: standing permissions were
+       deliberately not pre-verified (access is granted per incident instead,
+       see Ownership above), and that model has a real gap when ss-o, the
+       only admin, is the one who is unreachable. "Verify permissions" as
+       written implies a pre-check this ADR does not claim to have done.
 3. [x] Confirm where private vulnerability reporting, notifications, and
        release immutability are enabled or required. Confirmed 2026-07-25
        (ss-o); see the Administrative verification section above. Private
        vulnerability reporting is fully enabled; release immutability is
-       verified off everywhere and remains a rollout gap if the org wants it;
+       verified off in both release-cutting repositories sampled (`zsh-lint`,
+       packaged `zsh`) and remains a rollout gap if the org wants it;
        notifications are a personal setting outside this ADR's audit scope.
 4. [ ] Accept, amend, supersede, or reject this proposal and record the
        decider and decision date.
 
-Items 1 through 3 are resolved; the remaining gaps (release immutability,
-personal notification settings) are disclosed rather than hidden, not left
-unaddressed. Item 4, the actual accept, amend, or reject decision, is a
-maintainer call this ADR cannot make for itself.
+Items 1 and 3 are resolved. Item 2 is named but deliberately left open: the
+backup contact exists and the access model is decided, but standing
+permissions were never verified and the single-admin gap means escalation is
+not fully operational yet. Item 4, the actual accept, amend, or reject
+decision, is a maintainer call this ADR cannot make for itself.
 
 ## Consequences
 
