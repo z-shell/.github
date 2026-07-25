@@ -11,12 +11,12 @@ definitions come from `decisions/0007-release-publication-flow.md`.
 
 ## Identify the class first
 
-| Class | Repos                                   | What it is                       |
-| ----- | --------------------------------------- | -------------------------------- |
-| 1     | `wiki`, `src`, `zd`                     | Continuously deployed artifact   |
-| 2     | `zunit`, `zsh-lint`, packaged `zsh`     | Versioned tool/package           |
-| 3     | `zi`, most plugins/annexes              | Git-consumed source              |
-| 4     | `.github`                               | Meta/infrastructure              |
+| Class | Repos                               | What it is                     |
+| ----- | ----------------------------------- | ------------------------------ |
+| 1     | `wiki`, `src`, `zd`                 | Continuously deployed artifact |
+| 2     | `zunit`, `zsh-lint`, packaged `zsh` | Versioned tool/package         |
+| 3     | `zi`, most plugins/annexes          | Git-consumed source            |
+| 4     | `.github`                           | Meta/infrastructure            |
 
 ## Baseline (every repo)
 
@@ -24,7 +24,11 @@ definitions come from `decisions/0007-release-publication-flow.md`.
   least-privilege `permissions:`, `concurrency:` on push/PR, no-emoji workflow/
   job `name:` (ADR-0005), kebab-case filenames.
 - Zsh sources pass `zsh -n` and `zcompile`.
-- Conventional Commits (ADR-0003) and the disallowed-trailer check are enforced.
+- Conventional Commits (ADR-0003) and the disallowed-trailer rule are target
+  policy: follow them by habit when authoring commits and PR titles. A sweep
+  of all 86 active repositories found no workflow enforcing either one on a
+  default branch (see `decisions/0009-testing-ci-strategy.md` and issue
+  #454), so do not assume CI will catch a violation.
 
 ## By class
 

@@ -64,6 +64,12 @@ exception, such as a non-default target branch:
 Custom managers and specialized package grouping also belong in the repository
 that needs them.
 
+For any repository whose `decisions/0008-branching-model.md` row is `next` →
+`main`, this `baseBranches` override is not optional: without it Renovate
+opens routine update PRs against `main` directly, bypassing `next`. This was
+found live (not theoretical) in two repositories — see
+`runbooks/branch-protection.md` for the full audit checklist.
+
 ## Migrating a repository
 
 Do not remove Dependabot version updates until Renovate coverage is proven.
@@ -121,3 +127,4 @@ If Renovate cannot access or process a repository:
 - `decisions/0012-hybrid-dependency-management.md`
 - `renovate-config.json`
 - `runbooks/new-repository.md`
+- `runbooks/branch-protection.md`
