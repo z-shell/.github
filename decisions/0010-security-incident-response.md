@@ -97,9 +97,24 @@ tracker.
 
 ### Administrative verification
 
-As of the 2026-07-18 audit, private vulnerability reporting, advisory
-notifications, backup access, and release immutability were not administratively
-verified. This ADR does not claim that those controls are enabled.
+Verified 2026-07-25 (ss-o), via the GitHub API:
+
+- **Private vulnerability reporting:** enabled on all 86 public, non-fork
+  repositories in the org. Not applicable to the 2 private repositories
+  (`.github-private`, `.trunk`); GitHub only exposes this feature on public
+  repositories, since its purpose is letting reporters without write access
+  report privately.
+- **Release immutability:** not enabled anywhere sampled. The two repositories
+  that have actually cut a release (`zsh-lint`, packaged `zsh`) both show
+  `immutable: false` on their only release (`v1.0.0`, 2022). This is a real
+  gap, not an oversight in this ADR: if the org wants immutable releases, it
+  needs to be turned on, most usefully before the next tag on a release-cutting
+  repository.
+- **Advisory/backup-access notifications:** not verifiable through the
+  repository or organization API; these are the incident owner's personal
+  GitHub notification settings, not an administrative setting this ADR can
+  audit. Confirming them is a manual step for whoever holds the role.
+- **Backup incident contact:** still unresolved; see checklist item 2 below.
 
 ## Decision review required
 
@@ -110,15 +125,18 @@ This ADR remains **PROPOSED**. Before acceptance, a maintainer must:
        (ss-o); see the SLA and severity sections above.
 2. [ ] Name a backup incident contact and verify that contact's repository and
        advisory permissions.
-3. [ ] Confirm where private vulnerability reporting, notifications, and
-       release immutability are enabled or required.
+3. [x] Confirm where private vulnerability reporting, notifications, and
+       release immutability are enabled or required. Confirmed 2026-07-25
+       (ss-o); see the Administrative verification section above. Private
+       vulnerability reporting is fully enabled; release immutability is
+       verified off everywhere and remains a rollout gap if the org wants it;
+       notifications are a personal setting outside this ADR's audit scope.
 4. [ ] Accept, amend, supersede, or reject this proposal and record the
        decider and decision date.
 
-Items 2 and 3 are unresolved, so this ADR is deliberately kept proposed rather
-than accepted with those as rollout gaps: an incident-response process without
-a verified escalation route or verified reporting/notification settings would
-overstate what the org can actually deliver.
+Item 2 is unresolved, so this ADR is deliberately kept proposed rather than
+accepted with it as a rollout gap: an incident-response process without a
+verified escalation route would overstate what the org can actually deliver.
 
 ## Consequences
 
