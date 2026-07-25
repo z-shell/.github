@@ -15,7 +15,11 @@ ADR-0009 states that class-2 repositories have a test suite that is
 default branch reports:
 
 ```json
-{ "required_status_checks": null, "required_approving_review_count": 0, "enforce_admins": false }
+{
+  "required_status_checks": null,
+  "required_approving_review_count": 0,
+  "enforce_admins": false
+}
 ```
 
 The requirement is real policy and is enforced by nothing. This is the same
@@ -24,15 +28,15 @@ that no workflow ran, generalized from CI to repository configuration.
 
 A survey of all 86 active, public, non-fork repositories found:
 
-| Measure | Count |
-| --- | --- |
-| No rules at all on the default branch | **75 (87%)** |
-| No classic branch protection | 60 (70%) |
-| No rulesets | 73 (85%) |
-| Any rule present | 11 — six of which have only `copilot_code_review` |
-| Repositories with more than one kind of rule | **2** (`zi`, `wiki`) |
-| Required status checks configured | `zi` 5, `wiki` 1, all others 0 |
-| Default branch still `master` | `z-shell/web` |
+| Measure                                      | Count                                             |
+| -------------------------------------------- | ------------------------------------------------- |
+| No rules at all on the default branch        | **75 (87%)**                                      |
+| No classic branch protection                 | 60 (70%)                                          |
+| No rulesets                                  | 73 (85%)                                          |
+| Any rule present                             | 11 — six of which have only `copilot_code_review` |
+| Repositories with more than one kind of rule | **2** (`zi`, `wiki`)                              |
+| Required status checks configured            | `zi` 5, `wiki` 1, all others 0                    |
+| Default branch still `master`                | `z-shell/web`                                     |
 
 The two configured repositories do not agree with each other, and neither was
 derived from a written standard. Nothing in `decisions/`, `runbooks/`, or
@@ -70,27 +74,39 @@ table stays readable:
 3. **Git-consumed source** — `zi`, most plugins and annexes
 4. **Meta/infrastructure** — `.github`
 
-`R` = required. `S` = recommended, not required.
+`R` = required. `S` = recommended, not required. `-` = not required, not
+recommended for this class.
 
-| Setting | Class 1 | Class 2 | Class 3 | Class 4 |
-| --- | --- | --- | --- | --- |
-| Default branch named `main` (audit only, never auto-applied) | R | R | R | R |
-| Pull request required to the default branch | R | R | R | R |
-| Deletion of the default branch blocked | R | R | R | R |
-| Force push to the default branch blocked | R | R | R | R |
-| Required status checks | R | R | S | S |
-| Linear history | R | S | S | S |
-| Signed commits | S | S | S | S |
-| Copilot code review | R | R | S | R |
+| Setting                                                      | Class 1 | Class 2 | Class 3 | Class 4 |
+| ------------------------------------------------------------ | ------- | ------- | ------- | ------- |
+| Default branch named `main` (audit only, never auto-applied) | R       | R       | R       | R       |
+| Pull request required to the default branch                  | R       | R       | R       | R       |
+| Deletion of the default branch blocked                       | R       | R       | R       | R       |
+| Force push to the default branch blocked                     | R       | R       | R       | R       |
+| Required status checks                                       | R       | R       | S       | S       |
+| Linear history                                               | -       | S       | S       | S       |
+| Signed commits                                               | S       | S       | S       | S       |
+| Copilot code review                                          | R       | R       | S       | R       |
 
 Rationale for the differences:
 
 - **Required status checks** are mandatory only where a failing artifact reaches
   users automatically (class 1) or is published under a version tag (class 2).
   Class 3 is consumed from source at a ref the consumer chooses.
-- **Linear history** is required only for class 1, where the deployed branch must
-  be trivially bisectable against what is live. Elsewhere it constrains merge
-  strategy for little benefit — and see the cost recorded below.
+- **Linear history** is deliberately excluded from class 1, the opposite of an
+  earlier draft of this baseline. Class-1 repositories promote a persistent
+  development branch (ADR-0008's `next`) into the deployed branch repeatedly,
+  not a disposable feature branch once. Squash and rebase both mint commits
+  the development branch does not have, so requiring linear history on the
+  deployed branch forces the two branches to diverge after every promotion,
+  by construction. Issue #473 hit this on `z-shell/wiki` today: the only
+  available fix was a direct, admin-bypassing push to realign `next`, and a
+  bypass warning was once silently truncated by piping the push through
+  `tail`. A merge commit is the one merge strategy that preserves ancestry
+  between the two branches, and requiring linear history is exactly what
+  forbids it. Classes 2-4 do not carry this cost the same way: their
+  promotions are either infrequent (class 2 release tags) or nonexistent
+  (trunk-only classes 3-4), so linear history stays recommended there.
 - **Copilot code review** is required wherever a change reaches users or other
   repositories without a second human necessarily reading it.
 
