@@ -1,10 +1,12 @@
-# 11. zsh-lint Semantic Analyzer Architecture
+# 11. zsh-lint Conditional Semantic Analysis Pipeline
 
-Date: 2026-05-29
+Date: 2026-07-25
+
+Deciders: ss-o
 
 ## Status
 
-PROPOSED
+ACCEPTED
 
 ## Context
 
@@ -112,13 +114,6 @@ compatibility rules rather than changing this ADR alone.
    syntax tree. Rejected as the semantic engine because raw text does not retain
    shell grammar context and cannot reliably distinguish code from strings or
    comments.
-
-## Decision review
-
-This reconciliation remains a proposal. Maintainers should explicitly accept
-it with a named decider and date, amend it, supersede it with another ADR, or
-reject it. Until that decision is recorded, this document describes the
-implemented architecture but does not claim maintainer acceptance.
 
 ## References
 
