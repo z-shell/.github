@@ -49,7 +49,7 @@ collaborator on the affected repository's draft security advisory at
 escalation time, matching how GitHub advisory collaboration actually works
 and avoiding standing access that would sit unused between incidents.
 
-This has a real limit worth stating plainly: **ss-o is currently the
+This has a real limit worth stating plainly: **as of 2026-07-25, ss-o is the
 organization's only admin.** If ss-o specifically is the one who is
 unreachable, there is no second admin to perform the access-grant step above,
 and escalation is bounded by whatever access wicoop already holds until the
@@ -84,9 +84,10 @@ slips.
 If the owner cannot act within the acknowledgement SLA, escalate to wicoop.
 The owner grants wicoop collaborator access on the affected repository's
 draft security advisory at that time (see Ownership above). If the owner
-cannot act specifically because ss-o, the only org admin, is unreachable, no
-one else in the org can currently perform that grant, and wicoop responds
-using whatever access they already hold until the org has a second admin.
+cannot act specifically because ss-o (the org's only admin as of 2026-07-25)
+is unreachable, no one else in the org can perform that grant, and wicoop
+responds using whatever access they already hold until the org has a second
+admin.
 
 Critical incidents are worked immediately. Before the full fix, prefer a
 coordinated private mitigation, disabling or pinning affected functionality,
