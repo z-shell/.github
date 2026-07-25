@@ -80,7 +80,7 @@ published version tag.
 
 - Fixes land through the normal branch model (ADR-0008); critical fixes may use a
   `hotfix-<id>` branch from the publication branch.
-- Coordinate disclosure with the reporter per `SECURITY.md`: no public disclosure
+- Coordinate disclosure with the reporter per `.github/SECURITY.md`: no public disclosure
   until a fix is published or the report is declined, and credit the reporter.
 - Where a release artifact exists (ADR-0007 class 2), cut a patched tag and note
   the security fix in the release notes.
@@ -126,15 +126,15 @@ overstate what the org can actually deliver.
   acknowledgement and remediation path instead of ad-hoc handling.
 - `runbooks/security-incident-response.md` would be reconciled after acceptance;
   it is not changed by this draft.
-- `SECURITY.md` remains the reporter-facing entry point and would be reconciled
-  after acceptance; this ADR defines the proposed internal response.
+- `.github/SECURITY.md` remains the reporter-facing entry point and would be
+  reconciled after acceptance; this ADR defines the proposed internal response.
 - Sanitized post-incident reviews build durable security memory without exposing
   restricted report data.
 
 ## Alternatives considered
 
-- **Keep only `SECURITY.md`.** Rejected: it covers intake but leaves response
-  undefined, which is where time is actually lost.
+- **Keep only `.github/SECURITY.md`.** Rejected: it covers intake but leaves
+  response undefined, which is where time is actually lost.
 - **Adopt a formal external framework (e.g. full ISO/NIST IR process).** Rejected
   as disproportionate for a small-maintainer OSS org; this ADR takes the
   load-bearing pieces (SLA, severity targets, escalation, review) without the
