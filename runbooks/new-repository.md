@@ -115,8 +115,18 @@ Follow `runbooks/dependency-management.md`:
 3. Enable the dependency graph, Dependabot alerts, and Dependabot security
    updates in GitHub settings.
 4. Add `renovate.json` only for a repository-specific exception such as a
-   `next` target branch.
+   `next` target branch. If `decisions/0008-branching-model.md` assigns this
+   repository the `next` → `main` model, this exception is mandatory, not
+   optional — see `runbooks/branch-protection.md`.
 5. Do not add `.github/dependabot.yml` for routine version updates.
+
+## Step 5a — Provision branch rulesets
+
+If this repository uses the `next` → `main` model
+(`decisions/0008-branching-model.md`), follow `runbooks/branch-protection.md`
+in full before opening the bootstrap pull request. Trunk-on-`main`
+repositories still need a `main` ruleset, but can skip the `next`-specific
+items (the guard workflow, `renovate.json` override).
 
 ## Step 6 — Verify before publication
 
@@ -146,6 +156,7 @@ Reusable screenshot and terminal-demo generation is tracked separately in
 
 - `AGENTS.md`
 - `PATTERNS.md`
+- `runbooks/branch-protection.md`
 - `runbooks/dependency-management.md`
 - `runbooks/labels.md`
 - `runbooks/project-tracker.md`

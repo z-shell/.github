@@ -101,6 +101,9 @@ public factual-reconciliation change.
   repositories; the live tag-trigger exceptions above are accepted alongside
   it. For other classes the merge validates but does not mint a release
   (consistent with ADR-0007).
+- This ADR sets the policy; `runbooks/branch-protection.md` covers the
+  repository-settings and ruleset provisioning that enforces it (added after
+  an audit found `src` and `zsh-eza` both missing parts of it).
 
 ## Alternatives considered
 
@@ -117,5 +120,6 @@ public factual-reconciliation change.
 
 - `decisions/0007-release-publication-flow.md` — repository classes this builds on.
 - `decisions/0003-conventional-commits.md` — commit/branch naming conventions.
+- `runbooks/branch-protection.md` — enforcement checklist for this model.
 - [Issue #454](https://github.com/z-shell/.github/issues/454) — dated live audit
   and maintainer decision record.
