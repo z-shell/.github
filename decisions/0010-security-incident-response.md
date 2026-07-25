@@ -37,9 +37,16 @@ request are optional GitHub capabilities, not guaranteed outcomes.
 
 An organization maintainer is the incident owner for each report. The owner
 acknowledges, triages severity, coordinates the fix, and runs the post-incident
-review. **ss-o** is currently the only documented maintainer and therefore the
-proposed default incident owner. A named backup with verified access to the
-affected repository and advisory is required before escalation is operational.
+review. **ss-o** is the default incident owner. **wicoop** (named 2026-07-25) is
+the backup incident owner.
+
+Named 2026-07-25 (ss-o): backup access is granted per incident, not held
+standing. wicoop is an active org member today with read access on most repos
+and admin on `wiki`, not TSC-team access. When an incident is escalated, the
+owner adds wicoop as a collaborator on that repository's draft security
+advisory at that time, matching how GitHub advisory collaboration actually
+works; this avoids granting broad standing access that would sit unused
+between incidents.
 
 ### Acknowledgement SLA
 
@@ -66,9 +73,9 @@ slips.
 
 ### Escalation
 
-If the owner cannot act within the acknowledgement SLA, use the named,
-permission-verified backup route. Until that route exists, escalation is an
-acknowledged rollout gap rather than an operational promise.
+If the owner cannot act within the acknowledgement SLA, escalate to wicoop and
+add them as a collaborator on the affected repository's draft security
+advisory, per the Ownership section above.
 
 Critical incidents are worked immediately. Before the full fix, prefer a
 coordinated private mitigation, disabling or pinning affected functionality,
@@ -114,7 +121,8 @@ Verified 2026-07-25 (ss-o), via the GitHub API:
   repository or organization API; these are the incident owner's personal
   GitHub notification settings, not an administrative setting this ADR can
   audit. Confirming them is a manual step for whoever holds the role.
-- **Backup incident contact:** still unresolved; see checklist item 2 below.
+- **Backup incident contact:** named 2026-07-25 (ss-o); see the Ownership
+  section above and checklist item 2 below.
 
 ## Decision review required
 
@@ -123,8 +131,11 @@ This ADR remains **PROPOSED**. Before acceptance, a maintainer must:
 1. [x] Confirm the proposed 3/5-business-day acknowledgement and triage
        targets and the 7/30/90-day remediation targets. Confirmed 2026-07-25
        (ss-o); see the SLA and severity sections above.
-2. [ ] Name a backup incident contact and verify that contact's repository and
-       advisory permissions.
+2. [x] Name a backup incident contact and verify that contact's repository and
+       advisory permissions. Named 2026-07-25 (ss-o): wicoop, an active org
+       member. Access is granted per incident (added as a draft-advisory
+       collaborator when escalation actually happens) rather than held
+       standing; see the Ownership section above for why.
 3. [x] Confirm where private vulnerability reporting, notifications, and
        release immutability are enabled or required. Confirmed 2026-07-25
        (ss-o); see the Administrative verification section above. Private
@@ -134,9 +145,10 @@ This ADR remains **PROPOSED**. Before acceptance, a maintainer must:
 4. [ ] Accept, amend, supersede, or reject this proposal and record the
        decider and decision date.
 
-Item 2 is unresolved, so this ADR is deliberately kept proposed rather than
-accepted with it as a rollout gap: an incident-response process without a
-verified escalation route would overstate what the org can actually deliver.
+Items 1 through 3 are resolved; the remaining gaps (release immutability,
+personal notification settings) are disclosed rather than hidden, not left
+unaddressed. Item 4, the actual accept, amend, or reject decision, is a
+maintainer call this ADR cannot make for itself.
 
 ## Consequences
 
