@@ -1550,6 +1550,49 @@ class PublicRepositoryTests(unittest.TestCase):
         for fragment in required_fragments:
             self.assertIn(fragment, policy)
 
+    def test_public_repository_declares_learning_capture_surfaces(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["runbook-learning-capture"],
+            {
+                "id": "runbook-learning-capture",
+                "path": "runbooks/learning-capture.md",
+                "kind": "runbook",
+                "authority": "canonical-detail",
+                "consumers": [
+                    "codex",
+                    "claude-code",
+                    "copilot",
+                    "gemini-cli",
+                    "human",
+                ],
+                "tasks": ["learning-capture", "completion-review"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": ["learning-capture"],
+            },
+        )
+        self.assertEqual(
+            surfaces["skill-review-project-learning"],
+            {
+                "id": "skill-review-project-learning",
+                "path": ".github/skills/review-project-learning/SKILL.md",
+                "kind": "skill",
+                "authority": "advisory",
+                "consumers": ["copilot"],
+                "tasks": ["learning-capture", "completion-review"],
+                "file_patterns": ["**"],
+                "required": False,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
+        )
+
     def test_public_repository_prohibits_vendor_root_instruction_files(self) -> None:
         policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
         self.assertIn(

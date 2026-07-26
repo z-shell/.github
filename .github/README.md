@@ -37,16 +37,16 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 
 ## Repository Structure
 
-| Path                                              | Purpose                                                                                                     |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| [`AGENTS.md`](../AGENTS.md)                       | Canonical org-wide instructions for AI coding agents and maintainers                                        |
-| [`PATTERNS.md`](../PATTERNS.md)                   | Cross-repo implementation idioms grounded in real repositories                                              |
-| [`decisions/`](../decisions/)                     | Architectural decision records for non-obvious org-wide choices                                             |
-| [`runbooks/`](../runbooks/)                       | Repeatable operational workflows such as org review, triage, ADR drafting, and release coordination         |
-| [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell) |
-| [`actions/`](../actions/)                         | Reusable composite GitHub Actions shared across all org repositories                                        |
-| [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                  |
-| [`renovate-config.json`](../renovate-config.json) | Shared Renovate preset for routine dependency version updates                                               |
+| Path                                              | Purpose                                                                                                               |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [`AGENTS.md`](../AGENTS.md)                       | Canonical org-wide instructions for AI coding agents and maintainers                                                  |
+| [`PATTERNS.md`](../PATTERNS.md)                   | Cross-repo implementation idioms grounded in real repositories                                                        |
+| [`decisions/`](../decisions/)                     | Architectural decision records for non-obvious org-wide choices                                                       |
+| [`runbooks/`](../runbooks/)                       | Repeatable operational workflows such as learning capture, org review, triage, ADR drafting, and release coordination |
+| [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell)           |
+| [`actions/`](../actions/)                         | Reusable composite GitHub Actions shared across all org repositories                                                  |
+| [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                            |
+| [`renovate-config.json`](../renovate-config.json) | Shared Renovate preset for routine dependency version updates                                                         |
 
 ## Instruction Architecture
 
@@ -59,6 +59,10 @@ The organization uses a portable, manifest-backed instruction architecture:
   adapter to `AGENTS.md`; it is not a policy owner.
 - [`instruction-update.md`](../runbooks/instruction-update.md) is the required
   impact review for every material instruction change.
+- [`learning-capture.md`](../runbooks/learning-capture.md) defines the
+  evidence, destination, authority, and completion-review workflow.
+- [`review-project-learning`](skills/review-project-learning/SKILL.md) is the
+  advisory reusable skill for that workflow.
 - [`validate-agent-policy.py`](../scripts/validate-agent-policy.py) and
   [`agent-instructions.yml`](workflows/agent-instructions.yml) enforce the public
   instruction contract.

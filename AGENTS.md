@@ -132,14 +132,17 @@ Unless a maintainer asks otherwise, these workflows produce drafts only.
 
 ## Learning capture
 
-Non-trivial sessions should end with durable follow-up, not silent local memory. If you discover:
+Before claiming non-trivial work complete, perform a learning and reuse review
+using `runbooks/learning-capture.md`.
 
-- a pattern used in at least two repositories
-- a decision that should be recorded
-- a runbook gap
-- a tooling gap
+`No durable learning` is a valid silent result. Promote a finding only when it
+is evidence-backed, likely to recur, and routed to the smallest existing
+canonical owner. Prefer executable checks over prose. Do not create memory,
+instructions, skills, issues, ADRs, runbooks, or documentation merely to show
+that the review happened.
 
-capture it in the relevant issue, PR, or draft change to `PATTERNS.md`, `decisions/`, or `runbooks/` for human review.
+Hooks and skills may remind or guide the review, but they are optional and
+cannot own this mandatory rule.
 
 ## When this file is wrong
 

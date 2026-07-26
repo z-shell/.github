@@ -352,6 +352,18 @@
       "canonical_for": []
     },
     {
+      "id": "skill-review-project-learning",
+      "path": ".github/skills/review-project-learning/SKILL.md",
+      "kind": "skill",
+      "authority": "advisory",
+      "consumers": ["copilot"],
+      "tasks": ["learning-capture", "completion-review"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "runbook-adr",
       "path": "runbooks/adr.md",
       "kind": "runbook",
@@ -398,6 +410,18 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["instruction-impact-review"]
+    },
+    {
+      "id": "runbook-learning-capture",
+      "path": "runbooks/learning-capture.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["learning-capture", "completion-review"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["learning-capture"]
     },
     {
       "id": "runbook-labels",
