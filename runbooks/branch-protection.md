@@ -105,10 +105,22 @@ Immediately after a successful squash promotion:
    git diff --exit-code origin/main origin/next
    ```
 
-2. Create an issue branch from the current `next`, merge `origin/main` with a
-   signed, non-fast-forward merge commit, and preserve the pre-merge `next`
-   tree exactly. Open a PR from that issue branch into `next` and merge it
-   with a merge commit so the `main` parent remains in history.
+2. Create the signed merge commit on an issue branch from the current `next`
+   and verify it preserves the pre-merge `next` tree:
+
+   ```bash
+   next_tree=$(git rev-parse 'origin/next^{tree}')
+   git switch -c <issue-branch> origin/next
+   git merge --no-ff -S origin/main \
+     -m "chore: reconcile promoted main into next (#<issue>)"
+   test "$(git rev-parse 'HEAD^{tree}')" = "$next_tree"
+   git push -u origin <issue-branch>
+   ```
+
+   Open a PR from `<issue-branch>` into `next`. Merge it with **Create a merge
+   commit** so the `main` parent remains in history. Do not squash or rebase
+   this reconciliation PR.
+
 3. Fetch both branches again and verify `main` is now an ancestor of `next`:
 
    ```bash
