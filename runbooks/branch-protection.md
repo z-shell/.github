@@ -66,10 +66,13 @@ row is `next` → `main`. Skip repositories that are trunk-on-`main`.
       branch" condition, so this has to be a CI check wired in as
       `required_status_checks`. See `.github/workflows/main-branch-guard.yml`
       in `z-shell/src` or `z-shell/zsh-eza` for the reference implementation
-      (a single `run:` step reading `github.head_ref`, no third-party
-      actions needed). The check must run at least once on a real PR against
-      `main` before GitHub will accept its context name in
-      `required_status_checks`.
+      (a single `run:` step, no third-party actions needed). The check must
+      first require `github.event.pull_request.head.repo.full_name` to equal
+      `github.repository`, because a fork can reuse an allowed branch name.
+      It can then allow only `github.head_ref == 'next'` or
+      `github.head_ref` matching `hotfix-*`. The check must run at least once
+      on a real PR against `main` before GitHub will accept its context name
+      in `required_status_checks`.
 
 ## Squash-merge trailers
 
@@ -84,6 +87,38 @@ one-line `--body` (e.g. `gh pr merge <n> --squash --subject "..." --body "..."`)
 the synthesized body. Verify with
 `gh api repos/<org>/<repo>/commits/<sha> --jq .commit.message` before
 considering the promotion done.
+
+## Post-promotion reconciliation
+
+A squash merge keeps `main` linear but creates a new commit that is not in
+`next`, even when the resulting branch trees are identical. If that commit is
+not merged back, the next promotion uses an older merge base and can show
+already-promoted changes or produce avoidable conflicts.
+
+Immediately after a successful squash promotion:
+
+1. Fetch the current `main` and `next`, then verify the promoted `main` tree
+   matches the reviewed `next` tree:
+
+   ```bash
+   git fetch origin main next
+   git diff --exit-code origin/main origin/next
+   ```
+
+2. Create an issue branch from the current `next`, merge `origin/main` with a
+   signed, non-fast-forward merge commit, and preserve the pre-merge `next`
+   tree exactly. Open a PR from that issue branch into `next` and merge it
+   with a merge commit so the `main` parent remains in history.
+3. Fetch both branches again and verify `main` is now an ancestor of `next`:
+
+   ```bash
+   git fetch origin main next
+   git merge-base --is-ancestor origin/main origin/next
+   ```
+
+Do not reset, rebase, force-push, or replace the persistent `next` branch to
+perform this reconciliation. If the branch trees differ before the back-merge,
+stop and review the delta instead of resolving it as an ancestry-only change.
 
 ## Reference ruleset shape
 
