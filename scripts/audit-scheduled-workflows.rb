@@ -67,7 +67,8 @@ module ScheduledWorkflowAudit
 
   class WorkflowParser
     def parse(repository:, metadata:, content:)
-      workflow = YAML.safe_load(content, aliases: false) || {}
+      workflow = YAML.safe_load(content, aliases: false)
+      workflow = {} if workflow.nil?
       raise ArgumentError, "workflow must be a mapping" unless workflow.is_a?(Hash)
 
       triggers = workflow["on"] || workflow[true] || {}

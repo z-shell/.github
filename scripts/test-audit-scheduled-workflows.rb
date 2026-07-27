@@ -117,6 +117,17 @@ class ScheduledWorkflowAuditTest
     assert_match(/mapping/, error.message)
   end
 
+  def test_parser_rejects_a_false_workflow_document
+    data = fixture("comment-only-workflow")
+    error = assert_raises(ArgumentError) do
+      ScheduledWorkflowAudit::WorkflowParser.new.parse(
+        repository: data.fetch("repository"), metadata: data.fetch("workflow"), content: "false\n"
+      )
+    end
+
+    assert_match(/mapping/, error.message)
+  end
+
   def test_parser_finds_job_and_workflow_controls
     assert_equal ["job"], parse("job-level-controls").fetch("permissions_locations")
     assert_equal ["job"], parse("job-level-controls").fetch("concurrency_locations")
