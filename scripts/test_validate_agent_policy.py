@@ -1477,6 +1477,38 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_public_manifest_routes_recurring_operations_runbook(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        recurring_operations_surfaces = [
+            surface
+            for surface in manifest["surfaces"]
+            if surface.get("canonical_for") == ["recurring-operations"]
+        ]
+
+        self.assertEqual(
+            recurring_operations_surfaces,
+            [
+                {
+                    "id": "runbook-recurring-operations",
+                    "path": "runbooks/recurring-operations.md",
+                    "kind": "runbook",
+                    "authority": "canonical-detail",
+                    "consumers": ["codex", "claude-code", "copilot", "human"],
+                    "tasks": [
+                        "recurring-operations",
+                        "scheduled-workflow-audit",
+                        "automation-review",
+                    ],
+                    "file_patterns": ["**"],
+                    "required": True,
+                    "review_owner": "z-shell maintainers",
+                    "canonical_for": ["recurring-operations"],
+                }
+            ],
+        )
+
     def test_public_repository_documents_instruction_governance(self) -> None:
         adr = (
             PUBLIC_ROOT / "decisions/0014-portable-agent-instruction-architecture.md"

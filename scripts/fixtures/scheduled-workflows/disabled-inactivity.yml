@@ -1,0 +1,13 @@
+repository:
+  full_name: example/inactive-demo
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/inactive.yml
+  name: Inactive
+  state: disabled_inactivity
+content: |
+  name: Inactive
+  on:
+    schedule:
+      - cron: "0 0 * * 0"

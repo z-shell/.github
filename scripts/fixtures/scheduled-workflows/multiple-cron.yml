@@ -1,0 +1,14 @@
+repository:
+  full_name: example/multiple-cron
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/multiple.yml
+  name: Multiple cron
+  state: active
+content: |
+  name: Multiple cron
+  on:
+    schedule:
+      - cron: "0 1 * * *"
+      - cron: "0 13 * * *"

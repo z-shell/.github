@@ -1,0 +1,16 @@
+repository:
+  full_name: example/reusable-caller
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/caller.yml
+  name: Caller
+  state: active
+content: |
+  name: Caller
+  on:
+    schedule:
+      - cron: "0 3 * * *"
+  jobs:
+    reusable:
+      uses: example/platform/.github/workflows/reusable.yml@v1

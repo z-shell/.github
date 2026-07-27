@@ -1,0 +1,21 @@
+repository:
+  full_name: example/job-controls
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/job-controls.yml
+  name: Job controls
+  state: active
+content: |
+  name: Job controls
+  on:
+    schedule:
+      - cron: "0 4 * * *"
+  jobs:
+    scan:
+      permissions:
+        contents: read
+      concurrency: scan-${{ github.ref }}
+      runs-on: ubuntu-latest
+      steps:
+        - run: true

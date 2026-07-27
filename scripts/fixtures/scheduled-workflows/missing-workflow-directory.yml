@@ -1,0 +1,7 @@
+repository:
+  full_name: example/no-workflows
+  visibility: public
+  default_branch: main
+error:
+  status: 404
+  message: workflow directory not found

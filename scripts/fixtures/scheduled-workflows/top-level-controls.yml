@@ -1,0 +1,17 @@
+repository:
+  full_name: example/top-controls
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/top-controls.yml
+  name: Top controls
+  state: active
+content: |
+  name: Top controls
+  on:
+    schedule:
+      - cron: "0 5 * * *"
+  permissions: read-all
+  concurrency:
+    group: top-${{ github.ref }}
+    cancel-in-progress: true

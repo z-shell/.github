@@ -1,0 +1,6 @@
+repository:
+  full_name: example/directory-error
+  visibility: public
+  default_branch: main
+directory_response:
+  message: expected directory array but received an API object

@@ -1,0 +1,10 @@
+repository:
+  full_name: example/comment-only
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/comment-only.yml
+  name: Comment only
+  state: active
+content: |
+  # This file intentionally has no active workflow definition.

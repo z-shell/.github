@@ -1,0 +1,20 @@
+repository:
+  full_name: example/utc-demo
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/check.yml
+  name: Check
+  state: active
+content: |
+  name: Check
+  on:
+    schedule:
+      - cron: "17 9 * * 6"
+    workflow_dispatch:
+  permissions:
+    contents: read
+  concurrency: check-${{ github.ref }}
+  jobs:
+    lint:
+      uses: example/reusable/.github/workflows/lint.yml@main

@@ -1,0 +1,12 @@
+repository:
+  full_name: example/private-no-schedule
+  visibility: private
+  default_branch: main
+workflow:
+  path: .github/workflows/manual.yml
+  name: Manual
+  state: active
+content: |
+  name: Manual
+  on:
+    workflow_dispatch:

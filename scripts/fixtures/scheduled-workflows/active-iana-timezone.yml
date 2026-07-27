@@ -1,0 +1,14 @@
+repository:
+  full_name: example/iana-demo
+  visibility: public
+  default_branch: main
+workflow:
+  path: .github/workflows/timezone.yml
+  name: Timezone
+  state: active
+content: |
+  name: Timezone
+  on:
+    schedule:
+      - cron: "0 8 * * 1-5"
+        timezone: Europe/London
