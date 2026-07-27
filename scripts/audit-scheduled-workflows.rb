@@ -75,7 +75,9 @@ module ScheduledWorkflowAudit
         cron = entry["cron"] || entry[:cron]
         raise ArgumentError, "schedule entry must include cron" unless cron.is_a?(String) && !cron.empty?
 
-        { "cron" => cron, "timezone" => entry["timezone"] || entry[:timezone] || "UTC" }
+        timezone = entry["timezone"] || entry[:timezone]
+        timezone = "UTC" unless timezone.is_a?(String) && !timezone.empty?
+        { "cron" => cron, "timezone" => timezone }
       end
 
       jobs = workflow["jobs"].is_a?(Hash) ? workflow.fetch("jobs") : {}
@@ -133,7 +135,11 @@ module ScheduledWorkflowAudit
         Thread.new do
           loop do
             repository = queue.pop(true)
-            result = records_for(repository, active_only: active_only)
+            result = begin
+              records_for(repository, active_only: active_only)
+            rescue StandardError => error
+              [error_record(repository, {}, error)]
+            end
             lock.synchronize { records.concat(result) }
           rescue ThreadError
             break

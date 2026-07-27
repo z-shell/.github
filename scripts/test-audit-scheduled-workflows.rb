@@ -81,6 +81,27 @@ class ScheduledWorkflowAuditTest
     assert_equal 2, parse("multiple-cron").fetch("schedules").length
   end
 
+  def test_parser_defaults_invalid_timezones_to_utc
+    data = fixture("active-utc")
+    data["content"] = <<~YAML
+      on:
+        schedule:
+          - cron: "17 9 * * 6"
+            timezone: ""
+          - cron: "18 9 * * 6"
+            timezone: 42
+      jobs: {}
+    YAML
+
+    record = ScheduledWorkflowAudit::WorkflowParser.new.parse(
+      repository: data.fetch("repository"),
+      metadata: data.fetch("workflow"),
+      content: data.fetch("content")
+    )
+
+    assert_equal ["UTC", "UTC"], record.fetch("schedules").map { |schedule| schedule.fetch("timezone") }
+  end
+
   def test_parser_treats_a_comment_only_workflow_as_unscheduled
     assert_equal [], parse("comment-only-workflow").fetch("schedules")
   end
@@ -259,6 +280,21 @@ class ScheduledWorkflowAuditTest
     assert_match(/workflow directory entries must include paths/, records.fetch(0).fetch("errors").fetch(0).fetch("message"))
   end
 
+  def test_inventory_turns_unexpected_worker_failures_into_error_records
+    failed = fixture("active-utc")
+    failed.fetch("repository")["full_name"] = "example/worker-failure"
+    client = UnexpectedFailureClient.new(
+      [failed, fixture("active-utc")],
+      failing_repository: "example/worker-failure"
+    )
+
+    records = ScheduledWorkflowAudit::Inventory.new(client: client, org: "example").run
+
+    assert_equal ["example/utc-demo", "example/worker-failure"], records.map { |record| record.fetch("repository") }
+    failure = records.find { |record| record.fetch("repository") == "example/worker-failure" }
+    assert_match(/unexpected worker failure/, failure.fetch("errors").fetch(0).fetch("message"))
+  end
+
   def test_inventory_ignores_archived_and_fork_repositories
     archived = fixture("active-utc")
     archived.fetch("repository")["full_name"] = "example/archived"
@@ -360,6 +396,19 @@ class ScheduledWorkflowAuditTest
       return { "workflows" => [] } if path.end_with?("/actions/workflows?per_page=100")
 
       raise "unexpected request: #{path}"
+    end
+  end
+
+  class UnexpectedFailureClient < FixtureClient
+    def initialize(fixtures, failing_repository:)
+      super(fixtures)
+      @failing_repository = failing_repository
+    end
+
+    def json(path)
+      raise "unexpected worker failure" if path.start_with?("/repos/#{@failing_repository}/")
+
+      super
     end
   end
 end
