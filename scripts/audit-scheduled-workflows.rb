@@ -184,6 +184,9 @@ module ScheduledWorkflowAudit
         raise
       end
       raise GitHubError, "workflow directory response must be an array" unless directory.is_a?(Array)
+      unless directory.all? { |entry| entry.is_a?(Hash) && entry["path"].is_a?(String) }
+        raise ArgumentError, "workflow directory entries must include paths"
+      end
 
       metadata_by_path = workflow_metadata(name).to_h { |workflow| [workflow.fetch("path"), workflow] }
       directory.filter_map do |entry|
@@ -262,9 +265,15 @@ module ScheduledWorkflowAudit
       lines = ["# Scheduled workflow inventory", "", "| Repository | Workflow | State | Schedules |", "| --- | --- | --- | --- |"]
       visible.each do |record|
         schedules = record.fetch("schedules").map { |schedule| "#{schedule.fetch("cron")} (#{schedule.fetch("timezone")})" }.join("<br>")
-        lines << "| #{record.fetch("repository")} | #{record["name"] || record["path"] || "Unavailable"} | #{record["state"] || "unverified"} | #{schedules} |"
+        lines << "| #{table_cell(record.fetch("repository"))} | #{table_cell(record["name"] || record["path"] || "Unavailable")} | #{table_cell(record["state"] || "unverified")} | #{table_cell(schedules)} |"
       end
       lines.join("\n") + "\n"
+    end
+
+    private
+
+    def table_cell(value)
+      value.to_s.gsub("|", "\\|").gsub(/\r?\n/, "<br>")
     end
   end
 
@@ -283,8 +292,8 @@ module ScheduledWorkflowAudit
       raise OptionParser::InvalidOption, forbidden if forbidden
 
       parser.parse!(argv)
-      raise OptionParser::MissingArgument, "--org" if options[:org].nil? || options[:org].empty?
       raise OptionParser::InvalidArgument, "--repo must be OWNER/REPO" if options[:repo] && !options[:repo].match?(%r{\A[^/]+/[^/]+\z})
+      raise OptionParser::MissingArgument, "--org" if options[:repo].nil? && (options[:org].nil? || options[:org].empty?)
 
       inventory = Inventory.new(client: client, org: options[:org], repo: options[:repo], public_only: options[:public_only])
       if options[:format] == "json" && inventory.private_target_set? && options[:output].nil?

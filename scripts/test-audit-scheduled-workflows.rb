@@ -124,6 +124,34 @@ class ScheduledWorkflowAuditTest
     refute_includes rendered, "example/hidden-repository"
   end
 
+  def test_markdown_escapes_table_delimiters_and_newlines
+    record = parse("active-utc")
+    record["repository"] = "example/pipe|repo\ncontinued"
+    record["name"] = "Check|Now\nLater"
+    record["state"] = "active|queued\nstate"
+    record["schedules"] = [{ "cron" => "17|18\n19", "timezone" => "UTC|Local\nZone" }]
+
+    rendered = ScheduledWorkflowAudit::Renderer.new.markdown([record], public_only: false)
+
+    assert_includes rendered, "example/pipe\\|repo<br>continued"
+    assert_includes rendered, "Check\\|Now<br>Later"
+    assert_includes rendered, "active\\|queued<br>state"
+    assert_includes rendered, "17\\|18<br>19 (UTC\\|Local<br>Zone)"
+  end
+
+  def test_repository_scope_does_not_require_an_organization
+    stdout = StringIO.new
+    stderr = StringIO.new
+    status = ScheduledWorkflowAudit::CLI.run(
+      ["--repo", "example/utc-demo", "--format", "markdown"],
+      client: FixtureClient.new([fixture("active-utc")]), stdout: stdout, stderr: stderr
+    )
+
+    assert_equal 0, status
+    assert_equal "", stderr.string
+    assert_includes stdout.string, "example/utc-demo"
+  end
+
   def test_private_json_requires_a_private_output_file
     stdout = StringIO.new
     stderr = StringIO.new
@@ -221,6 +249,16 @@ class ScheduledWorkflowAuditTest
     assert_match(/workflow directory response must be an array/, records.fetch(0).fetch("errors").fetch(0).fetch("message"))
   end
 
+  def test_directory_entries_require_string_paths
+    data = fixture("active-utc")
+    data["directory_response"] = [nil, { "path" => 123 }]
+
+    records = ScheduledWorkflowAudit::Inventory.new(client: FixtureClient.new([data]), org: "example").run
+
+    assert_equal 1, records.length
+    assert_match(/workflow directory entries must include paths/, records.fetch(0).fetch("errors").fetch(0).fetch("message"))
+  end
+
   def test_inventory_ignores_archived_and_fork_repositories
     archived = fixture("active-utc")
     archived.fetch("repository")["full_name"] = "example/archived"
@@ -274,6 +312,8 @@ class ScheduledWorkflowAuditTest
 
       data = @fixtures.find { |fixture| fixture.fetch("repository").fetch("full_name") == repository_name }
       raise "unexpected request: #{path}" unless data
+
+      return data.fetch("repository") if path == "/repos/#{repository_name}"
 
       if data.key?("error")
         error = data.fetch("error")
