@@ -1,0 +1,13 @@
+repository:
+  full_name: example/hidden-repository
+  visibility: private
+  default_branch: main
+workflow:
+  path: .github/workflows/private.yml
+  name: Private schedule
+  state: active
+content: |
+  name: Private schedule
+  on:
+    schedule:
+      - cron: "0 6 * * *"

@@ -141,6 +141,21 @@ repository can reference it explicitly:
 See [`../runbooks/dependency-management.md`](../runbooks/dependency-management.md)
 for onboarding, validation, migration, and rollback.
 
+## Scheduled Workflow Inventory
+
+Use `scripts/audit-scheduled-workflows.rb` to produce a reproducible inventory
+of scheduled workflows. The command performs read-only GitHub API requests.
+
+```sh
+scripts/audit-scheduled-workflows.rb --org z-shell --public-only --format json
+```
+
+Disabled workflows are included unless `--active-only` is supplied. Use
+`--public-only` when writing a report intended for public distribution. JSON
+for a target set that includes private repositories must use `--output FILE`;
+the command creates that destination with mode `0600`. Markdown always omits
+private repository names.
+
 ---
 
 ## Common Use Cases

@@ -1,0 +1,7 @@
+repository:
+  full_name: example/rate-limited
+  visibility: public
+  default_branch: main
+error:
+  status: 403
+  message: API rate limit exceeded
