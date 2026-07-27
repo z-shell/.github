@@ -156,6 +156,10 @@ for a target set that includes private repositories must use `--output FILE`;
 the command creates that destination with mode `0600`. Markdown always omits
 private repository names.
 
+Follow the
+[`recurring-operations` runbook](../runbooks/recurring-operations.md) to
+classify the inventory, review failures, and draft evidence-backed follow-ups.
+
 ---
 
 ## Common Use Cases

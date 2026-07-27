@@ -472,6 +472,22 @@
       "canonical_for": ["project-tracking"]
     },
     {
+      "id": "runbook-recurring-operations",
+      "path": "runbooks/recurring-operations.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "human"],
+      "tasks": [
+        "recurring-operations",
+        "scheduled-workflow-audit",
+        "automation-review"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["recurring-operations"]
+    },
+    {
       "id": "runbook-release",
       "path": "runbooks/release.md",
       "kind": "runbook",
