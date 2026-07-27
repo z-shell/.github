@@ -50,7 +50,10 @@ module ScheduledWorkflowAudit
 
     def parse_error(body)
       parsed = JSON.parse(body)
-      return parsed.merge("status" => status_from(body)) if parsed.is_a?(Hash)
+      if parsed.is_a?(Hash)
+        parsed["status"] ||= status_from(body)
+        return parsed
+      end
 
       { "message" => body.to_s.strip.empty? ? "GitHub API request failed" : body.to_s.strip, "status" => status_from(body) }
     rescue JSON::ParserError

@@ -231,6 +231,16 @@ class ScheduledWorkflowAuditTest
     assert_equal "[]", error.message
   end
 
+  def test_client_preserves_status_from_a_json_error_payload
+    client = ScheduledWorkflowAudit::GitHubClient.new(runner: lambda do |_command|
+      ["", "{\"message\":\"Not Found\",\"status\":404}", false]
+    end)
+
+    error = assert_raises(ScheduledWorkflowAudit::GitHubError) { client.json("/repos/example/demo") }
+
+    assert_equal 404, error.status
+  end
+
   def test_inventory_returns_structured_errors_for_missing_or_failed_workflow_lookups
     data = [fixture("missing-workflow-directory"), fixture("directory-api-error"), fixture("rate-limit-error")]
     records = ScheduledWorkflowAudit::Inventory.new(client: FixtureClient.new(data), org: "example").run
