@@ -22,6 +22,8 @@ jobs:
     environment: metrics
     permissions:
       contents: write
+      issues: read
+      pull-requests: read
     env:
       metrics_svg: metrics/plugin/metrics.svg
       repositories_metrics_svg: metrics/plugin/repositories_metrics.svg
