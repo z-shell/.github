@@ -72,7 +72,8 @@ jobs:
         with:
           filename: ${{ env.zi_followup_svg }}
           template: repository
-          token: ${{ github.token }}
+          token: ${{ secrets.METRICS_TOKEN }}
+          committer_token: ${{ github.token }}
           user: ${{ github.repository_owner }}
           base: header, activity,community,repositories
           committer_branch: metrics
@@ -82,7 +83,8 @@ jobs:
         with:
           filename: ${{ env.wiki_followup_svg }}
           template: repository
-          token: ${{ github.token }}
+          token: ${{ secrets.METRICS_TOKEN }}
+          committer_token: ${{ github.token }}
           user: ${{ github.repository_owner }}
           base: header, activity,community,repositories
           committer_branch: metrics
@@ -92,7 +94,8 @@ jobs:
         with:
           filename: ${{ env.f-sy-h_followup_svg }}
           template: repository
-          token: ${{ github.token }}
+          token: ${{ secrets.METRICS_TOKEN }}
+          committer_token: ${{ github.token }}
           user: ${{ github.repository_owner }}
           base: header, activity,community,repositories
           committer_branch: metrics
