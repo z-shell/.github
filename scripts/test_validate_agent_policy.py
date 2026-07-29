@@ -1477,6 +1477,44 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_public_repository_declares_proposed_zsh_standard_adr(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["decision-0015"],
+            {
+                "id": "decision-0015",
+                "path": "decisions/0015-zsh-scripting-standard.md",
+                "kind": "decision",
+                "authority": "canonical-detail",
+                "consumers": ["codex", "claude-code", "copilot", "human"],
+                "tasks": ["architecture-decision", "zsh-standard"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
+        )
+
+        adr = (
+            PUBLIC_ROOT / "decisions/0015-zsh-scripting-standard.md"
+        ).read_text()
+        required = (
+            "# 15. Adopt an organization-wide Zsh scripting standard",
+            "**Status:** PROPOSED",
+            "**Deciders:** Pending maintainer acceptance",
+            "Zsh 5.9.2",
+            "per-repository compatibility floor",
+            "generated, digest-checked delivery",
+            "ShellCheck is not used for Zsh",
+        )
+        for fragment in required:
+            self.assertIn(fragment, adr)
+        self.assertNotIn("**Status:** ACCEPTED", adr)
+
     def test_public_manifest_routes_recurring_operations_runbook(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()

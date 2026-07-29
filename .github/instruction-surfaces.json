@@ -716,6 +716,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0015",
+      "path": "decisions/0015-zsh-scripting-standard.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "human"],
+      "tasks": ["architecture-decision", "zsh-standard"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "agent-policy-validator",
       "path": "scripts/validate-agent-policy.py",
       "kind": "enforcement",
