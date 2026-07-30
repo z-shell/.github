@@ -1477,6 +1477,44 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_public_manifest_routes_zsh_scripting_standard(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        self.assertEqual(
+            surfaces["instruction-zsh-scripting"]["tasks"],
+            ["all"],
+        )
+        self.assertEqual(
+            surfaces["instruction-zsh-scripting"]["canonical_for"],
+            ["zsh-scripting"],
+        )
+        self.assertEqual(
+            surfaces["zsh-standard-policy"]["canonical_for"],
+            [
+                "zsh-release-metadata",
+                "zsh-rule-metadata",
+                "zsh-source-classification",
+            ],
+        )
+        self.assertEqual(
+            surfaces["zsh-standard-validator"]["canonical_for"],
+            ["zsh-standard-validation"],
+        )
+
+    def test_public_policy_requires_zsh_standard_for_read_and_write(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        required = (
+            "reading, reviewing, diagnosing, creating, or changing Zsh source",
+            ".github/instructions/zsh-scripting.instructions.md",
+            "current released official Zsh manual",
+            "Native Zsh validity",
+            "does not authorize unrelated cleanup",
+        )
+        for fragment in required:
+            self.assertIn(fragment, policy)
+
     def test_public_repository_declares_proposed_zsh_standard_adr(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
@@ -1670,6 +1708,11 @@ class PublicRepositoryTests(unittest.TestCase):
             "      - name: Run agent policy unit tests\n"
             "        run: python3 -m unittest "
             "scripts/test_validate_agent_policy.py -v\n",
+            "      - name: Run Zsh standard policy unit tests\n"
+            "        run: python3 -m unittest "
+            "scripts/test_validate_zsh_standard_policy.py -v\n",
+            "      - name: Validate Zsh standard policy\n"
+            "        run: python3 scripts/validate-zsh-standard-policy.py\n",
             "      - name: Validate agent policy\n"
             "        run: python3 scripts/validate-agent-policy.py\n",
         )
@@ -1695,6 +1738,9 @@ class PublicRepositoryTests(unittest.TestCase):
             "runbooks/**",
             "scripts/validate-agent-policy.py",
             "scripts/test_validate_agent_policy.py",
+            "lib/zsh-standard-policy.json",
+            "scripts/validate-zsh-standard-policy.py",
+            "scripts/test_validate_zsh_standard_policy.py",
         )
         for path in filtered_paths:
             self.assertEqual(workflow.count(f'      - "{path}"'), 2, path)

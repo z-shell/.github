@@ -136,16 +136,30 @@
       "canonical_for": ["tool-integration-guidance"]
     },
     {
-      "id": "instruction-shell",
+      "id": "instruction-shell-dialect-dispatch",
       "path": ".github/instructions/shell.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
-      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "consumers": ["codex", "claude-code", "copilot", "human"],
       "tasks": ["shell"],
       "file_patterns": ["**/*.sh"],
       "required": true,
       "review_owner": "z-shell maintainers",
-      "canonical_for": ["shell"]
+      "canonical_for": ["shell-dialect-dispatch"]
+    },
+    {
+      "id": "instruction-zsh-scripting",
+      "path": ".github/instructions/zsh-scripting.instructions.md",
+      "kind": "scoped-guidance",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "human"],
+      "tasks": ["all"],
+      "file_patterns": [
+        "**/*.zsh,**/*.plugin.zsh,**/*.zsh-theme,**/*.zunit,**/.zshenv,**/.zprofile,**/.zshrc,**/.zlogin,**/.zlogout,**/zshenv,**/zprofile,**/zshrc,**/zlogin,**/zlogout,**/functions/**,**/completions/**/_*"
+      ],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["zsh-scripting"]
     },
     {
       "id": "instruction-testing",
@@ -726,6 +740,34 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": []
+    },
+    {
+      "id": "zsh-standard-policy",
+      "path": "lib/zsh-standard-policy.json",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "human", "ci"],
+      "tasks": ["instruction-change", "zsh-standard"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": [
+        "zsh-release-metadata",
+        "zsh-rule-metadata",
+        "zsh-source-classification"
+      ]
+    },
+    {
+      "id": "zsh-standard-validator",
+      "path": "scripts/validate-zsh-standard-policy.py",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["human", "ci"],
+      "tasks": ["instruction-change", "zsh-standard-validation"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["zsh-standard-validation"]
     },
     {
       "id": "agent-policy-validator",

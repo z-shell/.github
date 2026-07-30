@@ -19,8 +19,11 @@ on:
       - ".github/workflows/agent-instructions.yml"
       - "decisions/**"
       - "runbooks/**"
+      - "lib/zsh-standard-policy.json"
       - "scripts/validate-agent-policy.py"
       - "scripts/test_validate_agent_policy.py"
+      - "scripts/validate-zsh-standard-policy.py"
+      - "scripts/test_validate_zsh_standard_policy.py"
   push:
     branches:
       - main
@@ -41,8 +44,11 @@ on:
       - ".github/workflows/agent-instructions.yml"
       - "decisions/**"
       - "runbooks/**"
+      - "lib/zsh-standard-policy.json"
       - "scripts/validate-agent-policy.py"
       - "scripts/test_validate_agent_policy.py"
+      - "scripts/validate-zsh-standard-policy.py"
+      - "scripts/test_validate_zsh_standard_policy.py"
 
 permissions:
   contents: read
@@ -66,6 +72,12 @@ jobs:
 
       - name: Run agent policy unit tests
         run: python3 -m unittest scripts/test_validate_agent_policy.py -v
+
+      - name: Run Zsh standard policy unit tests
+        run: python3 -m unittest scripts/test_validate_zsh_standard_policy.py -v
+
+      - name: Validate Zsh standard policy
+        run: python3 scripts/validate-zsh-standard-policy.py
 
       - name: Validate agent policy
         run: python3 scripts/validate-agent-policy.py
