@@ -60,6 +60,67 @@ RULE_KEYS = (
     "evidence",
     "enforcement",
 )
+NORMATIVE_RULE_IDS = (
+    "zsh/authority/released-manual",
+    "zsh/compatibility/respect-floor",
+    "zsh/compatibility/annotate-version-sensitive",
+    "zsh/context/classify",
+    "zsh/context/select-profile",
+    "zsh/context/no-cross-dialect-defaults",
+    "zsh/review/report-without-rewrite",
+    "zsh/change/conform-touched-code",
+    "zsh/standalone/initialize",
+    "zsh/standalone/no-startup-state",
+    "zsh/sourced/preserve-caller-state",
+    "zsh/autoload/initialize",
+    "zsh/autoload/suppress-alias-expansion",
+    "zsh/completion/preserve-trust-boundaries",
+    "zsh/test/isolate-environment",
+    "zsh/test/declare-negative-fixtures",
+    "zsh/test/match-production-profile",
+    "zsh/options/declare-correctness-state",
+    "zsh/options/localize",
+    "zsh/options/no-top-level-leak",
+    "zsh/options/no-blanket-error-mode",
+    "zsh/options/constrain-multios",
+    "zsh/parameters/declare-scope",
+    "zsh/parameters/account-dynamic-scope",
+    "zsh/arrays/declare-kind",
+    "zsh/arrays/native-indexing",
+    "zsh/expansion/preserve-boundaries",
+    "zsh/expansion/use-native-word-splitting",
+    "zsh/quoting/quote-boundaries",
+    "zsh/associative/deterministic-order",
+    "zsh/patterns/declare-interpretation",
+    "zsh/conditions/use-native-form",
+    "zsh/conditions/declare-match-mode",
+    "zsh/arithmetic/handle-zero-status",
+    "zsh/arithmetic/validate-input",
+    "zsh/arithmetic/declare-base",
+    "zsh/status/check-critical",
+    "zsh/status/check-pipeline-components",
+    "zsh/status/preserve-command-substitution",
+    "zsh/cleanup/scope-traps",
+    "zsh/cleanup/use-always",
+    "zsh/output/literal-vs-formatted",
+    "zsh/input/raw-mode",
+    "zsh/operands/end-options",
+    "zsh/redirection/order-and-quote",
+    "zsh/fd/close-allocated",
+    "zsh/security/treat-strings-as-data",
+    "zsh/security/no-unreviewed-reevaluation",
+    "zsh/security/no-restricted-shell-sandbox",
+    "zsh/security/trust-paths",
+    "zsh/security/no-passive-network",
+    "zsh/plugin/document-global-state",
+    "zsh/plugin/restore-state",
+    "zsh/documentation/comment-invariants",
+    "zsh/documentation/track-deferred-work",
+    "zsh/validation/native-authority",
+    "zsh/validation/no-shellcheck",
+    "zsh/validation/parser-gap",
+    "zsh/formatting/no-unproven-rewrite",
+)
 RULE_ID = re.compile(r"^zsh/[a-z0-9-]+(?:/[a-z0-9-]+)+$")
 VERSION = re.compile(r"^[0-9]+(?:\.[0-9]+)+$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -284,10 +345,14 @@ def _is_non_empty_string(value: object) -> bool:
 def _official_url(value: object) -> bool:
     if not isinstance(value, str):
         return False
-    parsed = urlparse(value)
+    try:
+        parsed = urlparse(value)
+        hostname = parsed.hostname
+    except ValueError:
+        return False
     return (
         parsed.scheme == "https"
-        and parsed.hostname == "zsh.sourceforge.io"
+        and hostname == "zsh.sourceforge.io"
         and not parsed.username
         and not parsed.password
     )
@@ -296,10 +361,14 @@ def _official_url(value: object) -> bool:
 def _https_url(value: object) -> bool:
     if not isinstance(value, str):
         return False
-    parsed = urlparse(value)
+    try:
+        parsed = urlparse(value)
+        hostname = parsed.hostname
+    except ValueError:
+        return False
     return (
         parsed.scheme == "https"
-        and bool(parsed.hostname)
+        and bool(hostname)
         and not parsed.username
         and not parsed.password
     )
@@ -535,6 +604,14 @@ def _validate_rules(
         errors.append("$.normative_rules: must be a non-empty array")
         return
     rules = cast(list[object], value)
+    rule_ids = tuple(
+        rule.get("id") if isinstance(rule, dict) else None for rule in rules
+    )
+    if rule_ids != NORMATIVE_RULE_IDS:
+        errors.append(
+            "$.normative_rules: rule IDs must match the exact canonical ordered "
+            "inventory"
+        )
     seen_ids: set[str] = set()
     profile_order = {profile: index for index, profile in enumerate(PROFILE_IDS)}
     enforcement_order = {
@@ -854,15 +931,71 @@ def _apply_to_values(text: str) -> list[str]:
     return values
 
 
-def _metadata_values(value: str) -> list[str]:
-    return re.findall(r"`([^`]*)`", value)
+def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
+    """Return Markdown lines outside fenced code and HTML comments."""
+
+    visible_lines: list[tuple[int, str]] = []
+    in_comment = False
+    fence_character: str | None = None
+    fence_length = 0
+    for line_number, raw_line in enumerate(text.splitlines(), start=1):
+        line = raw_line
+        visible_parts: list[str] = []
+        contained_comment = False
+        cursor = 0
+        while cursor < len(line):
+            if in_comment:
+                comment_end = line.find("-->", cursor)
+                contained_comment = True
+                if comment_end == -1:
+                    cursor = len(line)
+                    break
+                in_comment = False
+                cursor = comment_end + len("-->")
+                continue
+            comment_start = line.find("<!--", cursor)
+            if comment_start == -1:
+                visible_parts.append(line[cursor:])
+                cursor = len(line)
+                break
+            visible_parts.append(line[cursor:comment_start])
+            contained_comment = True
+            in_comment = True
+            cursor = comment_start + len("<!--")
+
+        visible_line = "".join(visible_parts)
+        if contained_comment and visible_line.strip():
+            visible_line = f"{visible_line} <html-comment>"
+        stripped = visible_line.lstrip()
+        if fence_character is not None:
+            if re.fullmatch(
+                rf"{re.escape(fence_character)}{{{fence_length},}}\s*",
+                stripped,
+            ):
+                fence_character = None
+                fence_length = 0
+            continue
+        fence_match = re.match(r"^(`{3,}|~{3,})", stripped)
+        if fence_match is not None:
+            fence_character = fence_match.group(1)[0]
+            fence_length = len(fence_match.group(1))
+            continue
+        visible_lines.append((line_number, visible_line))
+    return visible_lines
+
+
+def _metadata_values(value: str) -> list[str] | None:
+    if re.fullmatch(r"`[^`]+`(?:, `[^`]+`)*", value) is None:
+        return None
+    return re.findall(r"`([^`]+)`", value)
 
 
 def _markdown_rules(
     text: str,
 ) -> tuple[list[dict[str, object]], list[str]]:
-    lines = text.splitlines()
+    lines = _visible_markdown_lines(text)
     heading = re.compile(r"^### `([^`]+)`$")
+    h3_heading = re.compile(r"^###(?:\s|$)")
     metadata_names = (
         "Level",
         "Profiles",
@@ -873,24 +1006,45 @@ def _markdown_rules(
     )
     parsed: list[dict[str, object]] = []
     errors: list[str] = []
-    for index, line in enumerate(lines):
+    for line_number, line in lines:
+        if h3_heading.match(line) and heading.fullmatch(line) is None:
+            errors.append(f"malformed rule heading at line {line_number}")
+    for index, (_, line) in enumerate(lines):
         match = heading.fullmatch(line)
         if match is None:
             continue
         rule_id = match.group(1)
         metadata: dict[str, list[str]] = {}
         cursor = index + 1
-        while cursor < len(lines) and not lines[cursor].strip():
+        while cursor < len(lines) and not lines[cursor][1].strip():
             cursor += 1
         for name in metadata_names:
             prefix = f"- {name}: "
-            if cursor >= len(lines) or not lines[cursor].startswith(prefix):
+            if cursor >= len(lines) or not lines[cursor][1].startswith(prefix):
                 errors.append(f"{rule_id}: missing or reordered {name} metadata")
                 break
-            metadata[name] = _metadata_values(lines[cursor][len(prefix) :])
+            values = _metadata_values(lines[cursor][1][len(prefix) :])
+            if values is None:
+                errors.append(f"{rule_id}: noncanonical {name} metadata")
+                break
+            metadata[name] = values
             cursor += 1
         if len(metadata) != len(metadata_names):
             continue
+        duplicate_cursor = cursor
+        while duplicate_cursor < len(lines):
+            candidate = lines[duplicate_cursor][1]
+            if candidate.startswith("## ") or candidate.startswith("### "):
+                break
+            duplicate_match = re.match(
+                r"- (Level|Profiles|Minimum Zsh|Basis|Evidence|Enforcement):",
+                candidate,
+            )
+            if duplicate_match is not None:
+                errors.append(
+                    f"{rule_id}: duplicate {duplicate_match.group(1)} metadata"
+                )
+            duplicate_cursor += 1
         minimum_values = metadata["Minimum Zsh"]
         minimum: str | None | object
         if minimum_values == ["null"]:
@@ -1089,12 +1243,87 @@ def validate_manifest_contract(
                 "restore the public surface inventory",
             )
         ]
+    expected_surfaces = _expected_manifest_surfaces(apply_to)
     surfaces: dict[str, list[dict[str, object]]] = {}
+    surface_items: list[dict[str, object]] = []
     for item in surface_values:
         if isinstance(item, dict) and isinstance(item.get("id"), str):
             surface = cast(dict[str, object], item)
+            surface_items.append(surface)
             surfaces.setdefault(cast(str, surface["id"]), []).append(surface)
-    for surface_id, expected in _expected_manifest_surfaces(apply_to).items():
+    canonical_paths = {
+        cast(str, expected["path"]): surface_id
+        for surface_id, expected in expected_surfaces.items()
+    }
+    canonical_owners = {
+        owner: surface_id
+        for surface_id, expected in expected_surfaces.items()
+        for owner in cast(list[str], expected["canonical_for"])
+    }
+    for surface in surface_items:
+        surface_id = cast(str, surface["id"])
+        if surface_id == "instruction-shell":
+            errors.append(
+                error(
+                    MANIFEST_PATH,
+                    "legacy surface id 'instruction-shell' aliases the shell "
+                    "dispatcher",
+                    "remove the legacy alias and keep "
+                    "instruction-shell-dialect-dispatch",
+                )
+            )
+        if surface_id in expected_surfaces:
+            continue
+        surface_path = surface.get("path")
+        if isinstance(surface_path, str) and surface_path in canonical_paths:
+            errors.append(
+                error(
+                    MANIFEST_PATH,
+                    f"extra surface {_safe_value(surface_id)!r} reuses canonical "
+                    f"contract path {_safe_value(surface_path)!r}",
+                    f"leave that path exclusively owned by "
+                    f"{canonical_paths[surface_path]!r}",
+                )
+            )
+        if surface.get("file_patterns") == [apply_to]:
+            errors.append(
+                error(
+                    MANIFEST_PATH,
+                    f"extra surface {_safe_value(surface_id)!r} reuses canonical "
+                    "Zsh file_patterns",
+                    "leave the policy-derived Zsh pattern on instruction-zsh-scripting",
+                )
+            )
+        owners = surface.get("canonical_for")
+        if isinstance(owners, list):
+            for owner in owners:
+                if isinstance(owner, str) and owner in canonical_owners:
+                    errors.append(
+                        error(
+                            MANIFEST_PATH,
+                            f"extra surface {_safe_value(surface_id)!r} reuses "
+                            f"canonical ownership value {_safe_value(owner)!r}",
+                            f"leave that value exclusively owned by "
+                            f"{canonical_owners[owner]!r}",
+                        )
+                    )
+    for owner, expected_owner in canonical_owners.items():
+        actual_owners = [
+            cast(str, surface["id"])
+            for surface in surface_items
+            if isinstance(surface.get("canonical_for"), list)
+            and owner in cast(list[object], surface["canonical_for"])
+        ]
+        if len(actual_owners) > 1:
+            errors.append(
+                error(
+                    MANIFEST_PATH,
+                    f"canonical ownership value {_safe_value(owner)!r} has duplicate "
+                    f"owners {_safe_value(actual_owners)!r}",
+                    f"leave it exclusively owned by {expected_owner!r}",
+                )
+            )
+    for surface_id, expected in expected_surfaces.items():
         matches = surfaces.get(surface_id, [])
         if len(matches) != 1:
             errors.append(
@@ -1180,27 +1409,66 @@ def validate_shell_dispatcher(root: Path) -> list[str]:
                     "restore the required shell dispatcher statement",
                 )
             )
-    folded = text.casefold()
-    prohibited = (
-        ("#!/bin/bash", "remove the default Bash shebang"),
-        (
-            "always enable `set -euo pipefail`",
-            "replace blanket error-mode guidance with dialect-specific choices",
-        ),
-        (
-            "validate zsh with shellcheck",
-            "state that ShellCheck is not used for Zsh",
-        ),
+    visible_text = " ".join(
+        line.strip() for _, line in _visible_markdown_lines(text) if line.strip()
     )
-    for claim, fix in prohibited:
-        if claim in folded:
-            errors.append(
-                error(
-                    SHELL_DISPATCHER_PATH,
-                    f"prohibited cross-dialect claim {_safe_value(claim)!r}",
-                    fix,
+    clauses = [
+        clause.strip().casefold()
+        for clause in re.split(r"(?<=[.!?;])\s+", visible_text)
+        if clause.strip()
+    ]
+    negation = re.compile(
+        r"\b(?:do not|don't|never|must not|should not|cannot|can't|is not|"
+        r"are not|not|no)\b"
+    )
+    prescription = re.compile(
+        r"\b(?:always|default|every|all|universal(?:ly)?|blanket|must|should|"
+        r"require[ds]?|enable|use|start|begin|prefer|prescribe)\b"
+    )
+    prohibited: list[tuple[str, str]] = []
+    for clause in clauses:
+        if negation.search(clause):
+            continue
+        if (
+            "bash" in clause
+            and ("shebang" in clause or "#!/bin/bash" in clause)
+            and prescription.search(clause)
+        ):
+            prohibited.append(
+                ("default Bash shebang", "remove the default Bash shebang")
+            )
+        if (
+            "set -euo pipefail" in clause
+            and prescription.search(clause)
+        ):
+            prohibited.append(
+                (
+                    "blanket set -euo pipefail",
+                    "replace blanket error-mode guidance with dialect-specific choices",
                 )
             )
+        if (
+            "shellcheck" in clause
+            and "zsh" in clause
+            and re.search(
+                r"\b(?:validate|lint|check|run|use|apply|require|must|should)\b",
+                clause,
+            )
+        ):
+            prohibited.append(
+                (
+                    "ShellCheck for Zsh",
+                    "state that ShellCheck is not used for Zsh",
+                )
+            )
+    for claim, fix in prohibited:
+        errors.append(
+            error(
+                SHELL_DISPATCHER_PATH,
+                f"prohibited cross-dialect prescription {_safe_value(claim)!r}",
+                fix,
+            )
+        )
     return errors
 
 

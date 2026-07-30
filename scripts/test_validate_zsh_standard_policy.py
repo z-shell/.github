@@ -75,6 +75,16 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             encoding="utf-8",
         )
 
+    def instruction_rule_block(self, root: Path, rule_id: str) -> str:
+        path = root / ".github/instructions/zsh-scripting.instructions.md"
+        text = path.read_text(encoding="utf-8")
+        marker = f"### `{rule_id}`"
+        start = text.index(marker)
+        end = text.find("\n### `", start + len(marker))
+        if end == -1:
+            end = len(text)
+        return text[start:end]
+
     def assert_error_contains(self, errors: list[str], *needles: str) -> None:
         self.assertTrue(
             any(all(needle in message for needle in needles) for message in errors),
@@ -170,6 +180,74 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 errors = load_validator().validate(root)
 
                 self.assert_error_contains(errors, expected_path)
+
+    def test_schema_rejects_malformed_urls_and_continues(self) -> None:
+        cases = (
+            ("manual-url", "$.stable_release.manual_url"),
+            ("release-notes-url", "$.stable_release.release_notes_url"),
+            (
+                "documentation-url",
+                "$.documentation_sources.manual-index.url",
+            ),
+            ("source-artifact-url", "$.stable_release.source_artifact.url"),
+        )
+        module = load_validator()
+        for field, expected_path in cases:
+            with self.subTest(field=field):
+                root = self.make_fixture()
+                policy = self.read_policy(root)
+                stable_release = policy["stable_release"]
+                self.assertIsInstance(stable_release, dict)
+                semantic_review = stable_release["semantic_review"]
+                self.assertIsInstance(semantic_review, dict)
+                semantic_review["owner"] = ""
+                if field == "manual-url":
+                    stable_release["manual_url"] = "https://["
+                elif field == "release-notes-url":
+                    stable_release["release_notes_url"] = "https://["
+                elif field == "documentation-url":
+                    sources = policy["documentation_sources"]
+                    self.assertIsInstance(sources, dict)
+                    source = sources["manual-index"]
+                    self.assertIsInstance(source, dict)
+                    source["url"] = "https://["
+                else:
+                    stable_release["source_artifact"] = {
+                        "url": "https://[",
+                        "sha256": "a" * 64,
+                    }
+
+                errors = module.validate_policy_schema(policy)
+
+                self.assert_error_contains(errors, expected_path)
+                self.assert_error_contains(
+                    errors,
+                    "$.stable_release.semantic_review.owner",
+                )
+
+    def test_composed_validation_reports_malformed_urls_by_field(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        stable_release = policy["stable_release"]
+        self.assertIsInstance(stable_release, dict)
+        stable_release["manual_url"] = "https://["
+        stable_release["source_artifact"] = {
+            "url": "https://[",
+            "sha256": "a" * 64,
+        }
+        self.write_policy(root, policy)
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(errors, "$.stable_release.manual_url")
+        self.assert_error_contains(errors, "$.stable_release.source_artifact.url")
+        self.assertFalse(
+            any(
+                "validation could not inspect repository input" in message
+                for message in errors
+            ),
+            errors,
+        )
 
     def test_rejects_nonofficial_documentation_sources(self) -> None:
         cases = (
@@ -334,6 +412,69 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
                 self.assert_error_contains(errors, expected_path, "applyTo")
 
+    def test_rejects_manifest_shadow_and_alias_surfaces(self) -> None:
+        cases = (
+            ("contract-path", "path", "reuses canonical contract path"),
+            (
+                "canonical-ownership",
+                "canonical_for",
+                "reuses canonical ownership value",
+            ),
+            (
+                "zsh-file-pattern",
+                "file_patterns",
+                "reuses canonical Zsh file_patterns",
+            ),
+            ("legacy-id", "id", "legacy surface id 'instruction-shell'"),
+            ("duplicate-owner", "duplicate_owner", "has duplicate owners"),
+        )
+        for name, mutation, expected in cases:
+            with self.subTest(name=name):
+                root = self.make_fixture()
+                path = root / ".github/instruction-surfaces.json"
+                manifest = json.loads(path.read_text(encoding="utf-8"))
+                surfaces = manifest["surfaces"]
+                canonical_zsh = next(
+                    surface
+                    for surface in surfaces
+                    if surface["id"] == "instruction-zsh-scripting"
+                )
+                shadow = {
+                    "id": f"instruction-zsh-shadow-{name}",
+                    "path": ".github/instructions/shadow.instructions.md",
+                    "kind": "scoped-guidance",
+                    "authority": "canonical-detail",
+                    "consumers": ["codex"],
+                    "tasks": ["shell"],
+                    "file_patterns": ["**/*.shadow"],
+                    "required": True,
+                    "review_owner": "z-shell maintainers",
+                    "canonical_for": ["shadow-guidance"],
+                }
+                if mutation == "path":
+                    shadow["path"] = canonical_zsh["path"]
+                elif mutation == "canonical_for":
+                    shadow["canonical_for"] = ["zsh-scripting"]
+                elif mutation == "file_patterns":
+                    shadow["file_patterns"] = canonical_zsh["file_patterns"]
+                elif mutation == "id":
+                    shadow["id"] = "instruction-shell"
+                else:
+                    shadow["canonical_for"] = ["zsh-standard-validation"]
+                surfaces.append(shadow)
+                path.write_text(
+                    json.dumps(manifest, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    ".github/instruction-surfaces.json",
+                    expected,
+                )
+
     def test_rejects_markdown_rule_metadata_drift(self) -> None:
         cases = (
             ("Level", "`required`", "`recommended`"),
@@ -371,6 +512,286 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     field,
                 )
 
+    def test_rejects_coordinated_normative_rule_inventory_drift(self) -> None:
+        def rule_block(text: str, rule_id: str) -> tuple[int, int, str]:
+            marker = f"### `{rule_id}`"
+            start = text.index(marker)
+            end = text.find("\n### `", start + len(marker))
+            if end == -1:
+                end = len(text)
+            return start, end, text[start:end]
+
+        for change in ("deletion", "insertion", "replacement", "reorder"):
+            with self.subTest(change=change):
+                root = self.make_fixture()
+                policy = self.read_policy(root)
+                rules = policy["normative_rules"]
+                self.assertIsInstance(rules, list)
+                instruction_path = (
+                    root / ".github/instructions/zsh-scripting.instructions.md"
+                )
+                text = instruction_path.read_text(encoding="utf-8")
+                first_id = rules[0]["id"]
+                second_id = rules[1]["id"]
+                self.assertIsInstance(first_id, str)
+                self.assertIsInstance(second_id, str)
+
+                if change == "deletion":
+                    rules.pop(0)
+                    start, end, _ = rule_block(text, first_id)
+                    text = text[:start] + text[end:]
+                elif change == "insertion":
+                    inserted_id = "zsh/authority/inserted"
+                    inserted_rule = dict(rules[0])
+                    inserted_rule["id"] = inserted_id
+                    rules.insert(1, inserted_rule)
+                    _, end, block = rule_block(text, first_id)
+                    inserted_block = block.replace(
+                        f"### `{first_id}`",
+                        f"### `{inserted_id}`",
+                        1,
+                    )
+                    text = text[:end] + "\n" + inserted_block + text[end:]
+                elif change == "replacement":
+                    replacement_id = "zsh/authority/replacement"
+                    rules[0]["id"] = replacement_id
+                    text = text.replace(
+                        f"### `{first_id}`",
+                        f"### `{replacement_id}`",
+                        1,
+                    )
+                else:
+                    rules[0], rules[1] = rules[1], rules[0]
+                    first_start, first_end, first_block = rule_block(text, first_id)
+                    second_start, second_end, second_block = rule_block(
+                        text, second_id
+                    )
+                    self.assertEqual(first_end + 1, second_start)
+                    text = (
+                        text[:first_start]
+                        + second_block
+                        + "\n"
+                        + first_block
+                        + text[second_end:]
+                    )
+
+                self.write_policy(root, policy)
+                instruction_path.write_text(text, encoding="utf-8")
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    "$.normative_rules",
+                    "exact canonical ordered inventory",
+                )
+
+    def test_instruction_qualifies_option_localization_exceptions(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(root, "zsh/options/localize")
+        prose = " ".join(block.split())
+
+        for fragment in (
+            "localizes most options, pattern-disable state, and signal traps",
+            "`PRIVILEGED`",
+            "`RESTRICTED`",
+            "`POSIX_TRAPS`",
+            "`LOCAL_TRAPS`",
+            "Handle these exceptions explicitly",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, prose)
+
+    def test_instruction_declares_autoload_loader_and_compilation_modes(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(
+            root,
+            "zsh/autoload/suppress-alias-expansion",
+        )
+
+        self.assertIn("loader", block)
+        self.assertIn("`autoload -Uz name`", block)
+        self.assertIn("`zcompile -U`", block)
+
+    def test_instruction_uses_anonymous_sourced_isolation(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(
+            root,
+            "zsh/sourced/preserve-caller-state",
+        )
+        prose = " ".join(block.split())
+
+        self.assertIn("immediately executed anonymous function", prose)
+        self.assertIn("() {\n  builtin emulate -L zsh", block)
+        self.assertNotIn("plugin_initialize", block)
+
+    def test_instruction_qualifies_standalone_emulation(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(root, "zsh/standalone/initialize")
+        prose = " ".join(block.split())
+
+        self.assertIn(
+            "`emulate -R zsh` resets settable option state to native Zsh defaults",
+            prose,
+        )
+        self.assertIn("documented exceptions", prose)
+        self.assertIn("does not clear other startup-file effects", prose)
+
+    def test_instruction_makes_command_substitution_failure_profile_specific(
+        self,
+    ) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(
+            root,
+            "zsh/status/preserve-command-substitution",
+        )
+        prose = " ".join(block.split())
+
+        self.assertIn("function or sourced context", prose)
+        self.assertIn("value=$(critical_command) || return", block)
+        self.assertIn("standalone top level", prose)
+        self.assertIn("value=$(critical_command) || exit", block)
+
+    def test_instruction_uses_valid_array_boundary_command(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(
+            root,
+            "zsh/expansion/preserve-boundaries",
+        )
+
+        self.assertIn('print -rl -- "${values[@]}"', block)
+        self.assertNotIn('command -- "${values[@]}"', block)
+
+    def test_instruction_printf_example_uses_newline_escape(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(
+            root,
+            "zsh/output/literal-vs-formatted",
+        )
+
+        self.assertIn("printf '%s: %d\\n' \"$label\" \"$count\"", block)
+        self.assertNotIn("printf '%s: %d\\\\n'", block)
+
+    def test_native_authority_uses_precise_existing_evidence(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        rule = next(
+            item
+            for item in rules
+            if item["id"] == "zsh/validation/native-authority"
+        )
+        expected = [
+            "manual-index",
+            "shell-grammar",
+            "options",
+            "shell-builtins",
+        ]
+
+        self.assertEqual(rule["evidence"], expected)
+        block = self.instruction_rule_block(
+            root,
+            "zsh/validation/native-authority",
+        )
+        self.assertIn(
+            "- Evidence: `manual-index`, `shell-grammar`, `options`, "
+            "`shell-builtins`",
+            block,
+        )
+
+    def test_ignores_fenced_or_commented_rule_blocks(self) -> None:
+        wrappers = (
+            ("fenced", "```markdown\n{block}```\n"),
+            ("commented", "<!--\n{block}-->\n"),
+        )
+        for name, wrapper in wrappers:
+            with self.subTest(name=name):
+                root = self.make_fixture()
+                path = root / ".github/instructions/zsh-scripting.instructions.md"
+                text = path.read_text(encoding="utf-8")
+                marker = "### `zsh/options/localize`"
+                start = text.index(marker)
+                end = text.find("\n### `", start + len(marker))
+                self.assertNotEqual(end, -1)
+                block = text[start + len(marker) : end]
+                path.write_text(
+                    text[:start]
+                    + wrapper.format(block=f"{marker}{block}\n")
+                    + text[end + 1 :],
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    ".github/instructions/zsh-scripting.instructions.md",
+                    "one-to-one",
+                )
+
+    def test_rejects_noncanonical_rule_metadata_lines(self) -> None:
+        cases = (
+            (
+                "leading-prose",
+                "- Level: `required`",
+                "- Level: policy says `required`",
+                "Level",
+            ),
+            (
+                "trailing-prose",
+                "- Level: `required`",
+                "- Level: `required` for all changes",
+                "Level",
+            ),
+            (
+                "duplicate-metadata",
+                "- Enforcement: `lint`, `runtime-test`",
+                "- Enforcement: `lint`, `runtime-test`\n- Level: `required`",
+                "duplicate Level",
+            ),
+        )
+        for name, old, new, expected in cases:
+            with self.subTest(name=name):
+                root = self.make_fixture()
+                path = root / ".github/instructions/zsh-scripting.instructions.md"
+                text = path.read_text(encoding="utf-8")
+                marker = "### `zsh/options/localize`"
+                start = text.index(marker)
+                end = text.find("\n### `", start + len(marker))
+                self.assertNotEqual(end, -1)
+                block = text[start:end]
+                self.assertIn(old, block)
+                path.write_text(
+                    text[:start] + block.replace(old, new, 1) + text[end:],
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    ".github/instructions/zsh-scripting.instructions.md",
+                    expected,
+                )
+
+    def test_rejects_malformed_rule_headings(self) -> None:
+        root = self.make_fixture()
+        path = root / ".github/instructions/zsh-scripting.instructions.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n### zsh/malformed/heading\n\nUntracked rule-like prose.\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instructions/zsh-scripting.instructions.md",
+            "malformed rule heading",
+        )
+
     def test_rejects_unsafe_shell_dispatcher_claims(self) -> None:
         cases = (
             ("default-bash", "\nStart with `#!/bin/bash` by default.\n"),
@@ -392,6 +813,68 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     errors,
                     ".github/instructions/shell.instructions.md",
                 )
+
+    def test_rejects_paraphrased_shell_dispatcher_prescriptions(self) -> None:
+        cases = (
+            ("default-bash", "\nDefault new scripts to a Bash shebang.\n"),
+            (
+                "blanket-strict",
+                "\nEnable `set -euo pipefail` in every shell script.\n",
+            ),
+            (
+                "shellcheck-zsh",
+                "\nRun ShellCheck against Zsh sources before committing.\n",
+            ),
+            (
+                "negated-clause-then-bash",
+                "\nDo not lint POSIX sh; default new scripts to a Bash shebang.\n",
+            ),
+            (
+                "negated-clause-then-strict",
+                "\nDo not use strict mode for POSIX sh; enable "
+                "`set -euo pipefail` in every Zsh script.\n",
+            ),
+            (
+                "negated-clause-then-shellcheck",
+                "\nDo not validate Bash with ShellCheck; run ShellCheck "
+                "against Zsh sources.\n",
+            ),
+        )
+        for name, addition in cases:
+            with self.subTest(name=name):
+                root = self.make_fixture()
+                path = root / ".github/instructions/shell.instructions.md"
+                path.write_text(
+                    path.read_text(encoding="utf-8") + addition,
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    ".github/instructions/shell.instructions.md",
+                    "prohibited cross-dialect prescription",
+                )
+
+    def test_accepts_explicitly_negated_shell_dispatcher_claims(self) -> None:
+        additions = (
+            "\nDo not use `#!/bin/bash` as a default.\n",
+            "\nNever prescribe `set -euo pipefail` universally.\n",
+            "\nDo not validate Zsh with ShellCheck.\n",
+        )
+        for addition in additions:
+            with self.subTest(addition=addition):
+                root = self.make_fixture()
+                path = root / ".github/instructions/shell.instructions.md"
+                path.write_text(
+                    path.read_text(encoding="utf-8") + addition,
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assertEqual(errors, [])
 
     def test_rejects_symlinked_or_escaping_contract_files(self) -> None:
         root = self.make_fixture()

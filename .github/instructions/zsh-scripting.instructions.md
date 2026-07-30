@@ -189,8 +189,10 @@ emulate -R zsh
 setopt pipe_fail
 ```
 
-`emulate -R zsh` resets standalone state. Reusable functions instead begin with
-`builtin emulate -L zsh` to localize their state.
+`emulate -R zsh` resets settable option state to native Zsh defaults, subject
+to documented exceptions; it does not clear other startup-file effects.
+Reusable functions instead begin with `builtin emulate -L zsh` to localize
+their state.
 
 ### `zsh/standalone/no-startup-state`
 
@@ -221,15 +223,15 @@ plugin effects.
 
 Do not use top-level `emulate -L zsh` as isolation. `-L` localizes state only
 for the surrounding function, so at sourced top level it can still alter the
-caller. Put option-sensitive work inside a function:
+caller. Put option-sensitive work inside an immediately executed anonymous
+function:
 
 ```zsh
-plugin_initialize() {
+() {
   builtin emulate -L zsh
   setopt local_options
   # Reusable work.
 }
-plugin_initialize
 ```
 
 ## Autoload functions and completions
@@ -255,7 +257,10 @@ narrowly justified early-return guard may precede it.
 - Evidence: `functions`
 - Enforcement: `human-review`
 
-Load autoload functions with alias suppression, normally `autoload -U`.
+At the loader, select the declared autoload file form. For a bare Zsh-style
+function body, normally use `autoload -Uz name` so loading selects Zsh form and
+suppresses alias expansion. Compile autoload artifacts with `zcompile -U` so
+the compiled form also records alias suppression.
 
 ### `zsh/completion/preserve-trust-boundaries`
 
@@ -332,9 +337,11 @@ inheriting unknown state.
 - Enforcement: `lint`, `runtime-test`
 
 Place option-sensitive reusable work in a function beginning with
-`builtin emulate -L zsh`. The `-L` flag localizes options, pattern-disable
-state, and traps only for the surrounding function; it does not make a sourced
-top level safe.
+`builtin emulate -L zsh`. `-L` localizes most options, pattern-disable state,
+and signal traps in the surrounding function. `PRIVILEGED` and `RESTRICTED`
+are documented option exceptions. When `POSIX_TRAPS` is set, `LOCAL_TRAPS`
+does not localize an `EXIT` trap. Handle these exceptions explicitly; `-L`
+does not make a sourced top level safe.
 
 ### `zsh/options/no-top-level-leak`
 
@@ -441,7 +448,7 @@ empty values.
 
 ```zsh
 typeset -a values=( "one value" "" three )
-command -- "${values[@]}"
+print -rl -- "${values[@]}"
 ```
 
 ### `zsh/expansion/use-native-word-splitting`
@@ -601,11 +608,19 @@ typeset -a statuses=( "${pipestatus[@]}" )
 - Enforcement: `lint`, `runtime-test`
 
 Separate a status-sensitive command substitution assignment from declaration
-forms that replace its status:
+forms that replace its status. In a function or sourced context:
 
 ```zsh
 typeset value
 value=$(critical_command) || return
+```
+
+At a standalone top level, use `exit` or another explicit top-level failure
+handler:
+
+```zsh
+typeset value
+value=$(critical_command) || exit
 ```
 
 ### `zsh/cleanup/scope-traps`
@@ -817,7 +832,7 @@ item.
 - Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
-- Evidence: `manual-index`, `shell-grammar`
+- Evidence: `manual-index`, `shell-grammar`, `options`, `shell-builtins`
 - Enforcement: `native-syntax`, `human-review`
 
 Distinguish native-invalid Zsh from supplemental-tool limitations and treat

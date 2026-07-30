@@ -618,7 +618,7 @@
       "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
-      "evidence": ["manual-index", "shell-grammar"],
+      "evidence": ["manual-index", "shell-grammar", "options", "shell-builtins"],
       "enforcement": ["native-syntax", "human-review"]
     },
     {
