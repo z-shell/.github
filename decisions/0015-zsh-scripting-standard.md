@@ -29,8 +29,8 @@ the current stable release. No global fallback floor is inferred.
 
 The standard distinguishes five source classes: `standalone-executable`,
 `startup-file`, `sourced-library`, `autoload-function`, and `test-fixture`.
-These startup and shutdown files intentionally configure shell state for their
-lifecycle phase, unlike caller-preserving sourced libraries.
+These startup and shutdown files are read by Zsh for defined lifecycle phases
+and may make phase-owned effects, unlike caller-preserving sourced libraries.
 
 Detailed normative prose lives in
 `.github/instructions/zsh-scripting.instructions.md`. Machine-readable release,

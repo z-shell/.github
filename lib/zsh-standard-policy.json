@@ -91,7 +91,7 @@
     },
     "startup-file": {
       "title": "Startup file",
-      "description": "A Zsh startup or shutdown file that configures shell state for its lifecycle phase."
+      "description": "A Zsh startup or shutdown file read for a defined shell lifecycle phase that may make phase-owned effects."
     },
     "sourced-library": {
       "title": "Sourced library",
@@ -246,7 +246,7 @@
     {
       "id": "zsh/completion/preserve-trust-boundaries",
       "level": "required",
-      "profiles": ["autoload-function"],
+      "profiles": ["startup-file", "autoload-function"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["completion-system", "functions"],
@@ -291,7 +291,7 @@
     {
       "id": "zsh/options/localize",
       "level": "required",
-      "profiles": ["sourced-library", "autoload-function"],
+      "profiles": ["startup-file", "sourced-library", "autoload-function"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-builtins", "options"],

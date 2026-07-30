@@ -40,13 +40,30 @@ STABLE_RELEASE_KEYS = (
     "semantic_review",
     "source_artifact",
 )
-PROFILE_IDS = (
-    "standalone-executable",
-    "startup-file",
-    "sourced-library",
-    "autoload-function",
-    "test-fixture",
-)
+EXECUTION_PROFILE_METADATA = {
+    "standalone-executable": (
+        "Standalone executable",
+        "A directly invoked Zsh program that owns its initial shell state.",
+    ),
+    "startup-file": (
+        "Startup file",
+        "A Zsh startup or shutdown file read for a defined shell lifecycle "
+        "phase that may make phase-owned effects.",
+    ),
+    "sourced-library": (
+        "Sourced library",
+        "A plugin or library loaded into and required to preserve caller state.",
+    ),
+    "autoload-function": (
+        "Autoload function",
+        "A function body loaded through Zsh autoload, including completions.",
+    ),
+    "test-fixture": (
+        "Test fixture",
+        "A Zsh test or fixture evaluated under an explicit production profile.",
+    ),
+}
+PROFILE_IDS = tuple(EXECUTION_PROFILE_METADATA)
 LEVELS = ("required", "recommended", "review")
 BASES = ("language-semantics", "organization-policy", "mixed")
 ENFORCEMENT_KINDS = (
@@ -125,6 +142,61 @@ NORMATIVE_RULE_IDS = (
     "zsh/validation/no-shellcheck",
     "zsh/validation/parser-gap",
     "zsh/formatting/no-unproven-rewrite",
+)
+STARTUP_PROFILE_RULE_IDS = (
+    "zsh/authority/released-manual",
+    "zsh/compatibility/respect-floor",
+    "zsh/compatibility/annotate-version-sensitive",
+    "zsh/context/classify",
+    "zsh/context/select-profile",
+    "zsh/context/no-cross-dialect-defaults",
+    "zsh/review/report-without-rewrite",
+    "zsh/change/conform-touched-code",
+    "zsh/completion/preserve-trust-boundaries",
+    "zsh/options/declare-correctness-state",
+    "zsh/options/localize",
+    "zsh/options/no-blanket-error-mode",
+    "zsh/options/constrain-multios",
+    "zsh/parameters/declare-scope",
+    "zsh/parameters/account-dynamic-scope",
+    "zsh/arrays/declare-kind",
+    "zsh/arrays/native-indexing",
+    "zsh/expansion/preserve-boundaries",
+    "zsh/expansion/use-native-word-splitting",
+    "zsh/quoting/quote-boundaries",
+    "zsh/associative/deterministic-order",
+    "zsh/patterns/declare-interpretation",
+    "zsh/conditions/use-native-form",
+    "zsh/conditions/declare-match-mode",
+    "zsh/arithmetic/handle-zero-status",
+    "zsh/arithmetic/validate-input",
+    "zsh/arithmetic/declare-base",
+    "zsh/status/check-critical",
+    "zsh/status/check-pipeline-components",
+    "zsh/status/preserve-command-substitution",
+    "zsh/cleanup/scope-traps",
+    "zsh/cleanup/use-always",
+    "zsh/output/literal-vs-formatted",
+    "zsh/input/raw-mode",
+    "zsh/operands/end-options",
+    "zsh/redirection/order-and-quote",
+    "zsh/fd/close-allocated",
+    "zsh/security/treat-strings-as-data",
+    "zsh/security/no-unreviewed-reevaluation",
+    "zsh/security/no-restricted-shell-sandbox",
+    "zsh/security/trust-paths",
+    "zsh/documentation/comment-invariants",
+    "zsh/documentation/track-deferred-work",
+    "zsh/validation/native-authority",
+    "zsh/validation/no-shellcheck",
+    "zsh/validation/parser-gap",
+    "zsh/formatting/no-unproven-rewrite",
+)
+TRUST_PATH_EVIDENCE = (
+    "command-execution",
+    "shell-builtins",
+    "functions",
+    "completion-system",
 )
 RULE_ID = re.compile(r"^zsh/[a-z0-9-]+(?:/[a-z0-9-]+)+$")
 VERSION = re.compile(r"^[0-9]+(?:\.[0-9]+)+$")
@@ -569,12 +641,19 @@ def _validate_profiles(
             errors,
         )
         if profile is not None:
-            for field in ("title", "description"):
-                if not _is_non_empty_string(profile.get(field)):
-                    errors.append(
-                        f"$.execution_profiles.{profile_id}.{field}: must be a "
-                        "non-empty string"
-                    )
+            expected_title, expected_description = EXECUTION_PROFILE_METADATA[
+                profile_id
+            ]
+            if profile.get("title") != expected_title:
+                errors.append(
+                    f"$.execution_profiles.{profile_id}.title: must match the "
+                    "canonical profile title"
+                )
+            if profile.get("description") != expected_description:
+                errors.append(
+                    f"$.execution_profiles.{profile_id}.description: must "
+                    "match the canonical profile description"
+                )
     return set(profiles).intersection(PROFILE_IDS)
 
 
@@ -621,6 +700,18 @@ def _validate_rules(
         errors.append(
             "$.normative_rules: rule IDs must match the exact canonical ordered "
             "inventory"
+        )
+    startup_memberships = tuple(
+        rule.get("id")
+        for rule in rules
+        if isinstance(rule, dict)
+        and isinstance(rule.get("profiles"), list)
+        and "startup-file" in rule["profiles"]
+    )
+    if startup_memberships != STARTUP_PROFILE_RULE_IDS:
+        errors.append(
+            "$.normative_rules: startup-file memberships must match the exact "
+            "canonical ordered rule inventory"
         )
     seen_ids: set[str] = set()
     profile_order = {profile: index for index, profile in enumerate(PROFILE_IDS)}
@@ -688,6 +779,13 @@ def _validate_rules(
                         f"{path}.evidence: unknown evidence "
                         f"{_safe_value(evidence_id)}"
                     )
+        if rule_id == "zsh/security/trust-paths" and tuple(
+            rule_evidence or ()
+        ) != TRUST_PATH_EVIDENCE:
+            errors.append(
+                f"{path}.evidence for zsh/security/trust-paths: must match "
+                "the exact canonical trust-path evidence"
+            )
 
         enforcement = _string_array(
             rule.get("enforcement"),
@@ -1000,6 +1098,36 @@ def _metadata_values(value: str) -> list[str] | None:
     return re.findall(r"`([^`]+)`", value)
 
 
+def _documentation_reference_index_errors(text: str) -> list[str]:
+    """Validate the exact visible Markdown documentation-source registry."""
+
+    lines = _visible_markdown_lines(text)
+    heading = "## Official documentation reference index"
+    heading_indexes = [
+        index for index, (_, line) in enumerate(lines) if line == heading
+    ]
+    problem = (
+        "official documentation reference index must match the exact ordered "
+        "registry"
+    )
+    if len(heading_indexes) != 1:
+        return [problem]
+
+    actual_lines: list[str] = []
+    for _, line in lines[heading_indexes[0] + 1 :]:
+        if line.startswith("## "):
+            break
+        if line.strip():
+            actual_lines.append(line)
+    expected_lines = tuple(
+        f"- `{evidence_id}`: [{title}]({url})"
+        for evidence_id, (title, url, _) in DOCUMENTATION_SOURCES.items()
+    )
+    if tuple(actual_lines) != expected_lines:
+        return [problem]
+    return []
+
+
 def _visible_markdown_rule_block(text: str, rule_id: str) -> str | None:
     lines = _visible_markdown_lines(text)
     heading = f"### `{rule_id}`"
@@ -1116,6 +1244,15 @@ def validate_instruction_contract(
                 "missing required autoload compilation form `zcompile -U -z`",
                 "compile autoload artifacts with alias suppression and Zsh "
                 "file style",
+            )
+        )
+    for reference_error in _documentation_reference_index_errors(text):
+        errors.append(
+            error(
+                INSTRUCTION_PATH,
+                reference_error,
+                "restore one visible entry for every canonical documentation "
+                "source in exact order",
             )
         )
     source = policy.get("source_classification")

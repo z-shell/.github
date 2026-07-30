@@ -89,6 +89,26 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             end = len(text)
         return text[start:end]
 
+    def replace_instruction_rule_metadata(
+        self,
+        root: Path,
+        rule_id: str,
+        field: str,
+        values: list[str],
+    ) -> None:
+        path = root / ".github/instructions/zsh-scripting.instructions.md"
+        text = path.read_text(encoding="utf-8")
+        block = self.instruction_rule_block(root, rule_id)
+        prefix = f"- {field}: "
+        old_line = next(
+            line for line in block.splitlines() if line.startswith(prefix)
+        )
+        new_line = prefix + ", ".join(f"`{value}`" for value in values)
+        path.write_text(
+            text.replace(block, block.replace(old_line, new_line, 1), 1),
+            encoding="utf-8",
+        )
+
     def assert_error_contains(self, errors: list[str], *needles: str) -> None:
         self.assertTrue(
             any(all(needle in message for needle in needles) for message in errors),
@@ -136,8 +156,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             {
                 "title": "Startup file",
                 "description": (
-                    "A Zsh startup or shutdown file that configures shell state "
-                    "for its lifecycle phase."
+                    "A Zsh startup or shutdown file read for a defined shell "
+                    "lifecycle phase that may make phase-owned effects."
                 ),
             },
         )
@@ -182,7 +202,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "zsh/context/no-cross-dialect-defaults",
             "zsh/review/report-without-rewrite",
             "zsh/change/conform-touched-code",
+            "zsh/completion/preserve-trust-boundaries",
             "zsh/options/declare-correctness-state",
+            "zsh/options/localize",
             "zsh/options/no-blanket-error-mode",
             "zsh/options/constrain-multios",
             "zsh/parameters/declare-scope",
@@ -228,9 +250,25 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             [rule["id"] for rule in matching_rules],
             expected_rule_ids,
         )
-        self.assertEqual(len(matching_rules), 45)
+        self.assertEqual(len(matching_rules), 47)
         for rule in matching_rules:
             with self.subTest(rule_id=rule["id"]):
+                if rule["id"] == "zsh/completion/preserve-trust-boundaries":
+                    self.assertEqual(
+                        rule["profiles"],
+                        ["startup-file", "autoload-function"],
+                    )
+                    continue
+                if rule["id"] == "zsh/options/localize":
+                    self.assertEqual(
+                        rule["profiles"],
+                        [
+                            "startup-file",
+                            "sourced-library",
+                            "autoload-function",
+                        ],
+                    )
+                    continue
                 standalone_index = rule["profiles"].index(
                     "standalone-executable"
                 )
@@ -283,6 +321,12 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             block,
         )
         self.assertNotIn("`shell-grammar`", block)
+        self.assertIn(
+            "Trust only controlled executable search paths (`$path`), autoload "
+            "search paths (`fpath`), module search paths (`$module_path`), and "
+            "completion directories.",
+            " ".join(block.split()),
+        )
 
     def test_instruction_declares_five_execution_profiles(self) -> None:
         path = PUBLIC_ROOT / ".github/instructions/zsh-scripting.instructions.md"
@@ -310,7 +354,34 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
         self.assertIn("startup or shutdown file", block)
         self.assertIn("lifecycle phase", block)
+        self.assertIn("may make phase-owned effects", block)
         self.assertIn("caller-preserving `sourced-library`", block)
+        self.assertIn(
+            "https://zsh.sourceforge.io/Doc/Release/Files.html",
+            block,
+        )
+        self.assertNotIn("deliberately configures shell state", block)
+        self.assertNotIn("intentionally changes shell state", block)
+
+    def test_startup_rules_explain_completion_and_localization_scope(self) -> None:
+        completion = " ".join(
+            self.instruction_rule_block(
+                PUBLIC_ROOT,
+                "zsh/completion/preserve-trust-boundaries",
+            ).split()
+        )
+        localization = " ".join(
+            self.instruction_rule_block(
+                PUBLIC_ROOT,
+                "zsh/options/localize",
+            ).split()
+        )
+
+        self.assertIn("startup file initializes completion", completion)
+        self.assertIn("autoloaded completion code runs", completion)
+        self.assertIn("reusable function bodies", localization)
+        self.assertIn("temporary function-local work", localization)
+        self.assertIn("not intentional top-level lifecycle effects", localization)
 
     def test_rejects_duplicate_json_keys(self) -> None:
         root = self.make_fixture()
@@ -642,6 +713,165 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "five canonical profiles in order",
         )
 
+    def test_rejects_exact_startup_profile_metadata_drift(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        profiles = policy["execution_profiles"]
+        self.assertIsInstance(profiles, dict)
+        startup = profiles["startup-file"]
+        self.assertIsInstance(startup, dict)
+        startup["description"] = "Another non-empty description."
+        self.write_policy(root, policy)
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            "$.execution_profiles.startup-file.description",
+            "canonical profile description",
+        )
+
+    def test_rejects_coordinated_startup_membership_removal(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        rule = next(
+            item for item in rules if item["id"] == "zsh/security/trust-paths"
+        )
+        rule["profiles"].remove("startup-file")
+        self.write_policy(root, policy)
+        self.replace_instruction_rule_metadata(
+            root,
+            "zsh/security/trust-paths",
+            "Profiles",
+            rule["profiles"],
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            "$.normative_rules",
+            "startup-file memberships",
+            "exact canonical ordered rule inventory",
+        )
+
+    def test_rejects_coordinated_startup_membership_addition(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        rule = next(
+            item
+            for item in rules
+            if item["id"] == "zsh/security/no-passive-network"
+        )
+        rule["profiles"].insert(0, "startup-file")
+        self.write_policy(root, policy)
+        self.replace_instruction_rule_metadata(
+            root,
+            "zsh/security/no-passive-network",
+            "Profiles",
+            rule["profiles"],
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            "$.normative_rules",
+            "startup-file memberships",
+            "exact canonical ordered rule inventory",
+        )
+
+    def test_rejects_coordinated_trust_path_evidence_drift(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        rule = next(
+            item for item in rules if item["id"] == "zsh/security/trust-paths"
+        )
+        rule["evidence"] = [
+            "shell-grammar",
+            "functions",
+            "completion-system",
+        ]
+        self.write_policy(root, policy)
+        self.replace_instruction_rule_metadata(
+            root,
+            "zsh/security/trust-paths",
+            "Evidence",
+            rule["evidence"],
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            "$.normative_rules",
+            "zsh/security/trust-paths",
+            "exact canonical trust-path evidence",
+        )
+
+    def test_rejects_markdown_documentation_reference_index_drift(self) -> None:
+        command_line = (
+            "- `command-execution`: [Command Execution]"
+            "(https://zsh.sourceforge.io/Doc/Release/Command-Execution.html)"
+        )
+        restricted_line = (
+            "- `restricted-shell`: [Restricted Shell]"
+            "(https://zsh.sourceforge.io/Doc/Release/Restricted-Shell.html)"
+        )
+        cases = (
+            ("deletion", ""),
+            (
+                "reordering",
+                f"{command_line}\n{restricted_line}",
+            ),
+            (
+                "relabeling",
+                command_line.replace("Command Execution", "Command Lookup"),
+            ),
+            (
+                "wrong-url",
+                command_line.replace(
+                    "Command-Execution.html",
+                    "Shell-Grammar.html",
+                ),
+            ),
+            ("duplication", f"{command_line}\n{command_line}"),
+            ("fenced-shadowing", f"```text\n{command_line}\n```"),
+            ("commented-shadowing", f"<!-- {command_line} -->"),
+        )
+        for variant, replacement in cases:
+            with self.subTest(variant=variant):
+                root = self.make_fixture()
+                path = (
+                    root
+                    / ".github/instructions/zsh-scripting.instructions.md"
+                )
+                text = path.read_text(encoding="utf-8")
+                if variant == "reordering":
+                    old = f"{restricted_line}\n{command_line}"
+                else:
+                    old = command_line
+                self.assertIn(old, text)
+                path.write_text(
+                    text.replace(old, replacement, 1),
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    ".github/instructions/zsh-scripting.instructions.md",
+                    "official documentation reference index",
+                    "exact ordered registry",
+                )
+
     def test_rejects_apply_to_drift(self) -> None:
         extra_glob = "**/drifted-zsh-source"
         for surface in ("json", "frontmatter", "manifest"):
@@ -765,8 +995,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ("Level", "`required`", "`recommended`"),
             (
                 "Profiles",
-                "`sourced-library`, `autoload-function`",
-                "`autoload-function`",
+                "`startup-file`, `sourced-library`, `autoload-function`",
+                "`startup-file`, `autoload-function`",
             ),
             ("Minimum Zsh", "`null`", "`5.9.2`"),
             ("Basis", "`language-semantics`", "`mixed`"),

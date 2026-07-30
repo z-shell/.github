@@ -1548,7 +1548,9 @@ class PublicRepositoryTests(unittest.TestCase):
             "per-repository compatibility floor",
             "five source classes",
             "`startup-file`",
-            "startup and shutdown files intentionally configure shell state",
+            "startup and shutdown files are read by Zsh for defined "
+            "lifecycle phases",
+            "may make phase-owned effects",
             "caller-preserving sourced libraries",
             "https://zsh.sourceforge.io/Doc/Release/Files.html",
             "generated, digest-checked delivery",

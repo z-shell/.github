@@ -34,15 +34,17 @@ The five profiles are:
 
 - `standalone-executable`: a directly invoked Zsh program that owns initial
   state;
-- `startup-file`: a Zsh-read startup or shutdown file that deliberately
-  configures shell state for its lifecycle phase;
+- `startup-file`: a Zsh startup or shutdown file read for a defined shell
+  lifecycle phase that may make phase-owned effects;
 - `sourced-library`: a plugin or library loaded into caller state;
 - `autoload-function`: an autoloaded function body, including completions;
 - `test-fixture`: a test or fixture evaluated under an explicit production
   profile.
 
-Unlike a caller-preserving `sourced-library`, a `startup-file` intentionally
-changes shell state for its lifecycle phase.
+The official [Startup/Shutdown Files chapter](https://zsh.sourceforge.io/Doc/Release/Files.html)
+defines these lifecycle phases. Unlike a caller-preserving `sourced-library`,
+a `startup-file` may make phase-owned effects without being required to
+configure or change shell state.
 
 Path is evidence, not sole authority. Use path, basename, shebang, invocation,
 repository override, and actual behavior together. Ambiguous or unassigned
@@ -273,13 +275,14 @@ flags.
 ### `zsh/completion/preserve-trust-boundaries`
 
 - Level: `required`
-- Profiles: `autoload-function`
+- Profiles: `startup-file`, `autoload-function`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `completion-system`, `functions`
 - Enforcement: `runtime-test`, `human-review`
 
-Treat `fpath`, completion-directory permissions, modules, and completion
+When a startup file initializes completion or autoloaded completion code runs,
+treat `fpath`, completion-directory permissions, modules, and completion
 dependencies as trust boundaries. Never bypass `compinit` or `compaudit`
 security behavior.
 
@@ -338,7 +341,7 @@ inheriting unknown state.
 ### `zsh/options/localize`
 
 - Level: `required`
-- Profiles: `sourced-library`, `autoload-function`
+- Profiles: `startup-file`, `sourced-library`, `autoload-function`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-builtins`, `options`
@@ -350,6 +353,9 @@ and signal traps in the surrounding function. `PRIVILEGED` and `RESTRICTED`
 are documented option exceptions. When `POSIX_TRAPS` is set, `LOCAL_TRAPS`
 does not localize an `EXIT` trap. Handle these exceptions explicitly; `-L`
 does not make a sourced top level safe.
+
+For `startup-file`, this rule governs reusable function bodies and temporary
+function-local work, not intentional top-level lifecycle effects.
 
 ### `zsh/options/no-top-level-leak`
 
@@ -769,7 +775,8 @@ Never present restricted-shell mode as a security sandbox.
 - Evidence: `command-execution`, `shell-builtins`, `functions`, `completion-system`
 - Enforcement: `runtime-test`, `human-review`
 
-Trust only controlled `PATH`, `fpath`, module, and completion locations.
+Trust only controlled executable search paths (`$path`), autoload search paths
+(`fpath`), module search paths (`$module_path`), and completion directories.
 
 ### `zsh/security/no-passive-network`
 
