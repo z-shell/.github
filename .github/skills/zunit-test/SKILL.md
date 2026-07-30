@@ -32,14 +32,29 @@ source was skipped; a system `zshenv` may still execute.
 ```zsh
 #!/usr/bin/env zunit
 
+typeset -ga saved_fpath
+
 @setup {
   # Runs before each @test; load the plugin as production does.
+  saved_fpath=("${fpath[@]}")
+  typeset -gA Plugins
+  unset 'Plugins[MY_PLUGIN]'
   load "../my-plugin.plugin.zsh"
 }
 
 @teardown {
-  # Runs after each @test; call unload and verify restoration in a test.
-  my-plugin_plugin_unload 2>/dev/null
+  # A lifecycle test can already have invoked the self-destructing function.
+  if (( ${+functions[my-plugin_plugin_unload]} )); then
+    my-plugin_plugin_unload
+  fi
+}
+
+@test 'unload restores state and self-destructs' {
+  my-plugin_plugin_unload
+
+  assert "${(j:|:)fpath}" same_as "${(j:|:)saved_fpath}"
+  assert "${+Plugins[MY_PLUGIN]}" equals 0
+  assert "${+functions[my-plugin_plugin_unload]}" equals 0
 }
 
 @test 'descriptive name of the behavior' {
@@ -54,15 +69,16 @@ source was skipped; a system `zshenv` may still execute.
 
 - `run <cmd>` — execute a command; populates `$state` (exit code), `$output` (combined output), `$lines` (array).
 - Assertions: `assert $state equals 0`, `assert "$output" same_as '...'`, `assert "$output" is_empty`, `assert "$x" contains '...'`, `assert "$path" is_file`, `assert "$x" matches '<regex>'`.
-- Lifecycle blocks: `@setup`, `@teardown`, plus file-level `@setup`/`@teardown` if defined once.
+- A test file may define one `@setup` and one `@teardown`, each running around every test in that file.
 - Result helpers tests can assert against: `pass`, `fail '<msg>'` (state 1), `error '<msg>'` (state 78), `skip '<msg>'` (state 48).
 
 Cross-reference real examples in `z-shell/zunit:tests/` and
 `z-shell/zsh-eza:tests/zsh-eza.zunit`.
 
 Add explicit lifecycle tests for each declared side effect. Assert that unload
-removes only plugin-owned state, preserves pre-existing state, removes the
-`Plugins` key, and self-destructs.
+removes only plugin-owned state, restores the `Plugins` key to its pre-load
+state (absent stays absent and an existing value is restored), and
+self-destructs. Test both key states when the plugin registers one.
 
 Declare each intentional negative fixture in repository metadata under
 `zsh/test/declare-negative-fixtures`. Name the exact fixture and expected

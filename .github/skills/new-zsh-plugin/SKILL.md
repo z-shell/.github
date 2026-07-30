@@ -39,7 +39,9 @@ semantics.
 
 4. **Write the entry file** from `templates/plugin.plugin.zsh`, replacing
    `__NAME__` (kebab name), `__KEY__` (PLUGIN_KEY), and `__FPATH_VAR__`
-   (`<KEY>_FPATH`). Keep the modelines as the first two lines verbatim.
+   (`<KEY>_FPATH`). Keep the modelines as the first two lines verbatim. The
+   first source owns the `fpath` decision and `Plugins` snapshot; repeated
+   sources must not reset them.
 
 5. **Write autoload function bodies**: begin each generated function body with
    `builtin emulate -L zsh`. Select only the correctness-affecting options that
@@ -51,9 +53,13 @@ semantics.
      `zsh/validation/native-authority`.
    - In an isolated shell with temporary `HOME` and `ZDOTDIR`, source the entry
      file, verify its declared load effects, invoke `<name>_plugin_unload`, and
-     assert post-unload restoration of `fpath`, the `Plugins` key, scaffold
-     parameters, functions, hooks, aliases, options, and every other declared
-     side effect.
+     assert post-unload restoration of `fpath`, the `Plugins` key to its
+     pre-load state, scaffold parameters, functions, hooks, aliases, options,
+     and every other declared side effect. Test both an absent key and an
+     existing value.
+   - The scaffold removes the last exact `fpath` match that it appended. Do not
+     insert or reorder an indistinguishable equal entry after that append
+     before unloading; Zsh arrays do not retain occurrence identity.
    - Remove the temporary directory. `zsh -f` suppresses normal RCS processing,
      but a system `zshenv` may still execute.
 

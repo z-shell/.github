@@ -74,8 +74,10 @@ Observed in:
 
 Pattern:
 
-- add `functions/` only when the plugin manager or current shell setup has not already done so
-- the common Zi-aware form is:
+- add `functions/` only when the plugin manager has not handled it and the
+  exact literal path is absent
+- when Zi's loader contract records handled `fpath` work through `PMSPEC`, the
+  common Zi-aware form is:
 
 ```zsh
 if [[ ${PMSPEC-} != *f* ]]; then
@@ -83,15 +85,24 @@ if [[ ${PMSPEC-} != *f* ]]; then
 fi
 ```
 
-- an explicit membership guard is also acceptable when the entry point must tolerate non-Zi loader paths:
+This loader-metadata guard does not independently inspect `fpath`.
+
+- use an explicit literal membership guard under localized native option
+  semantics when the entry point must tolerate non-Zi loader paths:
 
 ```zsh
-if [[ ${fpath[(r)${0:h}/functions]} != "${0:h}/functions" ]]; then
-  fpath+=( "${0:h}/functions" )
-fi
+() {
+  builtin emulate -L zsh
+  typeset -r functions_dir=$1
+
+  if (( ${fpath[(Ie)${functions_dir}]} == 0 )); then
+    fpath+=("$functions_dir")
+  fi
+} "${0:h}/functions"
 ```
 
-Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-managed loading.
+Prefer the simpler form only when the repository relies on Zi's documented
+loader contract.
 
 Relevant canonical rules: `zsh/security/trust-paths` and
 `zsh/plugin/restore-state`.

@@ -1059,6 +1059,16 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
     fence_character: str | None = None
     fence_length = 0
     for line_number, raw_line in enumerate(text.splitlines(), start=1):
+        if fence_character is not None:
+            if re.fullmatch(
+                rf" {{0,3}}{re.escape(fence_character)}"
+                rf"{{{fence_length},}}[ \t]*",
+                raw_line,
+            ):
+                fence_character = None
+                fence_length = 0
+            continue
+
         line = raw_line
         visible_parts: list[str] = []
         contained_comment = False
@@ -1086,22 +1096,142 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
         visible_line = "".join(visible_parts)
         if contained_comment and visible_line.strip():
             visible_line = f"{visible_line} <html-comment>"
-        stripped = visible_line.lstrip()
-        if fence_character is not None:
-            if re.fullmatch(
-                rf"{re.escape(fence_character)}{{{fence_length},}}\s*",
-                stripped,
-            ):
-                fence_character = None
-                fence_length = 0
-            continue
-        fence_match = re.match(r"^(`{3,}|~{3,})", stripped)
+        fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})", visible_line)
         if fence_match is not None:
             fence_character = fence_match.group(1)[0]
             fence_length = len(fence_match.group(1))
             continue
         visible_lines.append((line_number, visible_line))
     return visible_lines
+
+
+def _atx_heading_content(line: str, level: int) -> str | None:
+    """Return normalized visible ATX heading content for one exact level."""
+
+    visible_line = line.removesuffix(" <html-comment>")
+    match = re.fullmatch(
+        rf" {{0,3}}#{{{level}}}[ \t]+"
+        r"(.*?)(?:[ \t]+#+[ \t]*)?",
+        visible_line,
+    )
+    if match is None:
+        return None
+    return match.group(1).strip()
+
+
+def _single_code_span_content(content: str) -> str:
+    """Unwrap content only when the whole heading is one code span."""
+
+    match = re.fullmatch(
+        r"(?P<ticks>`+)(?P<body>[^\r\n]+?)(?P=ticks)",
+        content,
+    )
+    if match is None or match.group("ticks") in match.group("body"):
+        return content
+    return match.group("body").strip()
+
+
+def _visible_h2_section(
+    lines: list[tuple[int, str]],
+    title: str,
+) -> list[tuple[int, str]] | None:
+    """Return one exact visible H2 section, excluding its heading."""
+
+    heading_indexes = [
+        index
+        for index, (_, line) in enumerate(lines)
+        if _atx_heading_content(line, 2) == title
+    ]
+    if len(heading_indexes) != 1:
+        return None
+    section: list[tuple[int, str]] = []
+    for item in lines[heading_indexes[0] + 1 :]:
+        if _atx_heading_content(item[1], 2) is not None:
+            break
+        section.append(item)
+    return section
+
+
+def _normalized_visible_text(lines: list[tuple[int, str]]) -> str:
+    return " ".join(line.strip() for _, line in lines if line.strip())
+
+
+def _visible_markdown_segments(
+    lines: list[tuple[int, str]],
+) -> list[str]:
+    """Join wrapped visible Markdown into narrow prose/list segments."""
+
+    segments: list[str] = []
+    current: list[str] = []
+
+    def flush() -> None:
+        if current:
+            segments.append(" ".join(current))
+            current.clear()
+
+    for _, raw_line in lines:
+        line = raw_line.removesuffix(" <html-comment>").strip()
+        if not line:
+            flush()
+            continue
+        boundary = (
+            re.match(r"^#{1,6}[ \t]+", line) is not None
+            or re.match(r"^(?:[-+*]|\d+[.)])[ \t]+", line) is not None
+            or line.startswith(">")
+            or line.startswith("|")
+        )
+        if boundary:
+            flush()
+        current.append(line)
+    flush()
+    return segments
+
+
+README_ZSH_VALIDATION_SUBJECT = (
+    r"(?:"
+    r"zsh\s+standard\s+(?:validation|enforcement)"
+    r"|(?:validation|enforcement)\s+of\s+the\s+zsh\s+standard"
+    r"|(?:the\s+)?zsh\s+standard\s+validator"
+    r")"
+)
+README_ZSH_VALIDATION_CONTRADICTION = re.compile(
+    rf"""
+    \b{README_ZSH_VALIDATION_SUBJECT}
+    (?:
+      \s+(?:is|remains)\s+(?:currently\s+)?inactive
+      (?=\s*(?:[.;,:)]|$))
+      |
+      \s+(?:is|remains|has)\s+not\s+(?:yet\s+)?
+      (?:been\s+)?(?:implemented|active)
+      (?=\s*(?:[.;,:)]|$))
+      |
+      \s+(?:is|remains)\s+planned\s+for\s+(?:a\s+)?
+      (?:later|future)\s+phase
+      (?=\s*(?:[.;,:)]|$))
+      |
+      \s+will\s+(?:begin|start)\s+in\s+(?:a\s+)?
+      (?:later|future)\s+phase
+      (?=\s*(?:[.;,:)]|$))
+      |
+      \s+(?:is|remains)\s+deferred\s+(?:to|until)\s+
+      (?:a\s+)?(?:later|future)\s+phase
+      (?=\s*(?:[.;,:)]|$))
+    )
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
+def _readme_has_zsh_validation_contradiction(
+    lines: list[tuple[int, str]],
+) -> bool:
+    for segment in _visible_markdown_segments(lines):
+        simplified = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", segment)
+        simplified = re.sub(r"[`*_]", "", simplified)
+        simplified = " ".join(simplified.split())
+        if README_ZSH_VALIDATION_CONTRADICTION.search(simplified):
+            return True
+    return False
 
 
 def _metadata_values(value: str) -> list[str] | None:
@@ -1593,16 +1723,26 @@ def validate_consumer_contract(
         if text is not None:
             texts[relative_path] = text
 
+    visible_lines = {
+        relative_path: _visible_markdown_lines(text)
+        for relative_path, text in texts.items()
+    }
+    visible_texts = {
+        relative_path: "\n".join(line for _, line in lines)
+        for relative_path, lines in visible_lines.items()
+    }
+
     for relative_path in REFERENCE_CONSUMER_PATHS:
-        text = texts.get(relative_path)
-        if text is None:
+        visible_text = visible_texts.get(relative_path)
+        if visible_text is None:
             continue
         for canonical_path in (INSTRUCTION_PATH, POLICY_PATH):
-            if canonical_path not in text:
+            if canonical_path not in visible_text:
                 errors.append(
                     error(
                         relative_path,
-                        f"missing canonical Zsh reference {canonical_path!r}",
+                        "missing visible canonical Zsh reference "
+                        f"{canonical_path!r}",
                         f"link to {canonical_path} without copying its rule catalog",
                     )
                 )
@@ -1622,23 +1762,22 @@ def validate_consumer_contract(
             rule_ids = cast(tuple[str, ...], candidate_ids)
 
     if rule_ids:
-        heading_pattern = re.compile(
-            r"^###\s+`?("
-            + "|".join(re.escape(rule_id) for rule_id in rule_ids)
-            + r")`?\s*$"
-        )
+        rule_id_set = set(rule_ids)
         for relative_path in REFERENCE_CONSUMER_PATHS:
             text = texts.get(relative_path)
             if text is None:
                 continue
-            for line_number, line in _visible_markdown_lines(text):
-                match = heading_pattern.fullmatch(line)
-                if match is not None:
+            for line_number, line in visible_lines[relative_path]:
+                heading = _atx_heading_content(line, 3)
+                if heading is None:
+                    continue
+                normalized_heading = _single_code_span_content(heading)
+                if normalized_heading in rule_id_set:
                     errors.append(
                         error(
                             relative_path,
                             "normative rule heading "
-                            f"{match.group(1)!r} at line {line_number}; "
+                            f"{normalized_heading!r} at line {line_number}; "
                             "rules belong in canonical instruction",
                             "replace the heading with an inline rule-ID citation",
                         )
@@ -1654,7 +1793,18 @@ def validate_consumer_contract(
 
     patterns_text = texts.get("PATTERNS.md")
     if patterns_text is not None:
-        normalized_patterns = " ".join(patterns_text.split())
+        patterns_lines = visible_lines["PATTERNS.md"]
+        first_h2 = next(
+            (
+                index
+                for index, (_, line) in enumerate(patterns_lines)
+                if _atx_heading_content(line, 2) is not None
+            ),
+            len(patterns_lines),
+        )
+        normalized_patterns = _normalized_visible_text(
+            patterns_lines[:first_h2]
+        )
         patterns_contract = (
             "Patterns below are observed examples, not a second policy source.",
             "the canonical standard wins and the pattern must be corrected.",
@@ -1673,24 +1823,37 @@ def validate_consumer_contract(
 
     readme_text = texts.get(".github/README.md")
     if readme_text is not None:
-        if VALIDATOR_PATH not in readme_text:
-            errors.append(
-                error(
-                    ".github/README.md",
-                    f"missing implemented Zsh validator catalog entry {VALIDATOR_PATH!r}",
-                    f"catalog {VALIDATOR_PATH} as the Phase 1 drift validator",
-                )
+        readme_lines = visible_lines[".github/README.md"]
+        readme_sections = {
+            "Repository Structure": (
+                INSTRUCTION_PATH,
+                POLICY_PATH,
+            ),
+            "Instruction Architecture": (
+                INSTRUCTION_PATH,
+                POLICY_PATH,
+                VALIDATOR_PATH,
+            ),
+        }
+        for section_title, required_paths in readme_sections.items():
+            section_lines = _visible_h2_section(readme_lines, section_title)
+            section_text = (
+                ""
+                if section_lines is None
+                else "\n".join(line for _, line in section_lines)
             )
-        visible_readme = " ".join(
-            line.strip()
-            for _, line in _visible_markdown_lines(readme_text)
-            if line.strip()
-        )
-        deferred_claim = re.compile(
-            r"(?i)zsh standard (?:enforcement|validation).{0,80}"
-            r"deferred.{0,80}(?:later|future) phase"
-        )
-        if deferred_claim.search(visible_readme):
+            for required_path in required_paths:
+                if required_path in section_text:
+                    continue
+                errors.append(
+                    error(
+                        ".github/README.md",
+                        f"{section_title} must visibly catalog "
+                        f"{required_path!r}",
+                        f"catalog {required_path} in the {section_title} section",
+                    )
+                )
+        if _readme_has_zsh_validation_contradiction(readme_lines):
             errors.append(
                 error(
                     ".github/README.md",

@@ -3,10 +3,12 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 from types import ModuleType
@@ -1550,6 +1552,62 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
         self.assertEqual(path.read_text(encoding="utf-8"), changed)
 
+    def test_rejects_hidden_consumer_canonical_references(self) -> None:
+        canonical_paths = (
+            ".github/instructions/zsh-scripting.instructions.md",
+            "lib/zsh-standard-policy.json",
+        )
+        reference_consumers = (
+            ".github/agents/zsh-plugin-standard-reviewer.agent.md",
+            ".github/skills/new-zsh-plugin/SKILL.md",
+            ".github/skills/zunit-test/SKILL.md",
+            "PATTERNS.md",
+            ".github/README.md",
+        )
+        wrappers = (
+            ("html-comment", "<!-- {canonical_path} -->"),
+            (
+                "backtick-fence",
+                "```text\n{canonical_path}\n```",
+            ),
+            ("tilde-fence", "~~~text\n{canonical_path}\n~~~"),
+        )
+        for relative_path in reference_consumers:
+            for canonical_path in canonical_paths:
+                for wrapper_name, wrapper in wrappers:
+                    with self.subTest(
+                        relative_path=relative_path,
+                        canonical_path=canonical_path,
+                        wrapper=wrapper_name,
+                    ):
+                        root = self.make_fixture()
+                        path = root / relative_path
+                        text = path.read_text(encoding="utf-8")
+                        self.assertIn(canonical_path, text)
+                        changed = text.replace(
+                            canonical_path,
+                            "missing-canonical-reference",
+                        )
+                        changed += (
+                            "\n\n"
+                            + wrapper.format(canonical_path=canonical_path)
+                            + "\n"
+                        )
+                        path.write_text(changed, encoding="utf-8")
+
+                        errors = load_validator().validate(root)
+
+                        self.assert_error_contains(
+                            errors,
+                            relative_path,
+                            canonical_path,
+                            "fix:",
+                        )
+                        self.assertEqual(
+                            path.read_text(encoding="utf-8"),
+                            changed,
+                        )
+
     def test_rejects_consumer_canonical_ownership(self) -> None:
         cases = (
             ("authority", "canonical"),
@@ -1651,6 +1709,83 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
                 self.assertEqual(errors, [])
 
+    def test_rejects_valid_atx_h3_rule_heading_variants(self) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        visible_headings = (
+            "   ### zsh/options/localize",
+            "### zsh/options/localize ###",
+            " ### `zsh/options/localize`",
+            "  ### `zsh/options/localize` ##",
+            "   ### `zsh/options/localize` ###",
+            "### ``zsh/options/localize`` ###   ",
+            "### zsh/options/localize <!-- visible note -->",
+        )
+        for heading in visible_headings:
+            with self.subTest(heading=heading):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + f"\n{heading}\n\nDuplicated normative prose.\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
+        invisible_or_code = (
+            "    ### zsh/options/localize",
+            "\t### zsh/options/localize",
+            "## zsh/options/localize",
+            "#### zsh/options/localize",
+            "### zsh/options/localize guidance",
+            "### zsh/options/localize###",
+            "Inline `zsh/options/localize` citation.",
+            "```markdown\n   ### `zsh/options/localize` ###\n```",
+            "~~~markdown\n   ### `zsh/options/localize` ###\n~~~",
+            "<!--\n   ### zsh/options/localize ###\n-->",
+        )
+        for addition in invisible_or_code:
+            with self.subTest(non_heading=addition):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + "\n" + addition + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assertEqual(errors, [])
+
+        visible_after_literal_content = (
+            "    ```markdown\n### zsh/options/localize",
+            "```markdown\n<!-- literal comment\n```\n### zsh/options/localize",
+        )
+        for addition in visible_after_literal_content:
+            with self.subTest(visible_after_literal_content=addition):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + "\n" + addition + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
     def test_rejects_copied_normative_rule_inventory(self) -> None:
         root = self.make_fixture()
         relative_path = ".github/skills/zunit-test/SKILL.md"
@@ -1723,6 +1858,127 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "fix:",
         )
 
+    def test_rejects_hidden_patterns_contract_with_visible_override(self) -> None:
+        relative_path = "PATTERNS.md"
+        old_contract = (
+            "Patterns below are observed examples, not a\n"
+            "second policy source. When an observed pattern conflicts with a "
+            "required rule,\n"
+            "the canonical standard wins and the pattern must be corrected."
+        )
+        hidden_contract = (
+            "Patterns below are observed examples, not a second policy source. "
+            "the canonical standard wins and the pattern must be corrected."
+        )
+        wrappers = (
+            ("html-comment", f"<!-- {hidden_contract} -->"),
+            ("backtick-fence", f"```text\n{hidden_contract}\n```"),
+            ("tilde-fence", f"~~~text\n{hidden_contract}\n~~~"),
+        )
+        for wrapper_name, wrapper in wrappers:
+            with self.subTest(wrapper=wrapper_name):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(old_contract, text)
+                changed = text.replace(
+                    old_contract,
+                    "Patterns below are mandatory and override the canonical "
+                    "Zsh owners.",
+                    1,
+                )
+                changed += f"\n\n{wrapper}\n"
+                path.write_text(changed, encoding="utf-8")
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "observed patterns are non-normative",
+                    "fix:",
+                )
+
+    def test_requires_consumer_contracts_in_intended_sections(self) -> None:
+        patterns_root = self.make_fixture()
+        patterns_path = patterns_root / "PATTERNS.md"
+        patterns_text = patterns_path.read_text(encoding="utf-8")
+        patterns_contract = (
+            "Patterns below are observed examples, not a\n"
+            "second policy source. When an observed pattern conflicts with a "
+            "required rule,\n"
+            "the canonical standard wins and the pattern must be corrected."
+        )
+        self.assertIn(patterns_contract, patterns_text)
+        patterns_path.write_text(
+            patterns_text.replace(patterns_contract, "", 1)
+            + f"\n\n{patterns_contract}\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(patterns_root)
+
+        self.assert_error_contains(
+            errors,
+            "PATTERNS.md",
+            "observed patterns are non-normative",
+            "fix:",
+        )
+
+        readme_path = ".github/README.md"
+        section_cases = (
+            (
+                "Repository Structure",
+                (
+                    ".github/instructions/zsh-scripting.instructions.md",
+                    "lib/zsh-standard-policy.json",
+                ),
+            ),
+            (
+                "Instruction Architecture",
+                (
+                    ".github/instructions/zsh-scripting.instructions.md",
+                    "lib/zsh-standard-policy.json",
+                    "scripts/validate-zsh-standard-policy.py",
+                ),
+            ),
+        )
+        for section_title, required_paths in section_cases:
+            for required_path in required_paths:
+                with self.subTest(
+                    section=section_title,
+                    required_path=required_path,
+                ):
+                    root = self.make_fixture()
+                    path = root / readme_path
+                    text = path.read_text(encoding="utf-8")
+                    section_start = text.index(f"## {section_title}")
+                    next_h2 = text.find("\n## ", section_start + 3)
+                    section_end = len(text) if next_h2 == -1 else next_h2
+                    section = text[section_start:section_end]
+                    self.assertIn(required_path, section)
+                    changed_section = section.replace(
+                        required_path,
+                        "moved-contract-path",
+                    )
+                    changed = (
+                        text[:section_start]
+                        + changed_section
+                        + text[section_end:]
+                        + f"\n\nVisible moved reference: `{required_path}`.\n"
+                    )
+                    path.write_text(changed, encoding="utf-8")
+
+                    errors = load_validator().validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        readme_path,
+                        section_title,
+                        required_path,
+                        "fix:",
+                    )
+
     def test_rejects_incomplete_public_catalog(self) -> None:
         root = self.make_fixture()
         relative_path = ".github/README.md"
@@ -1742,6 +1998,361 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             relative_path,
             "scripts/validate-zsh-standard-policy.py",
             "fix:",
+        )
+
+    def test_rejects_hidden_or_misplaced_public_validator_catalog(self) -> None:
+        relative_path = ".github/README.md"
+        validator_path = "scripts/validate-zsh-standard-policy.py"
+        wrappers = (
+            ("html-comment", f"<!-- {validator_path} -->"),
+            ("backtick-fence", f"```text\n{validator_path}\n```"),
+            ("tilde-fence", f"~~~text\n{validator_path}\n~~~"),
+        )
+        for wrapper_name, wrapper in wrappers:
+            with self.subTest(wrapper=wrapper_name):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(validator_path, text)
+                changed = text.replace(
+                    validator_path,
+                    "scripts/missing-zsh-standard-validator.py",
+                )
+                changed += f"\n\n{wrapper}\n"
+                path.write_text(changed, encoding="utf-8")
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    validator_path,
+                    "fix:",
+                )
+
+        root = self.make_fixture()
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        section_start = text.index("## Instruction Architecture")
+        section_end = text.index("\n### Community Health Files", section_start)
+        section = text[section_start:section_end]
+        self.assertIn(validator_path, section)
+        changed_section = section.replace(
+            validator_path,
+            "scripts/missing-zsh-standard-validator.py",
+        )
+        changed = (
+            text[:section_start]
+            + changed_section
+            + text[section_end:]
+            + f"\n\nVisible unrelated mention: `{validator_path}`.\n"
+        )
+        path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            validator_path,
+            "fix:",
+        )
+
+    def test_rejects_inactive_or_future_phase_zsh_validation_claims(self) -> None:
+        relative_path = ".github/README.md"
+        claims = (
+            "Zsh standard validation is inactive.",
+            "Zsh standard validation is not implemented.",
+            "Zsh standard enforcement is planned for a later phase.",
+            "Zsh standard validation will begin in a future phase.",
+            "Validation of the Zsh standard remains currently inactive.",
+            "The Zsh standard validator has not yet been implemented.",
+            "Zsh standard enforcement is deferred until a later phase.",
+            "Zsh standard enforcement is deferred to a later phase.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + f"\n\n{claim}\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "Phase 1 Zsh validation",
+                    "fix:",
+                )
+
+    def test_allows_scoped_or_unrelated_readme_phase_language(self) -> None:
+        relative_path = ".github/README.md"
+        allowed_claims = (
+            "Zsh standard validation is active.",
+            "Zsh standard validation is not implemented by ShellCheck.",
+            (
+                "Zsh standard validation is active; classifier enforcement is "
+                "planned for a later phase."
+            ),
+            (
+                "Future-phase child enrollment is not implemented; Zsh "
+                "standard validation is active."
+            ),
+            "Do not describe Zsh standard validation as inactive.",
+            (
+                "The validator reports inactive plugins while Zsh standard "
+                "validation remains active."
+            ),
+            (
+                "The Zsh standard validator is available; maintenance "
+                "automation will begin in a future phase."
+            ),
+            (
+                "Zsh standard validation is planned for a later phase in "
+                "downstream repositories, while Phase 1 validation here is active."
+            ),
+        )
+        for claim in allowed_claims:
+            with self.subTest(claim=claim):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + f"\n\n{claim}\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                contradiction_errors = [
+                    message
+                    for message in errors
+                    if message.startswith(f"{relative_path}:")
+                    and "Phase 1 Zsh validation" in message
+                ]
+                self.assertEqual(contradiction_errors, [], errors)
+
+    def test_rendered_plugin_template_restores_lifecycle_state(self) -> None:
+        template_path = (
+            PUBLIC_ROOT
+            / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+        )
+        temporary_path: Path
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            temporary_path = Path(temporary_directory)
+            plugin_root = temporary_path / "plugin [literal]*? space"
+            functions_path = plugin_root / "functions"
+            functions_path.mkdir(parents=True)
+            entry_path = plugin_root / "demo.plugin.zsh"
+            rendered = (
+                template_path.read_text(encoding="utf-8")
+                .replace("__NAME__", "demo")
+                .replace("__KEY__", "DEMO")
+                .replace("__FPATH_VAR__", "DEMO_FPATH")
+            )
+            entry_path.write_text(rendered, encoding="utf-8")
+
+            syntax = subprocess.run(  # nosec B603
+                ["zsh", "-f", "-n", str(entry_path)],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(
+                syntax.returncode,
+                0,
+                syntax.stdout + syntax.stderr,
+            )
+
+            common = textwrap.dedent(
+                r"""
+                check_fpath() {
+                  builtin emulate -L zsh
+                  local actual=${(j:|:)fpath}
+                  local expected=${(j:|:)argv}
+                  [[ $actual == $expected ]] || {
+                    print -u2 -r -- "fpath mismatch: actual=${actual} expected=${expected}"
+                    return 1
+                  }
+                }
+
+                check_scaffold_removed() {
+                    (( ! ${+functions[demo_plugin_unload]} )) &&
+                    (( ! ${+parameters[DEMO_FPATH]} )) &&
+                    (( ! ${+parameters[DEMO_FPATH_ADDED]} )) &&
+                    (( ! ${+parameters[DEMO_FPATH_PLUGINS_KEY_EXISTED]} )) &&
+                    (( ! ${+parameters[DEMO_FPATH_PLUGINS_KEY_VALUE]} ))
+                }
+
+                unset PMSPEC
+                """
+            )
+            cases = {
+                "default-native": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins=( OTHER caller-other )
+                    unset PMSPEC
+                    . "$1" || exit 10
+                    check_fpath /baseline "$2" || exit 11
+                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 12
+                    (( DEMO_FPATH_ADDED == 1 )) || exit 13
+                    demo_plugin_unload || exit 14
+                    check_fpath /baseline || exit 15
+                    (( ! ${+Plugins[DEMO]} )) || exit 16
+                    [[ ${Plugins[OTHER]} == caller-other ]] || exit 17
+                    check_scaffold_removed || exit 18
+                    """
+                ),
+                "preexisting-single": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( "$2" /tail )
+                    typeset -gA Plugins
+                    . "$1" || exit 20
+                    (( DEMO_FPATH_ADDED == 0 )) || exit 21
+                    check_fpath "$2" /tail || exit 22
+                    demo_plugin_unload || exit 23
+                    check_fpath "$2" /tail || exit 24
+                    check_scaffold_removed || exit 25
+                    """
+                ),
+                "preexisting-duplicates": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( "$2" /middle "$2" )
+                    typeset -gA Plugins
+                    . "$1" || exit 30
+                    (( DEMO_FPATH_ADDED == 0 )) || exit 31
+                    demo_plugin_unload || exit 32
+                    check_fpath "$2" /middle "$2" || exit 33
+                    check_scaffold_removed || exit 34
+                    """
+                ),
+                "unset-pmspec-no-unset": textwrap.dedent(
+                    r"""
+                    setopt no_unset
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins
+                    unset PMSPEC
+                    . "$1" || exit 40
+                    demo_plugin_unload || exit 41
+                    check_fpath /baseline || exit 42
+                    check_scaffold_removed || exit 43
+                    """
+                ),
+                "caller-ksh-arrays": textwrap.dedent(
+                    r"""
+                    setopt ksh_arrays
+                    typeset -ga fpath=( "$2" /tail )
+                    typeset -gA Plugins
+                    . "$1" || exit 50
+                    [[ -o KSH_ARRAYS ]] || exit 51
+                    check_fpath "$2" /tail || exit 52
+                    demo_plugin_unload || exit 53
+                    [[ -o KSH_ARRAYS ]] || exit 54
+                    check_fpath "$2" /tail || exit 55
+                    check_scaffold_removed || exit 56
+                    """
+                ),
+                "caller-no-function-argzero": textwrap.dedent(
+                    r"""
+                    unsetopt function_argzero
+                    typeset caller_zero=$0
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins
+                    . "$1" || exit 60
+                    [[ $0 == "$caller_zero" ]] || exit 61
+                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 62
+                    demo_plugin_unload || exit 63
+                    [[ $0 == "$caller_zero" ]] || exit 64
+                    check_fpath /baseline || exit 65
+                    check_scaffold_removed || exit 66
+                    """
+                ),
+                "repeated-source": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins
+                    . "$1" || exit 70
+                    (( DEMO_FPATH_ADDED == 1 )) || exit 71
+                    . "$1" || exit 72
+                    (( DEMO_FPATH_ADDED == 1 )) || exit 73
+                    check_fpath /baseline "$2" || exit 74
+                    demo_plugin_unload || exit 75
+                    check_fpath /baseline || exit 76
+                    (( ! ${+Plugins[DEMO]} )) || exit 77
+                    check_scaffold_removed || exit 78
+                    """
+                ),
+                "preexisting-plugin-key": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins=(
+                      DEMO 'caller original [literal]*? value'
+                      OTHER caller-other
+                    )
+                    . "$1" || exit 80
+                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 81
+                    . "$1" || exit 82
+                    demo_plugin_unload || exit 83
+                    [[ ${Plugins[DEMO]} == 'caller original [literal]*? value' ]] ||
+                      exit 84
+                    [[ ${Plugins[OTHER]} == caller-other ]] || exit 85
+                    check_fpath /baseline || exit 86
+                    check_scaffold_removed || exit 87
+                    """
+                ),
+                "equal-entry-inserted-before-owned-append": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins
+                    . "$1" || exit 90
+                    fpath=( "$2" "${fpath[@]}" )
+                    check_fpath "$2" /baseline "$2" || exit 91
+                    demo_plugin_unload || exit 92
+                    check_fpath "$2" /baseline || exit 93
+                    check_scaffold_removed || exit 94
+                    """
+                ),
+            }
+            for case_name, body in cases.items():
+                with self.subTest(case=case_name):
+                    home = temporary_path / f"home-{case_name}"
+                    zdotdir = temporary_path / f"zdot-{case_name}"
+                    home.mkdir()
+                    zdotdir.mkdir()
+                    environment = os.environ.copy()
+                    environment.update(
+                        {
+                            "HOME": str(home),
+                            "ZDOTDIR": str(zdotdir),
+                        }
+                    )
+                    completed = subprocess.run(  # nosec B603
+                        [
+                            "zsh",
+                            "-f",
+                            "-c",
+                            common + body,
+                            case_name,
+                            str(entry_path),
+                            str(functions_path),
+                        ],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                        env=environment,
+                    )
+                    self.assertEqual(
+                        completed.returncode,
+                        0,
+                        completed.stdout + completed.stderr,
+                    )
+
+        self.assertFalse(
+            temporary_path.exists(),
+            "TemporaryDirectory must remove the rendered template tree",
         )
 
     def test_consumer_contract_uses_safe_text_reads(self) -> None:
@@ -1842,13 +2453,14 @@ class PublicZshStandardContractTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertNotIn("TODO", template)
         self.assertNotIn("#funtions-directory", template)
-        self.assertNotIn("emulate -L zsh", template)
+        self.assertNotIn('\n0="', template)
+        self.assertEqual(template.count("builtin emulate -L zsh"), 2)
         for fragment in (
             "${PMSPEC-}",
             "__FPATH_VAR___ADDED",
-            "fpath[(ie)${__FPATH_VAR__}]",
-            "unset __FPATH_VAR__ __FPATH_VAR___ADDED",
-            "'Plugins[__KEY__]'",
+            "__FPATH_VAR___PLUGINS_KEY_EXISTED",
+            "__FPATH_VAR___PLUGINS_KEY_VALUE",
+            "fpath[(Ie)${__FPATH_VAR__}]",
             "unfunction __NAME___plugin_unload",
             "zsh/security/trust-paths",
             "zsh/plugin/restore-state",
@@ -1861,6 +2473,63 @@ class PublicZshStandardContractTests(unittest.TestCase):
         self.assertNotIn(
             "Zsh standard enforcement is deferred to a later phase",
             readme,
+        )
+
+    def test_consumers_define_plugins_restoration_as_preload_state(self) -> None:
+        consumers = (
+            ".github/agents/zsh-plugin-standard-reviewer.agent.md",
+            ".github/skills/new-zsh-plugin/SKILL.md",
+            ".github/skills/zunit-test/SKILL.md",
+        )
+        for relative_path in consumers:
+            with self.subTest(relative_path=relative_path):
+                text = (PUBLIC_ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertIn(
+                    "pre-load state",
+                    " ".join(text.split()),
+                    relative_path,
+                )
+
+    def test_patterns_use_literal_fpath_membership_under_native_options(
+        self,
+    ) -> None:
+        text = (PUBLIC_ROOT / "PATTERNS.md").read_text(encoding="utf-8")
+        start = text.index("## Guard `fpath` additions")
+        end = text.index("\n## Mandatory SHA-pinning", start)
+        block = text[start:end]
+
+        self.assertIn("builtin emulate -L zsh", block)
+        self.assertIn("fpath[(Ie)", block)
+        self.assertNotIn("fpath[(r)", block)
+        self.assertIn("does not independently inspect `fpath`", block)
+
+    def test_zunit_example_guards_and_demonstrates_unload_lifecycle(
+        self,
+    ) -> None:
+        text = (
+            PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "if (( ${+functions[my-plugin_plugin_unload]} )); then",
+            text,
+        )
+        self.assertIn(
+            "@test 'unload restores state and self-destructs'",
+            text,
+        )
+        self.assertIn(
+            'assert "${(j:|:)fpath}" same_as "${(j:|:)saved_fpath}"',
+            text,
+        )
+        self.assertIn('assert "${+Plugins[MY_PLUGIN]}" equals 0', text)
+        self.assertIn(
+            'assert "${+functions[my-plugin_plugin_unload]}" equals 0',
+            text,
+        )
+        self.assertIn(
+            "one `@setup` and one `@teardown`, each running around every test",
+            text,
         )
 
 
