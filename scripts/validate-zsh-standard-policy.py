@@ -1051,6 +1051,80 @@ def _apply_to_values(text: str) -> list[str]:
     return values
 
 
+def _strip_indentation_columns(
+    line: str,
+    required_columns: int,
+) -> str | None:
+    """Strip an exact Markdown container indentation width."""
+
+    columns = 0
+    cursor = 0
+    while columns < required_columns and cursor < len(line):
+        character = line[cursor]
+        if character == " ":
+            columns += 1
+        elif character == "\t":
+            columns += 4 - (columns % 4)
+        else:
+            return None
+        cursor += 1
+    if columns != required_columns:
+        return None
+    return line[cursor:]
+
+
+def _fence_opening_view(
+    line: str,
+) -> tuple[str, tuple[tuple[str, int], ...]]:
+    """Return content after narrow list and blockquote container prefixes."""
+
+    content = line
+    containers: list[tuple[str, int]] = []
+    while True:
+        blockquote = re.match(r"^ {0,3}>[ \t]?(.*)$", content)
+        if blockquote is not None:
+            containers.append(("blockquote", 0))
+            content = blockquote.group(1)
+            continue
+        list_item = re.match(
+            r"^(?P<indent> {0,3})"
+            r"(?P<marker>[-+*]|\d{1,9}[.)])"
+            r"(?P<spacing> {1,4}|\t)"
+            r"(?P<content>\S.*|)$",
+            content,
+        )
+        if list_item is None:
+            break
+        prefix = (
+            list_item.group("indent")
+            + list_item.group("marker")
+            + list_item.group("spacing")
+        )
+        containers.append(("list", len(prefix.expandtabs(4))))
+        content = list_item.group("content")
+    return content, tuple(containers)
+
+
+def _fence_container_content(
+    line: str,
+    containers: tuple[tuple[str, int], ...],
+) -> str | None:
+    """Strip the container prefixes recorded by a fenced block opener."""
+
+    content = line
+    for kind, width in containers:
+        if kind == "blockquote":
+            blockquote = re.match(r"^ {0,3}>[ \t]?(.*)$", content)
+            if blockquote is None:
+                return None
+            content = blockquote.group(1)
+            continue
+        content = _strip_indentation_columns(content, width)
+        if content is None:
+            return None
+    return content
+
+
 def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
     """Return Markdown lines outside fenced code and HTML comments."""
 
@@ -1058,16 +1132,37 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
     in_comment = False
     fence_character: str | None = None
     fence_length = 0
+    fence_containers: tuple[tuple[str, int], ...] = ()
     for line_number, raw_line in enumerate(text.splitlines(), start=1):
         if fence_character is not None:
-            if re.fullmatch(
-                rf" {{0,3}}{re.escape(fence_character)}"
-                rf"{{{fence_length},}}[ \t]*",
+            candidate = _fence_container_content(
                 raw_line,
+                fence_containers,
+            )
+            if (
+                candidate is None
+                and fence_containers
+                and (
+                    raw_line.strip()
+                    or any(
+                        kind == "blockquote"
+                        for kind, _ in fence_containers
+                    )
+                )
             ):
                 fence_character = None
                 fence_length = 0
-            continue
+                fence_containers = ()
+            else:
+                if candidate is not None and re.fullmatch(
+                    rf" {{0,3}}{re.escape(fence_character)}"
+                    rf"{{{fence_length},}}[ \t]*",
+                    candidate,
+                ):
+                    fence_character = None
+                    fence_length = 0
+                    fence_containers = ()
+                continue
 
         line = raw_line
         visible_parts: list[str] = []
@@ -1096,13 +1191,104 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
         visible_line = "".join(visible_parts)
         if contained_comment and visible_line.strip():
             visible_line = f"{visible_line} <html-comment>"
-        fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})", visible_line)
+        fence_view, containers = _fence_opening_view(visible_line)
+        fence_match = re.match(
+            r"^ {0,3}(?P<marker>`{3,}|~{3,})(?P<info>.*)$",
+            fence_view,
+        )
         if fence_match is not None:
-            fence_character = fence_match.group(1)[0]
-            fence_length = len(fence_match.group(1))
-            continue
+            marker = fence_match.group("marker")
+            info = fence_match.group("info")
+            if marker[0] != "`" or "`" not in info:
+                fence_character = marker[0]
+                fence_length = len(marker)
+                fence_containers = containers
+                continue
         visible_lines.append((line_number, visible_line))
     return visible_lines
+
+
+def _strip_blockquote_prefixes(line: str) -> tuple[int, str]:
+    """Return blockquote depth and content for one visible Markdown line."""
+
+    depth = 0
+    content = line
+    while True:
+        blockquote = re.match(r"^ {0,3}>[ \t]?(.*)$", content)
+        if blockquote is None:
+            return depth, content
+        depth += 1
+        content = blockquote.group(1)
+
+
+def _leading_indentation_columns(line: str) -> int:
+    """Count leading Markdown indentation columns with four-column tabs."""
+
+    columns = 0
+    for character in line:
+        if character == " ":
+            columns += 1
+        elif character == "\t":
+            columns += 4 - (columns % 4)
+        else:
+            break
+    return columns
+
+
+def _list_item_content_indent(line: str) -> int | None:
+    """Return the content indent for one narrow list-item marker."""
+
+    list_item = re.match(
+        r"^(?P<indent> {0,3})"
+        r"(?P<marker>[-+*]|\d{1,9}[.)])"
+        r"(?P<spacing> {1,4}|\t)(?=\S|$)",
+        line,
+    )
+    if list_item is None:
+        return None
+    prefix = (
+        list_item.group("indent")
+        + list_item.group("marker")
+        + list_item.group("spacing")
+    )
+    return len(prefix.expandtabs(4))
+
+
+def _positive_markdown_lines(
+    lines: list[tuple[int, str]],
+) -> list[tuple[int, str]]:
+    """Exclude indented code while retaining immediate list continuations."""
+
+    positive: list[tuple[int, str]] = []
+    list_context: tuple[int, int] | None = None
+    for line_number, raw_line in lines:
+        visible_line = raw_line.removesuffix(" <html-comment>")
+        quote_depth, content = _strip_blockquote_prefixes(visible_line)
+        if not content.strip():
+            positive.append((line_number, raw_line))
+            list_context = None
+            continue
+
+        list_indent = _list_item_content_indent(content)
+        if list_indent is not None:
+            positive.append((line_number, raw_line))
+            list_context = (quote_depth, list_indent)
+            continue
+
+        indentation = _leading_indentation_columns(content)
+        if (
+            list_context is not None
+            and list_context[0] == quote_depth
+            and list_context[1] <= indentation < list_context[1] + 4
+        ):
+            positive.append((line_number, raw_line))
+            continue
+
+        list_context = None
+        if indentation >= 4:
+            continue
+        positive.append((line_number, raw_line))
+    return positive
 
 
 def _atx_heading_content(line: str, level: int) -> str | None:
@@ -1119,6 +1305,14 @@ def _atx_heading_content(line: str, level: int) -> str | None:
     return match.group(1).strip()
 
 
+def _consumer_h3_content(line: str) -> str | None:
+    """Return one consumer H3 after removing blockquote containers."""
+
+    visible_line = line.removesuffix(" <html-comment>")
+    _, content = _strip_blockquote_prefixes(visible_line)
+    return _atx_heading_content(content, 3)
+
+
 def _single_code_span_content(content: str) -> str:
     """Unwrap content only when the whole heading is one code span."""
 
@@ -1128,7 +1322,10 @@ def _single_code_span_content(content: str) -> str:
     )
     if match is None or match.group("ticks") in match.group("body"):
         return content
-    return match.group("body").strip()
+    body = match.group("body")
+    if body.startswith(" ") and body.endswith(" ") and body.strip(" "):
+        return body[1:-1]
+    return body
 
 
 def _visible_h2_section(
@@ -1153,7 +1350,20 @@ def _visible_h2_section(
 
 
 def _normalized_visible_text(lines: list[tuple[int, str]]) -> str:
-    return " ".join(line.strip() for _, line in lines if line.strip())
+    return " ".join(
+        line.strip()
+        for _, line in _positive_markdown_lines(lines)
+        if line.strip()
+    )
+
+
+def _positive_visible_text(lines: list[tuple[int, str]]) -> str:
+    """Join visible non-code lines for positive ownership checks."""
+
+    return "\n".join(
+        line
+        for _, line in _positive_markdown_lines(lines)
+    )
 
 
 def _visible_markdown_segments(
@@ -1163,21 +1373,32 @@ def _visible_markdown_segments(
 
     segments: list[str] = []
     current: list[str] = []
+    current_context: tuple[str, int] | None = None
 
     def flush() -> None:
         if current:
             segments.append(" ".join(current))
             current.clear()
 
-    for _, raw_line in lines:
-        line = raw_line.removesuffix(" <html-comment>").strip()
+    for _, raw_line in _positive_markdown_lines(lines):
+        visible_line = raw_line.removesuffix(" <html-comment>")
+        quote_depth, content = _strip_blockquote_prefixes(visible_line)
+        line = content.strip()
         if not line:
             flush()
+            current_context = None
             continue
+        context = (
+            ("blockquote", quote_depth)
+            if quote_depth
+            else ("document", 0)
+        )
+        if context != current_context:
+            flush()
+            current_context = context
         boundary = (
             re.match(r"^#{1,6}[ \t]+", line) is not None
             or re.match(r"^(?:[-+*]|\d+[.)])[ \t]+", line) is not None
-            or line.startswith(">")
             or line.startswith("|")
         )
         if boundary:
@@ -1728,7 +1949,7 @@ def validate_consumer_contract(
         for relative_path, text in texts.items()
     }
     visible_texts = {
-        relative_path: "\n".join(line for _, line in lines)
+        relative_path: _positive_visible_text(lines)
         for relative_path, lines in visible_lines.items()
     }
 
@@ -1768,7 +1989,7 @@ def validate_consumer_contract(
             if text is None:
                 continue
             for line_number, line in visible_lines[relative_path]:
-                heading = _atx_heading_content(line, 3)
+                heading = _consumer_h3_content(line)
                 if heading is None:
                     continue
                 normalized_heading = _single_code_span_content(heading)
@@ -1840,7 +2061,7 @@ def validate_consumer_contract(
             section_text = (
                 ""
                 if section_lines is None
-                else "\n".join(line for _, line in section_lines)
+                else _positive_visible_text(section_lines)
             )
             for required_path in required_paths:
                 if required_path in section_text:

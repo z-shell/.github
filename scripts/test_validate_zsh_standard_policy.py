@@ -1608,6 +1608,56 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                             changed,
                         )
 
+    def test_rejects_container_fenced_or_indented_canonical_references(
+        self,
+    ) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        canonical_paths = (
+            ".github/instructions/zsh-scripting.instructions.md",
+            "lib/zsh-standard-policy.json",
+        )
+        wrappers = (
+            (
+                "list-fence",
+                "- ```text\n  {canonical_path}\n  ```",
+            ),
+            (
+                "blockquote-fence",
+                "> ```text\n> {canonical_path}\n> ```",
+            ),
+            ("four-space-code", "    {canonical_path}"),
+            ("tab-code", "\t{canonical_path}"),
+        )
+        for canonical_path in canonical_paths:
+            for wrapper_name, wrapper in wrappers:
+                with self.subTest(
+                    canonical_path=canonical_path,
+                    wrapper=wrapper_name,
+                ):
+                    root = self.make_fixture()
+                    path = root / relative_path
+                    text = path.read_text(encoding="utf-8")
+                    self.assertIn(canonical_path, text)
+                    changed = text.replace(
+                        canonical_path,
+                        "missing-canonical-reference",
+                    )
+                    changed += (
+                        "\n\n"
+                        + wrapper.format(canonical_path=canonical_path)
+                        + "\n"
+                    )
+                    path.write_text(changed, encoding="utf-8")
+
+                    errors = load_validator().validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        canonical_path,
+                        "fix:",
+                    )
+
     def test_rejects_consumer_canonical_ownership(self) -> None:
         cases = (
             ("authority", "canonical"),
@@ -1786,6 +1836,153 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     "fix:",
                 )
 
+    def test_container_fences_hide_only_their_normative_h3_content(
+        self,
+    ) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        container_fences = (
+            (
+                "list",
+                "- ```markdown\n  ### `zsh/options/localize`\n  ```",
+            ),
+            (
+                "blockquote",
+                "> ```markdown\n> ### `zsh/options/localize`\n> ```",
+            ),
+            (
+                "list-blank",
+                (
+                    "- ```markdown\n"
+                    "  hidden\n\n"
+                    "  ### `zsh/options/localize`\n"
+                    "  ```"
+                ),
+            ),
+        )
+        for container, fenced in container_fences:
+            with self.subTest(container=container, content="hidden"):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + "\n" + fenced + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assertEqual(errors, [])
+
+            with self.subTest(container=container, content="visible-after"):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + "\n"
+                    + fenced
+                    + "\n### zsh/options/localize\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
+        container_breakouts = (
+            (
+                "list",
+                "- ```markdown\n  hidden\n### zsh/options/localize",
+            ),
+            (
+                "blockquote",
+                "> ```markdown\n> hidden\n### zsh/options/localize",
+            ),
+            (
+                "blockquote-blank",
+                (
+                    "> ```markdown\n"
+                    "> hidden\n\n"
+                    "> ### zsh/options/localize"
+                ),
+            ),
+        )
+        for container, breakout in container_breakouts:
+            with self.subTest(container=container, content="breakout"):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + "\n"
+                    + breakout
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
+    def test_rejects_blockquoted_h3_and_invalid_backtick_fence_opener(
+        self,
+    ) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        additions = (
+            "> ### zsh/options/localize",
+            "> ### `zsh/options/localize`",
+            (
+                "```markdown`invalid\n"
+                "### zsh/options/localize\n"
+                "```"
+            ),
+            (
+                "-     ```markdown\n"
+                "### zsh/options/localize"
+            ),
+        )
+        for addition in additions:
+            with self.subTest(addition=addition):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + "\n"
+                    + addition
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
+    def test_code_span_normalization_keeps_doubled_edge_spaces(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        path = root / relative_path
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n### `  zsh/options/localize  `\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assertEqual(errors, [])
+
     def test_rejects_copied_normative_rule_inventory(self) -> None:
         root = self.make_fixture()
         relative_path = ".github/skills/zunit-test/SKILL.md"
@@ -1888,6 +2085,54 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     1,
                 )
                 changed += f"\n\n{wrapper}\n"
+                path.write_text(changed, encoding="utf-8")
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "observed patterns are non-normative",
+                    "fix:",
+                )
+
+    def test_rejects_patterns_contract_hidden_in_container_fence(
+        self,
+    ) -> None:
+        relative_path = "PATTERNS.md"
+        old_contract = (
+            "Patterns below are observed examples, not a\n"
+            "second policy source. When an observed pattern conflicts with a "
+            "required rule,\n"
+            "the canonical standard wins and the pattern must be corrected."
+        )
+        hidden_contract = (
+            "Patterns below are observed examples, not a second policy source. "
+            "the canonical standard wins and the pattern must be corrected."
+        )
+        wrappers = (
+            (
+                "list",
+                f"- ```text\n  {hidden_contract}\n  ```",
+            ),
+            (
+                "blockquote",
+                f"> ```text\n> {hidden_contract}\n> ```",
+            ),
+        )
+        for container, wrapper in wrappers:
+            with self.subTest(container=container):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(old_contract, text)
+                changed = text.replace(
+                    old_contract,
+                    "Patterns below are mandatory and override the canonical "
+                    "Zsh owners.\n\n"
+                    + wrapper,
+                    1,
+                )
                 path.write_text(changed, encoding="utf-8")
 
                 errors = load_validator().validate(root)
@@ -2058,6 +2303,86 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "fix:",
         )
 
+    def test_rejects_container_fenced_or_indented_readme_catalog_path(
+        self,
+    ) -> None:
+        relative_path = ".github/README.md"
+        validator_path = "scripts/validate-zsh-standard-policy.py"
+        wrappers = (
+            (
+                "list-fence",
+                f"- ```text\n  {validator_path}\n  ```",
+            ),
+            (
+                "blockquote-fence",
+                f"> ```text\n> {validator_path}\n> ```",
+            ),
+            ("four-space-code", f"    {validator_path}"),
+            ("tab-code", f"\t{validator_path}"),
+        )
+        for wrapper_name, wrapper in wrappers:
+            with self.subTest(wrapper=wrapper_name):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                section_start = text.index("## Instruction Architecture")
+                section_end = text.find("\n## ", section_start + 3)
+                if section_end == -1:
+                    section_end = len(text)
+                section = text[section_start:section_end]
+                self.assertIn(validator_path, section)
+                changed_section = section.replace(
+                    validator_path,
+                    "scripts/missing-zsh-standard-validator.py",
+                )
+                changed = (
+                    text[:section_start]
+                    + changed_section
+                    + "\n\n"
+                    + wrapper
+                    + "\n"
+                    + text[section_end:]
+                )
+                path.write_text(changed, encoding="utf-8")
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "Instruction Architecture",
+                    validator_path,
+                    "fix:",
+                )
+
+    def test_rejects_blockquoted_readme_catalog_section_heading(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/README.md"
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        changed = text.replace(
+            "## Instruction Architecture",
+            "## Moved Instruction Architecture",
+            1,
+        )
+        changed += (
+            "\n\n> ## Instruction Architecture\n>\n"
+            "> .github/instructions/zsh-scripting.instructions.md\n"
+            "> lib/zsh-standard-policy.json\n"
+            "> scripts/validate-zsh-standard-policy.py\n"
+        )
+        path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "Instruction Architecture",
+            "scripts/validate-zsh-standard-policy.py",
+            "fix:",
+        )
+
     def test_rejects_inactive_or_future_phase_zsh_validation_claims(self) -> None:
         relative_path = ".github/README.md"
         claims = (
@@ -2087,6 +2412,25 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     "Phase 1 Zsh validation",
                     "fix:",
                 )
+
+    def test_rejects_wrapped_blockquote_zsh_validation_claim(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/README.md"
+        path = root / relative_path
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n\n> Zsh standard validation is\n> inactive.\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "Phase 1 Zsh validation",
+            "fix:",
+        )
 
     def test_allows_scoped_or_unrelated_readme_phase_language(self) -> None:
         relative_path = ".github/README.md"
@@ -2154,12 +2498,21 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             )
             entry_path.write_text(rendered, encoding="utf-8")
 
-            syntax = subprocess.run(  # nosec B603
-                ["zsh", "-f", "-n", str(entry_path)],
-                check=False,
-                capture_output=True,
-                text=True,
-            )
+            environment = os.environ.copy()
+            environment.pop("ZERO", None)
+            try:
+                syntax = subprocess.run(  # nosec B603
+                    ["zsh", "-f", "-n", str(entry_path)],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    env=environment,
+                    timeout=10,
+                )
+            except subprocess.TimeoutExpired as exc:
+                self.fail(
+                    f"template syntax timed out after {exc.timeout} seconds"
+                )
             self.assertEqual(
                 syntax.returncode,
                 0,
@@ -2236,9 +2589,11 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     typeset -gA Plugins
                     unset PMSPEC
                     . "$1" || exit 40
-                    demo_plugin_unload || exit 41
-                    check_fpath /baseline || exit 42
-                    check_scaffold_removed || exit 43
+                    [[ ! -o UNSET ]] || exit 41
+                    demo_plugin_unload || exit 42
+                    [[ ! -o UNSET ]] || exit 43
+                    check_fpath /baseline || exit 44
+                    check_scaffold_removed || exit 45
                     """
                 ),
                 "caller-ksh-arrays": textwrap.dedent(
@@ -2262,12 +2617,14 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins
                     . "$1" || exit 60
-                    [[ $0 == "$caller_zero" ]] || exit 61
-                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 62
-                    demo_plugin_unload || exit 63
-                    [[ $0 == "$caller_zero" ]] || exit 64
-                    check_fpath /baseline || exit 65
-                    check_scaffold_removed || exit 66
+                    [[ ! -o FUNCTION_ARGZERO ]] || exit 61
+                    [[ $0 == "$caller_zero" ]] || exit 62
+                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 63
+                    demo_plugin_unload || exit 64
+                    [[ ! -o FUNCTION_ARGZERO ]] || exit 65
+                    [[ $0 == "$caller_zero" ]] || exit 66
+                    check_fpath /baseline || exit 67
+                    check_scaffold_removed || exit 68
                     """
                 ),
                 "repeated-source": textwrap.dedent(
@@ -2315,6 +2672,24 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     check_scaffold_removed || exit 94
                     """
                 ),
+                "loader-handled-first-source": textwrap.dedent(
+                    r"""
+                    typeset -ga fpath=( /baseline )
+                    typeset -gA Plugins
+                    PMSPEC=f
+                    . "$1" || exit 100
+                    (( DEMO_FPATH_ADDED == 0 )) || exit 101
+                    check_fpath /baseline || exit 102
+                    unset PMSPEC
+                    . "$1" || exit 103
+                    (( DEMO_FPATH_ADDED == 0 )) || exit 104
+                    check_fpath /baseline || exit 105
+                    demo_plugin_unload || exit 106
+                    check_fpath /baseline || exit 107
+                    (( ! ${+Plugins[DEMO]} )) || exit 108
+                    check_scaffold_removed || exit 109
+                    """
+                ),
             }
             for case_name, body in cases.items():
                 with self.subTest(case=case_name):
@@ -2322,28 +2697,35 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     zdotdir = temporary_path / f"zdot-{case_name}"
                     home.mkdir()
                     zdotdir.mkdir()
-                    environment = os.environ.copy()
-                    environment.update(
+                    child_environment = environment.copy()
+                    child_environment.update(
                         {
                             "HOME": str(home),
                             "ZDOTDIR": str(zdotdir),
                         }
                     )
-                    completed = subprocess.run(  # nosec B603
-                        [
-                            "zsh",
-                            "-f",
-                            "-c",
-                            common + body,
-                            case_name,
-                            str(entry_path),
-                            str(functions_path),
-                        ],
-                        check=False,
-                        capture_output=True,
-                        text=True,
-                        env=environment,
-                    )
+                    try:
+                        completed = subprocess.run(  # nosec B603
+                            [
+                                "zsh",
+                                "-f",
+                                "-c",
+                                common + body,
+                                case_name,
+                                str(entry_path),
+                                str(functions_path),
+                            ],
+                            check=False,
+                            capture_output=True,
+                            text=True,
+                            env=child_environment,
+                            timeout=10,
+                        )
+                    except subprocess.TimeoutExpired as exc:
+                        self.fail(
+                            f"{case_name} timed out after "
+                            f"{exc.timeout} seconds"
+                        )
                     self.assertEqual(
                         completed.returncode,
                         0,
@@ -2490,18 +2872,69 @@ class PublicZshStandardContractTests(unittest.TestCase):
                     relative_path,
                 )
 
-    def test_patterns_use_literal_fpath_membership_under_native_options(
+    def test_patterns_retire_unsafe_zsh_lifecycle_snippets(self) -> None:
+        text = (PUBLIC_ROOT / "PATTERNS.md").read_text(encoding="utf-8")
+        section_names = (
+            "Plugin entry-point skeleton",
+            "Register the repository directory in `Plugins`",
+            "Guard `fpath` additions",
+        )
+        blocks: list[str] = []
+        for section_name in section_names:
+            start = text.index(f"## {section_name}")
+            end = text.find("\n## ", start + 3)
+            if end == -1:
+                end = len(text)
+            block = text[start:end]
+            blocks.append(block)
+            with self.subTest(section=section_name):
+                self.assertIn("Observed in:", block)
+                self.assertIn("Status: retired", block)
+                self.assertNotIn("```zsh", block)
+
+        retired_lifecycle = "\n".join(blocks)
+        for fragment in (
+            ".github/instructions/zsh-scripting.instructions.md",
+            ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh",
+            "not publish a replacement",
+            "zsh/sourced/preserve-caller-state",
+            "zsh/plugin/restore-state",
+            "zsh/security/trust-paths",
+        ):
+            with self.subTest(retirement_contract=fragment):
+                self.assertIn(fragment, retired_lifecycle)
+
+        self.assertNotIn('\n0="${ZERO:', retired_lifecycle)
+        self.assertNotIn("Plugins[PLUGIN_KEY]=", retired_lifecycle)
+        self.assertNotIn('} "${0:h}/functions"', retired_lifecycle)
+
+    def test_lifecycle_harness_is_option_sensitive_bounded_and_zero_neutral(
         self,
     ) -> None:
-        text = (PUBLIC_ROOT / "PATTERNS.md").read_text(encoding="utf-8")
-        start = text.index("## Guard `fpath` additions")
-        end = text.index("\n## Mandatory SHA-pinning", start)
-        block = text[start:end]
-
-        self.assertIn("builtin emulate -L zsh", block)
-        self.assertIn("fpath[(Ie)", block)
-        self.assertNotIn("fpath[(r)", block)
-        self.assertIn("does not independently inspect `fpath`", block)
+        source = Path(__file__).read_text(encoding="utf-8")
+        start = source.index(
+            "    def test_rendered_plugin_template_restores_lifecycle_state"
+        )
+        end = source.index(
+            "\n    def test_consumer_contract_uses_safe_text_reads",
+            start,
+        )
+        block = source[start:end]
+        requirements = (
+            ('environment.pop("ZERO", None)', 1),
+            ("timeout=10", 2),
+            ('"loader-handled-first-source"', 1),
+            ("PMSPEC=f", 1),
+            ("[[ ! -o UNSET ]]", 2),
+            ("[[ ! -o FUNCTION_ARGZERO ]]", 2),
+        )
+        for fragment, minimum_count in requirements:
+            with self.subTest(fragment=fragment):
+                self.assertGreaterEqual(
+                    block.count(fragment),
+                    minimum_count,
+                    block,
+                )
 
     def test_zunit_example_guards_and_demonstrates_unload_lifecycle(
         self,
