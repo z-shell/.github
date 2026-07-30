@@ -1080,6 +1080,16 @@ def validate_instruction_contract(
     text, errors = _read_text(root, INSTRUCTION_PATH)
     if text is None:
         return errors
+    visible_text = "\n".join(line for _, line in _visible_markdown_lines(text))
+    if "`zcompile -U -z`" not in visible_text:
+        errors.append(
+            error(
+                INSTRUCTION_PATH,
+                "missing required autoload compilation form `zcompile -U -z`",
+                "compile autoload artifacts with alias suppression and Zsh "
+                "file style",
+            )
+        )
     source = policy.get("source_classification")
     rules = policy.get("normative_rules")
     if not isinstance(source, dict) or not isinstance(source.get("path_globs"), list):
@@ -1285,7 +1295,8 @@ def validate_manifest_contract(
                     f"{canonical_paths[surface_path]!r}",
                 )
             )
-        if surface.get("file_patterns") == [apply_to]:
+        file_patterns = surface.get("file_patterns")
+        if isinstance(file_patterns, list) and apply_to in file_patterns:
             errors.append(
                 error(
                     MANIFEST_PATH,
@@ -1412,10 +1423,14 @@ def validate_shell_dispatcher(root: Path) -> list[str]:
     visible_text = " ".join(
         line.strip() for _, line in _visible_markdown_lines(text) if line.strip()
     )
-    clauses = [
-        clause.strip().casefold()
-        for clause in re.split(r"(?<=[.!?;])\s+", visible_text)
-        if clause.strip()
+    propositions = [
+        proposition.strip().casefold()
+        for proposition in re.split(
+            r"(?<=[.!?;])\s+|(?:,\s*)?\b(?:but|yet|however)\b\s+|"
+            r"\s+\band\b\s+",
+            visible_text,
+        )
+        if proposition.strip()
     ]
     negation = re.compile(
         r"\b(?:do not|don't|never|must not|should not|cannot|can't|is not|"
@@ -1426,20 +1441,20 @@ def validate_shell_dispatcher(root: Path) -> list[str]:
         r"require[ds]?|enable|use|start|begin|prefer|prescribe)\b"
     )
     prohibited: list[tuple[str, str]] = []
-    for clause in clauses:
-        if negation.search(clause):
+    for proposition in propositions:
+        if negation.search(proposition):
             continue
         if (
-            "bash" in clause
-            and ("shebang" in clause or "#!/bin/bash" in clause)
-            and prescription.search(clause)
+            "bash" in proposition
+            and ("shebang" in proposition or "#!/bin/bash" in proposition)
+            and prescription.search(proposition)
         ):
             prohibited.append(
                 ("default Bash shebang", "remove the default Bash shebang")
             )
         if (
-            "set -euo pipefail" in clause
-            and prescription.search(clause)
+            "set -euo pipefail" in proposition
+            and prescription.search(proposition)
         ):
             prohibited.append(
                 (
@@ -1448,11 +1463,11 @@ def validate_shell_dispatcher(root: Path) -> list[str]:
                 )
             )
         if (
-            "shellcheck" in clause
-            and "zsh" in clause
+            "shellcheck" in proposition
+            and "zsh" in proposition
             and re.search(
                 r"\b(?:validate|lint|check|run|use|apply|require|must|should)\b",
-                clause,
+                proposition,
             )
         ):
             prohibited.append(

@@ -259,8 +259,11 @@ narrowly justified early-return guard may precede it.
 
 At the loader, select the declared autoload file form. For a bare Zsh-style
 function body, normally use `autoload -Uz name` so loading selects Zsh form and
-suppresses alias expansion. Compile autoload artifacts with `zcompile -U` so
-the compiled form also records alias suppression.
+suppresses alias expansion. Compile autoload artifacts with `zcompile -U -z`:
+`-U` records alias suppression and `-z` records Zsh file style. Without
+`zcompile -z` or `zcompile -k`, loading consults the runtime `KSH_AUTOLOAD`
+setting; a style recorded in the compiled artifact overrides later `autoload`
+flags.
 
 ### `zsh/completion/preserve-trust-boundaries`
 

@@ -425,6 +425,11 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "file_patterns",
                 "reuses canonical Zsh file_patterns",
             ),
+            (
+                "zsh-file-pattern-with-extra",
+                "file_patterns_with_extra",
+                "reuses canonical Zsh file_patterns",
+            ),
             ("legacy-id", "id", "legacy surface id 'instruction-shell'"),
             ("duplicate-owner", "duplicate_owner", "has duplicate owners"),
         )
@@ -457,6 +462,14 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     shadow["canonical_for"] = ["zsh-scripting"]
                 elif mutation == "file_patterns":
                     shadow["file_patterns"] = canonical_zsh["file_patterns"]
+                elif mutation == "file_patterns_with_extra":
+                    shadow["kind"] = "enforcement"
+                    shadow["consumers"] = ["human", "ci"]
+                    shadow["tasks"] = ["instruction-change"]
+                    shadow["file_patterns"] = [
+                        canonical_zsh["file_patterns"][0],
+                        "**/*.shadow",
+                    ]
                 elif mutation == "id":
                     shadow["id"] = "instruction-shell"
                 else:
@@ -611,7 +624,23 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertIn("loader", block)
         self.assertIn("`autoload -Uz name`", block)
-        self.assertIn("`zcompile -U`", block)
+        self.assertIn("`zcompile -U -z`", block)
+
+    def test_rejects_autoload_compilation_without_zsh_file_style(self) -> None:
+        root = self.make_fixture()
+        path = root / ".github/instructions/zsh-scripting.instructions.md"
+        text = path.read_text(encoding="utf-8")
+        text = text.replace("`zcompile -U -z`", "`zcompile -U`", 1)
+        self.assertIn("`zcompile -U`", text)
+        path.write_text(text, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instructions/zsh-scripting.instructions.md",
+            "zcompile -U -z",
+        )
 
     def test_instruction_uses_anonymous_sourced_isolation(self) -> None:
         root = self.make_fixture()
@@ -838,6 +867,21 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "negated-clause-then-shellcheck",
                 "\nDo not validate Bash with ShellCheck; run ShellCheck "
                 "against Zsh sources.\n",
+            ),
+            (
+                "irrelevant-negation-then-bash",
+                "\nDo not standardize POSIX scripts and default all Bash "
+                "scripts to a Bash shebang.\n",
+            ),
+            (
+                "irrelevant-negation-then-strict",
+                "\nNever impose nounset on POSIX sh, but use "
+                "set -euo pipefail for every Zsh script.\n",
+            ),
+            (
+                "irrelevant-negation-then-shellcheck",
+                "\nDo not lint POSIX sh with ShellCheck but use ShellCheck "
+                "to validate Zsh sources.\n",
             ),
         )
         for name, addition in cases:
