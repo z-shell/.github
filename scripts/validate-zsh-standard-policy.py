@@ -21,6 +21,18 @@ SHELL_DISPATCHER_SHA256 = (
     "2c02e09c25047c6a16744e6b8be17afb8817ac67eb3a4a450d347bc88e8db8e3"
 )
 VALIDATOR_PATH = "scripts/validate-zsh-standard-policy.py"
+ADVISORY_CONSUMER_PATHS = (
+    ".github/agents/zsh-plugin-standard-reviewer.agent.md",
+    ".github/skills/new-zsh-plugin/SKILL.md",
+    ".github/skills/zunit-test/SKILL.md",
+)
+REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
+    "PATTERNS.md",
+    ".github/README.md",
+)
+PLUGIN_TEMPLATE_PATH = (
+    ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+)
 
 TOP_LEVEL_KEYS = (
     "schema_version",
@@ -1571,10 +1583,187 @@ def validate_consumer_contract(
     root: Path,
     policy: dict[str, object],
 ) -> list[str]:
-    """Task 5 extension point for advisory consumer ownership checks."""
+    """Validate advisory ownership and canonical references without rewriting."""
 
-    del root, policy
-    return []
+    errors: list[str] = []
+    texts: dict[str, str] = {}
+    for relative_path in REFERENCE_CONSUMER_PATHS + (PLUGIN_TEMPLATE_PATH,):
+        text, read_errors = _read_text(root, relative_path)
+        errors.extend(read_errors)
+        if text is not None:
+            texts[relative_path] = text
+
+    for relative_path in REFERENCE_CONSUMER_PATHS:
+        text = texts.get(relative_path)
+        if text is None:
+            continue
+        for canonical_path in (INSTRUCTION_PATH, POLICY_PATH):
+            if canonical_path not in text:
+                errors.append(
+                    error(
+                        relative_path,
+                        f"missing canonical Zsh reference {canonical_path!r}",
+                        f"link to {canonical_path} without copying its rule catalog",
+                    )
+                )
+
+    rule_values = policy.get("normative_rules")
+    rule_ids: tuple[str, ...] = ()
+    if isinstance(rule_values, list):
+        candidate_ids = tuple(
+            item.get("id")
+            for item in rule_values
+            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        )
+        if (
+            len(candidate_ids) == len(rule_values)
+            and candidate_ids == NORMATIVE_RULE_IDS
+        ):
+            rule_ids = cast(tuple[str, ...], candidate_ids)
+
+    if rule_ids:
+        heading_pattern = re.compile(
+            r"^###\s+`?("
+            + "|".join(re.escape(rule_id) for rule_id in rule_ids)
+            + r")`?\s*$"
+        )
+        for relative_path in REFERENCE_CONSUMER_PATHS:
+            text = texts.get(relative_path)
+            if text is None:
+                continue
+            for line_number, line in _visible_markdown_lines(text):
+                match = heading_pattern.fullmatch(line)
+                if match is not None:
+                    errors.append(
+                        error(
+                            relative_path,
+                            "normative rule heading "
+                            f"{match.group(1)!r} at line {line_number}; "
+                            "rules belong in canonical instruction",
+                            "replace the heading with an inline rule-ID citation",
+                        )
+                    )
+            if all(rule_id in text for rule_id in rule_ids):
+                errors.append(
+                    error(
+                        relative_path,
+                        "complete catalog duplication of all canonical Zsh rule IDs",
+                        "keep only the small rule-ID subset relevant to this consumer",
+                    )
+                )
+
+    patterns_text = texts.get("PATTERNS.md")
+    if patterns_text is not None:
+        normalized_patterns = " ".join(patterns_text.split())
+        patterns_contract = (
+            "Patterns below are observed examples, not a second policy source.",
+            "the canonical standard wins and the pattern must be corrected.",
+        )
+        if any(
+            fragment not in normalized_patterns for fragment in patterns_contract
+        ):
+            errors.append(
+                error(
+                    "PATTERNS.md",
+                    "observed patterns are non-normative and must defer on conflict",
+                    "state that patterns are observed examples and the canonical "
+                    "standard wins conflicts",
+                )
+            )
+
+    readme_text = texts.get(".github/README.md")
+    if readme_text is not None:
+        if VALIDATOR_PATH not in readme_text:
+            errors.append(
+                error(
+                    ".github/README.md",
+                    f"missing implemented Zsh validator catalog entry {VALIDATOR_PATH!r}",
+                    f"catalog {VALIDATOR_PATH} as the Phase 1 drift validator",
+                )
+            )
+        visible_readme = " ".join(
+            line.strip()
+            for _, line in _visible_markdown_lines(readme_text)
+            if line.strip()
+        )
+        deferred_claim = re.compile(
+            r"(?i)zsh standard (?:enforcement|validation).{0,80}"
+            r"deferred.{0,80}(?:later|future) phase"
+        )
+        if deferred_claim.search(visible_readme):
+            errors.append(
+                error(
+                    ".github/README.md",
+                    "claims active Phase 1 Zsh validation is deferred",
+                    "describe only the instruction, policy, and validator behavior "
+                    "implemented in Phase 1",
+                )
+            )
+
+    template_text = texts.get(PLUGIN_TEMPLATE_PATH)
+    if template_text is not None:
+        for marker, fix in (
+            ("TODO", "replace TODO markers with direct authoring instructions"),
+            (
+                "#funtions-directory",
+                "use the correct #functions-directory anchor",
+            ),
+        ):
+            if marker in template_text:
+                errors.append(
+                    error(
+                        PLUGIN_TEMPLATE_PATH,
+                        f"nonconforming scaffold marker {marker!r}",
+                        fix,
+                    )
+                )
+
+    manifest_path, _ = _contained_regular_path(root, MANIFEST_PATH)
+    manifest: dict[str, object] | None = None
+    if manifest_path is not None:
+        try:
+            manifest = load_json_strict(manifest_path)
+        except PolicyValidationError:
+            pass
+    if manifest is not None:
+        surface_values = manifest.get("surfaces")
+        if isinstance(surface_values, list):
+            for relative_path in ADVISORY_CONSUMER_PATHS:
+                matches = [
+                    cast(dict[str, object], item)
+                    for item in surface_values
+                    if isinstance(item, dict)
+                    and item.get("path") == relative_path
+                ]
+                if len(matches) != 1:
+                    errors.append(
+                        error(
+                            relative_path,
+                            "must have exactly one manifest surface for this "
+                            "advisory consumer",
+                            f"keep exactly one manifest surface with path "
+                            f"{relative_path!r}",
+                        )
+                    )
+                    continue
+                surface = matches[0]
+                if surface.get("authority") != "advisory":
+                    errors.append(
+                        error(
+                            relative_path,
+                            "manifest authority must be advisory",
+                            "set authority to 'advisory'",
+                        )
+                    )
+                if surface.get("canonical_for") != []:
+                    errors.append(
+                        error(
+                            relative_path,
+                            "manifest canonical_for must be empty",
+                            "set canonical_for to []",
+                        )
+                    )
+    return errors
 
 
 def validate(root: Path) -> list[str]:

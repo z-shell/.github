@@ -41,6 +41,8 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | [`AGENTS.md`](../AGENTS.md)                       | Canonical org-wide instructions for AI coding agents and maintainers                                                  |
 | [`PATTERNS.md`](../PATTERNS.md)                   | Cross-repo implementation idioms grounded in real repositories                                                        |
+| [`.github/instructions/zsh-scripting.instructions.md`](instructions/zsh-scripting.instructions.md) | Canonical detailed Zsh authoring, review, compatibility, and validation standard                                      |
+| [`lib/zsh-standard-policy.json`](../lib/zsh-standard-policy.json) | Machine-readable Zsh stable-release, profile, rule, and source-class contract                                         |
 | [`decisions/`](../decisions/)                     | Architectural decision records for non-obvious org-wide choices                                                       |
 | [`runbooks/`](../runbooks/)                       | Repeatable operational workflows such as learning capture, org review, triage, ADR drafting, and release coordination |
 | [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell)           |
@@ -63,6 +65,14 @@ The organization uses a portable, manifest-backed instruction architecture:
   evidence, destination, authority, and completion-review workflow.
 - [`review-project-learning`](skills/review-project-learning/SKILL.md) is the
   advisory reusable skill for that workflow.
+- [`.github/instructions/zsh-scripting.instructions.md`](instructions/zsh-scripting.instructions.md)
+  is the canonical detailed Zsh standard.
+- [`lib/zsh-standard-policy.json`](../lib/zsh-standard-policy.json) is the
+  machine-readable stable-release, execution-profile, rule, and source-class
+  contract.
+- [`scripts/validate-zsh-standard-policy.py`](../scripts/validate-zsh-standard-policy.py)
+  validates Phase 1 ownership and drift across the instruction, policy,
+  manifest, dispatcher, and public consumers.
 - [`validate-agent-policy.py`](../scripts/validate-agent-policy.py) and
   [`agent-instructions.yml`](workflows/agent-instructions.yml) enforce the public
   instruction contract.

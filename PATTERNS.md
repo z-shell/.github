@@ -2,6 +2,13 @@
 
 This file records implementation idioms already observed in multiple z-shell repositories. It exists to reduce drift, not to invent new style rules.
 
+The canonical Zsh requirements live in
+`.github/instructions/zsh-scripting.instructions.md`; machine-readable release,
+profile, rule, and source-class metadata lives in
+`lib/zsh-standard-policy.json`. Patterns below are observed examples, not a
+second policy source. When an observed pattern conflicts with a required rule,
+the canonical standard wins and the pattern must be corrected.
+
 Admission rule:
 
 - only record patterns already present in at least two real repositories
@@ -32,6 +39,9 @@ Pattern:
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
 
+Relevant canonical rules: `zsh/context/select-profile` and
+`zsh/sourced/preserve-caller-state`.
+
 ## Register the repository directory in `Plugins`
 
 Observed in:
@@ -51,6 +61,9 @@ Use a stable, repo-specific key and treat the registered directory as the root f
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash>
 
+Relevant canonical rules: `zsh/plugin/document-global-state` and
+`zsh/plugin/restore-state`.
+
 ## Guard `fpath` additions
 
 Observed in:
@@ -65,7 +78,7 @@ Pattern:
 - the common Zi-aware form is:
 
 ```zsh
-if [[ $PMSPEC != *f* ]]; then
+if [[ ${PMSPEC-} != *f* ]]; then
   fpath+=( "${0:h}/functions" )
 fi
 ```
@@ -79,6 +92,9 @@ fi
 ```
 
 Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-managed loading.
+
+Relevant canonical rules: `zsh/security/trust-paths` and
+`zsh/plugin/restore-state`.
 
 ## Mandatory SHA-pinning for GitHub Actions
 

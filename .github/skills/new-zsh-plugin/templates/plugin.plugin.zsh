@@ -10,26 +10,31 @@
 typeset -gA Plugins
 Plugins[__KEY__]="${0:h}"
 
-# https://wiki.zshell.dev/community/zsh_plugin_standard#funtions-directory
+# https://wiki.zshell.dev/community/zsh_plugin_standard#functions-directory
+# Canonical rule: zsh/security/trust-paths
 typeset -g __FPATH_VAR__="${0:h}/functions"
-if [[ $PMSPEC != *f* ]]; then
+typeset -gi __FPATH_VAR___ADDED=0
+if [[ ${PMSPEC-} != *f* ]] &&
+  (( ${fpath[(Ie)${__FPATH_VAR__}]} == 0 )); then
   fpath+=( "${__FPATH_VAR__}" )
+  __FPATH_VAR___ADDED=1
 fi
 
 # --- Plugin body -------------------------------------------------------------
 # Source library files or autoload functions here, e.g.:
 #   source "${0:h}/lib/setup.zsh"
 #   autoload -Uz +X .__NAME__ && .__NAME__
+# Pair every added side effect with its exact cleanup in the unload function.
 
 # https://wiki.zshell.dev/community/zsh_plugin_standard#unload-function
+# Canonical rule: zsh/plugin/restore-state
 __NAME___plugin_unload() {
-  # Remove our functions/ dir from fpath
-  fpath=("${fpath[@]:#${__FPATH_VAR__}}")
+  if (( ${__FPATH_VAR___ADDED:-0} )) &&
+    (( ${fpath[(Ie)${__FPATH_VAR__}]} != 0 )); then
+    fpath[${fpath[(ie)${__FPATH_VAR__}]}]=()
+  fi
 
-  # TODO: unset variables, remove aliases, remove hooks, unfunction helpers,
-  #       and restore any options/state this plugin changed.
-
-  unset __FPATH_VAR__ 'Plugins[__KEY__]'
+  unset __FPATH_VAR__ __FPATH_VAR___ADDED 'Plugins[__KEY__]'
 
   unfunction __NAME___plugin_unload
 }

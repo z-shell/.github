@@ -1527,6 +1527,342 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
         self.assertEqual(len(completed.stdout.splitlines()), 1, completed.stdout)
 
+    def test_rejects_missing_consumer_canonical_link(self) -> None:
+        root = self.make_fixture()
+        relative_path = (
+            ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+        )
+        path = root / relative_path
+        changed = path.read_text(encoding="utf-8").replace(
+            ".github/instructions/zsh-scripting.instructions.md",
+            ".github/instructions/missing-zsh-standard.md",
+            1,
+        )
+        path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            ".github/instructions/zsh-scripting.instructions.md",
+            "fix:",
+        )
+        self.assertEqual(path.read_text(encoding="utf-8"), changed)
+
+    def test_rejects_consumer_canonical_ownership(self) -> None:
+        cases = (
+            ("authority", "canonical"),
+            ("canonical_for", ["zsh-plugin-review"]),
+        )
+        for field, value in cases:
+            with self.subTest(field=field):
+                root = self.make_fixture()
+                path = root / ".github/instruction-surfaces.json"
+                manifest = json.loads(path.read_text(encoding="utf-8"))
+                surface = next(
+                    item
+                    for item in manifest["surfaces"]
+                    if item["path"]
+                    == ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+                )
+                surface[field] = value
+                path.write_text(
+                    json.dumps(manifest, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                expected = "advisory" if field == "authority" else "canonical_for"
+                self.assert_error_contains(
+                    errors,
+                    ".github/agents/zsh-plugin-standard-reviewer.agent.md",
+                    expected,
+                    "fix:",
+                )
+
+    def test_rejects_coordinated_consumer_manifest_path_drift(self) -> None:
+        root = self.make_fixture()
+        original_path = (
+            ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+        )
+        drifted_path = ".github/agents/drifted-zsh-reviewer.agent.md"
+        (root / original_path).rename(root / drifted_path)
+        manifest_path = root / ".github/instruction-surfaces.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        surface = next(
+            item for item in manifest["surfaces"] if item["path"] == original_path
+        )
+        surface["path"] = drifted_path
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            original_path,
+            "exactly one manifest surface",
+            "fix:",
+        )
+
+    def test_rejects_consumer_rule_definition_heading(self) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        cases = (
+            ("plain", "### zsh/options/localize"),
+            ("backticked", "### `zsh/options/localize`"),
+        )
+        for name, heading in cases:
+            with self.subTest(name=name):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + f"\n{heading}\n\nDuplicated normative prose.\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
+        wrappers = (
+            ("fenced", "```markdown\n### `zsh/options/localize`\n```\n"),
+            ("commented", "<!--\n### zsh/options/localize\n-->\n"),
+        )
+        for name, addition in wrappers:
+            with self.subTest(name=name):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + "\n" + addition,
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assertEqual(errors, [])
+
+    def test_rejects_copied_normative_rule_inventory(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/skills/zunit-test/SKILL.md"
+        path = root / relative_path
+        policy = self.read_policy(root)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        copied_ids = "\n".join(
+            f"- `{item['id']}`" for item in rules if isinstance(item, dict)
+        )
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n## Copied catalog\n\n"
+            + copied_ids
+            + "\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "complete catalog duplication",
+            "fix:",
+        )
+
+    def test_rejects_nonconforming_plugin_template(self) -> None:
+        root = self.make_fixture()
+        relative_path = (
+            ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+        )
+        path = root / relative_path
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n# TODO: restore this marker\n"
+            + "# https://example.test/#funtions-directory\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(errors, relative_path, "TODO", "fix:")
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "#funtions-directory",
+            "fix:",
+        )
+
+    def test_rejects_noncanonical_patterns_contract(self) -> None:
+        root = self.make_fixture()
+        relative_path = "PATTERNS.md"
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        changed = text.replace(
+            "Patterns below are observed examples, not a\nsecond policy source.",
+            "Patterns below define the policy.",
+            1,
+        )
+        self.assertNotEqual(changed, text)
+        path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "observed patterns are non-normative",
+            "fix:",
+        )
+
+    def test_rejects_incomplete_public_catalog(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/README.md"
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        changed = text.replace(
+            "scripts/validate-zsh-standard-policy.py",
+            "scripts/deferred-zsh-standard-validator.py",
+        )
+        self.assertNotEqual(changed, text)
+        path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "scripts/validate-zsh-standard-policy.py",
+            "fix:",
+        )
+
+    def test_consumer_contract_uses_safe_text_reads(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/skills/zunit-test/SKILL.md"
+        path = root / relative_path
+        outside_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(outside_directory.cleanup)
+        outside_path = Path(outside_directory.name) / "SKILL.md"
+        shutil.copy2(path, outside_path)
+        path.unlink()
+        path.symlink_to(outside_path)
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "contained regular file",
+            "fix:",
+        )
+
+    def test_consumer_contract_defers_to_malformed_manifest_error(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/instruction-surfaces.json"
+        (root / relative_path).write_text("{", encoding="utf-8")
+
+        errors = load_validator().validate(root)
+        manifest_errors = [
+            message for message in errors if message.startswith(f"{relative_path}:")
+        ]
+
+        self.assertEqual(len(manifest_errors), 1, errors)
+        self.assertIn("malformed JSON", manifest_errors[0])
+
+
+class PublicZshStandardContractTests(unittest.TestCase):
+    def test_public_zsh_consumers_defer_to_canonical_standard(self) -> None:
+        canonical_path = (
+            ".github/instructions/zsh-scripting.instructions.md"
+        )
+        policy_path = "lib/zsh-standard-policy.json"
+        consumers = (
+            ".github/agents/zsh-plugin-standard-reviewer.agent.md",
+            ".github/skills/new-zsh-plugin/SKILL.md",
+            ".github/skills/zunit-test/SKILL.md",
+            "PATTERNS.md",
+            ".github/README.md",
+        )
+        for relative_path in consumers:
+            text = (PUBLIC_ROOT / relative_path).read_text(encoding="utf-8")
+            self.assertIn(canonical_path, text, relative_path)
+            self.assertIn(policy_path, text, relative_path)
+
+        reviewer = (
+            PUBLIC_ROOT / ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+        ).read_text(encoding="utf-8")
+        for fragment in (
+            "severity",
+            "rule ID",
+            "evidence ID",
+            "execution profile",
+            "consequence",
+            "smallest safe correction",
+        ):
+            with self.subTest(reviewer_finding_field=fragment):
+                self.assertIn(fragment, reviewer)
+
+        new_plugin_skill = (
+            PUBLIC_ROOT / ".github/skills/new-zsh-plugin/SKILL.md"
+        ).read_text(encoding="utf-8")
+        for fragment in (
+            "sourced-library",
+            "autoload-function",
+            "isolated",
+            "invoke `<name>_plugin_unload`",
+            "assert post-unload restoration",
+        ):
+            with self.subTest(new_plugin_contract=fragment):
+                self.assertIn(fragment, new_plugin_skill)
+
+        zunit_skill = (
+            PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md"
+        ).read_text(encoding="utf-8")
+        for fragment in (
+            "test-fixture",
+            "zsh/test/isolate-environment",
+            "zsh/test/match-production-profile",
+            "zsh/plugin/restore-state",
+            "Declare each intentional negative fixture",
+        ):
+            with self.subTest(zunit_contract=fragment):
+                self.assertIn(fragment, zunit_skill)
+
+        template = (
+            PUBLIC_ROOT
+            / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("TODO", template)
+        self.assertNotIn("#funtions-directory", template)
+        self.assertNotIn("emulate -L zsh", template)
+        for fragment in (
+            "${PMSPEC-}",
+            "__FPATH_VAR___ADDED",
+            "fpath[(ie)${__FPATH_VAR__}]",
+            "unset __FPATH_VAR__ __FPATH_VAR___ADDED",
+            "'Plugins[__KEY__]'",
+            "unfunction __NAME___plugin_unload",
+            "zsh/security/trust-paths",
+            "zsh/plugin/restore-state",
+        ):
+            with self.subTest(template_contract=fragment):
+                self.assertIn(fragment, template)
+
+        readme = (PUBLIC_ROOT / ".github/README.md").read_text(encoding="utf-8")
+        self.assertIn("scripts/validate-zsh-standard-policy.py", readme)
+        self.assertNotIn(
+            "Zsh standard enforcement is deferred to a later phase",
+            readme,
+        )
+
 
 class PublicRepositoryTests(unittest.TestCase):
     def test_public_repository_zsh_standard_contract(self) -> None:
