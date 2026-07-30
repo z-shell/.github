@@ -116,6 +116,202 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(load_validator().validate(root), [])
 
+    def test_declares_canonical_startup_profile(self) -> None:
+        policy = self.read_policy(PUBLIC_ROOT)
+        profiles = policy["execution_profiles"]
+        self.assertIsInstance(profiles, dict)
+
+        self.assertEqual(
+            tuple(profiles),
+            (
+                "standalone-executable",
+                "startup-file",
+                "sourced-library",
+                "autoload-function",
+                "test-fixture",
+            ),
+        )
+        self.assertEqual(
+            profiles["startup-file"],
+            {
+                "title": "Startup file",
+                "description": (
+                    "A Zsh startup or shutdown file that configures shell state "
+                    "for its lifecycle phase."
+                ),
+            },
+        )
+
+    def test_maps_all_startup_basenames_to_startup_profile(self) -> None:
+        policy = self.read_policy(PUBLIC_ROOT)
+        source = policy["source_classification"]
+        self.assertIsInstance(source, dict)
+        startup_basenames = source["startup_basenames"]
+        self.assertIsInstance(startup_basenames, list)
+
+        self.assertEqual(
+            startup_basenames,
+            [
+                {"value": ".zshenv", "profile": "startup-file"},
+                {"value": ".zprofile", "profile": "startup-file"},
+                {"value": ".zshrc", "profile": "startup-file"},
+                {"value": ".zlogin", "profile": "startup-file"},
+                {"value": ".zlogout", "profile": "startup-file"},
+                {"value": "zshenv", "profile": "startup-file"},
+                {"value": "zprofile", "profile": "startup-file"},
+                {"value": "zshrc", "profile": "startup-file"},
+                {"value": "zlogin", "profile": "startup-file"},
+                {"value": "zlogout", "profile": "startup-file"},
+            ],
+        )
+        self.assertNotIn(
+            "sourced-library",
+            [item["profile"] for item in startup_basenames],
+        )
+
+    def test_startup_profile_has_exact_rule_membership(self) -> None:
+        policy = self.read_policy(PUBLIC_ROOT)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        expected_rule_ids = [
+            "zsh/authority/released-manual",
+            "zsh/compatibility/respect-floor",
+            "zsh/compatibility/annotate-version-sensitive",
+            "zsh/context/classify",
+            "zsh/context/select-profile",
+            "zsh/context/no-cross-dialect-defaults",
+            "zsh/review/report-without-rewrite",
+            "zsh/change/conform-touched-code",
+            "zsh/options/declare-correctness-state",
+            "zsh/options/no-blanket-error-mode",
+            "zsh/options/constrain-multios",
+            "zsh/parameters/declare-scope",
+            "zsh/parameters/account-dynamic-scope",
+            "zsh/arrays/declare-kind",
+            "zsh/arrays/native-indexing",
+            "zsh/expansion/preserve-boundaries",
+            "zsh/expansion/use-native-word-splitting",
+            "zsh/quoting/quote-boundaries",
+            "zsh/associative/deterministic-order",
+            "zsh/patterns/declare-interpretation",
+            "zsh/conditions/use-native-form",
+            "zsh/conditions/declare-match-mode",
+            "zsh/arithmetic/handle-zero-status",
+            "zsh/arithmetic/validate-input",
+            "zsh/arithmetic/declare-base",
+            "zsh/status/check-critical",
+            "zsh/status/check-pipeline-components",
+            "zsh/status/preserve-command-substitution",
+            "zsh/cleanup/scope-traps",
+            "zsh/cleanup/use-always",
+            "zsh/output/literal-vs-formatted",
+            "zsh/input/raw-mode",
+            "zsh/operands/end-options",
+            "zsh/redirection/order-and-quote",
+            "zsh/fd/close-allocated",
+            "zsh/security/treat-strings-as-data",
+            "zsh/security/no-unreviewed-reevaluation",
+            "zsh/security/no-restricted-shell-sandbox",
+            "zsh/security/trust-paths",
+            "zsh/documentation/comment-invariants",
+            "zsh/documentation/track-deferred-work",
+            "zsh/validation/native-authority",
+            "zsh/validation/no-shellcheck",
+            "zsh/validation/parser-gap",
+            "zsh/formatting/no-unproven-rewrite",
+        ]
+        matching_rules = [
+            rule for rule in rules if "startup-file" in rule["profiles"]
+        ]
+
+        self.assertEqual(
+            [rule["id"] for rule in matching_rules],
+            expected_rule_ids,
+        )
+        self.assertEqual(len(matching_rules), 45)
+        for rule in matching_rules:
+            with self.subTest(rule_id=rule["id"]):
+                standalone_index = rule["profiles"].index(
+                    "standalone-executable"
+                )
+                self.assertEqual(
+                    rule["profiles"][standalone_index + 1],
+                    "startup-file",
+                )
+
+    def test_registers_command_execution_as_fourteenth_source(self) -> None:
+        policy = self.read_policy(PUBLIC_ROOT)
+        sources = policy["documentation_sources"]
+        self.assertIsInstance(sources, dict)
+
+        self.assertEqual(len(sources), 14)
+        self.assertEqual(tuple(sources)[-1], "command-execution")
+        self.assertEqual(
+            sources["command-execution"],
+            {
+                "title": "Command Execution",
+                "url": (
+                    "https://zsh.sourceforge.io/Doc/Release/"
+                    "Command-Execution.html"
+                ),
+                "kind": "official-manual",
+            },
+        )
+
+    def test_trust_paths_uses_exact_domain_evidence(self) -> None:
+        policy = self.read_policy(PUBLIC_ROOT)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        rule = next(
+            item for item in rules if item["id"] == "zsh/security/trust-paths"
+        )
+        expected = [
+            "command-execution",
+            "shell-builtins",
+            "functions",
+            "completion-system",
+        ]
+
+        self.assertEqual(rule["evidence"], expected)
+        block = self.instruction_rule_block(
+            PUBLIC_ROOT,
+            "zsh/security/trust-paths",
+        )
+        self.assertIn(
+            "- Evidence: `command-execution`, `shell-builtins`, `functions`, "
+            "`completion-system`",
+            block,
+        )
+        self.assertNotIn("`shell-grammar`", block)
+
+    def test_instruction_declares_five_execution_profiles(self) -> None:
+        path = PUBLIC_ROOT / ".github/instructions/zsh-scripting.instructions.md"
+        text = path.read_text(encoding="utf-8")
+        start = text.index("## Execution-profile selection")
+        end = text.index("\n## Compatibility and repository-floor model", start)
+        block = text[start:end]
+
+        self.assertIn("The five profiles are:", block)
+        self.assertLess(
+            block.index("`standalone-executable`"),
+            block.index("`startup-file`"),
+        )
+        self.assertLess(
+            block.index("`startup-file`"),
+            block.index("`sourced-library`"),
+        )
+        self.assertLess(
+            block.index("`sourced-library`"),
+            block.index("`autoload-function`"),
+        )
+        self.assertLess(
+            block.index("`autoload-function`"),
+            block.index("`test-fixture`"),
+        )
+        self.assertIn("startup or shutdown file", block)
+        self.assertIn("lifecycle phase", block)
+        self.assertIn("caller-preserving `sourced-library`", block)
+
     def test_rejects_duplicate_json_keys(self) -> None:
         root = self.make_fixture()
         policy_path = root / "lib/zsh-standard-policy.json"
@@ -365,19 +561,46 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             self.assertIsInstance(suffix, dict)
             suffix["profile"] = "unknown-profile"
 
+        def sourced_startup_basename(source: dict[str, object]) -> None:
+            startup_basenames = source["startup_basenames"]
+            self.assertIsInstance(startup_basenames, list)
+            startup_basename = startup_basenames[0]
+            self.assertIsInstance(startup_basename, dict)
+            startup_basename["profile"] = "sourced-library"
+
         cases = (
-            ("wrong-type", wrong_type, "$.source_classification.tracked_files_only"),
-            ("duplicate-suffix", duplicate_suffix, "$.source_classification.suffixes"),
-            ("shell-suffix", shell_suffix, ".sh"),
+            (
+                "wrong-type",
+                wrong_type,
+                ("$.source_classification.tracked_files_only",),
+            ),
+            (
+                "duplicate-suffix",
+                duplicate_suffix,
+                ("$.source_classification.suffixes",),
+            ),
+            ("shell-suffix", shell_suffix, (".sh",)),
             (
                 "missing-compiled-suffix",
                 missing_compiled_suffix,
-                "$.source_classification.exclusions.compiled_suffixes",
+                ("$.source_classification.exclusions.compiled_suffixes",),
             ),
-            ("reordered-glob", reordered_globs, "$.source_classification.path_globs"),
-            ("unknown-profile", unknown_profile, "unknown-profile"),
+            (
+                "reordered-glob",
+                reordered_globs,
+                ("$.source_classification.path_globs",),
+            ),
+            ("unknown-profile", unknown_profile, ("unknown-profile",)),
+            (
+                "sourced-startup-basename",
+                sourced_startup_basename,
+                (
+                    "$.source_classification.startup_basenames",
+                    "exact ordered source-class contract",
+                ),
+            ),
         )
-        for name, mutation, expected in cases:
+        for name, mutation, expected_fragments in cases:
             with self.subTest(name=name):
                 root = self.make_fixture()
                 policy = self.read_policy(root)
@@ -388,7 +611,36 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
                 errors = load_validator().validate(root)
 
-                self.assert_error_contains(errors, expected)
+                self.assert_error_contains(errors, *expected_fragments)
+
+    def test_rejects_startup_profile_out_of_canonical_order(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        profiles = policy["execution_profiles"]
+        self.assertIsInstance(profiles, dict)
+        startup_profile = {
+            "title": "Startup file",
+            "description": (
+                "A Zsh startup or shutdown file that configures shell state "
+                "for its lifecycle phase."
+            ),
+        }
+        policy["execution_profiles"] = {
+            "standalone-executable": profiles["standalone-executable"],
+            "sourced-library": profiles["sourced-library"],
+            "startup-file": startup_profile,
+            "autoload-function": profiles["autoload-function"],
+            "test-fixture": profiles["test-fixture"],
+        }
+        self.write_policy(root, policy)
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            "$.execution_profiles",
+            "five canonical profiles in order",
+        )
 
     def test_rejects_apply_to_drift(self) -> None:
         extra_glob = "**/drifted-zsh-source"

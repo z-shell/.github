@@ -77,12 +77,21 @@
       "title": "Restricted Shell",
       "url": "https://zsh.sourceforge.io/Doc/Release/Restricted-Shell.html",
       "kind": "official-manual"
+    },
+    "command-execution": {
+      "title": "Command Execution",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Command-Execution.html",
+      "kind": "official-manual"
     }
   },
   "execution_profiles": {
     "standalone-executable": {
       "title": "Standalone executable",
       "description": "A directly invoked Zsh program that owns its initial shell state."
+    },
+    "startup-file": {
+      "title": "Startup file",
+      "description": "A Zsh startup or shutdown file that configures shell state for its lifecycle phase."
     },
     "sourced-library": {
       "title": "Sourced library",
@@ -120,7 +129,7 @@
     {
       "id": "zsh/authority/released-manual",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["manual-index", "release-notes"],
@@ -129,7 +138,7 @@
     {
       "id": "zsh/compatibility/respect-floor",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["manual-index", "release-notes"],
@@ -138,7 +147,7 @@
     {
       "id": "zsh/compatibility/annotate-version-sensitive",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["manual-index", "release-notes"],
@@ -147,7 +156,7 @@
     {
       "id": "zsh/context/classify",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["shell-grammar"],
@@ -156,7 +165,7 @@
     {
       "id": "zsh/context/select-profile",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["shell-grammar", "functions"],
@@ -165,7 +174,7 @@
     {
       "id": "zsh/context/no-cross-dialect-defaults",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-grammar", "expansion"],
@@ -174,7 +183,7 @@
     {
       "id": "zsh/review/report-without-rewrite",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["manual-index"],
@@ -183,7 +192,7 @@
     {
       "id": "zsh/change/conform-touched-code",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["manual-index"],
@@ -273,7 +282,7 @@
     {
       "id": "zsh/options/declare-correctness-state",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["options"],
@@ -300,7 +309,7 @@
     {
       "id": "zsh/options/no-blanket-error-mode",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["options", "shell-grammar"],
@@ -309,7 +318,7 @@
     {
       "id": "zsh/options/constrain-multios",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["redirection", "options"],
@@ -318,7 +327,7 @@
     {
       "id": "zsh/parameters/declare-scope",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["parameters", "shell-builtins"],
@@ -327,7 +336,7 @@
     {
       "id": "zsh/parameters/account-dynamic-scope",
       "level": "review",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["parameters", "functions"],
@@ -336,7 +345,7 @@
     {
       "id": "zsh/arrays/declare-kind",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["parameters"],
@@ -345,7 +354,7 @@
     {
       "id": "zsh/arrays/native-indexing",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["parameters"],
@@ -354,7 +363,7 @@
     {
       "id": "zsh/expansion/preserve-boundaries",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["expansion", "parameters"],
@@ -363,7 +372,7 @@
     {
       "id": "zsh/expansion/use-native-word-splitting",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["expansion"],
@@ -372,7 +381,7 @@
     {
       "id": "zsh/quoting/quote-boundaries",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["expansion", "redirection"],
@@ -381,7 +390,7 @@
     {
       "id": "zsh/associative/deterministic-order",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["parameters", "expansion"],
@@ -390,7 +399,7 @@
     {
       "id": "zsh/patterns/declare-interpretation",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["expansion", "conditional-expressions"],
@@ -399,7 +408,7 @@
     {
       "id": "zsh/conditions/use-native-form",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["conditional-expressions"],
@@ -408,7 +417,7 @@
     {
       "id": "zsh/conditions/declare-match-mode",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["conditional-expressions"],
@@ -417,7 +426,7 @@
     {
       "id": "zsh/arithmetic/handle-zero-status",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["arithmetic-evaluation"],
@@ -426,7 +435,7 @@
     {
       "id": "zsh/arithmetic/validate-input",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["arithmetic-evaluation", "parameters"],
@@ -435,7 +444,7 @@
     {
       "id": "zsh/arithmetic/declare-base",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["arithmetic-evaluation"],
@@ -444,7 +453,7 @@
     {
       "id": "zsh/status/check-critical",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["shell-grammar", "shell-builtins"],
@@ -453,7 +462,7 @@
     {
       "id": "zsh/status/check-pipeline-components",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-grammar", "parameters"],
@@ -462,7 +471,7 @@
     {
       "id": "zsh/status/preserve-command-substitution",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-grammar", "shell-builtins"],
@@ -471,7 +480,7 @@
     {
       "id": "zsh/cleanup/scope-traps",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["functions", "shell-grammar"],
@@ -480,7 +489,7 @@
     {
       "id": "zsh/cleanup/use-always",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-grammar"],
@@ -489,7 +498,7 @@
     {
       "id": "zsh/output/literal-vs-formatted",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-builtins"],
@@ -498,7 +507,7 @@
     {
       "id": "zsh/input/raw-mode",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-builtins"],
@@ -507,7 +516,7 @@
     {
       "id": "zsh/operands/end-options",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["shell-builtins"],
@@ -516,7 +525,7 @@
     {
       "id": "zsh/redirection/order-and-quote",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["redirection", "expansion"],
@@ -525,7 +534,7 @@
     {
       "id": "zsh/fd/close-allocated",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["redirection", "parameters"],
@@ -534,7 +543,7 @@
     {
       "id": "zsh/security/treat-strings-as-data",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["expansion", "parameters"],
@@ -543,7 +552,7 @@
     {
       "id": "zsh/security/no-unreviewed-reevaluation",
       "level": "review",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["expansion", "shell-builtins"],
@@ -552,7 +561,7 @@
     {
       "id": "zsh/security/no-restricted-shell-sandbox",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function"],
       "minimum_zsh": null,
       "basis": "language-semantics",
       "evidence": ["restricted-shell"],
@@ -561,10 +570,10 @@
     {
       "id": "zsh/security/trust-paths",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
-      "evidence": ["shell-grammar", "functions", "completion-system"],
+      "evidence": ["command-execution", "shell-builtins", "functions", "completion-system"],
       "enforcement": ["runtime-test", "human-review"]
     },
     {
@@ -597,7 +606,7 @@
     {
       "id": "zsh/documentation/comment-invariants",
       "level": "recommended",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["manual-index"],
@@ -606,7 +615,7 @@
     {
       "id": "zsh/documentation/track-deferred-work",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["manual-index"],
@@ -615,7 +624,7 @@
     {
       "id": "zsh/validation/native-authority",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["manual-index", "shell-grammar", "options", "shell-builtins"],
@@ -624,7 +633,7 @@
     {
       "id": "zsh/validation/no-shellcheck",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["shell-grammar"],
@@ -633,7 +642,7 @@
     {
       "id": "zsh/validation/parser-gap",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "mixed",
       "evidence": ["manual-index"],
@@ -642,7 +651,7 @@
     {
       "id": "zsh/formatting/no-unproven-rewrite",
       "level": "required",
-      "profiles": ["standalone-executable", "sourced-library", "autoload-function", "test-fixture"],
+      "profiles": ["standalone-executable", "startup-file", "sourced-library", "autoload-function", "test-fixture"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["manual-index"],
@@ -674,43 +683,43 @@
     "startup_basenames": [
       {
         "value": ".zshenv",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": ".zprofile",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": ".zshrc",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": ".zlogin",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": ".zlogout",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": "zshenv",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": "zprofile",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": "zshrc",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": "zlogin",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       },
       {
         "value": "zlogout",
-        "profile": "sourced-library"
+        "profile": "startup-file"
       }
     ],
     "directory_rules": [

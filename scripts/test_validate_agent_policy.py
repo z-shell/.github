@@ -1546,6 +1546,11 @@ class PublicRepositoryTests(unittest.TestCase):
             "**Deciders:** Pending maintainer acceptance",
             "Zsh 5.9.2",
             "per-repository compatibility floor",
+            "five source classes",
+            "`startup-file`",
+            "startup and shutdown files intentionally configure shell state",
+            "caller-preserving sourced libraries",
+            "https://zsh.sourceforge.io/Doc/Release/Files.html",
             "generated, digest-checked delivery",
             "ShellCheck is not used for Zsh",
         )

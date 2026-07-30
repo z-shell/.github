@@ -27,8 +27,10 @@ non-normative.
 Compatibility combines a per-repository compatibility floor with validation on
 the current stable release. No global fallback floor is inferred.
 
-The standard distinguishes four source classes: `standalone-executable`,
-`sourced-library`, `autoload-function`, and `test-fixture`.
+The standard distinguishes five source classes: `standalone-executable`,
+`startup-file`, `sourced-library`, `autoload-function`, and `test-fixture`.
+These startup and shutdown files intentionally configure shell state for their
+lifecycle phase, unlike caller-preserving sourced libraries.
 
 Detailed normative prose lives in
 `.github/instructions/zsh-scripting.instructions.md`. Machine-readable release,
@@ -87,5 +89,6 @@ separate, evidence-backed enrollment decision.
 - [Issue #493](https://github.com/z-shell/.github/issues/493)
 - [Official Zsh 5.9.2 manual](https://zsh.sourceforge.io/Doc/Release/index.html)
 - [Official Zsh release notes](https://zsh.sourceforge.io/releases.html)
+- [Official Startup/Shutdown Files reference](https://zsh.sourceforge.io/Doc/Release/Files.html)
 - `decisions/0014-portable-agent-instruction-architecture.md`
 - `runbooks/instruction-update.md`

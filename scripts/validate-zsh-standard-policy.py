@@ -42,6 +42,7 @@ STABLE_RELEASE_KEYS = (
 )
 PROFILE_IDS = (
     "standalone-executable",
+    "startup-file",
     "sourced-library",
     "autoload-function",
     "test-fixture",
@@ -195,6 +196,11 @@ DOCUMENTATION_SOURCES = {
         "https://zsh.sourceforge.io/Doc/Release/Restricted-Shell.html",
         "official-manual",
     ),
+    "command-execution": (
+        "Command Execution",
+        "https://zsh.sourceforge.io/Doc/Release/Command-Execution.html",
+        "official-manual",
+    ),
 }
 
 EXPECTED_SOURCE_CLASSIFICATION = {
@@ -208,16 +214,16 @@ EXPECTED_SOURCE_CLASSIFICATION = {
         {"value": ".zsh", "profile": None},
     ],
     "startup_basenames": [
-        {"value": ".zshenv", "profile": "sourced-library"},
-        {"value": ".zprofile", "profile": "sourced-library"},
-        {"value": ".zshrc", "profile": "sourced-library"},
-        {"value": ".zlogin", "profile": "sourced-library"},
-        {"value": ".zlogout", "profile": "sourced-library"},
-        {"value": "zshenv", "profile": "sourced-library"},
-        {"value": "zprofile", "profile": "sourced-library"},
-        {"value": "zshrc", "profile": "sourced-library"},
-        {"value": "zlogin", "profile": "sourced-library"},
-        {"value": "zlogout", "profile": "sourced-library"},
+        {"value": ".zshenv", "profile": "startup-file"},
+        {"value": ".zprofile", "profile": "startup-file"},
+        {"value": ".zshrc", "profile": "startup-file"},
+        {"value": ".zlogin", "profile": "startup-file"},
+        {"value": ".zlogout", "profile": "startup-file"},
+        {"value": "zshenv", "profile": "startup-file"},
+        {"value": "zprofile", "profile": "startup-file"},
+        {"value": "zshrc", "profile": "startup-file"},
+        {"value": "zlogin", "profile": "startup-file"},
+        {"value": "zlogout", "profile": "startup-file"},
     ],
     "directory_rules": [
         {
@@ -544,7 +550,7 @@ def _validate_profiles(
     profiles = cast(dict[str, object], value)
     if tuple(profiles) != PROFILE_IDS:
         errors.append(
-            "$.execution_profiles: keys must be exactly the four canonical "
+            "$.execution_profiles: keys must be exactly the five canonical "
             "profiles in order"
         )
     for profile_id in profiles:

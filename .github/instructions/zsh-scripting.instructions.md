@@ -30,14 +30,19 @@ manually and fail rather than guess when evidence conflicts.
 
 ## Execution-profile selection
 
-The four profiles are:
+The five profiles are:
 
 - `standalone-executable`: a directly invoked Zsh program that owns initial
   state;
+- `startup-file`: a Zsh-read startup or shutdown file that deliberately
+  configures shell state for its lifecycle phase;
 - `sourced-library`: a plugin or library loaded into caller state;
 - `autoload-function`: an autoloaded function body, including completions;
 - `test-fixture`: a test or fixture evaluated under an explicit production
   profile.
+
+Unlike a caller-preserving `sourced-library`, a `startup-file` intentionally
+changes shell state for its lifecycle phase.
 
 Path is evidence, not sole authority. Use path, basename, shebang, invocation,
 repository override, and actual behavior together. Ambiguous or unassigned
@@ -75,7 +80,7 @@ implemented.
 ### `zsh/authority/released-manual`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `manual-index`, `release-notes`
@@ -87,7 +92,7 @@ organization policy, examples, or tools.
 ### `zsh/compatibility/respect-floor`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `manual-index`, `release-notes`
@@ -99,7 +104,7 @@ version-sensitive behavior.
 ### `zsh/compatibility/annotate-version-sensitive`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `manual-index`, `release-notes`
@@ -111,7 +116,7 @@ compatible floor, tested branch, or deliberate floor increase.
 ### `zsh/context/classify`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `shell-grammar`
@@ -123,19 +128,19 @@ before applying rules.
 ### `zsh/context/select-profile`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `shell-grammar`, `functions`
 - Enforcement: `classifier`, `human-review`
 
-Select one of the four execution profiles before assessing options, scope, or
+Select one of the five execution profiles before assessing options, scope, or
 caller state.
 
 ### `zsh/context/no-cross-dialect-defaults`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-grammar`, `expansion`
@@ -148,7 +153,7 @@ Do not import Bash or POSIX defaults into native Zsh.
 ### `zsh/review/report-without-rewrite`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `manual-index`
@@ -160,7 +165,7 @@ silently rewriting unrelated legacy code.
 ### `zsh/change/conform-touched-code`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `manual-index`
@@ -321,7 +326,7 @@ execution profile.
 ### `zsh/options/declare-correctness-state`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `options`
@@ -360,7 +365,7 @@ Do not change options, pattern state, or traps at sourced top level.
 ### `zsh/options/no-blanket-error-mode`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `options`, `shell-grammar`
@@ -374,7 +379,7 @@ bundle.
 ### `zsh/options/constrain-multios`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `redirection`, `options`
@@ -387,7 +392,7 @@ Constrain or disable `MULTIOS` when implicit fan-out is not intended.
 ### `zsh/parameters/declare-scope`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `parameters`, `shell-builtins`
@@ -398,7 +403,7 @@ Declare function-local parameters and intentional globals explicitly.
 ### `zsh/parameters/account-dynamic-scope`
 
 - Level: `review`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `parameters`, `functions`
@@ -410,7 +415,7 @@ parameters.
 ### `zsh/arrays/declare-kind`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `parameters`
@@ -426,7 +431,7 @@ typeset -A associative
 ### `zsh/arrays/native-indexing`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `parameters`
@@ -440,7 +445,7 @@ profile requires otherwise.
 ### `zsh/expansion/preserve-boundaries`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `expansion`, `parameters`
@@ -457,7 +462,7 @@ print -rl -- "${values[@]}"
 ### `zsh/expansion/use-native-word-splitting`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `expansion`
@@ -469,7 +474,7 @@ intended.
 ### `zsh/quoting/quote-boundaries`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `expansion`, `redirection`
@@ -481,7 +486,7 @@ native Zsh expansion semantics.
 ### `zsh/associative/deterministic-order`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `parameters`, `expansion`
@@ -492,7 +497,7 @@ Sort associative keys explicitly when output order is observable.
 ### `zsh/patterns/declare-interpretation`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `expansion`, `conditional-expressions`
@@ -511,7 +516,7 @@ explicit. In `[[ ... ]]`, quoting changes pattern treatment:
 ### `zsh/conditions/use-native-form`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `conditional-expressions`
@@ -522,7 +527,7 @@ Prefer native `[[ ... ]]` for Zsh conditions.
 ### `zsh/conditions/declare-match-mode`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `conditional-expressions`
@@ -533,7 +538,7 @@ Document and encode the intended comparison or match mode.
 ### `zsh/arithmetic/handle-zero-status`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `arithmetic-evaluation`
@@ -551,7 +556,7 @@ The assignment succeeds semantically but the arithmetic command status is 1.
 ### `zsh/arithmetic/validate-input`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `arithmetic-evaluation`, `parameters`
@@ -562,7 +567,7 @@ Validate externally supplied arithmetic and subscript input before evaluation.
 ### `zsh/arithmetic/declare-base`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `arithmetic-evaluation`
@@ -575,7 +580,7 @@ Make numeric type and base assumptions explicit.
 ### `zsh/status/check-critical`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `shell-grammar`, `shell-builtins`
@@ -587,7 +592,7 @@ options.
 ### `zsh/status/check-pipeline-components`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-grammar`, `parameters`
@@ -604,7 +609,7 @@ typeset -a statuses=( "${pipestatus[@]}" )
 ### `zsh/status/preserve-command-substitution`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-grammar`, `shell-builtins`
@@ -629,7 +634,7 @@ value=$(critical_command) || exit
 ### `zsh/cleanup/scope-traps`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `functions`, `shell-grammar`
@@ -640,7 +645,7 @@ Declare trap form and scope, and restore caller trap state where required.
 ### `zsh/cleanup/use-always`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-grammar`
@@ -654,7 +659,7 @@ matches the cleanup requirement.
 ### `zsh/output/literal-vs-formatted`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-builtins`
@@ -671,7 +676,7 @@ printf '%s: %d\n' "$label" "$count"
 ### `zsh/input/raw-mode`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-builtins`
@@ -682,7 +687,7 @@ Use raw input modes when backslash interpretation is not intended.
 ### `zsh/operands/end-options`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `shell-builtins`
@@ -693,7 +698,7 @@ Place `--` before untrusted operands when the builtin supports it.
 ### `zsh/redirection/order-and-quote`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `redirection`, `expansion`
@@ -704,7 +709,7 @@ Quote redirection targets and make descriptor order deliberate.
 ### `zsh/fd/close-allocated`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `redirection`, `parameters`
@@ -723,7 +728,7 @@ exec {output_fd}>&-
 ### `zsh/security/treat-strings-as-data`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `expansion`, `parameters`
@@ -735,7 +740,7 @@ option, or path interpretation.
 ### `zsh/security/no-unreviewed-reevaluation`
 
 - Level: `review`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `expansion`, `shell-builtins`
@@ -747,7 +752,7 @@ qualifiers, and generated code.
 ### `zsh/security/no-restricted-shell-sandbox`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
 - Evidence: `restricted-shell`
@@ -758,10 +763,10 @@ Never present restricted-shell mode as a security sandbox.
 ### `zsh/security/trust-paths`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
-- Evidence: `shell-grammar`, `functions`, `completion-system`
+- Evidence: `command-execution`, `shell-builtins`, `functions`, `completion-system`
 - Enforcement: `runtime-test`, `human-review`
 
 Trust only controlled `PATH`, `fpath`, module, and completion locations.
@@ -806,7 +811,7 @@ the unload function.
 ### `zsh/documentation/comment-invariants`
 
 - Level: `recommended`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `manual-index`
@@ -818,7 +823,7 @@ decisions, and accepted parser gaps, not visible syntax.
 ### `zsh/documentation/track-deferred-work`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `manual-index`
@@ -832,7 +837,7 @@ item.
 ### `zsh/validation/native-authority`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `manual-index`, `shell-grammar`, `options`, `shell-builtins`
@@ -849,7 +854,7 @@ require runtime tests.
 ### `zsh/validation/no-shellcheck`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `shell-grammar`
@@ -862,7 +867,7 @@ only as supplemental tool-boundary evidence, never as language authority.
 ### `zsh/validation/parser-gap`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `mixed`
 - Evidence: `manual-index`
@@ -884,7 +889,7 @@ and must be pinned before gating.
 ### `zsh/formatting/no-unproven-rewrite`
 
 - Level: `required`
-- Profiles: `standalone-executable`, `sourced-library`, `autoload-function`, `test-fixture`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `manual-index`
@@ -911,3 +916,4 @@ than a source rewrite.
 - `functions`: [Functions](https://zsh.sourceforge.io/Doc/Release/Functions.html)
 - `completion-system`: [Completion System](https://zsh.sourceforge.io/Doc/Release/Completion-System.html)
 - `restricted-shell`: [Restricted Shell](https://zsh.sourceforge.io/Doc/Release/Restricted-Shell.html)
+- `command-execution`: [Command Execution](https://zsh.sourceforge.io/Doc/Release/Command-Execution.html)
