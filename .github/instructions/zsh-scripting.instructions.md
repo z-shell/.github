@@ -254,7 +254,7 @@ narrowly justified early-return guard may precede it.
 - Profiles: `autoload-function`
 - Minimum Zsh: `null`
 - Basis: `language-semantics`
-- Evidence: `functions`
+- Evidence: `functions`, `shell-builtins`
 - Enforcement: `human-review`
 
 At the loader, select the declared autoload file form. For a bare Zsh-style

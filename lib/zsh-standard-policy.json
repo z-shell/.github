@@ -231,7 +231,7 @@
       "profiles": ["autoload-function"],
       "minimum_zsh": null,
       "basis": "language-semantics",
-      "evidence": ["functions"],
+      "evidence": ["functions", "shell-builtins"],
       "enforcement": ["human-review"]
     },
     {

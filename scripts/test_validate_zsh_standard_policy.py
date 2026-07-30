@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import shutil
@@ -13,6 +14,9 @@ from types import ModuleType
 sys.dont_write_bytecode = True
 SCRIPT_PATH = Path(__file__).with_name("validate-zsh-standard-policy.py")
 PUBLIC_ROOT = SCRIPT_PATH.resolve().parent.parent
+EXPECTED_SHELL_DISPATCHER_SHA256 = (
+    "2c02e09c25047c6a16744e6b8be17afb8817ac67eb3a4a450d347bc88e8db8e3"
+)
 CORE_CONTRACT_PATHS = (
     "lib/zsh-standard-policy.json",
     ".github/instruction-surfaces.json",
@@ -89,6 +93,22 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         self.assertTrue(
             any(all(needle in message for needle in needles) for message in errors),
             f"expected one error containing {needles!r}; got {errors!r}",
+        )
+
+    def assert_dispatcher_digest_mismatch(
+        self,
+        errors: list[str],
+        actual_digest: str,
+    ) -> None:
+        self.assertEqual(
+            errors,
+            [
+                ".github/instructions/shell.instructions.md: canonical "
+                "dispatcher content digest mismatch; expected sha256:"
+                f"{EXPECTED_SHELL_DISPATCHER_SHA256}, got sha256:{actual_digest}; "
+                "fix: restore the approved dispatcher, or after policy review "
+                "update SHELL_DISPATCHER_SHA256 for the exact reviewed text"
+            ],
         )
 
     def test_valid_fixture_has_no_errors(self) -> None:
@@ -631,6 +651,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         path = root / ".github/instructions/zsh-scripting.instructions.md"
         text = path.read_text(encoding="utf-8")
         text = text.replace("`zcompile -U -z`", "`zcompile -U`", 1)
+        text += "\n## Unrelated compilation example\n\n`zcompile -U -z`\n"
         self.assertIn("`zcompile -U`", text)
         path.write_text(text, encoding="utf-8")
 
@@ -641,6 +662,24 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ".github/instructions/zsh-scripting.instructions.md",
             "zcompile -U -z",
         )
+
+    def test_autoload_alias_rule_uses_exact_evidence(self) -> None:
+        root = self.make_fixture()
+        policy = self.read_policy(root)
+        rules = policy["normative_rules"]
+        self.assertIsInstance(rules, list)
+        rule = next(
+            item
+            for item in rules
+            if item["id"] == "zsh/autoload/suppress-alias-expansion"
+        )
+        block = self.instruction_rule_block(
+            root,
+            "zsh/autoload/suppress-alias-expansion",
+        )
+
+        self.assertEqual(rule["evidence"], ["functions", "shell-builtins"])
+        self.assertIn("- Evidence: `functions`, `shell-builtins`", block)
 
     def test_instruction_uses_anonymous_sourced_isolation(self) -> None:
         root = self.make_fixture()
@@ -821,104 +860,103 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "malformed rule heading",
         )
 
-    def test_rejects_unsafe_shell_dispatcher_claims(self) -> None:
-        cases = (
-            ("default-bash", "\nStart with `#!/bin/bash` by default.\n"),
-            ("blanket-strict", "\nAlways enable `set -euo pipefail`.\n"),
-            ("shellcheck-zsh", "\nValidate Zsh with ShellCheck.\n"),
+    def test_declares_canonical_shell_dispatcher_digest(self) -> None:
+        module = load_validator()
+
+        self.assertEqual(
+            getattr(module, "SHELL_DISPATCHER_SHA256", None),
+            EXPECTED_SHELL_DISPATCHER_SHA256,
         )
-        for name, addition in cases:
+
+    def test_rejects_unapproved_shell_dispatcher_content_drift(self) -> None:
+        cases = (
+            ("insertion", lambda text: text + "\nUnapproved dispatcher prose.\n"),
+            (
+                "deletion",
+                lambda text: text.replace(
+                    "- Validate untrusted input before interpreting it.\n",
+                    "",
+                    1,
+                ),
+            ),
+            (
+                "replacement",
+                lambda text: text.replace(
+                    "# Shell Dialect Dispatcher",
+                    "# Shell Dispatcher",
+                    1,
+                ),
+            ),
+            (
+                "frontmatter",
+                lambda text: text.replace(
+                    'applyTo: "**/*.sh"',
+                    'applyTo: "**/*"',
+                    1,
+                ),
+            ),
+        )
+        for name, mutation in cases:
             with self.subTest(name=name):
                 root = self.make_fixture()
                 path = root / ".github/instructions/shell.instructions.md"
-                path.write_text(
-                    path.read_text(encoding="utf-8") + addition,
-                    encoding="utf-8",
-                )
+                original = path.read_text(encoding="utf-8")
+                changed = mutation(original)
+                self.assertNotEqual(changed, original)
+                path.write_text(changed, encoding="utf-8")
+                normalized = changed.replace("\r\n", "\n").replace("\r", "\n")
+                actual_digest = hashlib.sha256(
+                    normalized.encode("utf-8")
+                ).hexdigest()
 
                 errors = load_validator().validate(root)
 
-                self.assert_error_contains(
-                    errors,
-                    ".github/instructions/shell.instructions.md",
-                )
+                self.assert_dispatcher_digest_mismatch(errors, actual_digest)
 
-    def test_rejects_paraphrased_shell_dispatcher_prescriptions(self) -> None:
+    def test_dispatcher_probes_are_unapproved_content_drift(self) -> None:
         cases = (
-            ("default-bash", "\nDefault new scripts to a Bash shebang.\n"),
             (
-                "blanket-strict",
-                "\nEnable `set -euo pipefail` in every shell script.\n",
+                "unsafe-bash-default",
+                "Use Bash as the default interpreter and begin scripts with "
+                "its shebang.",
             ),
             (
-                "shellcheck-zsh",
-                "\nRun ShellCheck against Zsh sources before committing.\n",
+                "unsafe-strict-mode",
+                "Always enable strict handling and set -euo pipefail.",
             ),
             (
-                "negated-clause-then-bash",
-                "\nDo not lint POSIX sh; default new scripts to a Bash shebang.\n",
+                "unsafe-shellcheck-zsh",
+                "Always use ShellCheck and validate Zsh sources with it.",
             ),
             (
-                "negated-clause-then-strict",
-                "\nDo not use strict mode for POSIX sh; enable "
-                "`set -euo pipefail` in every Zsh script.\n",
-            ),
-            (
-                "negated-clause-then-shellcheck",
-                "\nDo not validate Bash with ShellCheck; run ShellCheck "
-                "against Zsh sources.\n",
-            ),
-            (
-                "irrelevant-negation-then-bash",
-                "\nDo not standardize POSIX scripts and default all Bash "
-                "scripts to a Bash shebang.\n",
-            ),
-            (
-                "irrelevant-negation-then-strict",
-                "\nNever impose nounset on POSIX sh, but use "
-                "set -euo pipefail for every Zsh script.\n",
-            ),
-            (
-                "irrelevant-negation-then-shellcheck",
-                "\nDo not lint POSIX sh with ShellCheck but use ShellCheck "
-                "to validate Zsh sources.\n",
+                "safe-but-unapproved",
+                "Never prescribe default Bash shebangs and set -euo pipefail "
+                "universally.",
             ),
         )
-        for name, addition in cases:
+        for name, probe in cases:
             with self.subTest(name=name):
                 root = self.make_fixture()
                 path = root / ".github/instructions/shell.instructions.md"
-                path.write_text(
-                    path.read_text(encoding="utf-8") + addition,
-                    encoding="utf-8",
-                )
+                changed = path.read_text(encoding="utf-8") + f"\n{probe}\n"
+                path.write_text(changed, encoding="utf-8")
+                actual_digest = hashlib.sha256(
+                    changed.encode("utf-8")
+                ).hexdigest()
 
                 errors = load_validator().validate(root)
 
-                self.assert_error_contains(
-                    errors,
-                    ".github/instructions/shell.instructions.md",
-                    "prohibited cross-dialect prescription",
-                )
+                self.assert_dispatcher_digest_mismatch(errors, actual_digest)
 
-    def test_accepts_explicitly_negated_shell_dispatcher_claims(self) -> None:
-        additions = (
-            "\nDo not use `#!/bin/bash` as a default.\n",
-            "\nNever prescribe `set -euo pipefail` universally.\n",
-            "\nDo not validate Zsh with ShellCheck.\n",
-        )
-        for addition in additions:
-            with self.subTest(addition=addition):
-                root = self.make_fixture()
-                path = root / ".github/instructions/shell.instructions.md"
-                path.write_text(
-                    path.read_text(encoding="utf-8") + addition,
-                    encoding="utf-8",
-                )
+    def test_accepts_shell_dispatcher_crlf_equivalent(self) -> None:
+        root = self.make_fixture()
+        path = root / ".github/instructions/shell.instructions.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
 
-                errors = load_validator().validate(root)
+        errors = load_validator().validate(root)
 
-                self.assertEqual(errors, [])
+        self.assertEqual(errors, [])
 
     def test_rejects_symlinked_or_escaping_contract_files(self) -> None:
         root = self.make_fixture()
@@ -965,6 +1003,20 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
 
         self.assertEqual(len(expected_errors), 2, expected_errors)
+        self.assertEqual(expected_errors, sorted(expected_errors))
+        self.assertTrue(all("\n" not in message for message in expected_errors))
+        self.assert_error_contains(
+            expected_errors,
+            ".github/instructions/shell.instructions.md",
+            "canonical dispatcher content digest mismatch",
+        )
+        self.assertFalse(
+            any(
+                "prohibited cross-dialect prescription" in message
+                for message in expected_errors
+            ),
+            expected_errors,
+        )
         self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
         output_lines = completed.stdout.splitlines()
         self.assertEqual(len(output_lines), 2, completed.stdout)

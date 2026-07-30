@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import stat
@@ -16,6 +17,9 @@ POLICY_PATH = "lib/zsh-standard-policy.json"
 INSTRUCTION_PATH = ".github/instructions/zsh-scripting.instructions.md"
 MANIFEST_PATH = ".github/instruction-surfaces.json"
 SHELL_DISPATCHER_PATH = ".github/instructions/shell.instructions.md"
+SHELL_DISPATCHER_SHA256 = (
+    "2c02e09c25047c6a16744e6b8be17afb8817ac67eb3a4a450d347bc88e8db8e3"
+)
 VALIDATOR_PATH = "scripts/validate-zsh-standard-policy.py"
 
 TOP_LEVEL_KEYS = (
@@ -990,6 +994,21 @@ def _metadata_values(value: str) -> list[str] | None:
     return re.findall(r"`([^`]+)`", value)
 
 
+def _visible_markdown_rule_block(text: str, rule_id: str) -> str | None:
+    lines = _visible_markdown_lines(text)
+    heading = f"### `{rule_id}`"
+    for index, (_, line) in enumerate(lines):
+        if line != heading:
+            continue
+        block_lines = [line]
+        for _, candidate in lines[index + 1 :]:
+            if candidate.startswith("## ") or candidate.startswith("### "):
+                break
+            block_lines.append(candidate)
+        return "\n".join(block_lines)
+    return None
+
+
 def _markdown_rules(
     text: str,
 ) -> tuple[list[dict[str, object]], list[str]]:
@@ -1080,8 +1099,11 @@ def validate_instruction_contract(
     text, errors = _read_text(root, INSTRUCTION_PATH)
     if text is None:
         return errors
-    visible_text = "\n".join(line for _, line in _visible_markdown_lines(text))
-    if "`zcompile -U -z`" not in visible_text:
+    autoload_block = _visible_markdown_rule_block(
+        text,
+        "zsh/autoload/suppress-alias-expansion",
+    )
+    if autoload_block is not None and "`zcompile -U -z`" not in autoload_block:
         errors.append(
             error(
                 INSTRUCTION_PATH,
@@ -1382,106 +1404,21 @@ def validate_manifest_contract(
 
 
 def validate_shell_dispatcher(root: Path) -> list[str]:
-    """Enforce the generic .sh dialect-dispatch contract."""
+    """Enforce the exact reviewed shell-dialect dispatcher content."""
 
     text, errors = _read_text(root, SHELL_DISPATCHER_PATH)
     if text is None:
         return errors
-    apply_to = _apply_to_values(text)
-    if apply_to != ["**/*.sh"]:
+    normalized_text = text.replace("\r\n", "\n").replace("\r", "\n")
+    actual_digest = hashlib.sha256(normalized_text.encode("utf-8")).hexdigest()
+    if actual_digest != SHELL_DISPATCHER_SHA256:
         errors.append(
             error(
                 SHELL_DISPATCHER_PATH,
-                'dispatcher applyTo must be exactly "**/*.sh"',
-                'set one quoted applyTo scalar to "**/*.sh"',
-            )
-        )
-    required_fragments = (
-        "# Shell Dialect Dispatcher",
-        "actual shebang",
-        "invocation",
-        "repository contract",
-        "behavior",
-        ".sh",
-        INSTRUCTION_PATH,
-        POLICY_PATH,
-        "ShellCheck is not used for Zsh",
-        "## Bash",
-        "## POSIX sh",
-        "No shebang, error-option bundle, array model, condition syntax, declaration",
-        "word-splitting rule is universal",
-    )
-    for fragment in required_fragments:
-        if fragment not in text:
-            errors.append(
-                error(
-                    SHELL_DISPATCHER_PATH,
-                    f"missing dialect-dispatch requirement {_safe_value(fragment)!r}",
-                    "restore the required shell dispatcher statement",
-                )
-            )
-    visible_text = " ".join(
-        line.strip() for _, line in _visible_markdown_lines(text) if line.strip()
-    )
-    propositions = [
-        proposition.strip().casefold()
-        for proposition in re.split(
-            r"(?<=[.!?;])\s+|(?:,\s*)?\b(?:but|yet|however)\b\s+|"
-            r"\s+\band\b\s+",
-            visible_text,
-        )
-        if proposition.strip()
-    ]
-    negation = re.compile(
-        r"\b(?:do not|don't|never|must not|should not|cannot|can't|is not|"
-        r"are not|not|no)\b"
-    )
-    prescription = re.compile(
-        r"\b(?:always|default|every|all|universal(?:ly)?|blanket|must|should|"
-        r"require[ds]?|enable|use|start|begin|prefer|prescribe)\b"
-    )
-    prohibited: list[tuple[str, str]] = []
-    for proposition in propositions:
-        if negation.search(proposition):
-            continue
-        if (
-            "bash" in proposition
-            and ("shebang" in proposition or "#!/bin/bash" in proposition)
-            and prescription.search(proposition)
-        ):
-            prohibited.append(
-                ("default Bash shebang", "remove the default Bash shebang")
-            )
-        if (
-            "set -euo pipefail" in proposition
-            and prescription.search(proposition)
-        ):
-            prohibited.append(
-                (
-                    "blanket set -euo pipefail",
-                    "replace blanket error-mode guidance with dialect-specific choices",
-                )
-            )
-        if (
-            "shellcheck" in proposition
-            and "zsh" in proposition
-            and re.search(
-                r"\b(?:validate|lint|check|run|use|apply|require|must|should)\b",
-                proposition,
-            )
-        ):
-            prohibited.append(
-                (
-                    "ShellCheck for Zsh",
-                    "state that ShellCheck is not used for Zsh",
-                )
-            )
-    for claim, fix in prohibited:
-        errors.append(
-            error(
-                SHELL_DISPATCHER_PATH,
-                f"prohibited cross-dialect prescription {_safe_value(claim)!r}",
-                fix,
+                "canonical dispatcher content digest mismatch; expected "
+                f"sha256:{SHELL_DISPATCHER_SHA256}, got sha256:{actual_digest}",
+                "restore the approved dispatcher, or after policy review "
+                "update SHELL_DISPATCHER_SHA256 for the exact reviewed text",
             )
         )
     return errors
