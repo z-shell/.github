@@ -10,7 +10,7 @@ import stat
 import sys
 from datetime import date
 from pathlib import Path
-from typing import cast
+from typing import NamedTuple, cast
 from urllib.parse import urlparse
 
 POLICY_PATH = "lib/zsh-standard-policy.json"
@@ -1096,7 +1096,7 @@ def _markdown_container_view(
 
     expanded = line.expandtabs(4)
     if work is not None:
-        work[0] += len(expanded)
+        work[0] += len(line) + len(expanded)
     cursor = 0
     containers: list[tuple[str, int]] = []
 
@@ -1114,6 +1114,8 @@ def _markdown_container_view(
             indentation += 1
         if indentation == 4:
             cursor = container_start
+            break
+        if cursor >= len(expanded):
             break
 
         if cursor < len(expanded) and expanded[cursor] == ">":
@@ -1150,6 +1152,11 @@ def _markdown_container_view(
             cursor = container_start
             break
 
+        if marker_end == len(expanded):
+            advance(marker_end - cursor)
+            containers.append(("list", marker_end - container_start + 1))
+            continue
+
         spacing_end = marker_end
         while (
             spacing_end < len(expanded)
@@ -1166,7 +1173,10 @@ def _markdown_container_view(
         advance(spacing_end - cursor)
         containers.append(("list", cursor - container_start))
 
-    return expanded[cursor:], tuple(containers)
+    content = expanded[cursor:]
+    if work is not None:
+        work[0] += len(content)
+    return content, tuple(containers)
 
 
 def _replayed_markdown_prefixes(
@@ -1179,7 +1189,7 @@ def _replayed_markdown_prefixes(
 
     expanded = line.expandtabs(4)
     if work is not None:
-        work[0] += len(expanded)
+        work[0] += len(line) + len(expanded)
     cursor = 0
     matched_cursors: list[int] = []
     for kind, width in containers:
@@ -1227,7 +1237,10 @@ def _replay_markdown_containers(
     if len(matched_cursors) != len(containers):
         return None
     cursor = matched_cursors[-1] if matched_cursors else 0
-    return expanded[cursor:]
+    content = expanded[cursor:]
+    if work is not None:
+        work[0] += len(content)
+    return content
 
 
 def _resolve_markdown_container_view(
@@ -1249,6 +1262,8 @@ def _resolve_markdown_container_view(
     prefix = active_containers[:prefix_length]
     if prefix and any(kind == "list" for kind, _ in prefix):
         remainder = expanded[matched_cursors[-1] :]
+        if work is not None:
+            work[0] += len(remainder)
         content, nested = _markdown_container_view(remainder, work=work)
         return content, prefix + nested
     return _markdown_container_view(line, work=work)
@@ -1398,44 +1413,123 @@ def _leading_indentation_columns(line: str) -> int:
     return columns
 
 
-def _positive_markdown_lines(
-    lines: list[tuple[int, str]],
-) -> list[tuple[int, str]]:
-    """Exclude code while retaining paragraphs and list continuations."""
+class _MarkdownLineContext(NamedTuple):
+    line_number: int
+    raw_line: str
+    content: str
+    containers: tuple[tuple[str, int], ...]
+    source_gap: bool
 
-    positive: list[tuple[int, str]] = []
+
+def _contextual_markdown_lines(
+    lines: list[tuple[int, str]],
+) -> list[_MarkdownLineContext]:
+    """Resolve containers without changing the compatible visible-line API."""
+
+    contextual: list[_MarkdownLineContext] = []
     active_containers: tuple[tuple[str, int], ...] = ()
-    paragraph_context: tuple[tuple[str, int], ...] | None = None
+    previous_line_number: int | None = None
     for line_number, raw_line in lines:
         visible_line = raw_line.removesuffix(" <html-comment>")
         content, containers = _resolve_markdown_container_view(
             visible_line,
             active_containers,
         )
+        contextual.append(
+            _MarkdownLineContext(
+                line_number,
+                raw_line,
+                content,
+                containers,
+                previous_line_number is not None
+                and line_number != previous_line_number + 1,
+            )
+        )
+        previous_line_number = line_number
         if not visible_line.strip():
-            positive.append((line_number, raw_line))
-            paragraph_context = None
             continue
-
-        indentation = _leading_indentation_columns(content)
-        if indentation >= 4 and paragraph_context != containers:
-            paragraph_context = None
-            if not any(kind == "list" for kind, _ in containers):
-                active_containers = ()
-            continue
-
-        positive.append((line_number, raw_line))
         if any(kind == "list" for kind, _ in containers):
             active_containers = containers
         else:
             active_containers = ()
+    return contextual
 
-        paragraph_content = content[indentation:]
-        if re.match(r"^#{1,6}(?:[ \t]+|$)", paragraph_content):
+
+def _starts_markdown_paragraph(content: str) -> bool:
+    """Return whether visible container content can open a paragraph."""
+
+    stripped = content.strip()
+    if not stripped or re.match(r"^#{1,6}(?:[ \t]+|$)", stripped):
+        return False
+    if re.fullmatch(
+        r"(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,}",
+        stripped,
+    ):
+        return False
+    return True
+
+
+def _positive_markdown_lines(
+    lines: list[tuple[int, str]],
+) -> list[tuple[int, str]]:
+    """Exclude code while retaining paragraphs and list continuations."""
+
+    positive: list[tuple[int, str]] = []
+    paragraph_context: tuple[tuple[str, int], ...] | None = None
+    empty_list_context: tuple[tuple[str, int], ...] | None = None
+    for context in _contextual_markdown_lines(lines):
+        if context.source_gap:
             paragraph_context = None
+            empty_list_context = None
+        if not context.content.strip():
+            positive.append((context.line_number, context.raw_line))
+            paragraph_context = None
+            visible_line = context.raw_line.removesuffix(" <html-comment>")
+            empty_list_context = (
+                context.containers
+                if visible_line.strip()
+                and any(kind == "list" for kind, _ in context.containers)
+                else None
+            )
+            continue
+
+        indentation = _leading_indentation_columns(context.content)
+        visible_line = context.raw_line.removesuffix(" <html-comment>")
+        if (
+            empty_list_context is not None
+            and context.containers == empty_list_context
+            and _leading_indentation_columns(visible_line) >= 4
+        ):
+            empty_list_context = None
+            paragraph_context = None
+            continue
+        empty_list_context = None
+        if indentation >= 4 and paragraph_context != context.containers:
+            paragraph_context = None
+            continue
+
+        positive.append((context.line_number, context.raw_line))
+        paragraph_content = context.content[indentation:]
+        if _starts_markdown_paragraph(paragraph_content):
+            paragraph_context = context.containers
         else:
-            paragraph_context = containers
+            paragraph_context = None
     return positive
+
+
+def _positive_markdown_contexts(
+    lines: list[tuple[int, str]],
+) -> list[_MarkdownLineContext]:
+    """Return contextual records retained by the positive-line filter."""
+
+    positive_line_numbers = {
+        line_number for line_number, _ in _positive_markdown_lines(lines)
+    }
+    return [
+        context
+        for context in _contextual_markdown_lines(lines)
+        if context.line_number in positive_line_numbers
+    ]
 
 
 def _atx_heading_content(line: str, level: int) -> str | None:
@@ -1452,11 +1546,9 @@ def _atx_heading_content(line: str, level: int) -> str | None:
     return match.group(1).strip()
 
 
-def _consumer_h3_content(line: str) -> str | None:
-    """Return one consumer H3 after supported container prefixes."""
+def _consumer_h3_content(content: str) -> str | None:
+    """Return one consumer H3 from resolved container content."""
 
-    visible_line = line.removesuffix(" <html-comment>")
-    content, _ = _markdown_container_view(visible_line)
     return _atx_heading_content(content, 3)
 
 
@@ -1475,24 +1567,42 @@ def _single_code_span_content(content: str) -> str:
     return body
 
 
+def _listed_code_span_content(line: str) -> str | None:
+    """Return an exact code span owned by any supported list marker."""
+
+    content, containers = _markdown_container_view(line)
+    if not any(kind == "list" for kind, _ in containers):
+        return None
+    match = re.fullmatch(
+        r"(?P<ticks>`+)(?P<body>[^`\r\n]+)(?P=ticks)",
+        content,
+    )
+    return None if match is None else match.group("body")
+
+
 def _visible_h2_section(
     lines: list[tuple[int, str]],
     title: str,
 ) -> list[tuple[int, str]] | None:
     """Return one exact visible H2 section, excluding its heading."""
 
+    contextual = _contextual_markdown_lines(lines)
     heading_indexes = [
         index
-        for index, (_, line) in enumerate(lines)
-        if _atx_heading_content(line, 2) == title
+        for index, context in enumerate(contextual)
+        if not context.containers
+        and _atx_heading_content(context.content, 2) == title
     ]
     if len(heading_indexes) != 1:
         return None
     section: list[tuple[int, str]] = []
-    for item in lines[heading_indexes[0] + 1 :]:
-        if _atx_heading_content(item[1], 2) is not None:
+    for context in contextual[heading_indexes[0] + 1 :]:
+        if (
+            not context.containers
+            and _atx_heading_content(context.content, 2) is not None
+        ):
             break
-        section.append(item)
+        section.append((context.line_number, context.raw_line))
     return section
 
 
@@ -1501,20 +1611,25 @@ def _visible_h2_source_section(text: str, title: str) -> str | None:
 
     raw_lines = text.splitlines()
     visible_lines = _visible_markdown_lines(text)
+    contextual = _contextual_markdown_lines(visible_lines)
     headings = [
-        line_number
-        for line_number, line in visible_lines
-        if _atx_heading_content(line, 2) == title
+        context.line_number
+        for context in contextual
+        if not context.containers
+        and _atx_heading_content(context.content, 2) == title
     ]
     if len(headings) != 1:
         return None
     start = headings[0] - 1
     end = len(raw_lines)
-    for line_number, line in visible_lines:
-        if line_number <= headings[0]:
+    for context in contextual:
+        if context.line_number <= headings[0]:
             continue
-        if _atx_heading_content(line, 2) is not None:
-            end = line_number - 1
+        if (
+            not context.containers
+            and _atx_heading_content(context.content, 2) is not None
+        ):
+            end = context.line_number - 1
             break
     return "\n".join(raw_lines[start:end])
 
@@ -1570,14 +1685,16 @@ def _retired_patterns_contract_errors(text: str) -> list[str]:
 
         visible = _visible_markdown_lines(section)
         positive_lines = _positive_markdown_lines(visible)
-        positive = _positive_visible_text(visible)
         evidence = tuple(
-            match.group(1)
+            evidence_item
             for _, line in positive_lines
-            if (match := re.fullmatch(r"- `([^`]+)`", line)) is not None
+            if (evidence_item := _listed_code_span_content(line)) is not None
         )
+        positive_contexts = _positive_markdown_contexts(visible)
         status_lines = [
-            line for _, line in positive_lines if line.startswith("Status:")
+            context.content
+            for context in positive_contexts
+            if not context.containers and context.content.startswith("Status:")
         ]
         exact_status = (
             len(status_lines) == 1
@@ -1589,16 +1706,24 @@ def _retired_patterns_contract_errors(text: str) -> list[str]:
         )
         expected_evidence = cast(tuple[str, ...], contract["evidence"])
         expected_rules = cast(tuple[str, ...], contract["rules"])
-        required_fragments = (
+        required_tokens = (
             INSTRUCTION_PATH,
             PLUGIN_TEMPLATE_PATH,
             *expected_rules,
+        )
+        inline_code_tokens = tuple(
+            match.group(1)
+            for _, line in positive_lines
+            for match in re.finditer(r"(?<!`)`([^`\r\n]+)`(?!`)", line)
         )
         if (
             len(evidence) != len(expected_evidence)
             or set(evidence) != set(expected_evidence)
             or not exact_status
-            or any(fragment not in positive for fragment in required_fragments)
+            or any(
+                inline_code_tokens.count(token) != 1
+                for token in required_tokens
+            )
         ):
             errors.append(
                 error(
@@ -2259,8 +2384,10 @@ def validate_consumer_contract(
             text = texts.get(relative_path)
             if text is None:
                 continue
-            for line_number, line in visible_lines[relative_path]:
-                heading = _consumer_h3_content(line)
+            for context in _contextual_markdown_lines(
+                visible_lines[relative_path]
+            ):
+                heading = _consumer_h3_content(context.content)
                 if heading is None:
                     continue
                 normalized_heading = _single_code_span_content(heading)
@@ -2269,7 +2396,8 @@ def validate_consumer_contract(
                         error(
                             relative_path,
                             "normative rule heading "
-                            f"{normalized_heading!r} at line {line_number}; "
+                            f"{normalized_heading!r} at line "
+                            f"{context.line_number}; "
                             "rules belong in canonical instruction",
                             "replace the heading with an inline rule-ID citation",
                         )
@@ -2289,8 +2417,11 @@ def validate_consumer_contract(
         first_h2 = next(
             (
                 index
-                for index, (_, line) in enumerate(patterns_lines)
-                if _atx_heading_content(line, 2) is not None
+                for index, context in enumerate(
+                    _contextual_markdown_lines(patterns_lines)
+                )
+                if not context.containers
+                and _atx_heading_content(context.content, 2) is not None
             ),
             len(patterns_lines),
         )
