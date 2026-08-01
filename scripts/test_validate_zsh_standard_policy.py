@@ -5,7 +5,7 @@ import importlib.util
 import json
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404 - tests execute fixed local tools without a shell.
 import sys
 import tempfile
 import textwrap
@@ -102,9 +102,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         text = path.read_text(encoding="utf-8")
         block = self.instruction_rule_block(root, rule_id)
         prefix = f"- {field}: "
-        old_line = next(
-            line for line in block.splitlines() if line.startswith(prefix)
-        )
+        old_line = next(line for line in block.splitlines() if line.startswith(prefix))
         new_line = prefix + ", ".join(f"`{value}`" for value in values)
         path.write_text(
             text.replace(block, block.replace(old_line, new_line, 1), 1),
@@ -244,9 +242,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "zsh/validation/parser-gap",
             "zsh/formatting/no-unproven-rewrite",
         ]
-        matching_rules = [
-            rule for rule in rules if "startup-file" in rule["profiles"]
-        ]
+        matching_rules = [rule for rule in rules if "startup-file" in rule["profiles"]]
 
         self.assertEqual(
             [rule["id"] for rule in matching_rules],
@@ -271,9 +267,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                         ],
                     )
                     continue
-                standalone_index = rule["profiles"].index(
-                    "standalone-executable"
-                )
+                standalone_index = rule["profiles"].index("standalone-executable")
                 self.assertEqual(
                     rule["profiles"][standalone_index + 1],
                     "startup-file",
@@ -291,8 +285,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             {
                 "title": "Command Execution",
                 "url": (
-                    "https://zsh.sourceforge.io/Doc/Release/"
-                    "Command-Execution.html"
+                    "https://zsh.sourceforge.io/Doc/Release/" "Command-Execution.html"
                 ),
                 "kind": "official-manual",
             },
@@ -302,9 +295,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         policy = self.read_policy(PUBLIC_ROOT)
         rules = policy["normative_rules"]
         self.assertIsInstance(rules, list)
-        rule = next(
-            item for item in rules if item["id"] == "zsh/security/trust-paths"
-        )
+        rule = next(item for item in rules if item["id"] == "zsh/security/trust-paths")
         expected = [
             "command-execution",
             "shell-builtins",
@@ -560,8 +551,16 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_rule_schema_and_duplicate_ids(self) -> None:
         cases = (
-            ("invalid-id", lambda rule: rule.__setitem__("id", "zsh/Bad"), "$.normative_rules[0].id"),
-            ("invalid-enum", lambda rule: rule.__setitem__("level", "must"), "$.normative_rules[0].level"),
+            (
+                "invalid-id",
+                lambda rule: rule.__setitem__("id", "zsh/Bad"),
+                "$.normative_rules[0].id",
+            ),
+            (
+                "invalid-enum",
+                lambda rule: rule.__setitem__("level", "must"),
+                "$.normative_rules[0].level",
+            ),
             (
                 "unknown-profile",
                 lambda rule: rule.__setitem__("profiles", ["unknown-profile"]),
@@ -738,9 +737,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         policy = self.read_policy(root)
         rules = policy["normative_rules"]
         self.assertIsInstance(rules, list)
-        rule = next(
-            item for item in rules if item["id"] == "zsh/security/trust-paths"
-        )
+        rule = next(item for item in rules if item["id"] == "zsh/security/trust-paths")
         rule["profiles"].remove("startup-file")
         self.write_policy(root, policy)
         self.replace_instruction_rule_metadata(
@@ -765,9 +762,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         rules = policy["normative_rules"]
         self.assertIsInstance(rules, list)
         rule = next(
-            item
-            for item in rules
-            if item["id"] == "zsh/security/no-passive-network"
+            item for item in rules if item["id"] == "zsh/security/no-passive-network"
         )
         rule["profiles"].insert(0, "startup-file")
         self.write_policy(root, policy)
@@ -792,9 +787,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         policy = self.read_policy(root)
         rules = policy["normative_rules"]
         self.assertIsInstance(rules, list)
-        rule = next(
-            item for item in rules if item["id"] == "zsh/security/trust-paths"
-        )
+        rule = next(item for item in rules if item["id"] == "zsh/security/trust-paths")
         rule["evidence"] = [
             "shell-grammar",
             "functions",
@@ -850,10 +843,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         for variant, replacement in cases:
             with self.subTest(variant=variant):
                 root = self.make_fixture()
-                path = (
-                    root
-                    / ".github/instructions/zsh-scripting.instructions.md"
-                )
+                path = root / ".github/instructions/zsh-scripting.instructions.md"
                 text = path.read_text(encoding="utf-8")
                 if variant == "reordering":
                     old = f"{restricted_line}\n{command_line}"
@@ -903,9 +893,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     path = root / ".github/instruction-surfaces.json"
                     manifest = json.loads(path.read_text(encoding="utf-8"))
                     surfaces = {item["id"]: item for item in manifest["surfaces"]}
-                    surfaces["instruction-zsh-scripting"]["file_patterns"][0] += (
-                        f",{extra_glob}"
-                    )
+                    surfaces["instruction-zsh-scripting"]["file_patterns"][
+                        0
+                    ] += f",{extra_glob}"
                     path.write_text(
                         json.dumps(manifest, indent=2) + "\n",
                         encoding="utf-8",
@@ -1080,9 +1070,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 else:
                     rules[0], rules[1] = rules[1], rules[0]
                     first_start, first_end, first_block = rule_block(text, first_id)
-                    second_start, second_end, second_block = rule_block(
-                        text, second_id
-                    )
+                    second_start, second_end, second_block = rule_block(text, second_id)
                     self.assertEqual(first_end + 1, second_start)
                     text = (
                         text[:first_start]
@@ -1221,7 +1209,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "zsh/output/literal-vs-formatted",
         )
 
-        self.assertIn("printf '%s: %d\\n' \"$label\" \"$count\"", block)
+        self.assertIn('printf \'%s: %d\\n\' "$label" "$count"', block)
         self.assertNotIn("printf '%s: %d\\\\n'", block)
 
     def test_native_authority_uses_precise_existing_evidence(self) -> None:
@@ -1230,9 +1218,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         rules = policy["normative_rules"]
         self.assertIsInstance(rules, list)
         rule = next(
-            item
-            for item in rules
-            if item["id"] == "zsh/validation/native-authority"
+            item for item in rules if item["id"] == "zsh/validation/native-authority"
         )
         expected = [
             "manual-index",
@@ -1389,9 +1375,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 self.assertNotEqual(changed, original)
                 path.write_text(changed, encoding="utf-8")
                 normalized = changed.replace("\r\n", "\n").replace("\r", "\n")
-                actual_digest = hashlib.sha256(
-                    normalized.encode("utf-8")
-                ).hexdigest()
+                actual_digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
                 errors = load_validator().validate(root)
 
@@ -1424,9 +1408,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 path = root / ".github/instructions/shell.instructions.md"
                 changed = path.read_text(encoding="utf-8") + f"\n{probe}\n"
                 path.write_text(changed, encoding="utf-8")
-                actual_digest = hashlib.sha256(
-                    changed.encode("utf-8")
-                ).hexdigest()
+                actual_digest = hashlib.sha256(changed.encode("utf-8")).hexdigest()
 
                 errors = load_validator().validate(root)
 
@@ -1531,9 +1513,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_missing_consumer_canonical_link(self) -> None:
         root = self.make_fixture()
-        relative_path = (
-            ".github/agents/zsh-plugin-standard-reviewer.agent.md"
-        )
+        relative_path = ".github/agents/zsh-plugin-standard-reviewer.agent.md"
         path = root / relative_path
         changed = path.read_text(encoding="utf-8").replace(
             ".github/instructions/zsh-scripting.instructions.md",
@@ -1643,9 +1623,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                         "missing-canonical-reference",
                     )
                     changed += (
-                        "\n\n"
-                        + wrapper.format(canonical_path=canonical_path)
-                        + "\n"
+                        "\n\n" + wrapper.format(canonical_path=canonical_path) + "\n"
                     )
                     path.write_text(changed, encoding="utf-8")
 
@@ -1692,9 +1670,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_coordinated_consumer_manifest_path_drift(self) -> None:
         root = self.make_fixture()
-        original_path = (
-            ".github/agents/zsh-plugin-standard-reviewer.agent.md"
-        )
+        original_path = ".github/agents/zsh-plugin-standard-reviewer.agent.md"
         drifted_path = ".github/agents/drifted-zsh-reviewer.agent.md"
         (root / original_path).rename(root / drifted_path)
         manifest_path = root / ".github/instruction-surfaces.json"
@@ -1995,7 +1971,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "e85e0a71f0eb957efd9293e8dc1aa7e428163e0ec693f265e2fcff2bb4135d8b",
+            "34523518b0298654aceb3c67439c9cdcaf8fe9d93a90b285b6722b04d725fd5e",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
@@ -2249,11 +2225,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ),
             (
                 "blockquote-blank",
-                (
-                    "> ```markdown\n"
-                    "> hidden\n\n"
-                    "> ### zsh/options/localize"
-                ),
+                ("> ```markdown\n" "> hidden\n\n" "> ### zsh/options/localize"),
             ),
         )
         for container, breakout in container_breakouts:
@@ -2261,10 +2233,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 root = self.make_fixture()
                 path = root / relative_path
                 path.write_text(
-                    path.read_text(encoding="utf-8")
-                    + "\n"
-                    + breakout
-                    + "\n",
+                    path.read_text(encoding="utf-8") + "\n" + breakout + "\n",
                     encoding="utf-8",
                 )
 
@@ -2284,25 +2253,15 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         additions = (
             "> ### zsh/options/localize",
             "> ### `zsh/options/localize`",
-            (
-                "```markdown`invalid\n"
-                "### zsh/options/localize\n"
-                "```"
-            ),
-            (
-                "-     ```markdown\n"
-                "### zsh/options/localize"
-            ),
+            ("```markdown`invalid\n" "### zsh/options/localize\n" "```"),
+            ("-     ```markdown\n" "### zsh/options/localize"),
         )
         for addition in additions:
             with self.subTest(addition=addition):
                 root = self.make_fixture()
                 path = root / relative_path
                 path.write_text(
-                    path.read_text(encoding="utf-8")
-                    + "\n"
-                    + addition
-                    + "\n",
+                    path.read_text(encoding="utf-8") + "\n" + addition + "\n",
                     encoding="utf-8",
                 )
 
@@ -2320,8 +2279,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
         path = root / relative_path
         path.write_text(
-            path.read_text(encoding="utf-8")
-            + "\n### `  zsh/options/localize  `\n",
+            path.read_text(encoding="utf-8") + "\n### `  zsh/options/localize  `\n",
             encoding="utf-8",
         )
 
@@ -2337,132 +2295,95 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         hidden_references = (
             (
                 "fenced-block",
-                "Visible paragraph\n```text\nhidden\n```\n"
-                f"    {canonical_path}",
+                "Visible paragraph\n```text\nhidden\n```\n" f"    {canonical_path}",
             ),
             (
                 "blank-blockquote",
-                "> Visible paragraph\n>\n"
-                f">     {canonical_path}",
+                "> Visible paragraph\n>\n" f">     {canonical_path}",
             ),
             (
                 "thematic-break",
-                "Visible paragraph\n---\n"
-                f"    {canonical_path}",
+                "Visible paragraph\n---\n" f"    {canonical_path}",
             ),
             (
                 "empty-unordered-item",
-                "Visible paragraph\n-\n"
-                f"    {canonical_path}",
+                "Visible paragraph\n-\n" f"    {canonical_path}",
             ),
             (
                 "top-level-fence-after-list",
-                "- List paragraph\n```text\nhidden\n```\n"
-                f"    {canonical_path}",
+                "- List paragraph\n```text\nhidden\n```\n" f"    {canonical_path}",
             ),
             (
                 "setext-h1",
-                "Visible heading\n===\n"
-                f"    {canonical_path}",
+                "Visible heading\n===\n" f"    {canonical_path}",
             ),
             (
                 "link-reference-definition",
-                "[canonical]: https://example.test/reference\n"
-                f"    {canonical_path}",
+                "[canonical]: https://example.test/reference\n" f"    {canonical_path}",
             ),
             (
                 "html-block",
-                "<div>\n"
-                f"    {canonical_path}\n"
-                "</div>",
+                "<div>\n" f"    {canonical_path}\n" "</div>",
             ),
             (
                 "html-script-block",
-                "<script>\n"
-                f"    {canonical_path}\n"
-                "</script>",
+                "<script>\n" f"    {canonical_path}\n" "</script>",
             ),
             (
                 "html-pre-block",
-                "<pre>\n"
-                f"    {canonical_path}\n"
-                "</pre>",
+                "<pre>\n" f"    {canonical_path}\n" "</pre>",
             ),
             (
                 "html-style-block",
-                "<style>\n"
-                f"    {canonical_path}\n"
-                "</style>",
+                "<style>\n" f"    {canonical_path}\n" "</style>",
             ),
             (
                 "html-textarea-block",
-                "<textarea>\n"
-                f"    {canonical_path}\n"
-                "</textarea>",
+                "<textarea>\n" f"    {canonical_path}\n" "</textarea>",
             ),
             (
                 "html-processing-instruction",
-                "<?target\n"
-                f"    {canonical_path}\n"
-                "?>",
+                "<?target\n" f"    {canonical_path}\n" "?>",
             ),
             (
                 "html-declaration",
-                "<!DOCTYPE html\n"
-                f"    {canonical_path}\n"
-                ">",
+                "<!DOCTYPE html\n" f"    {canonical_path}\n" ">",
             ),
             (
                 "html-lowercase-declaration",
-                "<!doctype html\n"
-                f"    {canonical_path}\n"
-                ">",
+                "<!doctype html\n" f"    {canonical_path}\n" ">",
             ),
             (
                 "html-raw-blockquote-looking-line",
-                "<script>\n"
-                f"> {canonical_path}\n"
-                "</script>",
+                "<script>\n" f"> {canonical_path}\n" "</script>",
             ),
             (
                 "html-raw-list-looking-line",
-                "<script>\n"
-                f"- {canonical_path}\n"
-                "</script>",
+                "<script>\n" f"- {canonical_path}\n" "</script>",
             ),
             (
                 "list-html-raw-blank-line",
-                "- <script>\n\n"
-                f"  {canonical_path}\n"
-                "  </script>",
+                "- <script>\n\n" f"  {canonical_path}\n" "  </script>",
             ),
             (
                 "html-cdata",
-                "<![CDATA[\n"
-                f"    {canonical_path}\n"
-                "]]>",
+                "<![CDATA[\n" f"    {canonical_path}\n" "]]>",
             ),
             (
                 "html-custom-tag",
-                "<custom-element>\n"
-                f"    {canonical_path}\n"
-                "</custom-element>",
+                "<custom-element>\n" f"    {canonical_path}\n" "</custom-element>",
             ),
             (
                 "split-link-destination",
-                "[canonical]:\n"
-                f"  {canonical_path}",
+                "[canonical]:\n" f"  {canonical_path}",
             ),
             (
                 "split-link-title",
-                "[canonical]: /target\n"
-                f"  \"{canonical_path}\"",
+                "[canonical]: /target\n" f'  "{canonical_path}"',
             ),
             (
                 "multiline-link-title",
-                "[canonical]: /target\n"
-                "  \"title\n"
-                f"  {canonical_path}\"",
+                "[canonical]: /target\n" '  "title\n' f'  {canonical_path}"',
             ),
             (
                 "escaped-link-label",
@@ -2470,26 +2391,19 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ),
             (
                 "multiline-link-label",
-                "[\n"
-                f"{canonical_path}\n"
-                "]: /target",
+                "[\n" f"{canonical_path}\n" "]: /target",
             ),
             (
                 "indented-code-after-multiline-link-label",
-                "[\n"
-                "canonical\n"
-                "]: /target\n"
-                f"    {canonical_path}",
+                "[\n" "canonical\n" "]: /target\n" f"    {canonical_path}",
             ),
             (
                 "blockquote-empty-unordered-item",
-                "> -\n"
-                f">     {canonical_path}",
+                "> -\n" f">     {canonical_path}",
             ),
             (
                 "blockquote-empty-ordered-item",
-                "> 1.\n"
-                f">     {canonical_path}",
+                "> 1.\n" f">     {canonical_path}",
             ),
         )
         for boundary, hidden_reference in hidden_references:
@@ -2529,10 +2443,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     "\n\n- list paragraph\n"
                     "  ```text\n"
                     "  hidden\n"
-                    "  ```\n"
-                    + " " * indentation
-                    + canonical_path
-                    + "\n"
+                    "  ```\n" + " " * indentation + canonical_path + "\n"
                 )
                 path.write_text(changed, encoding="utf-8")
 
@@ -2560,10 +2471,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 root = self.make_fixture()
                 path = root / consumer_path
                 path.write_text(
-                    path.read_text(encoding="utf-8")
-                    + "\n\n"
-                    + hidden_h3
-                    + "\n",
+                    path.read_text(encoding="utf-8") + "\n\n" + hidden_h3 + "\n",
                     encoding="utf-8",
                 )
 
@@ -2579,7 +2487,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 )
 
         interrupting_h3_blocks = (
-            f"[reference]: /target \"\n### `{rule_id}`\n\"",
+            f'[reference]: /target "\n### `{rule_id}`\n"',
             f"[\n### `{rule_id}`\n]: /target",
             f"<!-- --> ```\n### `{rule_id}`",
             f"<!--\n--> ```\n### `{rule_id}`",
@@ -2590,10 +2498,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 root = self.make_fixture()
                 path = root / consumer_path
                 path.write_text(
-                    path.read_text(encoding="utf-8")
-                    + "\n\n"
-                    + interrupting_h3
-                    + "\n",
+                    path.read_text(encoding="utf-8") + "\n\n" + interrupting_h3 + "\n",
                     encoding="utf-8",
                 )
 
@@ -2628,10 +2533,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     1,
                 )
                 path.write_text(
-                    changed
-                    + "\n\n"
-                    + hidden_h2.format(paths=required_paths)
-                    + "\n",
+                    changed + "\n\n" + hidden_h2.format(paths=required_paths) + "\n",
                     encoding="utf-8",
                 )
 
@@ -2660,20 +2562,15 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ),
             (
                 "fence-marker-inside-raw-html",
-                "<script>\n"
-                "```text\n"
-                "</script>\n"
-                f"{canonical_path}",
+                "<script>\n" "```text\n" "</script>\n" f"{canonical_path}",
             ),
             (
                 "raw-html-any-type-1-end-tag",
-                "<script>\n"
-                "</pre>\n"
-                f"{canonical_path}",
+                "<script>\n" "</pre>\n" f"{canonical_path}",
             ),
             (
                 "reference-title-with-trailing-content",
-                f"[{canonical_path}]: /target \"title\" trailing",
+                f'[{canonical_path}]: /target "title" trailing',
             ),
             (
                 "reference-without-destination",
@@ -2681,22 +2578,17 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ),
             (
                 "reference-title-with-blank-line",
-                "[canonical]: /target \"title\n"
+                '[canonical]: /target "title\n'
                 f"  {canonical_path}\n\n"
-                "closing title\"",
+                'closing title"',
             ),
             (
                 "multiline-label-with-blank-line",
-                "[\n"
-                f"{canonical_path}\n\n"
-                "]: /target",
+                "[\n" f"{canonical_path}\n\n" "]: /target",
             ),
             (
                 "multiline-label-with-setext-heading",
-                "[\n"
-                f"{canonical_path}\n"
-                "===\n"
-                "]: /target",
+                "[\n" f"{canonical_path}\n" "===\n" "]: /target",
             ),
         )
         for boundary, visible_reference in visible_references:
@@ -2751,9 +2643,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_nonconforming_plugin_template(self) -> None:
         root = self.make_fixture()
-        relative_path = (
-            ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
-        )
+        relative_path = ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
         path = root / relative_path
         path.write_text(
             path.read_text(encoding="utf-8")
@@ -2868,8 +2758,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 changed = text.replace(
                     old_contract,
                     "Patterns below are mandatory and override the canonical "
-                    "Zsh owners.\n\n"
-                    + wrapper,
+                    "Zsh owners.\n\n" + wrapper,
                     1,
                 )
                 path.write_text(changed, encoding="utf-8")
@@ -2923,32 +2812,36 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ),
         }
         for title, (evidence, rule_ids) in section_contracts.items():
-            evidence_mutations = tuple(
-                (
-                    f"missing-evidence-{index}",
-                    f"- `{repository}`\n",
-                    "",
+            evidence_mutations = (
+                tuple(
+                    (
+                        f"missing-evidence-{index}",
+                        f"- `{repository}`\n",
+                        "",
+                    )
+                    for index, repository in enumerate(evidence)
                 )
-                for index, repository in enumerate(evidence)
-            ) + tuple(
-                (
-                    f"duplicate-evidence-{index}",
-                    f"- `{repository}`\n",
-                    f"- `{repository}`\n- `{repository}`\n",
+                + tuple(
+                    (
+                        f"duplicate-evidence-{index}",
+                        f"- `{repository}`\n",
+                        f"- `{repository}`\n- `{repository}`\n",
+                    )
+                    for index, repository in enumerate(evidence)
                 )
-                for index, repository in enumerate(evidence)
-            ) + tuple(
-                (
-                    f"extra-evidence-{marker_name}",
-                    f"- `{evidence[-1]}`\n",
-                    f"- `{evidence[-1]}`\n{marker} "
-                    "`z-shell/unevidenced:replacement.plugin.zsh`\n",
-                )
-                for marker_name, marker in (
-                    ("asterisk", "*"),
-                    ("plus", "+"),
-                    ("ordered-period", "1."),
-                    ("ordered-parenthesis", "1)"),
+                + tuple(
+                    (
+                        f"extra-evidence-{marker_name}",
+                        f"- `{evidence[-1]}`\n",
+                        f"- `{evidence[-1]}`\n{marker} "
+                        "`z-shell/unevidenced:replacement.plugin.zsh`\n",
+                    )
+                    for marker_name, marker in (
+                        ("asterisk", "*"),
+                        ("plus", "+"),
+                        ("ordered-period", "1."),
+                        ("ordered-parenthesis", "1)"),
+                    )
                 )
             )
             mutations = (
@@ -3333,11 +3226,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         section_start = text.index("## Instruction Architecture")
         validator_index = text.index(validator_path, section_start)
         validator_line_start = text.rfind("\n", section_start, validator_index) + 1
-        changed = (
-            text[:validator_line_start]
-            + "## \n"
-            + text[validator_line_start:]
-        )
+        changed = text[:validator_line_start] + "## \n" + text[validator_line_start:]
         path.write_text(changed, encoding="utf-8")
 
         errors = load_validator().validate(root)
@@ -3411,9 +3300,11 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 )
                 indent = attack.split("{paths}", 1)[0].splitlines()[-1]
                 indent = indent[: len(indent) - len(indent.lstrip())]
-                changed += "\n\n" + attack.format(
-                    paths=paths.replace("\n", "\n" + indent)
-                ) + "\n"
+                changed += (
+                    "\n\n"
+                    + attack.format(paths=paths.replace("\n", "\n" + indent))
+                    + "\n"
+                )
                 path.write_text(changed, encoding="utf-8")
 
                 errors = load_validator().validate(root)
@@ -3548,9 +3439,11 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 self.assertEqual(contradiction_errors, [], errors)
 
     def test_rendered_plugin_template_restores_lifecycle_state(self) -> None:
+        zsh_path = shutil.which("zsh")
+        if zsh_path is None:
+            self.fail("zsh is required for lifecycle tests")
         template_path = (
-            PUBLIC_ROOT
-            / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+            PUBLIC_ROOT / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
         )
         temporary_path: Path
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -3571,7 +3464,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             environment.pop("ZERO", None)
             try:
                 syntax = subprocess.run(  # nosec B603
-                    ["zsh", "-f", "-n", str(entry_path)],
+                    [zsh_path, "-f", "-n", str(entry_path)],
                     check=False,
                     capture_output=True,
                     text=True,
@@ -3579,17 +3472,14 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     timeout=10,
                 )
             except subprocess.TimeoutExpired as exc:
-                self.fail(
-                    f"template syntax timed out after {exc.timeout} seconds"
-                )
+                self.fail(f"template syntax timed out after {exc.timeout} seconds")
             self.assertEqual(
                 syntax.returncode,
                 0,
                 syntax.stdout + syntax.stderr,
             )
 
-            common = textwrap.dedent(
-                r"""
+            common = textwrap.dedent(r"""
                 check_fpath() {
                   builtin emulate -L zsh
                   local actual=${(j:|:)fpath}
@@ -3609,11 +3499,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 }
 
                 unset PMSPEC
-                """
-            )
+                """)
             cases = {
-                "default-native": textwrap.dedent(
-                    r"""
+                "default-native": textwrap.dedent(r"""
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins=( OTHER caller-other )
                     unset PMSPEC
@@ -3626,10 +3514,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     (( ! ${+Plugins[DEMO]} )) || exit 16
                     [[ ${Plugins[OTHER]} == caller-other ]] || exit 17
                     check_scaffold_removed || exit 18
-                    """
-                ),
-                "preexisting-single": textwrap.dedent(
-                    r"""
+                    """),
+                "preexisting-single": textwrap.dedent(r"""
                     typeset -ga fpath=( "$2" /tail )
                     typeset -gA Plugins
                     . "$1" || exit 20
@@ -3638,10 +3524,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     demo_plugin_unload || exit 23
                     check_fpath "$2" /tail || exit 24
                     check_scaffold_removed || exit 25
-                    """
-                ),
-                "preexisting-duplicates": textwrap.dedent(
-                    r"""
+                    """),
+                "preexisting-duplicates": textwrap.dedent(r"""
                     typeset -ga fpath=( "$2" /middle "$2" )
                     typeset -gA Plugins
                     . "$1" || exit 30
@@ -3649,10 +3533,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     demo_plugin_unload || exit 32
                     check_fpath "$2" /middle "$2" || exit 33
                     check_scaffold_removed || exit 34
-                    """
-                ),
-                "unset-pmspec-no-unset": textwrap.dedent(
-                    r"""
+                    """),
+                "unset-pmspec-no-unset": textwrap.dedent(r"""
                     setopt no_unset
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins
@@ -3663,10 +3545,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     [[ ! -o UNSET ]] || exit 43
                     check_fpath /baseline || exit 44
                     check_scaffold_removed || exit 45
-                    """
-                ),
-                "caller-ksh-arrays": textwrap.dedent(
-                    r"""
+                    """),
+                "caller-ksh-arrays": textwrap.dedent(r"""
                     setopt ksh_arrays
                     typeset -ga fpath=( "$2" /tail )
                     typeset -gA Plugins
@@ -3677,10 +3557,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     [[ -o KSH_ARRAYS ]] || exit 54
                     check_fpath "$2" /tail || exit 55
                     check_scaffold_removed || exit 56
-                    """
-                ),
-                "caller-no-function-argzero": textwrap.dedent(
-                    r"""
+                    """),
+                "caller-no-function-argzero": textwrap.dedent(r"""
                     unsetopt function_argzero
                     typeset caller_zero=$0
                     typeset -ga fpath=( /baseline )
@@ -3694,10 +3572,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     [[ $0 == "$caller_zero" ]] || exit 66
                     check_fpath /baseline || exit 67
                     check_scaffold_removed || exit 68
-                    """
-                ),
-                "repeated-source": textwrap.dedent(
-                    r"""
+                    """),
+                "repeated-source": textwrap.dedent(r"""
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins
                     . "$1" || exit 70
@@ -3709,10 +3585,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     check_fpath /baseline || exit 76
                     (( ! ${+Plugins[DEMO]} )) || exit 77
                     check_scaffold_removed || exit 78
-                    """
-                ),
-                "preexisting-plugin-key": textwrap.dedent(
-                    r"""
+                    """),
+                "preexisting-plugin-key": textwrap.dedent(r"""
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins=(
                       DEMO 'caller original [literal]*? value'
@@ -3727,10 +3601,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     [[ ${Plugins[OTHER]} == caller-other ]] || exit 85
                     check_fpath /baseline || exit 86
                     check_scaffold_removed || exit 87
-                    """
-                ),
-                "equal-entry-inserted-before-owned-append": textwrap.dedent(
-                    r"""
+                    """),
+                "equal-entry-inserted-before-owned-append": textwrap.dedent(r"""
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins
                     . "$1" || exit 90
@@ -3739,10 +3611,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     demo_plugin_unload || exit 92
                     check_fpath "$2" /baseline || exit 93
                     check_scaffold_removed || exit 94
-                    """
-                ),
-                "loader-handled-first-source": textwrap.dedent(
-                    r"""
+                    """),
+                "loader-handled-first-source": textwrap.dedent(r"""
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins
                     PMSPEC=f
@@ -3757,8 +3627,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     check_fpath /baseline || exit 107
                     (( ! ${+Plugins[DEMO]} )) || exit 108
                     check_scaffold_removed || exit 109
-                    """
-                ),
+                    """),
             }
             for case_name, body in cases.items():
                 with self.subTest(case=case_name):
@@ -3776,7 +3645,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     try:
                         completed = subprocess.run(  # nosec B603
                             [
-                                "zsh",
+                                zsh_path,
                                 "-f",
                                 "-c",
                                 common + body,
@@ -3792,8 +3661,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                         )
                     except subprocess.TimeoutExpired as exc:
                         self.fail(
-                            f"{case_name} timed out after "
-                            f"{exc.timeout} seconds"
+                            f"{case_name} timed out after " f"{exc.timeout} seconds"
                         )
                     self.assertEqual(
                         completed.returncode,
@@ -3842,9 +3710,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
 class PublicZshStandardContractTests(unittest.TestCase):
     def test_public_zsh_consumers_defer_to_canonical_standard(self) -> None:
-        canonical_path = (
-            ".github/instructions/zsh-scripting.instructions.md"
-        )
+        canonical_path = ".github/instructions/zsh-scripting.instructions.md"
         policy_path = "lib/zsh-standard-policy.json"
         consumers = (
             ".github/agents/zsh-plugin-standard-reviewer.agent.md",
@@ -3885,9 +3751,9 @@ class PublicZshStandardContractTests(unittest.TestCase):
             with self.subTest(new_plugin_contract=fragment):
                 self.assertIn(fragment, new_plugin_skill)
 
-        zunit_skill = (
-            PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md"
-        ).read_text(encoding="utf-8")
+        zunit_skill = (PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md").read_text(
+            encoding="utf-8"
+        )
         for fragment in (
             "test-fixture",
             "zsh/test/isolate-environment",
@@ -3899,8 +3765,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
                 self.assertIn(fragment, zunit_skill)
 
         template = (
-            PUBLIC_ROOT
-            / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+            PUBLIC_ROOT / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
         ).read_text(encoding="utf-8")
         self.assertNotIn("TODO", template)
         self.assertNotIn("#funtions-directory", template)
@@ -4010,9 +3875,9 @@ class PublicZshStandardContractTests(unittest.TestCase):
     def test_zunit_example_guards_and_demonstrates_unload_lifecycle(
         self,
     ) -> None:
-        text = (
-            PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md"
-        ).read_text(encoding="utf-8")
+        text = (PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md").read_text(
+            encoding="utf-8"
+        )
 
         self.assertIn(
             "if (( ${+functions[my-plugin_plugin_unload]} )); then",

@@ -30,9 +30,7 @@ REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
     "PATTERNS.md",
     ".github/README.md",
 )
-PLUGIN_TEMPLATE_PATH = (
-    ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
-)
+PLUGIN_TEMPLATE_PATH = ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
 RETIRED_PATTERN_SECTIONS = {
     "Plugin entry-point skeleton": {
         "evidence": (
@@ -406,9 +404,7 @@ def error(path: str, problem: str, fix: str) -> str:
 def _safe_value(value: object) -> str:
     text = str(value)
     return "".join(
-        character
-        if 32 <= ord(character) < 127
-        else f"\\x{ord(character):02x}"
+        character if 32 <= ord(character) < 127 else f"\\x{ord(character):02x}"
         for character in text
     )
 
@@ -434,9 +430,7 @@ def load_json_strict(path: Path) -> dict[str, object]:
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
-        raise PolicyValidationError(
-            f"invalid UTF-8 at byte {exc.start}"
-        ) from exc
+        raise PolicyValidationError(f"invalid UTF-8 at byte {exc.start}") from exc
     try:
         parsed = json.loads(text, object_pairs_hook=_reject_duplicate_json_keys)
     except PolicyValidationError:
@@ -762,9 +756,7 @@ def _validate_rules(
         )
     seen_ids: set[str] = set()
     profile_order = {profile: index for index, profile in enumerate(PROFILE_IDS)}
-    enforcement_order = {
-        kind: index for index, kind in enumerate(ENFORCEMENT_KINDS)
-    }
+    enforcement_order = {kind: index for index, kind in enumerate(ENFORCEMENT_KINDS)}
     for index, value_rule in enumerate(rules):
         path = f"$.normative_rules[{index}]"
         rule = _object(value_rule, path, RULE_KEYS, errors)
@@ -793,9 +785,7 @@ def _validate_rules(
             known_profiles = [
                 profile for profile in rule_profiles if profile in profile_order
             ]
-            if known_profiles != sorted(
-                known_profiles, key=profile_order.__getitem__
-            ):
+            if known_profiles != sorted(known_profiles, key=profile_order.__getitem__):
                 errors.append(
                     f"{path}.profiles: profiles must preserve canonical order"
                 )
@@ -806,10 +796,9 @@ def _validate_rules(
                 errors.append(
                     f"{path}.minimum_zsh: must be null or a dotted numeric version"
                 )
-            elif (
-                stable_version is not None
-                and _version_tuple(minimum) > _version_tuple(stable_version)
-            ):
+            elif stable_version is not None and _version_tuple(
+                minimum
+            ) > _version_tuple(stable_version):
                 errors.append(
                     f"{path}.minimum_zsh: cannot be newer than the stable release"
                 )
@@ -826,9 +815,10 @@ def _validate_rules(
                         f"{path}.evidence: unknown evidence "
                         f"{_safe_value(evidence_id)}"
                     )
-        if rule_id == "zsh/security/trust-paths" and tuple(
-            rule_evidence or ()
-        ) != TRUST_PATH_EVIDENCE:
+        if (
+            rule_id == "zsh/security/trust-paths"
+            and tuple(rule_evidence or ()) != TRUST_PATH_EVIDENCE
+        ):
             errors.append(
                 f"{path}.evidence for zsh/security/trust-paths: must match "
                 "the exact canonical trust-path evidence"
@@ -847,9 +837,7 @@ def _validate_rules(
                         f"{_safe_value(kind)}"
                     )
             known_kinds = [kind for kind in enforcement if kind in enforcement_order]
-            if known_kinds != sorted(
-                known_kinds, key=enforcement_order.__getitem__
-            ):
+            if known_kinds != sorted(known_kinds, key=enforcement_order.__getitem__):
                 errors.append(
                     f"{path}.enforcement: kinds must preserve canonical order"
                 )
@@ -987,9 +975,7 @@ def validate_policy_schema(policy: dict[str, object]) -> list[str]:
     ):
         errors.append("$.schema_version: must be integer 1")
     if top.get("policy_id") != "z-shell-zsh-scripting-standard":
-        errors.append(
-            "$.policy_id: must be 'z-shell-zsh-scripting-standard'"
-        )
+        errors.append("$.policy_id: must be 'z-shell-zsh-scripting-standard'")
     stable_version = _validate_release(top, errors)
     evidence_ids = _validate_documentation_sources(top, errors)
     profiles = _validate_profiles(top, errors)
@@ -1391,11 +1377,7 @@ def _scan_visible_markdown(
         visible_parts: list[str] = []
         contained_comment = False
         cursor = 0
-        while (
-            cursor < len(line)
-            and not html_active
-            and not starts_html_comment
-        ):
+        while cursor < len(line) and not html_active and not starts_html_comment:
             if in_comment:
                 comment_end = line.find("-->", cursor)
                 contained_comment = True
@@ -1416,9 +1398,7 @@ def _scan_visible_markdown(
             cursor = comment_start + len("<!--")
 
         visible_line = (
-            raw_line
-            if html_active or starts_html_comment
-            else "".join(visible_parts)
+            raw_line if html_active or starts_html_comment else "".join(visible_parts)
         )
         if contained_comment and visible_line.strip():
             visible_line = f"{visible_line} <html-comment>"
@@ -1438,9 +1418,7 @@ def _scan_visible_markdown(
             elif (
                 html_containers
                 and not raw_line.strip()
-                and not any(
-                    kind == "blockquote" for kind, _ in html_containers
-                )
+                and not any(kind == "blockquote" for kind, _ in html_containers)
             ):
                 fence_view = ""
                 containers = html_containers
@@ -1462,10 +1440,7 @@ def _scan_visible_markdown(
                     html_containers = ()
             else:
                 html_line = True
-                if (
-                    html_end_pattern is not None
-                    and html_end_pattern.search(fence_view)
-                ):
+                if html_end_pattern is not None and html_end_pattern.search(fence_view):
                     html_active = False
                     html_end_pattern = None
                     html_containers = ()
@@ -1516,9 +1491,7 @@ def _scan_visible_markdown(
             paragraph_context = None
         if not fence_view.strip():
             paragraph_context = None
-            if visible_line.strip() and any(
-                kind == "list" for kind, _ in containers
-            ):
+            if visible_line.strip() and any(kind == "list" for kind, _ in containers):
                 blank_lines = 0
                 active_containers = containers
             else:
@@ -1591,8 +1564,7 @@ def _contextual_markdown_lines(
     blank_lines = 0
     for line_number, raw_line in lines:
         source_gap = (
-            previous_line_number is not None
-            and line_number != previous_line_number + 1
+            previous_line_number is not None and line_number != previous_line_number + 1
         )
         if source_gap:
             active_containers = ()
@@ -1612,9 +1584,7 @@ def _contextual_markdown_lines(
         )
         previous_line_number = line_number
         if not content.strip():
-            if visible_line.strip() and any(
-                kind == "list" for kind, _ in containers
-            ):
+            if visible_line.strip() and any(kind == "list" for kind, _ in containers):
                 blank_lines = 0
                 active_containers = containers
             else:
@@ -1670,9 +1640,7 @@ HTML_TYPE_7_START = re.compile(
     rf"(?:<[A-Za-z][A-Za-z0-9-]*(?:[ \t]+{HTML_ATTRIBUTE})*[ \t]*/?>"
     r"|</[A-Za-z][A-Za-z0-9-]*[ \t]*>)[ \t]*$"
 )
-ASCII_PUNCTUATION = frozenset(
-    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-)
+ASCII_PUNCTUATION = frozenset("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
 
 
 class _HtmlBlockState(NamedTuple):
@@ -1788,7 +1756,7 @@ def _reference_title_phase(
         if not text or text[0] not in "\"'(":
             return None
         closer = {
-            "\"": "\"",
+            '"': '"',
             "'": "'",
             "(": ")",
         }[text[0]]
@@ -1913,9 +1881,7 @@ def _positive_markdown_lines(
     empty_list_context: tuple[tuple[str, int], ...] | None = None
     html_block: _HtmlBlockState | None = None
     reference: _ReferenceDefinitionState | None = None
-    contextual = (
-        _contextual_markdown_lines(lines) if contexts is None else contexts
-    )
+    contextual = _contextual_markdown_lines(lines) if contexts is None else contexts
     for context in contextual:
         if context.source_gap:
             paragraph_context = None
@@ -1923,8 +1889,7 @@ def _positive_markdown_lines(
             if reference is not None:
                 if reference.phase != "maybe_title":
                     positive.extend(
-                        (item.line_number, item.raw_line)
-                        for item in reference.pending
+                        (item.line_number, item.raw_line) for item in reference.pending
                     )
                 reference = None
         if html_block is not None:
@@ -1936,16 +1901,10 @@ def _positive_markdown_lines(
                 html_content is None
                 and html_block.containers
                 and not context.raw_line.strip()
-                and not any(
-                    kind == "blockquote"
-                    for kind, _ in html_block.containers
-                )
+                and not any(kind == "blockquote" for kind, _ in html_block.containers)
             ):
                 html_content = ""
-            if (
-                html_content is None
-                or context.containers != html_block.containers
-            ):
+            if html_content is None or context.containers != html_block.containers:
                 html_block = None
             elif html_block.end_pattern is None:
                 if html_content.strip():
@@ -1960,17 +1919,14 @@ def _positive_markdown_lines(
             if context.containers != reference.containers:
                 if reference.phase != "maybe_title":
                     positive.extend(
-                        (item.line_number, item.raw_line)
-                        for item in reference.pending
+                        (item.line_number, item.raw_line) for item in reference.pending
                     )
                 reference = None
-            elif (
-                reference.phase != "maybe_title"
-                and _interrupts_reference_definition(context.content)
+            elif reference.phase != "maybe_title" and _interrupts_reference_definition(
+                context.content
             ):
                 positive.extend(
-                    (item.line_number, item.raw_line)
-                    for item in reference.pending
+                    (item.line_number, item.raw_line) for item in reference.pending
                 )
                 reference = None
                 paragraph_context = context.containers
@@ -2002,8 +1958,7 @@ def _positive_markdown_lines(
                             reference = None
                         continue
                 positive.extend(
-                    (item.line_number, item.raw_line)
-                    for item in reference.pending
+                    (item.line_number, item.raw_line) for item in reference.pending
                 )
                 reference = None
                 paragraph_context = context.containers
@@ -2021,8 +1976,7 @@ def _positive_markdown_lines(
                         reference = None
                     continue
                 positive.extend(
-                    (item.line_number, item.raw_line)
-                    for item in reference.pending
+                    (item.line_number, item.raw_line) for item in reference.pending
                 )
                 reference = None
                 paragraph_context = context.containers
@@ -2041,14 +1995,13 @@ def _positive_markdown_lines(
                             reference = None
                         continue
                 positive.extend(
-                    (item.line_number, item.raw_line)
-                    for item in reference.pending
+                    (item.line_number, item.raw_line) for item in reference.pending
                 )
                 reference = None
                 paragraph_context = context.containers
             else:
                 title_text = context.content.lstrip(" \t")
-                if title_text.startswith(("\"", "'", "(")):
+                if title_text.startswith(('"', "'", "(")):
                     title = _reference_title_phase(title_text)
                     if title is not None:
                         phase, closer = title
@@ -2123,9 +2076,7 @@ def _positive_markdown_lines(
         else:
             paragraph_context = None
     if reference is not None and reference.phase != "maybe_title":
-        positive.extend(
-            (item.line_number, item.raw_line) for item in reference.pending
-        )
+        positive.extend((item.line_number, item.raw_line) for item in reference.pending)
     return positive
 
 
@@ -2135,12 +2086,9 @@ def _positive_markdown_contexts(
 ) -> list[_MarkdownLineContext]:
     """Return contextual records retained by the positive-line filter."""
 
-    contextual = (
-        _contextual_markdown_lines(lines) if contexts is None else contexts
-    )
+    contextual = _contextual_markdown_lines(lines) if contexts is None else contexts
     positive_line_numbers = {
-        line_number
-        for line_number, _ in _positive_markdown_lines(lines, contextual)
+        line_number for line_number, _ in _positive_markdown_lines(lines, contextual)
     }
     return [
         context
@@ -2154,8 +2102,7 @@ def _atx_heading_content(line: str, level: int) -> str | None:
 
     visible_line = line.removesuffix(" <html-comment>")
     match = re.fullmatch(
-        rf" {{0,3}}#{{{level}}}[ \t]+"
-        r"(.*?)(?:[ \t]+#+[ \t]*)?",
+        rf" {{0,3}}#{{{level}}}[ \t]+" r"(.*?)(?:[ \t]+#+[ \t]*)?",
         visible_line,
     )
     if match is None:
@@ -2204,14 +2151,11 @@ def _visible_h2_section(
 ) -> list[tuple[int, str]] | None:
     """Return one exact visible H2 section, excluding its heading."""
 
-    contextual = (
-        _contextual_markdown_lines(lines) if contexts is None else contexts
-    )
+    contextual = _contextual_markdown_lines(lines) if contexts is None else contexts
     heading_indexes = [
         index
         for index, context in enumerate(contextual)
-        if not context.containers
-        and _atx_heading_content(context.content, 2) == title
+        if not context.containers and _atx_heading_content(context.content, 2) == title
     ]
     if len(heading_indexes) != 1:
         return None
@@ -2235,8 +2179,7 @@ def _visible_h2_source_section(text: str, title: str) -> str | None:
     headings = [
         context.line_number
         for context in contextual
-        if not context.containers
-        and _atx_heading_content(context.content, 2) == title
+        if not context.containers and _atx_heading_content(context.content, 2) == title
     ]
     if len(headings) != 1:
         return None
@@ -2279,8 +2222,7 @@ def _section_has_indented_code(section: str) -> bool:
 
     visible, contexts = _scan_visible_markdown(section)
     positive_line_numbers = {
-        line_number
-        for line_number, _ in _positive_markdown_lines(visible, contexts)
+        line_number for line_number, _ in _positive_markdown_lines(visible, contexts)
     }
     return any(
         line.strip() and line_number not in positive_line_numbers
@@ -2341,10 +2283,7 @@ def _retired_patterns_contract_errors(text: str) -> list[str]:
             len(evidence) != len(expected_evidence)
             or set(evidence) != set(expected_evidence)
             or not exact_status
-            or any(
-                inline_code_tokens.count(token) != 1
-                for token in required_tokens
-            )
+            or any(inline_code_tokens.count(token) != 1 for token in required_tokens)
         ):
             errors.append(
                 error(
@@ -2383,10 +2322,7 @@ def _positive_visible_text(
 ) -> str:
     """Join visible non-code lines for positive ownership checks."""
 
-    return "\n".join(
-        line
-        for _, line in _positive_markdown_lines(lines, contexts)
-    )
+    return "\n".join(line for _, line in _positive_markdown_lines(lines, contexts))
 
 
 def _visible_markdown_segments(
@@ -2412,11 +2348,7 @@ def _visible_markdown_segments(
             flush()
             current_context = None
             continue
-        context = (
-            ("blockquote", quote_depth)
-            if quote_depth
-            else ("document", 0)
-        )
+        context = ("blockquote", quote_depth) if quote_depth else ("document", 0)
         if context != current_context:
             flush()
             current_context = context
@@ -2600,14 +2532,14 @@ def _markdown_rules(
         parsed.append(
             {
                 "id": rule_id,
-                "level": metadata["Level"][0]
-                if len(metadata["Level"]) == 1
-                else object(),
+                "level": (
+                    metadata["Level"][0] if len(metadata["Level"]) == 1 else object()
+                ),
                 "profiles": metadata["Profiles"],
                 "minimum_zsh": minimum,
-                "basis": metadata["Basis"][0]
-                if len(metadata["Basis"]) == 1
-                else object(),
+                "basis": (
+                    metadata["Basis"][0] if len(metadata["Basis"]) == 1 else object()
+                ),
                 "evidence": metadata["Evidence"],
                 "enforcement": metadata["Enforcement"],
             }
@@ -2700,7 +2632,7 @@ def validate_instruction_contract(
         "enforcement": "Enforcement",
     }
     for index, (markdown_rule, policy_rule_value) in enumerate(
-        zip(parsed_rules, rules)
+        zip(parsed_rules, rules, strict=False)
     ):
         if not isinstance(policy_rule_value, dict):
             continue
@@ -2797,9 +2729,7 @@ def validate_manifest_contract(
     source = policy.get("source_classification")
     if not isinstance(source, dict) or not isinstance(source.get("path_globs"), list):
         return errors
-    apply_to = ",".join(
-        item for item in source["path_globs"] if isinstance(item, str)
-    )
+    apply_to = ",".join(item for item in source["path_globs"] if isinstance(item, str))
     surface_values = manifest.get("surfaces")
     if not isinstance(surface_values, list):
         return [
@@ -2902,10 +2832,9 @@ def validate_manifest_contract(
             )
             continue
         actual = matches[0]
-        if (
-            surface_id == "instruction-zsh-scripting"
-            and actual.get("file_patterns") != [apply_to]
-        ):
+        if surface_id == "instruction-zsh-scripting" and actual.get(
+            "file_patterns"
+        ) != [apply_to]:
             errors.append(
                 error(
                     MANIFEST_PATH,
@@ -2915,8 +2844,7 @@ def validate_manifest_contract(
             )
         for field, expected_value in expected.items():
             if actual.get(field) != expected_value and not (
-                surface_id == "instruction-zsh-scripting"
-                and field == "file_patterns"
+                surface_id == "instruction-zsh-scripting" and field == "file_patterns"
             ):
                 errors.append(
                     error(
@@ -2976,12 +2904,8 @@ def validate_consumer_contract(
         relative_path: _scan_visible_markdown(text)
         for relative_path, text in texts.items()
     }
-    visible_lines = {
-        relative_path: scan[0] for relative_path, scan in scans.items()
-    }
-    visible_contexts = {
-        relative_path: scan[1] for relative_path, scan in scans.items()
-    }
+    visible_lines = {relative_path: scan[0] for relative_path, scan in scans.items()}
+    visible_contexts = {relative_path: scan[1] for relative_path, scan in scans.items()}
     visible_texts = {
         relative_path: _positive_visible_text(
             lines,
@@ -3069,9 +2993,7 @@ def validate_consumer_contract(
             ),
             len(patterns_text.splitlines()) + 1,
         )
-        intro_lines = [
-            line for line in patterns_lines if line[0] < first_h2_line
-        ]
+        intro_lines = [line for line in patterns_lines if line[0] < first_h2_line]
         intro_contexts = [
             context
             for context in positive_contexts["PATTERNS.md"]
@@ -3085,9 +3007,7 @@ def validate_consumer_contract(
             "Patterns below are observed examples, not a second policy source.",
             "the canonical standard wins and the pattern must be corrected.",
         )
-        if any(
-            fragment not in normalized_patterns for fragment in patterns_contract
-        ):
+        if any(fragment not in normalized_patterns for fragment in patterns_contract):
             errors.append(
                 error(
                     "PATTERNS.md",
@@ -3139,8 +3059,7 @@ def validate_consumer_contract(
                 errors.append(
                     error(
                         ".github/README.md",
-                        f"{section_title} must visibly catalog "
-                        f"{required_path!r}",
+                        f"{section_title} must visibly catalog " f"{required_path!r}",
                         f"catalog {required_path} in the {section_title} section",
                     )
                 )
@@ -3189,8 +3108,7 @@ def validate_consumer_contract(
                 matches = [
                     cast(dict[str, object], item)
                     for item in surface_values
-                    if isinstance(item, dict)
-                    and item.get("path") == relative_path
+                    if isinstance(item, dict) and item.get("path") == relative_path
                 ]
                 if len(matches) != 1:
                     errors.append(

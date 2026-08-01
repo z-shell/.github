@@ -37,18 +37,18 @@ The `.github` repository is a [special GitHub repository](https://docs.github.co
 
 ## Repository Structure
 
-| Path                                              | Purpose                                                                                                               |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`AGENTS.md`](../AGENTS.md)                       | Canonical org-wide instructions for AI coding agents and maintainers                                                  |
-| [`PATTERNS.md`](../PATTERNS.md)                   | Cross-repo implementation idioms grounded in real repositories                                                        |
+| Path                                                                                               | Purpose                                                                                                               |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [`AGENTS.md`](../AGENTS.md)                                                                        | Canonical org-wide instructions for AI coding agents and maintainers                                                  |
+| [`PATTERNS.md`](../PATTERNS.md)                                                                    | Cross-repo implementation idioms grounded in real repositories                                                        |
 | [`.github/instructions/zsh-scripting.instructions.md`](instructions/zsh-scripting.instructions.md) | Canonical detailed Zsh authoring, review, compatibility, and validation standard                                      |
-| [`lib/zsh-standard-policy.json`](../lib/zsh-standard-policy.json) | Machine-readable Zsh stable-release, profile, rule, and source-class contract                                         |
-| [`decisions/`](../decisions/)                     | Architectural decision records for non-obvious org-wide choices                                                       |
-| [`runbooks/`](../runbooks/)                       | Repeatable operational workflows such as learning capture, org review, triage, ADR drafting, and release coordination |
-| [`profile/`](../profile/)                         | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell)           |
-| [`actions/`](../actions/)                         | Reusable composite GitHub Actions shared across all org repositories                                                  |
-| [`workflow-templates/`](../workflow-templates/)   | Starter workflow templates available in the **Actions > New workflow** tab                                            |
-| [`renovate-config.json`](../renovate-config.json) | Shared Renovate preset for routine dependency version updates                                                         |
+| [`lib/zsh-standard-policy.json`](../lib/zsh-standard-policy.json)                                  | Machine-readable Zsh stable-release, profile, rule, and source-class contract                                         |
+| [`decisions/`](../decisions/)                                                                      | Architectural decision records for non-obvious org-wide choices                                                       |
+| [`runbooks/`](../runbooks/)                                                                        | Repeatable operational workflows such as learning capture, org review, triage, ADR drafting, and release coordination |
+| [`profile/`](../profile/)                                                                          | Organization profile — the README and visual assets displayed on the [org page](https://github.com/z-shell)           |
+| [`actions/`](../actions/)                                                                          | Reusable composite GitHub Actions shared across all org repositories                                                  |
+| [`workflow-templates/`](../workflow-templates/)                                                    | Starter workflow templates available in the **Actions > New workflow** tab                                            |
+| [`renovate-config.json`](../renovate-config.json)                                                  | Shared Renovate preset for routine dependency version updates                                                         |
 
 ## Instruction Architecture
 

@@ -1537,9 +1537,7 @@ class PublicRepositoryTests(unittest.TestCase):
             },
         )
 
-        adr = (
-            PUBLIC_ROOT / "decisions/0015-zsh-scripting-standard.md"
-        ).read_text()
+        adr = (PUBLIC_ROOT / "decisions/0015-zsh-scripting-standard.md").read_text()
         required = (
             "# 15. Adopt an organization-wide Zsh scripting standard",
             "**Status:** PROPOSED",
