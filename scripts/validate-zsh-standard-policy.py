@@ -1426,6 +1426,7 @@ def _scan_visible_markdown(
             visible_line,
             active_containers,
         )
+        html_container_replayed = True
         if html_active:
             html_content = _fence_container_content(
                 raw_line,
@@ -1434,9 +1435,11 @@ def _scan_visible_markdown(
             if html_content is not None:
                 fence_view = html_content
                 containers = html_containers
+            else:
+                html_container_replayed = False
         html_line = False
         if html_active:
-            if containers != html_containers:
+            if not html_container_replayed or containers != html_containers:
                 html_active = False
                 html_blank_terminated = False
                 html_end_pattern = None
@@ -1916,14 +1919,21 @@ def _positive_markdown_lines(
                     )
                 reference = None
         if html_block is not None:
-            if context.containers != html_block.containers:
+            html_content = _fence_container_content(
+                context.raw_line,
+                html_block.containers,
+            )
+            if (
+                html_content is None
+                or context.containers != html_block.containers
+            ):
                 html_block = None
             elif html_block.end_pattern is None:
-                if context.content.strip():
+                if html_content.strip():
                     continue
                 html_block = None
             else:
-                if html_block.end_pattern.search(context.content):
+                if html_block.end_pattern.search(html_content):
                     html_block = None
                 continue
 

@@ -2577,6 +2577,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             f"[\n### `{rule_id}`\n]: /target",
             f"<!-- --> ```\n### `{rule_id}`",
             f"<!--\n--> ```\n### `{rule_id}`",
+            f"- <script>\n- ### `{rule_id}`",
         )
         for interrupting_h3 in interrupting_h3_blocks:
             with self.subTest(kind=interrupting_h3.splitlines()[0]):
