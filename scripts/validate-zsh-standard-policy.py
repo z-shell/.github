@@ -33,6 +33,41 @@ REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
 PLUGIN_TEMPLATE_PATH = (
     ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
 )
+RETIRED_PATTERN_SECTIONS = {
+    "Plugin entry-point skeleton": {
+        "evidence": (
+            "z-shell/zsh-eza:zsh-eza.plugin.zsh",
+            "z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh",
+            "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
+        ),
+        "rules": (
+            "zsh/context/select-profile",
+            "zsh/sourced/preserve-caller-state",
+        ),
+    },
+    "Register the repository directory in `Plugins`": {
+        "evidence": (
+            "z-shell/zsh-eza:zsh-eza.plugin.zsh",
+            "z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh",
+            "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
+        ),
+        "rules": (
+            "zsh/plugin/document-global-state",
+            "zsh/plugin/restore-state",
+        ),
+    },
+    "Guard `fpath` additions": {
+        "evidence": (
+            "z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh",
+            "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
+            "z-shell/zsh-eza:zsh-eza.plugin.zsh",
+        ),
+        "rules": (
+            "zsh/security/trust-paths",
+            "zsh/plugin/restore-state",
+        ),
+    },
+}
 
 TOP_LEVEL_KEYS = (
     "schema_version",
@@ -1051,78 +1086,207 @@ def _apply_to_values(text: str) -> list[str]:
     return values
 
 
-def _strip_indentation_columns(
+def _markdown_container_view(
     line: str,
-    required_columns: int,
-) -> str | None:
-    """Strip an exact Markdown container indentation width."""
-
-    columns = 0
-    cursor = 0
-    while columns < required_columns and cursor < len(line):
-        character = line[cursor]
-        if character == " ":
-            columns += 1
-        elif character == "\t":
-            columns += 4 - (columns % 4)
-        else:
-            return None
-        cursor += 1
-    if columns != required_columns:
-        return None
-    return line[cursor:]
-
-
-def _fence_opening_view(
-    line: str,
+    *,
+    work: list[int] | None = None,
+    include_lists: bool = True,
 ) -> tuple[str, tuple[tuple[str, int], ...]]:
-    """Return content after narrow list and blockquote container prefixes."""
+    """Return content after supported containers using linear cursor work."""
 
-    content = line
+    expanded = line.expandtabs(4)
+    if work is not None:
+        work[0] += len(expanded)
+    cursor = 0
     containers: list[tuple[str, int]] = []
-    while True:
-        blockquote = re.match(r"^ {0,3}>[ \t]?(.*)$", content)
-        if blockquote is not None:
-            containers.append(("blockquote", 0))
-            content = blockquote.group(1)
-            continue
-        list_item = re.match(
-            r"^(?P<indent> {0,3})"
-            r"(?P<marker>[-+*]|\d{1,9}[.)])"
-            r"(?P<spacing> {1,4}|\t)"
-            r"(?P<content>\S.*|)$",
-            content,
-        )
-        if list_item is None:
+
+    def advance(amount: int = 1) -> None:
+        nonlocal cursor
+        cursor += amount
+        if work is not None:
+            work[0] += amount
+
+    while cursor < len(expanded):
+        container_start = cursor
+        indentation = 0
+        while indentation < 4 and cursor < len(expanded) and expanded[cursor] == " ":
+            advance()
+            indentation += 1
+        if indentation == 4:
+            cursor = container_start
             break
-        prefix = (
-            list_item.group("indent")
-            + list_item.group("marker")
-            + list_item.group("spacing")
-        )
-        containers.append(("list", len(prefix.expandtabs(4))))
-        content = list_item.group("content")
-    return content, tuple(containers)
+
+        if cursor < len(expanded) and expanded[cursor] == ">":
+            advance()
+            if cursor < len(expanded) and expanded[cursor] == " ":
+                advance()
+            containers.append(("blockquote", 0))
+            continue
+
+        if not include_lists:
+            cursor = container_start
+            break
+
+        marker_end = cursor
+        if expanded[cursor] in "-+*":
+            marker_end += 1
+        elif expanded[cursor].isdigit():
+            digit_start = cursor
+            while (
+                marker_end < len(expanded)
+                and marker_end - digit_start < 10
+                and expanded[marker_end].isdigit()
+            ):
+                marker_end += 1
+            if (
+                not 1 <= marker_end - digit_start <= 9
+                or marker_end >= len(expanded)
+                or expanded[marker_end] not in ".)"
+            ):
+                cursor = container_start
+                break
+            marker_end += 1
+        else:
+            cursor = container_start
+            break
+
+        spacing_end = marker_end
+        while (
+            spacing_end < len(expanded)
+            and expanded[spacing_end] == " "
+            and spacing_end - marker_end < 5
+        ):
+            spacing_end += 1
+        spacing = spacing_end - marker_end
+        if not 1 <= spacing <= 4 or (
+            spacing_end < len(expanded) and expanded[spacing_end] == " "
+        ):
+            cursor = container_start
+            break
+        advance(spacing_end - cursor)
+        containers.append(("list", cursor - container_start))
+
+    return expanded[cursor:], tuple(containers)
+
+
+def _replayed_markdown_prefixes(
+    line: str,
+    containers: tuple[tuple[str, int], ...],
+    *,
+    work: list[int] | None = None,
+) -> tuple[str, tuple[int, ...]]:
+    """Replay recorded containers once and return each matched cursor."""
+
+    expanded = line.expandtabs(4)
+    if work is not None:
+        work[0] += len(expanded)
+    cursor = 0
+    matched_cursors: list[int] = []
+    for kind, width in containers:
+        if kind == "list":
+            if not expanded.startswith(" " * width, cursor):
+                break
+            cursor += width
+            if work is not None:
+                work[0] += width
+        else:
+            indentation = 0
+            while (
+                indentation < 4 and cursor < len(expanded) and expanded[cursor] == " "
+            ):
+                cursor += 1
+                indentation += 1
+                if work is not None:
+                    work[0] += 1
+            if indentation == 4 or cursor >= len(expanded) or expanded[cursor] != ">":
+                break
+            cursor += 1
+            if work is not None:
+                work[0] += 1
+            if cursor < len(expanded) and expanded[cursor] == " ":
+                cursor += 1
+                if work is not None:
+                    work[0] += 1
+        matched_cursors.append(cursor)
+    return expanded, tuple(matched_cursors)
+
+
+def _replay_markdown_containers(
+    line: str,
+    containers: tuple[tuple[str, int], ...],
+    *,
+    work: list[int] | None = None,
+) -> str | None:
+    """Return a continuation view for an exact recorded container stack."""
+
+    expanded, matched_cursors = _replayed_markdown_prefixes(
+        line,
+        containers,
+        work=work,
+    )
+    if len(matched_cursors) != len(containers):
+        return None
+    cursor = matched_cursors[-1] if matched_cursors else 0
+    return expanded[cursor:]
+
+
+def _resolve_markdown_container_view(
+    line: str,
+    active_containers: tuple[tuple[str, int], ...] = (),
+    *,
+    work: list[int] | None = None,
+) -> tuple[str, tuple[tuple[str, int], ...]]:
+    """Resolve active list continuations, then any explicit nested containers."""
+
+    if not active_containers:
+        return _markdown_container_view(line, work=work)
+    expanded, matched_cursors = _replayed_markdown_prefixes(
+        line,
+        active_containers,
+        work=work,
+    )
+    prefix_length = len(matched_cursors)
+    prefix = active_containers[:prefix_length]
+    if prefix and any(kind == "list" for kind, _ in prefix):
+        remainder = expanded[matched_cursors[-1] :]
+        content, nested = _markdown_container_view(remainder, work=work)
+        return content, prefix + nested
+    return _markdown_container_view(line, work=work)
 
 
 def _fence_container_content(
     line: str,
     containers: tuple[tuple[str, int], ...],
+    *,
+    work: list[int] | None = None,
 ) -> str | None:
     """Strip the container prefixes recorded by a fenced block opener."""
 
-    content = line
-    for kind, width in containers:
-        if kind == "blockquote":
-            blockquote = re.match(r"^ {0,3}>[ \t]?(.*)$", content)
-            if blockquote is None:
-                return None
-            content = blockquote.group(1)
-            continue
-        content = _strip_indentation_columns(content, width)
-        if content is None:
-            return None
-    return content
+    return _replay_markdown_containers(line, containers, work=work)
+
+
+def _fence_opener(content: str) -> tuple[str, int] | None:
+    match = re.match(
+        r"^ {0,3}(?P<marker>`{3,}|~{3,})(?P<info>.*)$",
+        content,
+    )
+    if match is None:
+        return None
+    marker = match.group("marker")
+    info = match.group("info")
+    if marker[0] == "`" and "`" in info:
+        return None
+    return marker[0], len(marker)
+
+
+def _fence_closer(content: str, marker: str, minimum: int) -> bool:
+    return (
+        re.fullmatch(
+            rf" {{0,3}}{re.escape(marker)}{{{minimum},}}[ \t]*",
+            content,
+        )
+        is not None
+    )
 
 
 def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
@@ -1133,6 +1297,7 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
     fence_character: str | None = None
     fence_length = 0
     fence_containers: tuple[tuple[str, int], ...] = ()
+    active_containers: tuple[tuple[str, int], ...] = ()
     for line_number, raw_line in enumerate(text.splitlines(), start=1):
         if fence_character is not None:
             candidate = _fence_container_content(
@@ -1144,20 +1309,17 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
                 and fence_containers
                 and (
                     raw_line.strip()
-                    or any(
-                        kind == "blockquote"
-                        for kind, _ in fence_containers
-                    )
+                    or any(kind == "blockquote" for kind, _ in fence_containers)
                 )
             ):
                 fence_character = None
                 fence_length = 0
                 fence_containers = ()
             else:
-                if candidate is not None and re.fullmatch(
-                    rf" {{0,3}}{re.escape(fence_character)}"
-                    rf"{{{fence_length},}}[ \t]*",
+                if candidate is not None and _fence_closer(
                     candidate,
+                    fence_character,
+                    fence_length,
                 ):
                     fence_character = None
                     fence_length = 0
@@ -1191,34 +1353,35 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
         visible_line = "".join(visible_parts)
         if contained_comment and visible_line.strip():
             visible_line = f"{visible_line} <html-comment>"
-        fence_view, containers = _fence_opening_view(visible_line)
-        fence_match = re.match(
-            r"^ {0,3}(?P<marker>`{3,}|~{3,})(?P<info>.*)$",
-            fence_view,
+        fence_view, containers = _resolve_markdown_container_view(
+            visible_line,
+            active_containers,
         )
-        if fence_match is not None:
-            marker = fence_match.group("marker")
-            info = fence_match.group("info")
-            if marker[0] != "`" or "`" not in info:
-                fence_character = marker[0]
-                fence_length = len(marker)
-                fence_containers = containers
-                continue
+        opener = _fence_opener(fence_view)
+        if opener is not None:
+            fence_character, fence_length = opener
+            fence_containers = containers
+            if any(kind == "list" for kind, _ in containers):
+                active_containers = containers
+            continue
         visible_lines.append((line_number, visible_line))
+        if not visible_line.strip():
+            continue
+        if any(kind == "list" for kind, _ in containers):
+            active_containers = containers
+        else:
+            active_containers = ()
     return visible_lines
 
 
 def _strip_blockquote_prefixes(line: str) -> tuple[int, str]:
     """Return blockquote depth and content for one visible Markdown line."""
 
-    depth = 0
-    content = line
-    while True:
-        blockquote = re.match(r"^ {0,3}>[ \t]?(.*)$", content)
-        if blockquote is None:
-            return depth, content
-        depth += 1
-        content = blockquote.group(1)
+    content, containers = _markdown_container_view(
+        line,
+        include_lists=False,
+    )
+    return len(containers), content
 
 
 def _leading_indentation_columns(line: str) -> int:
@@ -1235,59 +1398,43 @@ def _leading_indentation_columns(line: str) -> int:
     return columns
 
 
-def _list_item_content_indent(line: str) -> int | None:
-    """Return the content indent for one narrow list-item marker."""
-
-    list_item = re.match(
-        r"^(?P<indent> {0,3})"
-        r"(?P<marker>[-+*]|\d{1,9}[.)])"
-        r"(?P<spacing> {1,4}|\t)(?=\S|$)",
-        line,
-    )
-    if list_item is None:
-        return None
-    prefix = (
-        list_item.group("indent")
-        + list_item.group("marker")
-        + list_item.group("spacing")
-    )
-    return len(prefix.expandtabs(4))
-
-
 def _positive_markdown_lines(
     lines: list[tuple[int, str]],
 ) -> list[tuple[int, str]]:
-    """Exclude indented code while retaining immediate list continuations."""
+    """Exclude code while retaining paragraphs and list continuations."""
 
     positive: list[tuple[int, str]] = []
-    list_context: tuple[int, int] | None = None
+    active_containers: tuple[tuple[str, int], ...] = ()
+    paragraph_context: tuple[tuple[str, int], ...] | None = None
     for line_number, raw_line in lines:
         visible_line = raw_line.removesuffix(" <html-comment>")
-        quote_depth, content = _strip_blockquote_prefixes(visible_line)
-        if not content.strip():
+        content, containers = _resolve_markdown_container_view(
+            visible_line,
+            active_containers,
+        )
+        if not visible_line.strip():
             positive.append((line_number, raw_line))
-            list_context = None
-            continue
-
-        list_indent = _list_item_content_indent(content)
-        if list_indent is not None:
-            positive.append((line_number, raw_line))
-            list_context = (quote_depth, list_indent)
+            paragraph_context = None
             continue
 
         indentation = _leading_indentation_columns(content)
-        if (
-            list_context is not None
-            and list_context[0] == quote_depth
-            and list_context[1] <= indentation < list_context[1] + 4
-        ):
-            positive.append((line_number, raw_line))
+        if indentation >= 4 and paragraph_context != containers:
+            paragraph_context = None
+            if not any(kind == "list" for kind, _ in containers):
+                active_containers = ()
             continue
 
-        list_context = None
-        if indentation >= 4:
-            continue
         positive.append((line_number, raw_line))
+        if any(kind == "list" for kind, _ in containers):
+            active_containers = containers
+        else:
+            active_containers = ()
+
+        paragraph_content = content[indentation:]
+        if re.match(r"^#{1,6}(?:[ \t]+|$)", paragraph_content):
+            paragraph_context = None
+        else:
+            paragraph_context = containers
     return positive
 
 
@@ -1306,10 +1453,10 @@ def _atx_heading_content(line: str, level: int) -> str | None:
 
 
 def _consumer_h3_content(line: str) -> str | None:
-    """Return one consumer H3 after removing blockquote containers."""
+    """Return one consumer H3 after supported container prefixes."""
 
     visible_line = line.removesuffix(" <html-comment>")
-    _, content = _strip_blockquote_prefixes(visible_line)
+    content, _ = _markdown_container_view(visible_line)
     return _atx_heading_content(content, 3)
 
 
@@ -1347,6 +1494,130 @@ def _visible_h2_section(
             break
         section.append(item)
     return section
+
+
+def _visible_h2_source_section(text: str, title: str) -> str | None:
+    """Return raw source owned by one exact visible top-level H2."""
+
+    raw_lines = text.splitlines()
+    visible_lines = _visible_markdown_lines(text)
+    headings = [
+        line_number
+        for line_number, line in visible_lines
+        if _atx_heading_content(line, 2) == title
+    ]
+    if len(headings) != 1:
+        return None
+    start = headings[0] - 1
+    end = len(raw_lines)
+    for line_number, line in visible_lines:
+        if line_number <= headings[0]:
+            continue
+        if _atx_heading_content(line, 2) is not None:
+            end = line_number - 1
+            break
+    return "\n".join(raw_lines[start:end])
+
+
+def _section_has_fenced_code(section: str) -> bool:
+    """Return whether a raw Markdown section opens any supported fence."""
+
+    active_containers: tuple[tuple[str, int], ...] = ()
+    for line in section.splitlines():
+        content, containers = _resolve_markdown_container_view(
+            line,
+            active_containers,
+        )
+        if _fence_opener(content) is not None:
+            return True
+        if not line.strip():
+            continue
+        if any(kind == "list" for kind, _ in containers):
+            active_containers = containers
+        else:
+            active_containers = ()
+    return False
+
+
+def _section_has_indented_code(section: str) -> bool:
+    """Return whether visible section content contains indented code."""
+
+    visible = _visible_markdown_lines(section)
+    positive_line_numbers = {
+        line_number for line_number, _ in _positive_markdown_lines(visible)
+    }
+    return any(
+        line.strip() and line_number not in positive_line_numbers
+        for line_number, line in visible
+    )
+
+
+def _retired_patterns_contract_errors(text: str) -> list[str]:
+    """Validate exact evidence and no-code contracts for retired patterns."""
+
+    errors: list[str] = []
+    for title, contract in RETIRED_PATTERN_SECTIONS.items():
+        section = _visible_h2_source_section(text, title)
+        if section is None:
+            errors.append(
+                error(
+                    "PATTERNS.md",
+                    f"{title} retired section contract is missing or ambiguous",
+                    f"restore the exact top-level {title!r} retired section",
+                )
+            )
+            continue
+
+        visible = _visible_markdown_lines(section)
+        positive_lines = _positive_markdown_lines(visible)
+        positive = _positive_visible_text(visible)
+        evidence = tuple(
+            match.group(1)
+            for _, line in positive_lines
+            if (match := re.fullmatch(r"- `([^`]+)`", line)) is not None
+        )
+        status_lines = [
+            line for _, line in positive_lines if line.startswith("Status:")
+        ]
+        exact_status = (
+            len(status_lines) == 1
+            and re.match(
+                r"^Status: retired\.(?:[ \t]|$)",
+                status_lines[0],
+            )
+            is not None
+        )
+        expected_evidence = cast(tuple[str, ...], contract["evidence"])
+        expected_rules = cast(tuple[str, ...], contract["rules"])
+        required_fragments = (
+            INSTRUCTION_PATH,
+            PLUGIN_TEMPLATE_PATH,
+            *expected_rules,
+        )
+        if (
+            len(evidence) != len(expected_evidence)
+            or set(evidence) != set(expected_evidence)
+            or not exact_status
+            or any(fragment not in positive for fragment in required_fragments)
+        ):
+            errors.append(
+                error(
+                    "PATTERNS.md",
+                    f"{title} retired section contract does not match exact "
+                    "evidence, status, routing, and rule citations",
+                    f"restore the reviewed retired section contract for {title}",
+                )
+            )
+        if _section_has_fenced_code(section) or _section_has_indented_code(section):
+            errors.append(
+                error(
+                    "PATTERNS.md",
+                    f"{title} must not publish replacement code",
+                    "remove fenced or indented code and route new work to the "
+                    "canonical Zsh standard and plugin template",
+                )
+            )
+    return errors
 
 
 def _normalized_visible_text(lines: list[tuple[int, str]]) -> str:
@@ -2041,6 +2312,7 @@ def validate_consumer_contract(
                     "standard wins conflicts",
                 )
             )
+        errors.extend(_retired_patterns_contract_errors(patterns_text))
 
     readme_text = texts.get(".github/README.md")
     if readme_text is not None:

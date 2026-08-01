@@ -1892,6 +1892,194 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     "fix:",
                 )
 
+    def test_visual_column_and_continuation_fences_reprocess_visible_h3(
+        self,
+    ) -> None:
+        validator = load_validator()
+        rule_heading = "### `zsh/options/localize`"
+        hidden_cases = (
+            "- item\n  ```markdown\n  " + rule_heading + "\n  ```",
+            "- ```markdown\n  " + rule_heading + "\n  ```",
+            "-  ```markdown\n   " + rule_heading + "\n   ```",
+            "-   ```markdown\n    " + rule_heading + "\n    ```",
+            "-    ```markdown\n     " + rule_heading + "\n     ```",
+            "> \t```markdown\n>   " + rule_heading + "\n>   ```",
+            "- > ```markdown\n  > " + rule_heading + "\n  > ```",
+            "> - ```markdown\n>   " + rule_heading + "\n>   ```",
+        )
+        for source in hidden_cases:
+            with self.subTest(source=source):
+                visible = validator._visible_markdown_lines(source)
+                self.assertNotIn(rule_heading, [line for _, line in visible])
+
+        visible_cases = (
+            "- item\n  ```markdown\n  hidden\n" + rule_heading,
+            "- \t```markdown\n    <!-- literal\n    hidden\n    ```\n" + rule_heading,
+            "-     ```markdown\n" + rule_heading,
+        )
+        for source in visible_cases:
+            with self.subTest(source=source):
+                visible = validator._visible_markdown_lines(source)
+                self.assertIn(rule_heading, [line for _, line in visible])
+
+    def test_rejects_list_and_nested_container_rule_headings(self) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        additions = (
+            "- ### zsh/options/localize",
+            "1. ### `zsh/options/localize`",
+            "- > ### zsh/options/localize",
+            "> - ### `zsh/options/localize`",
+        )
+        for addition in additions:
+            with self.subTest(addition=addition):
+                root = self.make_fixture()
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + f"\n\n{addition}\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    relative_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
+    def test_container_prefix_paths_do_linear_suffix_work(self) -> None:
+        validator = load_validator()
+        for depth in (4_000, 8_000, 16_000, 32_000):
+            with self.subTest(depth=depth):
+                line = "> " * depth + "### `zsh/options/localize`"
+                work = [0]
+                content, containers = validator._markdown_container_view(
+                    line,
+                    work=work,
+                )
+                self.assertEqual(content, "### `zsh/options/localize`")
+                self.assertEqual(len(containers), depth)
+                self.assertLessEqual(work[0], 16 * len(line) + 64)
+
+                fence_work = [0]
+                fence_content = validator._fence_container_content(
+                    line,
+                    containers,
+                    work=fence_work,
+                )
+                self.assertEqual(fence_content, "### `zsh/options/localize`")
+                self.assertLessEqual(fence_work[0], 16 * len(line) + 64)
+
+                active = (("list", 2),) + containers
+                active_line = "  " + line
+                active_work = [0]
+                active_content, resolved = validator._resolve_markdown_container_view(
+                    active_line,
+                    active,
+                    work=active_work,
+                )
+                self.assertEqual(active_content, "### `zsh/options/localize`")
+                self.assertEqual(resolved, active)
+                self.assertLessEqual(
+                    active_work[0],
+                    16 * len(active_line) + 64,
+                )
+
+        active = (("list", 2), ("blockquote", 0), ("blockquote", 0))
+        content, resolved = validator._resolve_markdown_container_view(
+            "  > visible",
+            active,
+        )
+        self.assertEqual(content, "visible")
+        self.assertEqual(resolved, active[:2])
+
+    def test_positive_markdown_state_distinguishes_indented_content(
+        self,
+    ) -> None:
+        validator = load_validator()
+        canonical_path = ".github/instructions/zsh-scripting.instructions.md"
+        source = (
+            "Ordinary paragraph reference:\n"
+            f"    {canonical_path}\n\n"
+            f"    hidden/{canonical_path}\n\n"
+            "1. Blank-separated list reference\n\n"
+            f"   listed/{canonical_path}\n"
+        )
+
+        visible = validator._visible_markdown_lines(source)
+        positive_lines = validator._positive_markdown_lines(visible)
+        positive = validator._positive_visible_text(visible)
+
+        self.assertIn(
+            f"    {canonical_path}",
+            [line for _, line in positive_lines],
+        )
+        self.assertNotIn(f"hidden/{canonical_path}", positive)
+        self.assertIn(f"listed/{canonical_path}", positive)
+
+    def test_visible_paragraph_and_blank_list_continuations_satisfy_references(
+        self,
+    ) -> None:
+        relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        cases = (
+            (
+                ".github/instructions/zsh-scripting.instructions.md",
+                (
+                    "Visible canonical instruction reference:\n"
+                    "    .github/instructions/zsh-scripting.instructions.md"
+                ),
+            ),
+            (
+                "lib/zsh-standard-policy.json",
+                (
+                    "1. Visible canonical policy reference\n\n"
+                    "   lib/zsh-standard-policy.json"
+                ),
+            ),
+        )
+        for canonical_path, addition in cases:
+            with self.subTest(canonical_path=canonical_path):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(canonical_path, text)
+                path.write_text(
+                    text.replace(canonical_path, "removed-canonical-path")
+                    + f"\n\n{addition}\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                missing_reference_errors = [
+                    message
+                    for message in errors
+                    if message.startswith(f"{relative_path}:")
+                    and "missing visible canonical Zsh reference" in message
+                    and canonical_path in message
+                ]
+                self.assertEqual(missing_reference_errors, [], errors)
+
+    def test_rejects_indented_blockquote_paragraph_contradiction(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/README.md"
+        path = root / relative_path
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n\n> Zsh standard validation is\n>     inactive.\n",
+            encoding="utf-8",
+        )
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "Phase 1 Zsh validation",
+            "fix:",
+        )
+
         container_breakouts = (
             (
                 "list",
@@ -2144,6 +2332,174 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     "fix:",
                 )
 
+    def test_rejects_retired_patterns_contract_mutations(self) -> None:
+        relative_path = "PATTERNS.md"
+        fancy_owner = "z-shell/zsh-fancy-completions"
+        fancy_evidence = f"{fancy_owner}:zsh-fancy-completions.plugin.zsh"
+        section_contracts = {
+            "Plugin entry-point skeleton": (
+                (
+                    "z-shell/zsh-eza:zsh-eza.plugin.zsh",
+                    fancy_evidence,
+                    "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
+                ),
+                (
+                    "zsh/context/select-profile",
+                    "zsh/sourced/preserve-caller-state",
+                ),
+            ),
+            "Register the repository directory in `Plugins`": (
+                (
+                    "z-shell/zsh-eza:zsh-eza.plugin.zsh",
+                    fancy_evidence,
+                    "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
+                ),
+                (
+                    "zsh/plugin/document-global-state",
+                    "zsh/plugin/restore-state",
+                ),
+            ),
+            "Guard `fpath` additions": (
+                (
+                    fancy_evidence,
+                    "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
+                    "z-shell/zsh-eza:zsh-eza.plugin.zsh",
+                ),
+                (
+                    "zsh/security/trust-paths",
+                    "zsh/plugin/restore-state",
+                ),
+            ),
+        }
+        for title, (evidence, rule_ids) in section_contracts.items():
+            evidence_mutations = tuple(
+                (
+                    f"missing-evidence-{index}",
+                    f"- `{repository}`\n",
+                    "",
+                )
+                for index, repository in enumerate(evidence)
+            ) + tuple(
+                (
+                    f"duplicate-evidence-{index}",
+                    f"- `{repository}`\n",
+                    f"- `{repository}`\n- `{repository}`\n",
+                )
+                for index, repository in enumerate(evidence)
+            )
+            mutations = (
+                evidence_mutations
+                + (
+                    ("status", "Status: retired.", "Status: active."),
+                    (
+                        "duplicate-status",
+                        "Status: retired.",
+                        "Status: retired.\n\nStatus: retired.",
+                    ),
+                    (
+                        "instruction-route",
+                        ".github/instructions/zsh-scripting.instructions.md",
+                        ".github/instructions/missing-zsh-standard.md",
+                    ),
+                    (
+                        "template-route",
+                        ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh",
+                        ".github/skills/new-zsh-plugin/templates/missing.plugin.zsh",
+                    ),
+                )
+                + tuple(
+                    (
+                        f"rule-id-{index}",
+                        rule_id,
+                        f"zsh/missing/retired-rule-{index}",
+                    )
+                    for index, rule_id in enumerate(rule_ids)
+                )
+            )
+            for mutation, old, new in mutations:
+                with self.subTest(title=title, mutation=mutation):
+                    root = self.make_fixture()
+                    path = root / relative_path
+                    text = path.read_text(encoding="utf-8")
+                    start = text.index(f"## {title}")
+                    end = text.find("\n## ", start + 3)
+                    if end == -1:
+                        end = len(text)
+                    section = text[start:end]
+                    self.assertIn(old, section)
+                    changed_section = section.replace(old, new, 1)
+                    path.write_text(
+                        text[:start] + changed_section + text[end:],
+                        encoding="utf-8",
+                    )
+
+                    errors = load_validator().validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        title,
+                        "retired section contract",
+                        "fix:",
+                    )
+
+    def test_rejects_code_blocks_in_retired_patterns_sections(self) -> None:
+        relative_path = "PATTERNS.md"
+        section_names = (
+            "Plugin entry-point skeleton",
+            "Register the repository directory in `Plugins`",
+            "Guard `fpath` additions",
+        )
+        additions = (
+            "```\nreplacement\n```",
+            "~~~zsh\nreplacement\n~~~",
+            "```text\nreplacement\n```",
+            "- ```zsh\n  replacement\n  ```",
+            "> ~~~zsh\n> replacement\n> ~~~",
+            "    replacement_code",
+        )
+        for title in section_names:
+            for addition in additions:
+                with self.subTest(title=title, addition=addition):
+                    root = self.make_fixture()
+                    path = root / relative_path
+                    text = path.read_text(encoding="utf-8")
+                    start = text.index(f"## {title}")
+                    end = text.find("\n## ", start + 3)
+                    if end == -1:
+                        end = len(text)
+                    path.write_text(
+                        text[:end] + f"\n\n{addition}\n" + text[end:],
+                        encoding="utf-8",
+                    )
+
+                    errors = load_validator().validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        title,
+                        "must not publish replacement code",
+                        "fix:",
+                    )
+
+    def test_allows_prose_in_retired_patterns_sections(self) -> None:
+        root = self.make_fixture()
+        relative_path = "PATTERNS.md"
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        title = "Plugin entry-point skeleton"
+        start = text.index(f"## {title}")
+        end = text.find("\n## ", start + 3)
+        self.assertNotEqual(end, -1)
+        addition = (
+            "\n\nAllowed explanatory prose names `inline_identifier` and continues\n"
+            "    with a deliberately indented paragraph line.\n"
+        )
+        path.write_text(text[:end] + addition + text[end:], encoding="utf-8")
+
+        self.assertEqual(load_validator().validate(root), [])
+
     def test_requires_consumer_contracts_in_intended_sections(self) -> None:
         patterns_root = self.make_fixture()
         patterns_path = patterns_root / "PATTERNS.md"
@@ -2370,6 +2726,34 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "> .github/instructions/zsh-scripting.instructions.md\n"
             "> lib/zsh-standard-policy.json\n"
             "> scripts/validate-zsh-standard-policy.py\n"
+        )
+        path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "Instruction Architecture",
+            "scripts/validate-zsh-standard-policy.py",
+            "fix:",
+        )
+
+    def test_listed_readme_h2_cannot_anchor_catalog_section(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/README.md"
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        changed = text.replace(
+            "## Instruction Architecture",
+            "## Moved Instruction Architecture",
+            1,
+        )
+        changed += (
+            "\n\n- ## Instruction Architecture\n"
+            "  .github/instructions/zsh-scripting.instructions.md\n"
+            "  lib/zsh-standard-policy.json\n"
+            "  scripts/validate-zsh-standard-policy.py\n"
         )
         path.write_text(changed, encoding="utf-8")
 
@@ -2874,6 +3258,8 @@ class PublicZshStandardContractTests(unittest.TestCase):
 
     def test_patterns_retire_unsafe_zsh_lifecycle_snippets(self) -> None:
         text = (PUBLIC_ROOT / "PATTERNS.md").read_text(encoding="utf-8")
+        validator = load_validator()
+        self.assertEqual(validator._retired_patterns_contract_errors(text), [])
         section_names = (
             "Plugin entry-point skeleton",
             "Register the repository directory in `Plugins`",
