@@ -2413,6 +2413,12 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 ">",
             ),
             (
+                "html-lowercase-declaration",
+                "<!doctype html\n"
+                f"    {canonical_path}\n"
+                ">",
+            ),
+            (
                 "html-cdata",
                 "<![CDATA[\n"
                 f"    {canonical_path}\n"
@@ -2530,7 +2536,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             f"<div>\n### `{rule_id}`\n</div>",
             f"<script>\n### `{rule_id}`\n</script>",
             f"<custom-element>\n### `{rule_id}`\n</custom-element>",
-            f"[reference]: /target \"\n### `{rule_id}`\n\"",
         )
         for hidden_h3 in hidden_h3_blocks:
             with self.subTest(kind=hidden_h3.splitlines()[0]):
@@ -2555,6 +2560,33 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     errors,
                 )
 
+        interrupting_h3_blocks = (
+            f"[reference]: /target \"\n### `{rule_id}`\n\"",
+            f"[\n### `{rule_id}`\n]: /target",
+            f"<!-- --> ```\n### `{rule_id}`",
+            f"<!--\n--> ```\n### `{rule_id}`",
+        )
+        for interrupting_h3 in interrupting_h3_blocks:
+            with self.subTest(kind=interrupting_h3.splitlines()[0]):
+                root = self.make_fixture()
+                path = root / consumer_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + "\n\n"
+                    + interrupting_h3
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    consumer_path,
+                    "rules belong in canonical instruction",
+                    "fix:",
+                )
+
         readme_path = ".github/README.md"
         required_paths = (
             ".github/instructions/zsh-scripting.instructions.md\n"
@@ -2565,7 +2597,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "<div>\n## Instruction Architecture\n{paths}\n</div>",
             "<script>\n## Instruction Architecture\n{paths}\n</script>",
             "<custom-element>\n## Instruction Architecture\n{paths}\n</custom-element>",
-            "[reference]: /target \"\n## Instruction Architecture\n{paths}\n\"",
         )
         for hidden_h2 in hidden_h2_blocks:
             with self.subTest(kind=hidden_h2.splitlines()[0]):
@@ -2609,12 +2640,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "</custom-element>",
             ),
             (
-                "lowercase-pseudo-declaration",
-                "<!doctype html\n"
-                f"    {canonical_path}\n"
-                ">",
-            ),
-            (
                 "fence-marker-inside-raw-html",
                 "<script>\n"
                 "```text\n"
@@ -2640,6 +2665,12 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "[canonical]: /target \"title\n"
                 f"  {canonical_path}\n\n"
                 "closing title\"",
+            ),
+            (
+                "multiline-label-with-blank-line",
+                "[\n"
+                f"{canonical_path}\n\n"
+                "]: /target",
             ),
         )
         for boundary, visible_reference in visible_references:

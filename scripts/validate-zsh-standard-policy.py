@@ -1377,11 +1377,25 @@ def _scan_visible_markdown(
                     fence_containers = ()
                 continue
 
+        raw_view, _ = _resolve_markdown_container_view(
+            raw_line,
+            active_containers,
+        )
+        starts_html_comment = (
+            not html_active
+            and not in_comment
+            and _leading_indentation_columns(raw_view) <= 3
+            and raw_view.lstrip(" \t").startswith("<!--")
+        )
         line = raw_line
         visible_parts: list[str] = []
         contained_comment = False
         cursor = 0
-        while cursor < len(line) and not html_active:
+        while (
+            cursor < len(line)
+            and not html_active
+            and not starts_html_comment
+        ):
             if in_comment:
                 comment_end = line.find("-->", cursor)
                 contained_comment = True
@@ -1401,7 +1415,11 @@ def _scan_visible_markdown(
             in_comment = True
             cursor = comment_start + len("<!--")
 
-        visible_line = raw_line if html_active else "".join(visible_parts)
+        visible_line = (
+            raw_line
+            if html_active or starts_html_comment
+            else "".join(visible_parts)
+        )
         if contained_comment and visible_line.strip():
             visible_line = f"{visible_line} <html-comment>"
         fence_view, containers = _resolve_markdown_container_view(
@@ -1614,6 +1632,7 @@ HTML_RAW_END = re.compile(
     r"</(?:pre|script|style|textarea)>",
     re.IGNORECASE,
 )
+HTML_COMMENT_END = re.compile(r"-->")
 HTML_TYPE_6_START = re.compile(
     r"^</?(?:address|article|aside|base|basefont|blockquote|body|caption|center|"
     r"col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|"
@@ -1686,7 +1705,9 @@ def _html_block_end_pattern(
         return HTML_RAW_END
     if candidate.startswith("<?"):
         return re.compile(r"\?>")
-    if re.match(r"^<![A-Z]", candidate):
+    if candidate.startswith("<!--"):
+        return HTML_COMMENT_END
+    if re.match(r"^<![A-Za-z]", candidate):
         return re.compile(r">")
     if candidate.startswith("<![CDATA["):
         return re.compile(r"\]\]>")
@@ -1843,6 +1864,22 @@ def _reference_definition_start(
     return phase, closer, characters, has_nonspace
 
 
+def _interrupts_reference_definition(content: str) -> bool:
+    """Return whether a CommonMark block start interrupts a definition."""
+
+    stripped = content.strip()
+    if not stripped:
+        return True
+    if re.match(r"^ {0,3}#{1,6}(?:[ \t]+|$)", content):
+        return True
+    if re.fullmatch(
+        r" {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})",
+        content,
+    ):
+        return True
+    return _html_block_end_pattern(content, allow_type_7=False) is not None
+
+
 def _positive_markdown_lines(
     lines: list[tuple[int, str]],
     contexts: list[_MarkdownLineContext] | None = None,
@@ -1888,6 +1925,16 @@ def _positive_markdown_lines(
                         for item in reference.pending
                     )
                 reference = None
+            elif (
+                reference.phase != "maybe_title"
+                and _interrupts_reference_definition(context.content)
+            ):
+                positive.extend(
+                    (item.line_number, item.raw_line)
+                    for item in reference.pending
+                )
+                reference = None
+                paragraph_context = context.containers
             elif reference.phase == "label":
                 label = _reference_label_line(
                     context.content,
@@ -2403,7 +2450,8 @@ def _metadata_values(value: str) -> list[str] | None:
 def _documentation_reference_index_errors(text: str) -> list[str]:
     """Validate the exact visible Markdown documentation-source registry."""
 
-    lines = _visible_markdown_lines(text)
+    lines, contexts = _scan_visible_markdown(text)
+    lines = _positive_markdown_lines(lines, contexts)
     heading = "## Official documentation reference index"
     heading_indexes = [
         index for index, (_, line) in enumerate(lines) if line == heading
@@ -2431,7 +2479,8 @@ def _documentation_reference_index_errors(text: str) -> list[str]:
 
 
 def _visible_markdown_rule_block(text: str, rule_id: str) -> str | None:
-    lines = _visible_markdown_lines(text)
+    lines, contexts = _scan_visible_markdown(text)
+    lines = _positive_markdown_lines(lines, contexts)
     heading = f"### `{rule_id}`"
     for index, (_, line) in enumerate(lines):
         if line != heading:
@@ -2448,7 +2497,8 @@ def _visible_markdown_rule_block(text: str, rule_id: str) -> str | None:
 def _markdown_rules(
     text: str,
 ) -> tuple[list[dict[str, object]], list[str]]:
-    lines = _visible_markdown_lines(text)
+    lines, contexts = _scan_visible_markdown(text)
+    lines = _positive_markdown_lines(lines, contexts)
     heading = re.compile(r"^### `([^`]+)`$")
     h3_heading = re.compile(r"^###(?:\s|$)")
     metadata_names = (
