@@ -2377,6 +2377,74 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "</div>",
             ),
             (
+                "html-script-block",
+                "<script>\n"
+                f"    {canonical_path}\n"
+                "</script>",
+            ),
+            (
+                "html-pre-block",
+                "<pre>\n"
+                f"    {canonical_path}\n"
+                "</pre>",
+            ),
+            (
+                "html-style-block",
+                "<style>\n"
+                f"    {canonical_path}\n"
+                "</style>",
+            ),
+            (
+                "html-textarea-block",
+                "<textarea>\n"
+                f"    {canonical_path}\n"
+                "</textarea>",
+            ),
+            (
+                "html-processing-instruction",
+                "<?target\n"
+                f"    {canonical_path}\n"
+                "?>",
+            ),
+            (
+                "html-declaration",
+                "<!DOCTYPE html\n"
+                f"    {canonical_path}\n"
+                ">",
+            ),
+            (
+                "html-cdata",
+                "<![CDATA[\n"
+                f"    {canonical_path}\n"
+                "]]>",
+            ),
+            (
+                "html-custom-tag",
+                "<custom-element>\n"
+                f"    {canonical_path}\n"
+                "</custom-element>",
+            ),
+            (
+                "split-link-destination",
+                "[canonical]:\n"
+                f"  {canonical_path}",
+            ),
+            (
+                "split-link-title",
+                "[canonical]: /target\n"
+                f"  \"{canonical_path}\"",
+            ),
+            (
+                "multiline-link-title",
+                "[canonical]: /target\n"
+                "  \"title\n"
+                f"  {canonical_path}\"",
+            ),
+            (
+                "escaped-link-label",
+                f"[can\\]onical]: {canonical_path}",
+            ),
+            (
                 "blockquote-empty-unordered-item",
                 "> -\n"
                 f">     {canonical_path}",
@@ -2407,6 +2475,91 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     canonical_path,
                     "fix:",
                 )
+
+    def test_list_owned_fence_preserves_visible_reference_continuations(
+        self,
+    ) -> None:
+        relative_path = ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+        canonical_path = ".github/instructions/zsh-scripting.instructions.md"
+        for indentation in range(2, 6):
+            with self.subTest(indentation=indentation):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(canonical_path, text)
+                changed = text.replace(canonical_path, "moved-zsh-standard", 1)
+                changed += (
+                    "\n\n- list paragraph\n"
+                    "  ```text\n"
+                    "  hidden\n"
+                    "  ```\n"
+                    + " " * indentation
+                    + canonical_path
+                    + "\n"
+                )
+                path.write_text(changed, encoding="utf-8")
+
+                errors = load_validator().validate(root)
+
+                missing_reference_errors = [
+                    message
+                    for message in errors
+                    if message.startswith(f"{relative_path}:")
+                    and "missing visible canonical Zsh reference" in message
+                    and canonical_path in message
+                ]
+                self.assertEqual(missing_reference_errors, [], errors)
+
+    def test_malformed_blocks_do_not_hide_visible_canonical_references(
+        self,
+    ) -> None:
+        relative_path = ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+        canonical_path = ".github/instructions/zsh-scripting.instructions.md"
+        visible_references = (
+            (
+                "type-7-tag-interrupting-paragraph",
+                "Visible paragraph\n"
+                "<custom-element>\n"
+                f"    {canonical_path}\n"
+                "</custom-element>",
+            ),
+            (
+                "reference-title-with-trailing-content",
+                f"[{canonical_path}]: /target \"title\" trailing",
+            ),
+            (
+                "reference-without-destination",
+                f"[{canonical_path}]:",
+            ),
+            (
+                "reference-title-with-blank-line",
+                "[canonical]: /target \"title\n"
+                f"  {canonical_path}\n\n"
+                "closing title\"",
+            ),
+        )
+        for boundary, visible_reference in visible_references:
+            with self.subTest(boundary=boundary):
+                root = self.make_fixture()
+                path = root / relative_path
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(canonical_path, text)
+                changed = text.replace(canonical_path, "moved-zsh-standard", 1)
+                path.write_text(
+                    changed + "\n\n" + visible_reference + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                missing_reference_errors = [
+                    message
+                    for message in errors
+                    if message.startswith(f"{relative_path}:")
+                    and "missing visible canonical Zsh reference" in message
+                    and canonical_path in message
+                ]
+                self.assertEqual(missing_reference_errors, [], errors)
 
     def test_rejects_copied_normative_rule_inventory(self) -> None:
         root = self.make_fixture()
