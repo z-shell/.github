@@ -1435,6 +1435,15 @@ def _scan_visible_markdown(
             if html_content is not None:
                 fence_view = html_content
                 containers = html_containers
+            elif (
+                html_containers
+                and not raw_line.strip()
+                and not any(
+                    kind == "blockquote" for kind, _ in html_containers
+                )
+            ):
+                fence_view = ""
+                containers = html_containers
             else:
                 html_container_replayed = False
         html_line = False
@@ -1923,6 +1932,16 @@ def _positive_markdown_lines(
                 context.raw_line,
                 html_block.containers,
             )
+            if (
+                html_content is None
+                and html_block.containers
+                and not context.raw_line.strip()
+                and not any(
+                    kind == "blockquote"
+                    for kind, _ in html_block.containers
+                )
+            ):
+                html_content = ""
             if (
                 html_content is None
                 or context.containers != html_block.containers

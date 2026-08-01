@@ -2431,6 +2431,12 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "</script>",
             ),
             (
+                "list-html-raw-blank-line",
+                "- <script>\n\n"
+                f"  {canonical_path}\n"
+                "  </script>",
+            ),
+            (
                 "html-cdata",
                 "<![CDATA[\n"
                 f"    {canonical_path}\n"
