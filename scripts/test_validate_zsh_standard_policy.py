@@ -2445,6 +2445,19 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 f"[can\\]onical]: {canonical_path}",
             ),
             (
+                "multiline-link-label",
+                "[\n"
+                f"{canonical_path}\n"
+                "]: /target",
+            ),
+            (
+                "indented-code-after-multiline-link-label",
+                "[\n"
+                "canonical\n"
+                "]: /target\n"
+                f"    {canonical_path}",
+            ),
+            (
                 "blockquote-empty-unordered-item",
                 "> -\n"
                 f">     {canonical_path}",
@@ -2510,6 +2523,78 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 ]
                 self.assertEqual(missing_reference_errors, [], errors)
 
+    def test_leaf_blocks_cannot_supply_structural_headings(self) -> None:
+        rule_id = "zsh/options/localize"
+        consumer_path = ".github/skills/new-zsh-plugin/SKILL.md"
+        hidden_h3_blocks = (
+            f"<div>\n### `{rule_id}`\n</div>",
+            f"<script>\n### `{rule_id}`\n</script>",
+            f"<custom-element>\n### `{rule_id}`\n</custom-element>",
+            f"[reference]: /target \"\n### `{rule_id}`\n\"",
+        )
+        for hidden_h3 in hidden_h3_blocks:
+            with self.subTest(kind=hidden_h3.splitlines()[0]):
+                root = self.make_fixture()
+                path = root / consumer_path
+                path.write_text(
+                    path.read_text(encoding="utf-8")
+                    + "\n\n"
+                    + hidden_h3
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assertFalse(
+                    any(
+                        message.startswith(f"{consumer_path}:")
+                        and "rules belong in canonical instruction" in message
+                        for message in errors
+                    ),
+                    errors,
+                )
+
+        readme_path = ".github/README.md"
+        required_paths = (
+            ".github/instructions/zsh-scripting.instructions.md\n"
+            "lib/zsh-standard-policy.json\n"
+            "scripts/validate-zsh-standard-policy.py"
+        )
+        hidden_h2_blocks = (
+            "<div>\n## Instruction Architecture\n{paths}\n</div>",
+            "<script>\n## Instruction Architecture\n{paths}\n</script>",
+            "<custom-element>\n## Instruction Architecture\n{paths}\n</custom-element>",
+            "[reference]: /target \"\n## Instruction Architecture\n{paths}\n\"",
+        )
+        for hidden_h2 in hidden_h2_blocks:
+            with self.subTest(kind=hidden_h2.splitlines()[0]):
+                root = self.make_fixture()
+                path = root / readme_path
+                text = path.read_text(encoding="utf-8")
+                changed = text.replace(
+                    "## Instruction Architecture",
+                    "## Moved Instruction Architecture",
+                    1,
+                )
+                path.write_text(
+                    changed
+                    + "\n\n"
+                    + hidden_h2.format(paths=required_paths)
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = load_validator().validate(root)
+
+                self.assert_error_contains(
+                    errors,
+                    readme_path,
+                    "Instruction Architecture",
+                    "scripts/validate-zsh-standard-policy.py",
+                    "fix:",
+                )
+
     def test_malformed_blocks_do_not_hide_visible_canonical_references(
         self,
     ) -> None:
@@ -2522,6 +2607,25 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "<custom-element>\n"
                 f"    {canonical_path}\n"
                 "</custom-element>",
+            ),
+            (
+                "lowercase-pseudo-declaration",
+                "<!doctype html\n"
+                f"    {canonical_path}\n"
+                ">",
+            ),
+            (
+                "fence-marker-inside-raw-html",
+                "<script>\n"
+                "```text\n"
+                "</script>\n"
+                f"{canonical_path}",
+            ),
+            (
+                "raw-html-any-type-1-end-tag",
+                "<script>\n"
+                "</pre>\n"
+                f"{canonical_path}",
             ),
             (
                 "reference-title-with-trailing-content",

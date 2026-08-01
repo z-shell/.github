@@ -1341,7 +1341,12 @@ def _scan_visible_markdown(
     fence_character: str | None = None
     fence_length = 0
     fence_containers: tuple[tuple[str, int], ...] = ()
+    html_active = False
+    html_blank_terminated = False
+    html_end_pattern: re.Pattern[str] | None = None
+    html_containers: tuple[tuple[str, int], ...] = ()
     active_containers: tuple[tuple[str, int], ...] = ()
+    paragraph_context: tuple[tuple[str, int], ...] | None = None
     blank_lines = 0
     previous_visible_line_number: int | None = None
     for line_number, raw_line in enumerate(text.splitlines(), start=1):
@@ -1376,7 +1381,7 @@ def _scan_visible_markdown(
         visible_parts: list[str] = []
         contained_comment = False
         cursor = 0
-        while cursor < len(line):
+        while cursor < len(line) and not html_active:
             if in_comment:
                 comment_end = line.find("-->", cursor)
                 contained_comment = True
@@ -1396,36 +1401,83 @@ def _scan_visible_markdown(
             in_comment = True
             cursor = comment_start + len("<!--")
 
-        visible_line = "".join(visible_parts)
+        visible_line = raw_line if html_active else "".join(visible_parts)
         if contained_comment and visible_line.strip():
             visible_line = f"{visible_line} <html-comment>"
         fence_view, containers = _resolve_markdown_container_view(
             visible_line,
             active_containers,
         )
-        opener = _fence_opener(fence_view)
-        if opener is not None:
-            fence_character, fence_length = opener
-            fence_containers = containers
-            if any(kind == "list" for kind, _ in containers):
-                active_containers = containers
+        html_line = False
+        if html_active:
+            if containers != html_containers:
+                html_active = False
+                html_blank_terminated = False
+                html_end_pattern = None
+                html_containers = ()
+            elif html_blank_terminated:
+                if fence_view.strip():
+                    html_line = True
+                else:
+                    html_active = False
+                    html_blank_terminated = False
+                    html_containers = ()
             else:
-                active_containers = ()
-            blank_lines = 0
-            continue
+                html_line = True
+                if (
+                    html_end_pattern is not None
+                    and html_end_pattern.search(fence_view)
+                ):
+                    html_active = False
+                    html_end_pattern = None
+                    html_containers = ()
+
+        if not html_line:
+            html_end = _html_block_end_pattern(
+                fence_view,
+                allow_type_7=paragraph_context is None,
+            )
+            if html_end is not None:
+                html_line = True
+                html_containers = containers
+                if html_end is False:
+                    html_active = True
+                    html_blank_terminated = True
+                elif not html_end.search(fence_view):
+                    html_active = True
+                    html_end_pattern = html_end
+
+        if not html_line:
+            opener = _fence_opener(fence_view)
+            if opener is not None:
+                fence_character, fence_length = opener
+                fence_containers = containers
+                paragraph_context = None
+                if any(kind == "list" for kind, _ in containers):
+                    active_containers = containers
+                else:
+                    active_containers = ()
+                blank_lines = 0
+                continue
         visible_lines.append((line_number, visible_line))
+        source_gap = (
+            previous_visible_line_number is not None
+            and line_number != previous_visible_line_number + 1
+        )
         contextual.append(
             _MarkdownLineContext(
                 line_number,
                 visible_line,
                 fence_view,
                 containers,
-                previous_visible_line_number is not None
-                and line_number != previous_visible_line_number + 1,
+                source_gap,
             )
         )
         previous_visible_line_number = line_number
+        if source_gap:
+            paragraph_context = None
         if not fence_view.strip():
+            paragraph_context = None
             if visible_line.strip() and any(
                 kind == "list" for kind, _ in containers
             ):
@@ -1437,6 +1489,16 @@ def _scan_visible_markdown(
                     active_containers = ()
             continue
         blank_lines = 0
+        if html_line:
+            paragraph_context = None
+        else:
+            indentation = _leading_indentation_columns(fence_view)
+            if indentation >= 4 and paragraph_context != containers:
+                paragraph_context = None
+            elif _starts_markdown_paragraph(fence_view[indentation:]):
+                paragraph_context = containers
+            else:
+                paragraph_context = None
         if any(kind == "list" for kind, _ in containers):
             active_containers = containers
         else:
@@ -1569,9 +1631,8 @@ HTML_TYPE_7_START = re.compile(
     rf"(?:<[A-Za-z][A-Za-z0-9-]*(?:[ \t]+{HTML_ATTRIBUTE})*[ \t]*/?>"
     r"|</[A-Za-z][A-Za-z0-9-]*[ \t]*>)[ \t]*$"
 )
-LINK_LABEL_START = re.compile(
-    r"^\[(?P<label>(?:\\[!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]"
-    r"|[^\[\]\\\r\n]){1,999})\]:[ \t]*(?P<remainder>.*)$"
+ASCII_PUNCTUATION = frozenset(
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
 )
 
 
@@ -1580,11 +1641,31 @@ class _HtmlBlockState(NamedTuple):
     containers: tuple[tuple[str, int], ...]
 
 
-class _ReferenceDefinitionState(NamedTuple):
-    phase: str
-    closer: str | None
-    pending: tuple[_MarkdownLineContext, ...]
-    containers: tuple[tuple[str, int], ...]
+class _ReferenceDefinitionState:
+    __slots__ = (
+        "phase",
+        "closer",
+        "pending",
+        "containers",
+        "label_characters",
+        "label_has_nonspace",
+    )
+
+    def __init__(
+        self,
+        phase: str,
+        closer: str | None,
+        pending: list[_MarkdownLineContext],
+        containers: tuple[tuple[str, int], ...],
+        label_characters: int = 0,
+        label_has_nonspace: bool = False,
+    ) -> None:
+        self.phase = phase
+        self.closer = closer
+        self.pending = pending
+        self.containers = containers
+        self.label_characters = label_characters
+        self.label_has_nonspace = label_has_nonspace
 
 
 def _html_block_end_pattern(
@@ -1605,7 +1686,7 @@ def _html_block_end_pattern(
         return HTML_RAW_END
     if candidate.startswith("<?"):
         return re.compile(r"\?>")
-    if re.match(r"^<![A-Za-z]", candidate):
+    if re.match(r"^<![A-Z]", candidate):
         return re.compile(r">")
     if candidate.startswith("<![CDATA["):
         return re.compile(r"\]\]>")
@@ -1702,20 +1783,64 @@ def _reference_destination_phase(
     return _reference_title_phase(title)
 
 
+def _reference_label_line(
+    text: str,
+    characters: int = 0,
+    has_nonspace: bool = False,
+) -> tuple[str | None, int, bool] | None:
+    """Scan one physical line of a bounded CommonMark link label."""
+
+    index = 0
+    while index < len(text):
+        character = text[index]
+        if (
+            character == "\\"
+            and index + 1 < len(text)
+            and text[index + 1] in ASCII_PUNCTUATION
+        ):
+            characters += 2
+            has_nonspace = True
+            index += 2
+            continue
+        if character == "[":
+            return None
+        if character == "]":
+            if text[index + 1 : index + 2] != ":":
+                return None
+            if not has_nonspace or characters > 999:
+                return None
+            return text[index + 2 :].lstrip(" \t"), characters, has_nonspace
+        characters += 1
+        has_nonspace = has_nonspace or character not in " \t\r\n"
+        if characters > 999:
+            return None
+        index += 1
+    return None, characters, has_nonspace
+
+
 def _reference_definition_start(
     content: str,
-) -> tuple[str, str | None] | None:
+) -> tuple[str, str | None, int, bool] | None:
     """Return the continuation state for one possible definition line."""
 
     if _leading_indentation_columns(content) > 3:
         return None
-    match = LINK_LABEL_START.match(content.lstrip(" \t"))
-    if match is None or not match.group("label").strip(" \t"):
+    candidate = content.lstrip(" \t")
+    if not candidate.startswith("["):
         return None
-    remainder = match.group("remainder")
+    label = _reference_label_line(candidate[1:])
+    if label is None:
+        return None
+    remainder, characters, has_nonspace = label
+    if remainder is None:
+        return "label", None, characters, has_nonspace
     if not remainder:
-        return "destination", None
-    return _reference_destination_phase(remainder)
+        return "destination", None, characters, has_nonspace
+    destination = _reference_destination_phase(remainder)
+    if destination is None:
+        return None
+    phase, closer = destination
+    return phase, closer, characters, has_nonspace
 
 
 def _positive_markdown_lines(
@@ -1763,6 +1888,39 @@ def _positive_markdown_lines(
                         for item in reference.pending
                     )
                 reference = None
+            elif reference.phase == "label":
+                label = _reference_label_line(
+                    context.content,
+                    reference.label_characters + 1,
+                    reference.label_has_nonspace,
+                )
+                if label is not None:
+                    remainder, characters, has_nonspace = label
+                    if remainder is None:
+                        reference.pending.append(context)
+                        reference.label_characters = characters
+                        reference.label_has_nonspace = has_nonspace
+                        continue
+                    destination = (
+                        ("destination", None)
+                        if not remainder
+                        else _reference_destination_phase(remainder)
+                    )
+                    if destination is not None:
+                        phase, closer = destination
+                        if phase != "complete":
+                            reference.phase = phase
+                            reference.closer = closer
+                            reference.pending.append(context)
+                        else:
+                            reference = None
+                        continue
+                positive.extend(
+                    (item.line_number, item.raw_line)
+                    for item in reference.pending
+                )
+                reference = None
+                paragraph_context = context.containers
             elif reference.phase == "destination":
                 destination = _reference_destination_phase(
                     context.content.lstrip(" \t")
@@ -1770,12 +1928,9 @@ def _positive_markdown_lines(
                 if destination is not None:
                     phase, closer = destination
                     if phase != "complete":
-                        reference = _ReferenceDefinitionState(
-                            phase,
-                            closer,
-                            (*reference.pending, context),
-                            reference.containers,
-                        )
+                        reference.phase = phase
+                        reference.closer = closer
+                        reference.pending.append(context)
                     else:
                         reference = None
                     continue
@@ -1794,12 +1949,8 @@ def _positive_markdown_lines(
                     if title is not None:
                         phase, closer = title
                         if phase == "title":
-                            reference = _ReferenceDefinitionState(
-                                phase,
-                                closer,
-                                (*reference.pending, context),
-                                reference.containers,
-                            )
+                            reference.closer = closer
+                            reference.pending.append(context)
                         else:
                             reference = None
                         continue
@@ -1816,12 +1967,9 @@ def _positive_markdown_lines(
                     if title is not None:
                         phase, closer = title
                         if phase == "title":
-                            reference = _ReferenceDefinitionState(
-                                phase,
-                                closer,
-                                (*reference.pending, context),
-                                reference.containers,
-                            )
+                            reference.phase = phase
+                            reference.closer = closer
+                            reference.pending.append(context)
                         else:
                             reference = None
                         continue
@@ -1870,13 +2018,15 @@ def _positive_markdown_lines(
         if paragraph_context is None:
             definition = _reference_definition_start(context.content)
             if definition is not None:
-                phase, closer = definition
+                phase, closer, characters, has_nonspace = definition
                 if phase != "complete":
                     reference = _ReferenceDefinitionState(
                         phase,
                         closer,
-                        (context,),
+                        [context],
                         context.containers,
+                        characters,
+                        has_nonspace,
                     )
                 continue
 
@@ -1994,7 +2144,8 @@ def _visible_h2_source_section(text: str, title: str) -> str | None:
     """Return raw source owned by one exact visible top-level H2."""
 
     raw_lines = text.splitlines()
-    contextual = _visible_markdown_contexts(text)
+    visible, contextual = _scan_visible_markdown(text)
+    contextual = _positive_markdown_contexts(visible, contextual)
     headings = [
         context.line_number
         for context in contextual
@@ -2749,6 +2900,13 @@ def validate_consumer_contract(
         )
         for relative_path, lines in visible_lines.items()
     }
+    positive_contexts = {
+        relative_path: _positive_markdown_contexts(
+            lines,
+            visible_contexts[relative_path],
+        )
+        for relative_path, lines in visible_lines.items()
+    }
 
     for relative_path in REFERENCE_CONSUMER_PATHS:
         visible_text = visible_texts.get(relative_path)
@@ -2785,7 +2943,7 @@ def validate_consumer_contract(
             text = texts.get(relative_path)
             if text is None:
                 continue
-            for context in visible_contexts[relative_path]:
+            for context in positive_contexts[relative_path]:
                 heading = _consumer_h3_content(context.content)
                 if heading is None:
                     continue
@@ -2813,18 +2971,26 @@ def validate_consumer_contract(
     patterns_text = texts.get("PATTERNS.md")
     if patterns_text is not None:
         patterns_lines = visible_lines["PATTERNS.md"]
-        first_h2 = next(
+        first_h2_line = next(
             (
-                index
-                for index, context in enumerate(visible_contexts["PATTERNS.md"])
+                context.line_number
+                for context in positive_contexts["PATTERNS.md"]
                 if not context.containers
                 and _atx_heading_content(context.content, 2) is not None
             ),
-            len(patterns_lines),
+            len(patterns_text.splitlines()) + 1,
         )
+        intro_lines = [
+            line for line in patterns_lines if line[0] < first_h2_line
+        ]
+        intro_contexts = [
+            context
+            for context in positive_contexts["PATTERNS.md"]
+            if context.line_number < first_h2_line
+        ]
         normalized_patterns = _normalized_visible_text(
-            patterns_lines[:first_h2],
-            visible_contexts["PATTERNS.md"][:first_h2],
+            intro_lines,
+            intro_contexts,
         )
         patterns_contract = (
             "Patterns below are observed examples, not a second policy source.",
@@ -2861,7 +3027,7 @@ def validate_consumer_contract(
             section_lines = _visible_h2_section(
                 readme_lines,
                 section_title,
-                visible_contexts[".github/README.md"],
+                positive_contexts[".github/README.md"],
             )
             section_line_numbers = {
                 line_number for line_number, _ in section_lines or []
@@ -2873,7 +3039,7 @@ def validate_consumer_contract(
                     section_lines,
                     [
                         context
-                        for context in visible_contexts[".github/README.md"]
+                        for context in positive_contexts[".github/README.md"]
                         if context.line_number in section_line_numbers
                     ],
                 )
@@ -2891,7 +3057,7 @@ def validate_consumer_contract(
                 )
         if _readme_has_zsh_validation_contradiction(
             readme_lines,
-            visible_contexts[".github/README.md"],
+            positive_contexts[".github/README.md"],
         ):
             errors.append(
                 error(
