@@ -1910,7 +1910,37 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         for source in hidden_cases:
             with self.subTest(source=source):
                 visible = validator._visible_markdown_lines(source)
-                self.assertNotIn(rule_heading, [line for _, line in visible])
+                hidden_line_numbers = {
+                    line_number
+                    for line_number, line in enumerate(
+                        source.splitlines(),
+                        start=1,
+                    )
+                    if "zsh/options/localize" in line
+                }
+                self.assertTrue(hidden_line_numbers)
+                self.assertTrue(
+                    hidden_line_numbers.isdisjoint(
+                        line_number for line_number, _ in visible
+                    )
+                )
+
+                root = self.make_fixture()
+                relative_path = ".github/skills/new-zsh-plugin/SKILL.md"
+                path = root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8") + "\n" + source + "\n",
+                    encoding="utf-8",
+                )
+                errors = validator.validate(root)
+                self.assertFalse(
+                    any(
+                        message.startswith(f"{relative_path}:")
+                        and "rules belong in canonical instruction" in message
+                        for message in errors
+                    ),
+                    errors,
+                )
 
         visible_cases = (
             "- item\n  ```markdown\n  hidden\n" + rule_heading,
@@ -2061,6 +2091,24 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
         self.assertEqual(content, "visible")
         self.assertEqual(resolved, active[:2])
+
+        for tab_count in (4_000, 8_000, 16_000):
+            with self.subTest(tab_count=tab_count):
+                tab_line = "\t" * tab_count + "visible"
+                tab_work = [0]
+                tab_content, tab_containers = (
+                    validator._resolve_markdown_container_view(
+                        tab_line,
+                        (("list", 4),),
+                        work=tab_work,
+                    )
+                )
+                self.assertTrue(tab_content.endswith("visible"))
+                self.assertEqual(tab_containers, (("list", 4),))
+                self.assertLessEqual(
+                    tab_work[0],
+                    16 * len(tab_line) + 64,
+                )
 
     def test_whitespace_only_lines_preserve_empty_markdown_content(self) -> None:
         validator = load_validator()
@@ -2306,6 +2354,37 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "empty-unordered-item",
                 "Visible paragraph\n-\n"
                 f"    {canonical_path}",
+            ),
+            (
+                "top-level-fence-after-list",
+                "- List paragraph\n```text\nhidden\n```\n"
+                f"    {canonical_path}",
+            ),
+            (
+                "setext-h1",
+                "Visible heading\n===\n"
+                f"    {canonical_path}",
+            ),
+            (
+                "link-reference-definition",
+                "[canonical]: https://example.test/reference\n"
+                f"    {canonical_path}",
+            ),
+            (
+                "html-block",
+                "<div>\n"
+                f"    {canonical_path}\n"
+                "</div>",
+            ),
+            (
+                "blockquote-empty-unordered-item",
+                "> -\n"
+                f">     {canonical_path}",
+            ),
+            (
+                "blockquote-empty-ordered-item",
+                "> 1.\n"
+                f">     {canonical_path}",
             ),
         )
         for boundary, hidden_reference in hidden_references:
@@ -2946,6 +3025,39 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             + text[validator_line_start:]
         )
         path.write_text(changed, encoding="utf-8")
+
+        errors = load_validator().validate(root)
+
+        self.assert_error_contains(
+            errors,
+            relative_path,
+            "Instruction Architecture",
+            validator_path,
+            "fix:",
+        )
+
+    def test_two_blank_lines_end_list_ownership_in_readme_section(self) -> None:
+        root = self.make_fixture()
+        relative_path = ".github/README.md"
+        validator_path = "scripts/validate-zsh-standard-policy.py"
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        section_start = text.index("## Instruction Architecture")
+        section_end = text.index("\n## Shared Actions", section_start)
+        section = text[section_start:section_end]
+        validator_line_start = section.rfind("\n", 0, section.index(validator_path))
+        validator_line_end = section.index("\n", section.index(validator_path))
+        changed_section = (
+            section[:validator_line_start]
+            + section[validator_line_end:]
+            + "\n- list paragraph\n\n\n"
+            + "  ## Unrelated Section\n"
+            + f"  {validator_path}\n"
+        )
+        path.write_text(
+            text[:section_start] + changed_section + text[section_end:],
+            encoding="utf-8",
+        )
 
         errors = load_validator().validate(root)
 

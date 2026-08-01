@@ -1097,7 +1097,24 @@ def _markdown_container_view(
     expanded = line.expandtabs(4)
     if work is not None:
         work[0] += len(line) + len(expanded)
-    cursor = 0
+    return _markdown_container_view_from_expanded(
+        expanded,
+        0,
+        work=work,
+        include_lists=include_lists,
+    )
+
+
+def _markdown_container_view_from_expanded(
+    expanded: str,
+    start: int,
+    *,
+    work: list[int] | None = None,
+    include_lists: bool = True,
+) -> tuple[str, tuple[tuple[str, int], ...]]:
+    """Parse containers from one shared tab-expanded source buffer."""
+
+    cursor = start
     containers: list[tuple[str, int]] = []
 
     def advance(amount: int = 1) -> None:
@@ -1261,10 +1278,11 @@ def _resolve_markdown_container_view(
     prefix_length = len(matched_cursors)
     prefix = active_containers[:prefix_length]
     if prefix and any(kind == "list" for kind, _ in prefix):
-        remainder = expanded[matched_cursors[-1] :]
-        if work is not None:
-            work[0] += len(remainder)
-        content, nested = _markdown_container_view(remainder, work=work)
+        content, nested = _markdown_container_view_from_expanded(
+            expanded,
+            matched_cursors[-1],
+            work=work,
+        )
         return content, prefix + nested
     return _markdown_container_view(line, work=work)
 
@@ -1304,15 +1322,28 @@ def _fence_closer(content: str, marker: str, minimum: int) -> bool:
     )
 
 
-def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
-    """Return Markdown lines outside fenced code and HTML comments."""
+class _MarkdownLineContext(NamedTuple):
+    line_number: int
+    raw_line: str
+    content: str
+    containers: tuple[tuple[str, int], ...]
+    source_gap: bool
+
+
+def _scan_visible_markdown(
+    text: str,
+) -> tuple[list[tuple[int, str]], list[_MarkdownLineContext]]:
+    """Scan visibility and container ownership in one source-order pass."""
 
     visible_lines: list[tuple[int, str]] = []
+    contextual: list[_MarkdownLineContext] = []
     in_comment = False
     fence_character: str | None = None
     fence_length = 0
     fence_containers: tuple[tuple[str, int], ...] = ()
     active_containers: tuple[tuple[str, int], ...] = ()
+    blank_lines = 0
+    previous_visible_line_number: int | None = None
     for line_number, raw_line in enumerate(text.splitlines(), start=1):
         if fence_character is not None:
             candidate = _fence_container_content(
@@ -1378,15 +1409,51 @@ def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
             fence_containers = containers
             if any(kind == "list" for kind, _ in containers):
                 active_containers = containers
+            else:
+                active_containers = ()
+            blank_lines = 0
             continue
         visible_lines.append((line_number, visible_line))
-        if not visible_line.strip():
+        contextual.append(
+            _MarkdownLineContext(
+                line_number,
+                visible_line,
+                fence_view,
+                containers,
+                previous_visible_line_number is not None
+                and line_number != previous_visible_line_number + 1,
+            )
+        )
+        previous_visible_line_number = line_number
+        if not fence_view.strip():
+            if visible_line.strip() and any(
+                kind == "list" for kind, _ in containers
+            ):
+                blank_lines = 0
+                active_containers = containers
+            else:
+                blank_lines += 1
+                if blank_lines >= 2:
+                    active_containers = ()
             continue
+        blank_lines = 0
         if any(kind == "list" for kind, _ in containers):
             active_containers = containers
         else:
             active_containers = ()
-    return visible_lines
+    return visible_lines, contextual
+
+
+def _visible_markdown_lines(text: str) -> list[tuple[int, str]]:
+    """Return Markdown lines outside fenced code and HTML comments."""
+
+    return _scan_visible_markdown(text)[0]
+
+
+def _visible_markdown_contexts(text: str) -> list[_MarkdownLineContext]:
+    """Return visible lines with source-accurate container ownership."""
+
+    return _scan_visible_markdown(text)[1]
 
 
 def _strip_blockquote_prefixes(line: str) -> tuple[int, str]:
@@ -1413,14 +1480,6 @@ def _leading_indentation_columns(line: str) -> int:
     return columns
 
 
-class _MarkdownLineContext(NamedTuple):
-    line_number: int
-    raw_line: str
-    content: str
-    containers: tuple[tuple[str, int], ...]
-    source_gap: bool
-
-
 def _contextual_markdown_lines(
     lines: list[tuple[int, str]],
 ) -> list[_MarkdownLineContext]:
@@ -1429,7 +1488,14 @@ def _contextual_markdown_lines(
     contextual: list[_MarkdownLineContext] = []
     active_containers: tuple[tuple[str, int], ...] = ()
     previous_line_number: int | None = None
+    blank_lines = 0
     for line_number, raw_line in lines:
+        source_gap = (
+            previous_line_number is not None
+            and line_number != previous_line_number + 1
+        )
+        if source_gap:
+            active_containers = ()
         visible_line = raw_line.removesuffix(" <html-comment>")
         content, containers = _resolve_markdown_container_view(
             visible_line,
@@ -1441,13 +1507,22 @@ def _contextual_markdown_lines(
                 raw_line,
                 content,
                 containers,
-                previous_line_number is not None
-                and line_number != previous_line_number + 1,
+                source_gap,
             )
         )
         previous_line_number = line_number
-        if not visible_line.strip():
+        if not content.strip():
+            if visible_line.strip() and any(
+                kind == "list" for kind, _ in containers
+            ):
+                blank_lines = 0
+                active_containers = containers
+            else:
+                blank_lines += 1
+                if blank_lines >= 2:
+                    active_containers = ()
             continue
+        blank_lines = 0
         if any(kind == "list" for kind, _ in containers):
             active_containers = containers
         else:
@@ -1466,7 +1541,22 @@ def _starts_markdown_paragraph(content: str) -> bool:
         stripped,
     ):
         return False
+    if re.fullmatch(r"(?:=+|-+)[ \t]*", stripped):
+        return False
+    if re.match(r"^\[[^\]\r\n]+\]:[ \t]*(?:\S|$)", stripped):
+        return False
     return True
+
+
+HTML_BLOCK_START = re.compile(
+    r"^<(?:address|article|aside|base|basefont|blockquote|body|caption|center|"
+    r"col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|"
+    r"footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|"
+    r"link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|search|"
+    r"section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)"
+    r"(?:[ \t]|/?>|$)",
+    re.IGNORECASE,
+)
 
 
 def _positive_markdown_lines(
@@ -1477,10 +1567,15 @@ def _positive_markdown_lines(
     positive: list[tuple[int, str]] = []
     paragraph_context: tuple[tuple[str, int], ...] | None = None
     empty_list_context: tuple[tuple[str, int], ...] | None = None
+    in_html_block = False
     for context in _contextual_markdown_lines(lines):
         if context.source_gap:
             paragraph_context = None
             empty_list_context = None
+        if in_html_block:
+            if context.content.strip():
+                continue
+            in_html_block = False
         if not context.content.strip():
             positive.append((context.line_number, context.raw_line))
             paragraph_context = None
@@ -1492,13 +1587,19 @@ def _positive_markdown_lines(
                 else None
             )
             continue
+        if HTML_BLOCK_START.match(context.content.lstrip(" \t")):
+            paragraph_context = None
+            empty_list_context = None
+            in_html_block = True
+            continue
 
         indentation = _leading_indentation_columns(context.content)
         visible_line = context.raw_line.removesuffix(" <html-comment>")
+        _, unquoted_line = _strip_blockquote_prefixes(visible_line)
         if (
             empty_list_context is not None
             and context.containers == empty_list_context
-            and _leading_indentation_columns(visible_line) >= 4
+            and _leading_indentation_columns(unquoted_line) >= 4
         ):
             empty_list_context = None
             paragraph_context = None
@@ -1583,10 +1684,13 @@ def _listed_code_span_content(line: str) -> str | None:
 def _visible_h2_section(
     lines: list[tuple[int, str]],
     title: str,
+    contexts: list[_MarkdownLineContext] | None = None,
 ) -> list[tuple[int, str]] | None:
     """Return one exact visible H2 section, excluding its heading."""
 
-    contextual = _contextual_markdown_lines(lines)
+    contextual = (
+        _contextual_markdown_lines(lines) if contexts is None else contexts
+    )
     heading_indexes = [
         index
         for index, context in enumerate(contextual)
@@ -1610,8 +1714,7 @@ def _visible_h2_source_section(text: str, title: str) -> str | None:
     """Return raw source owned by one exact visible top-level H2."""
 
     raw_lines = text.splitlines()
-    visible_lines = _visible_markdown_lines(text)
-    contextual = _contextual_markdown_lines(visible_lines)
+    contextual = _visible_markdown_contexts(text)
     headings = [
         context.line_number
         for context in contextual
@@ -2340,9 +2443,15 @@ def validate_consumer_contract(
         if text is not None:
             texts[relative_path] = text
 
-    visible_lines = {
-        relative_path: _visible_markdown_lines(text)
+    scans = {
+        relative_path: _scan_visible_markdown(text)
         for relative_path, text in texts.items()
+    }
+    visible_lines = {
+        relative_path: scan[0] for relative_path, scan in scans.items()
+    }
+    visible_contexts = {
+        relative_path: scan[1] for relative_path, scan in scans.items()
     }
     visible_texts = {
         relative_path: _positive_visible_text(lines)
@@ -2384,9 +2493,7 @@ def validate_consumer_contract(
             text = texts.get(relative_path)
             if text is None:
                 continue
-            for context in _contextual_markdown_lines(
-                visible_lines[relative_path]
-            ):
+            for context in visible_contexts[relative_path]:
                 heading = _consumer_h3_content(context.content)
                 if heading is None:
                     continue
@@ -2417,9 +2524,7 @@ def validate_consumer_contract(
         first_h2 = next(
             (
                 index
-                for index, context in enumerate(
-                    _contextual_markdown_lines(patterns_lines)
-                )
+                for index, context in enumerate(visible_contexts["PATTERNS.md"])
                 if not context.containers
                 and _atx_heading_content(context.content, 2) is not None
             ),
@@ -2460,7 +2565,11 @@ def validate_consumer_contract(
             ),
         }
         for section_title, required_paths in readme_sections.items():
-            section_lines = _visible_h2_section(readme_lines, section_title)
+            section_lines = _visible_h2_section(
+                readme_lines,
+                section_title,
+                visible_contexts[".github/README.md"],
+            )
             section_text = (
                 ""
                 if section_lines is None
