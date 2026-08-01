@@ -1426,6 +1426,14 @@ def _scan_visible_markdown(
             visible_line,
             active_containers,
         )
+        if html_active:
+            html_content = _fence_container_content(
+                raw_line,
+                html_containers,
+            )
+            if html_content is not None:
+                fence_view = html_content
+                containers = html_containers
         html_line = False
         if html_active:
             if containers != html_containers:
@@ -1871,6 +1879,8 @@ def _interrupts_reference_definition(content: str) -> bool:
     if not stripped:
         return True
     if re.match(r"^ {0,3}#{1,6}(?:[ \t]+|$)", content):
+        return True
+    if re.fullmatch(r" {0,3}(?:=+|-+)[ \t]*", content):
         return True
     if re.fullmatch(
         r" {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})",

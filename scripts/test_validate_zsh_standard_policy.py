@@ -2419,6 +2419,18 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 ">",
             ),
             (
+                "html-raw-blockquote-looking-line",
+                "<script>\n"
+                f"> {canonical_path}\n"
+                "</script>",
+            ),
+            (
+                "html-raw-list-looking-line",
+                "<script>\n"
+                f"- {canonical_path}\n"
+                "</script>",
+            ),
+            (
                 "html-cdata",
                 "<![CDATA[\n"
                 f"    {canonical_path}\n"
@@ -2670,6 +2682,13 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "multiline-label-with-blank-line",
                 "[\n"
                 f"{canonical_path}\n\n"
+                "]: /target",
+            ),
+            (
+                "multiline-label-with-setext-heading",
+                "[\n"
+                f"{canonical_path}\n"
+                "===\n"
                 "]: /target",
             ),
         )
