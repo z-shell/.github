@@ -80,7 +80,7 @@ GitHub's asynchronous stacked-merge path has one observed exception to the
 normal branch-deletion setting. During
 [`z-shell/zsh-lint#117`](https://github.com/z-shell/zsh-lint/pull/117), the
 accepted asynchronous merge deleted persistent head branch `next` even though
-`delete_branch_on_merge` was `false`. GitHub also retargeted dependent
+`delete_branch_on_merge` was `false`. GitHub also retargeted
 [`dependent PR #110`](https://github.com/z-shell/zsh-lint/pull/110) from `next` to `main` and
 placed it in immutable stack metadata. Treat this as evidence for that path,
 not proof that every asynchronous merge behaves identically.
