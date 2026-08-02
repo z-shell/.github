@@ -81,7 +81,7 @@ normal branch-deletion setting. During
 [`z-shell/zsh-lint#117`](https://github.com/z-shell/zsh-lint/pull/117), the
 accepted asynchronous merge deleted persistent head branch `next` even though
 `delete_branch_on_merge` was `false`. GitHub also retargeted dependent
-[`#110`](https://github.com/z-shell/zsh-lint/pull/110) from `next` to `main` and
+[`dependent PR #110`](https://github.com/z-shell/zsh-lint/pull/110) from `next` to `main` and
 placed it in immutable stack metadata. Treat this as evidence for that path,
 not proof that every asynchronous merge behaves identically.
 
