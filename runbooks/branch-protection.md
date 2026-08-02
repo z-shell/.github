@@ -43,9 +43,9 @@ row is `next` → `main`. Skip repositories that are trunk-on-`main`.
       promotion) risks GitHub deleting `next` right after merge, regardless of
       the ruleset's `deletion` rule. Disable it:
       `gh api -X PATCH repos/<org>/<repo> --field delete_branch_on_merge=false`.
-      This is the single highest-value check in this runbook — it is the one
-      that caused actual data loss (recovered from the merge commit's known
-      SHA in this case, but that is luck, not a safety net).
+      Keep this setting disabled as the required baseline for ordinary pull
+      request merges. It is not a complete safeguard for GitHub's asynchronous
+      stacked-merge path; see the caveat below.
 - [ ] **`renovate.json` has `"baseBranches": ["next"]`** if the repository
       uses Renovate. See `dependency-management.md` for the full config
       example. Check `.github/dependabot.yml`'s `target-branch` too — it is
@@ -73,6 +73,32 @@ row is `next` → `main`. Skip repositories that are trunk-on-`main`.
       `github.head_ref` matching `hotfix-*`. The check must run at least once
       on a real PR against `main` before GitHub will accept its context name
       in `required_status_checks`.
+
+## Asynchronous stacked-merge caveat
+
+GitHub's asynchronous stacked-merge path has one observed exception to the
+normal branch-deletion setting. During
+[`z-shell/zsh-lint#117`](https://github.com/z-shell/zsh-lint/pull/117), the
+accepted asynchronous merge deleted persistent head branch `next` even though
+`delete_branch_on_merge` was `false`. GitHub also retargeted
+[`dependent PR #110`](https://github.com/z-shell/zsh-lint/pull/110) from `next` to `main` and
+placed it in immutable stack metadata. Treat this as evidence for that path,
+not proof that every asynchronous merge behaves identically.
+
+Before using an asynchronous stacked merge for a persistent branch:
+
+1. Record the promotion pull request's exact head branch and head SHA.
+2. Record each dependent pull request's base branch, base SHA, head branch,
+   and head SHA.
+3. After the merge, immediately verify that the persistent head ref still
+   exists and that dependent pull requests retain their intended bases.
+
+If GitHub removes the branch, stop further merges. With explicit maintainer
+authorization, recreate only the recorded branch ref at the recorded exact
+head SHA, then re-audit every dependent pull request. GitHub may reject a base
+restoration after it creates immutable stack metadata, so do not assume the
+original base can be restored. Record and obtain an explicit maintainer
+decision for any dependent pull request that must remain retargeted.
 
 ## Squash-merge trailers
 
