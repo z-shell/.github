@@ -36,6 +36,8 @@ Examples likely to fit:
 
 - `zunit`
 - `zsh-lint`
+- `zpmod`
+- packaged `zsh`
 
 Policy:
 

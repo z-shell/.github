@@ -13,7 +13,7 @@ inconsistency is real, not cosmetic:
 
 - Some repos run a `next` → `main` integration flow (`src`, `wiki`, `zi`,
   `zsh-lint`, `zsh-eza`).
-- Others are trunk-based on `main` only (`zd`, packaged `zsh`,
+- Others are trunk-based on `main` only (`zd`, `zpmod`, packaged `zsh`,
   `z-a-meta-plugins`, `zsh-fancy-completions`, `zunit`, `.github`).
 
 An audit on 2026-07-18 found that all listed repositories use `main` as their
@@ -51,6 +51,7 @@ superseding one), not merely creating or deleting a branch.
 | `zd`                    | 1     | trunk on `main` | `main`             | push to `main` (image)   |
 | `zunit`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag             |
 | `zsh-lint`              | 2     | `next` → `main` | `next`             | `vX.Y.Z` tag             |
+| `zpmod`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag             |
 | packaged `zsh`          | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag (deferred)  |
 | `zi`                    | 3     | `next` → `main` | `next`             | `main` is consumable ref |
 | `zsh-eza`               | 3     | `next` → `main` | `next`             | `main` is consumable ref |
@@ -123,3 +124,5 @@ public factual-reconciliation change.
 - `runbooks/branch-protection.md` — enforcement checklist for this model.
 - [Issue #454](https://github.com/z-shell/.github/issues/454) — dated live audit
   and maintainer decision record.
+- [`z-shell/zpmod#70`](https://github.com/z-shell/zpmod/issues/70) — owning
+  remediation issue for the `zpmod` classification and branch migration.

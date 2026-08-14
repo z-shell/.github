@@ -71,7 +71,8 @@ Classes are exactly those defined in
 table stays readable:
 
 1. **Continuously deployed artifacts** — `wiki`, `src`, `zd` images
-2. **Versioned tools and packages** — `zunit`, `zsh-lint`, packaged `zsh`
+2. **Versioned tools and packages** — `zunit`, `zsh-lint`, `zpmod`, packaged
+   `zsh`
 3. **Git-consumed source** — `zi`, most plugins and annexes
 4. **Meta/infrastructure** — `.github`
 

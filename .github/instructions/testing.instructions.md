@@ -11,12 +11,12 @@ definitions come from `decisions/0007-release-publication-flow.md`.
 
 ## Identify the class first
 
-| Class | Repos                               | What it is                     |
-| ----- | ----------------------------------- | ------------------------------ |
-| 1     | `wiki`, `src`, `zd`                 | Continuously deployed artifact |
-| 2     | `zunit`, `zsh-lint`, packaged `zsh` | Versioned tool/package         |
-| 3     | `zi`, most plugins/annexes          | Git-consumed source            |
-| 4     | `.github`                           | Meta/infrastructure            |
+| Class | Repos                                        | What it is                     |
+| ----- | -------------------------------------------- | ------------------------------ |
+| 1     | `wiki`, `src`, `zd`                          | Continuously deployed artifact |
+| 2     | `zunit`, `zsh-lint`, `zpmod`, packaged `zsh` | Versioned tool/package         |
+| 3     | `zi`, most plugins/annexes                   | Git-consumed source            |
+| 4     | `.github`                                    | Meta/infrastructure            |
 
 ## Baseline (every repo)
 
@@ -36,7 +36,8 @@ definitions come from `decisions/0007-release-publication-flow.md`.
   deploy. Wiki: ESLint + Stylelint + production build. `zd`: Docker build matrix.
   `src`: installer/loader validation. Add CodeQL where a supported language exists.
 - **Class 2 — versioned tools:** a **full functional suite is required and gates
-  release tags**. ZUnit for Zsh tools; `go test` for the `zsh-lint` Go CLI. Never
+  release tags**. Run the repository's full suite on the exact tag commit,
+  including ZUnit for Zsh tools and `go test` for the `zsh-lint` Go CLI. Never
   cut a `vX.Y.Z` tag from a red commit.
 - **Class 3 — git-consumed:** **validation-only.** Baseline checks plus ZUnit
   where the plugin ships tests. No release automation, no coverage gate. The bar

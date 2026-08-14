@@ -29,7 +29,8 @@ formalizes.
    the development branch; deploy via the repo's existing delivery model. No
    tag-driven changelog/release automation unless a separate packaged artifact
    appears.
-2. **Versioned tools and packages** (`zunit`, `zsh-lint`, packaged `zsh`):
+2. **Versioned tools and packages** (`zunit`, `zsh-lint`, `zpmod`, packaged
+   `zsh`):
    `main` is continuously validated development output; **annotated semantic
    tags `vX.Y.Z` are the publication boundary**. User-facing releases are minted
    only from those tags.
@@ -60,6 +61,11 @@ Per-repo application:
 - **`zsh-lint`** — a Zsh plugin consumed from source, with **no build artifact**.
   Its release is a tagged GitHub release with generated notes only (no upload).
   (`zsh-lint#21`.)
+- **`zpmod`** — a compiled module/package. It uses trunk-based development on
+  `main`; an annotated `vX.Y.Z` tag from a reviewed, green `main` commit is the
+  release boundary, gated by the full functional suite on that exact commit.
+  Pages and documentation publish only from reviewed `main` commits.
+  ([`zpmod#70`](https://github.com/z-shell/zpmod/issues/70).)
 - **packaged `zsh`** — deferred: confirm what it publishes (npm package vs.
   metadata) before wiring a release, since the artifact determines the steps.
   (`zsh#8`.)
