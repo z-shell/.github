@@ -61,17 +61,18 @@ rollout status per repository is tracked in issue #454, not restated here.
    installer/loader validation, plus CodeQL where a supported language is
    present.
 2. **Versioned tools and packages** (`zunit`, `zsh-lint`, `zpmod`, packaged
-   `zsh`) — a full functional suite is **required** before a release tag is cut,
+   `zsh`): a full functional suite is **required** before a release tag is cut,
    defined per tool: `zunit`'s release workflow must run its own native suite on
    the exact tag commit before publication, since prior branch checks alone do
-   not prove the released commit; packaged `zsh`'s gate is metadata/manifest
-   validation plus a clean disposable install and a startup/version smoke test,
-   all on the exact tag commit, since metadata-only validation alone is not a
-   functional suite; `zsh-lint`'s gate is `go test` on the exact tag commit;
-   `zpmod`'s full functional suite likewise runs on the exact tag commit before
-   publication. Compiled tools additionally run an appropriate SAST control,
-   such as CodeQL or `gosec`; a release artifact is part of the security surface
-   governed by `decisions/0010-security-incident-response.md`.
+   not prove the released commit; `zpmod` must run its repository-defined full
+   functional suite on the exact tag commit before publication; packaged
+   `zsh`'s gate is metadata/manifest validation plus a clean disposable install
+   and a startup/version smoke test, all on the exact tag commit, since
+   metadata-only validation alone is not a functional suite; `zsh-lint`'s gate
+   is `go test` on the exact tag commit. Compiled tools additionally run an
+   appropriate SAST control, such as CodeQL or `gosec`; a release artifact is
+   part of the security surface governed by
+   `decisions/0010-security-incident-response.md`.
 3. **Git-consumed source** (`zi`, most plugins/annexes) — **validation-only**: the
    baseline checks above, plus ZUnit where the plugin ships tests. No release
    automation and no coverage gate; these repos are consumed from source and the
@@ -131,5 +132,6 @@ that a ruleset enforces it.
 - `z-shell/zd` `.github/workflows/test-native.yml` — reusable ZUnit workflow.
 - [Issue #454](https://github.com/z-shell/.github/issues/454) — dated rollout-gap
   evidence and maintainer decision record.
-- [`z-shell/zpmod#70`](https://github.com/z-shell/zpmod/issues/70) — owning
-  remediation issue for the class-2 functional-suite gate.
+- [Issue #497](https://github.com/z-shell/.github/issues/497) and
+  [z-shell/zpmod#70](https://github.com/z-shell/zpmod/issues/70): accepted
+  `zpmod` classification and exact-tag test obligation.

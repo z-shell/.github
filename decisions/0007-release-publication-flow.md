@@ -61,11 +61,11 @@ Per-repo application:
 - **`zsh-lint`** — a Zsh plugin consumed from source, with **no build artifact**.
   Its release is a tagged GitHub release with generated notes only (no upload).
   (`zsh-lint#21`.)
-- **`zpmod`** — a compiled module/package. It uses trunk-based development on
-  `main`; an annotated `vX.Y.Z` tag from a reviewed, green `main` commit is the
-  release boundary, gated by the full functional suite on that exact commit.
-  Pages and documentation publish only from reviewed `main` commits.
-  ([`zpmod#70`](https://github.com/z-shell/zpmod/issues/70).)
+- **`zpmod`**: class 2, with annotated `vX.Y.Z` tags created only from reviewed,
+  green `main` commits. Pages and documentation publish only from reviewed
+  `main` commits; that continuous documentation surface does not replace the
+  annotated tag as the versioned release boundary. (`z-shell/.github#497`,
+  `z-shell/zpmod#70`.)
 - **packaged `zsh`** — deferred: confirm what it publishes (npm package vs.
   metadata) before wiring a release, since the artifact determines the steps.
   (`zsh#8`.)
@@ -100,3 +100,6 @@ Per-repo application:
 - `z-shell/zunit` `.github/workflows/release.yml` — reference tag-driven flow.
 - `decisions/0003-conventional-commits.md` — history format this builds on.
 - Tracker: `zsh-lint#21`, `zsh#8`, `zi#346`.
+- [Issue #497](https://github.com/z-shell/.github/issues/497) and
+  [z-shell/zpmod#70](https://github.com/z-shell/zpmod/issues/70): accepted
+  `zpmod` classification and owning repository remediation.
