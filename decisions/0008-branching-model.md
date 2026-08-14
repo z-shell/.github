@@ -13,12 +13,13 @@ inconsistency is real, not cosmetic:
 
 - Some repos run a `next` → `main` integration flow (`src`, `wiki`, `zi`,
   `zsh-lint`, `zsh-eza`).
-- Others are trunk-based on `main` only (`zd`, packaged `zsh`,
+- Others are trunk-based on `main` only (`zd`, packaged `zsh`, `zpmod`,
   `z-a-meta-plugins`, `zsh-fancy-completions`, `zunit`, `.github`).
 
-An audit on 2026-07-18 found that all listed repositories use `main` as their
-GitHub default branch. Only `src`, `wiki`, `zi`, `zsh-lint`, and `zsh-eza` have
-a live `next` branch for development or integration. In this ADR, **GitHub
+An audit on 2026-07-18 found that all repositories listed at that time use
+`main` as their GitHub default branch. Only `src`, `wiki`, `zi`, `zsh-lint`, and
+`zsh-eza` have a live `next` branch for development or integration. The accepted
+2026-08-14 `zpmod` audit adds `zpmod` as trunk on `main`. In this ADR, **GitHub
 default branch** and **development branch** are therefore separate concepts.
 
 The private meta-workspace catalog (`workspace/repos.yml`) is still out of date. Its
@@ -38,25 +39,26 @@ development branch and branch model. The ADR-0007 repository class is an
 _input_ to the choice because it sets the publication boundary and a default,
 but it does **not** by itself determine the branch model — repo churn/scale
 does. Within class 1, `wiki`/`src` use `next` → `main` while `zd` is
-trunk-only; within class 2, `zsh-lint` uses `next` while `zunit` is trunk.
-Changing a repository's assigned model requires amending this ADR (or a
-superseding one), not merely creating or deleting a branch.
+trunk-only; within class 2, `zsh-lint` uses `next` while `zunit` and `zpmod` are
+trunk-based. Changing a repository's assigned model requires amending this ADR
+(or a superseding one), not merely creating or deleting a branch.
 
 ### Canonical branch model
 
-| Repo                    | Class | Branch model    | Development branch | Publication boundary     |
-| ----------------------- | ----- | --------------- | ------------------ | ------------------------ |
-| `wiki`                  | 1     | `next` → `main` | `next`             | merge to `main` (deploy) |
-| `src`                   | 1     | `next` → `main` | `next`             | merge to `main` (deploy) |
-| `zd`                    | 1     | trunk on `main` | `main`             | push to `main` (image)   |
-| `zunit`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag             |
-| `zsh-lint`              | 2     | `next` → `main` | `next`             | `vX.Y.Z` tag             |
-| packaged `zsh`          | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag (deferred)  |
-| `zi`                    | 3     | `next` → `main` | `next`             | `main` is consumable ref |
-| `zsh-eza`               | 3     | `next` → `main` | `next`             | `main` is consumable ref |
-| `z-a-meta-plugins`      | 3     | trunk on `main` | `main`             | `main` is consumable ref |
-| `zsh-fancy-completions` | 3     | trunk on `main` | `main`             | `main` is consumable ref |
-| `.github`               | 4     | trunk on `main` | `main`             | n/a                      |
+| Repo                    | Class | Branch model    | Development branch | Publication boundary                      |
+| ----------------------- | ----- | --------------- | ------------------ | ----------------------------------------- |
+| `wiki`                  | 1     | `next` → `main` | `next`             | merge to `main` (deploy)                  |
+| `src`                   | 1     | `next` → `main` | `next`             | merge to `main` (deploy)                  |
+| `zd`                    | 1     | trunk on `main` | `main`             | push to `main` (image)                    |
+| `zunit`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag                              |
+| `zsh-lint`              | 2     | `next` → `main` | `next`             | `vX.Y.Z` tag                              |
+| `zpmod`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag; Pages from reviewed `main`  |
+| packaged `zsh`          | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag (deferred)                   |
+| `zi`                    | 3     | `next` → `main` | `next`             | `main` is consumable ref                  |
+| `zsh-eza`               | 3     | `next` → `main` | `next`             | `main` is consumable ref                  |
+| `z-a-meta-plugins`      | 3     | trunk on `main` | `main`             | `main` is consumable ref                  |
+| `zsh-fancy-completions` | 3     | trunk on `main` | `main`             | `main` is consumable ref                  |
+| `.github`               | 4     | trunk on `main` | `main`             | n/a                                       |
 
 The publication-boundary column states the policy, not a complete inventory of
 live workflow triggers. At the 2026-07-18 audit, `src` and `zd` also had
@@ -123,3 +125,6 @@ public factual-reconciliation change.
 - `runbooks/branch-protection.md` — enforcement checklist for this model.
 - [Issue #454](https://github.com/z-shell/.github/issues/454) — dated live audit
   and maintainer decision record.
+- [Issue #497](https://github.com/z-shell/.github/issues/497) and
+  [z-shell/zpmod#70](https://github.com/z-shell/zpmod/issues/70): accepted
+  `zpmod` classification and owning repository remediation.
