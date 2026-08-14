@@ -11,12 +11,12 @@ definitions come from `decisions/0007-release-publication-flow.md`.
 
 ## Identify the class first
 
-| Class | Repos                               | What it is                     |
-| ----- | ----------------------------------- | ------------------------------ |
-| 1     | `wiki`, `src`, `zd`                 | Continuously deployed artifact |
-| 2     | `zunit`, `zsh-lint`, packaged `zsh` | Versioned tool/package         |
-| 3     | `zi`, most plugins/annexes          | Git-consumed source            |
-| 4     | `.github`                           | Meta/infrastructure            |
+| Class | Repos                                        | What it is                     |
+| ----- | -------------------------------------------- | ------------------------------ |
+| 1     | `wiki`, `src`, `zd`                          | Continuously deployed artifact |
+| 2     | `zunit`, `zsh-lint`, `zpmod`, packaged `zsh` | Versioned tool/package         |
+| 3     | `zi`, most plugins/annexes                   | Git-consumed source            |
+| 4     | `.github`                                    | Meta/infrastructure            |
 
 ## Baseline (every repo)
 
@@ -35,9 +35,10 @@ definitions come from `decisions/0007-release-publication-flow.md`.
 - **Class 1 — deployed:** the build must pass on the development branch before
   deploy. Wiki: ESLint + Stylelint + production build. `zd`: Docker build matrix.
   `src`: installer/loader validation. Add CodeQL where a supported language exists.
-- **Class 2 — versioned tools:** a **full functional suite is required and gates
-  release tags**. ZUnit for Zsh tools; `go test` for the `zsh-lint` Go CLI. Never
-  cut a `vX.Y.Z` tag from a red commit.
+- **Class 2, versioned tools:** a **full functional suite is required on the
+  exact tag commit and gates release publication**. ZUnit for Zsh tools;
+  `go test` for the `zsh-lint` Go CLI; the repository-defined full suite for
+  `zpmod`. Never cut a `vX.Y.Z` tag from a red commit.
 - **Class 3 — git-consumed:** **validation-only.** Baseline checks plus ZUnit
   where the plugin ships tests. No release automation, no coverage gate. The bar
   is "loads and parses cleanly."
