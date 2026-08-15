@@ -8,6 +8,26 @@ Admission rule:
 - prefer linking to the wiki or plugin standard when a deeper explanation already exists
 - supersede patterns by updating this file, not by relying on private memory
 
+## Zsh plugin standard boundary
+
+The canonical public authoring contract is the
+[Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard).
+Official Zsh documentation remains authoritative for shell semantics. The
+patterns below are implementation examples, not a replacement for either
+source.
+
+Across Z-Shell plugins, preserve these organization-level expectations:
+
+- use Zsh-first syntax and namespace plugin-owned shell state
+- scope option changes and make load-time side effects explicit
+- reverse plugin-owned side effects during unload
+- keep network activity out of the load path
+- separate portable plugin behavior from optional manager APIs
+
+Zi is the reference manager for Z-Shell examples. `PMSPEC` and similar
+integration APIs form an optional manager profile; do not describe their
+absence as a portable-standard failure.
+
 ## Plugin entry-point skeleton
 
 Observed in:
@@ -32,24 +52,19 @@ Pattern:
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
 
-## Register the repository directory in `Plugins`
+## Namespace and track plugin-owned state
 
-Observed in:
-
-- `z-shell/zsh-eza:zsh-eza.plugin.zsh`
-- `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
-- `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
-
-Pattern:
+Use plugin-specific parameter names for paths and ownership markers. Preserve
+an existing ownership marker when an entry file is sourced repeatedly so the
+eventual unload still reverses the original plugin-owned change.
 
 ```zsh
-typeset -gA Plugins
-Plugins[PLUGIN_KEY]="${0:h}"
+typeset -g ZSH_EXAMPLE_FPATH="${0:h}/functions"
+typeset -gi ZSH_EXAMPLE_FPATH_ADDED=${ZSH_EXAMPLE_FPATH_ADDED:-0}
 ```
 
-Use a stable, repo-specific key and treat the registered directory as the root for cleanup and sibling-path resolution.
-
-Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash>
+Do not register plugin state in a shared global registry. Clear namespaced
+parameters during unload after reversing only the state the plugin introduced.
 
 ## Guard `fpath` additions
 
@@ -61,24 +76,24 @@ Observed in:
 
 Pattern:
 
-- add `functions/` only when the plugin manager or current shell setup has not already done so
-- the common Zi-aware form is:
-
 ```zsh
-if [[ $PMSPEC != *f* ]]; then
-  fpath+=( "${0:h}/functions" )
+if [[ ${PMSPEC-} != *f* ]] &&
+  (( ! ${fpath[(Ie)${ZSH_EXAMPLE_FPATH}]} )); then
+  fpath+=( "$ZSH_EXAMPLE_FPATH" )
+  ZSH_EXAMPLE_FPATH_ADDED=1
 fi
 ```
 
-- an explicit membership guard is also acceptable when the entry point must tolerate non-Zi loader paths:
+The capability and membership checks preserve manager- or user-owned entries.
+Unload only when the ownership marker says the plugin added the path:
 
 ```zsh
-if [[ ${fpath[(r)${0:h}/functions]} != "${0:h}/functions" ]]; then
-  fpath+=( "${0:h}/functions" )
+if (( ZSH_EXAMPLE_FPATH_ADDED )); then
+  local fpath_index=${fpath[(Ie)${ZSH_EXAMPLE_FPATH}]}
+  (( fpath_index )) && fpath[$fpath_index]=()
 fi
+unset ZSH_EXAMPLE_FPATH ZSH_EXAMPLE_FPATH_ADDED
 ```
-
-Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-managed loading.
 
 ## Mandatory SHA-pinning for GitHub Actions
 
