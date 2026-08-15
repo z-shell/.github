@@ -57,7 +57,14 @@
       "kind": "shared-policy",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["implementation", "review"],
+      "tasks": [
+        "implementation",
+        "review",
+        "zsh-plugin-creation",
+        "zsh-plugin-review",
+        "zsh-plugin-code-change",
+        "zsh-plugin-template"
+      ],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -146,6 +153,39 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["shell"]
+    },
+    {
+      "id": "instruction-zsh-plugin-standard",
+      "path": ".github/instructions/zsh-plugin-standard.instructions.md",
+      "kind": "scoped-guidance",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": [
+        "zsh-plugin-creation",
+        "zsh-plugin-review",
+        "zsh-plugin-code-change",
+        "zsh-plugin-template",
+        "zsh-plugin-documentation",
+        "zsh-plugin-scaffolding"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["zsh-plugin-standard-application"]
+    },
+    {
+      "id": "instruction-zsh-plugin-standard-aliases",
+      "path": ".github/instructions/zsh-plugin-standard-aliases.instructions.md",
+      "kind": "scoped-guidance",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["code-review", "readme-authoring", "zsh-plugin-scaffolding"],
+      "file_patterns": [
+        "**/*.plugin.zsh,**/init.zsh,templates/readme/zsh-plugin.md,.github/skills/new-zsh-plugin/**,.github/agents/zsh-plugin-standard-reviewer.agent.md"
+      ],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
     },
     {
       "id": "instruction-testing",
@@ -237,7 +277,7 @@
       "kind": "agent",
       "authority": "advisory",
       "consumers": ["copilot"],
-      "tasks": ["zsh-plugin-review"],
+      "tasks": ["zsh-plugin-review", "code-review"],
       "file_patterns": ["**"],
       "required": false,
       "review_owner": "z-shell maintainers",
@@ -261,7 +301,7 @@
       "kind": "skill",
       "authority": "advisory",
       "consumers": ["copilot"],
-      "tasks": ["readme-authoring"],
+      "tasks": ["readme-authoring", "zsh-plugin-documentation"],
       "file_patterns": ["**"],
       "required": false,
       "review_owner": "z-shell maintainers",
@@ -333,7 +373,7 @@
       "kind": "skill",
       "authority": "advisory",
       "consumers": ["copilot"],
-      "tasks": ["zsh-plugin-scaffolding"],
+      "tasks": ["zsh-plugin-scaffolding", "zsh-plugin-creation"],
       "file_patterns": ["**"],
       "required": false,
       "review_owner": "z-shell maintainers",
@@ -417,7 +457,7 @@
       "kind": "runbook",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["instruction-change"],
+      "tasks": ["instruction-change", "zsh-plugin-standard-governance"],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -516,12 +556,16 @@
       "tasks": [
         "recurring-operations",
         "scheduled-workflow-audit",
-        "automation-review"
+        "automation-review",
+        "zsh-plugin-standard-review"
       ],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
-      "canonical_for": ["recurring-operations"]
+      "canonical_for": [
+        "recurring-operations",
+        "zsh-plugin-standard-review"
+      ]
     },
     {
       "id": "runbook-release",

@@ -33,16 +33,17 @@ The broad shapes are:
 
 Use the right home for each kind of knowledge:
 
-| Kind of information                   | Source of truth                                                      |
-| ------------------------------------- | -------------------------------------------------------------------- |
-| Active work, blockers, next steps     | GitHub issues, pull requests, and Linear                             |
-| Organization policy                   | AGENTS.md in this repository                                         |
-| Instruction routing and impact review | .github/instruction-surfaces.json and runbooks/instruction-update.md |
-| Durable architectural decisions       | `decisions/` in this repo                                            |
-| Cross-repo operational procedures     | `runbooks/` in this repo                                             |
-| Reusable implementation idioms        | `PATTERNS.md` in this repo                                           |
-| Long-form user and maintainer docs    | `wiki/` where practical                                              |
-| Local LLM memory                      | Optional cache only, never the only record                           |
+| Kind of information                   | Source of truth                                                              |
+| ------------------------------------- | ---------------------------------------------------------------------------- |
+| Active work, blockers, next steps     | GitHub issues, pull requests, and Linear                                     |
+| Organization policy                   | AGENTS.md in this repository                                                 |
+| Instruction routing and impact review | .github/instruction-surfaces.json and runbooks/instruction-update.md         |
+| Durable architectural decisions       | `decisions/` in this repo                                                    |
+| Cross-repo operational procedures     | `runbooks/` in this repo                                                     |
+| Reusable implementation idioms        | `PATTERNS.md` in this repo                                                   |
+| Public Zsh plugin-authoring standard  | [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) |
+| Long-form user and maintainer docs    | `wiki/` where practical                                                      |
+| Local LLM memory                      | Optional cache only, never the only record                                   |
 
 For handoffs, follow `.github/AGENT_MEMORY.md`.
 
@@ -59,6 +60,7 @@ When working in z-shell repositories, optimize for:
 
 - **Language:** Zsh-first. Bash-only constructs are bugs in Zsh code unless the file is explicitly POSIX `sh`.
 - **Naming:** plugins use `zsh-<name>`, annexes use `z-a-<name>`, modules keep short descriptive names.
+- **Plugin authoring:** read the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) for plugin creation, code changes, reviews, templates, and documentation. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
 - **Commit trailers:** Never include a `Co-authored-by` trailer. This organization-wide ban is author-enforced until [z-shell/.github#464](https://github.com/z-shell/.github/issues/464) lands.
@@ -153,6 +155,7 @@ Do not silently work around drift. Open or update an issue in `z-shell/.github`,
 - `.github/AGENT_MEMORY.md`
 - `.github/instruction-surfaces.json`
 - `PATTERNS.md`
+- [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
 - `decisions/`
 - `runbooks/org-review.md`
 - `runbooks/adr.md`

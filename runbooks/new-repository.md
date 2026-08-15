@@ -62,9 +62,14 @@ lib/                       # only when sourced helpers are needed
 docs/                      # short repository-local usage only
 ```
 
-Follow the entry-point, `ZERO`, `Plugins`, guarded `fpath`, and unload patterns
-in `PATTERNS.md` and the Z-Shell Plugin Standard. The unload function must
-reverse plugin-owned side effects.
+Follow the entry-point, `ZERO`, namespaced state, ownership-tracked `fpath`, and
+unload patterns in `PATTERNS.md` and the
+[Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard).
+Official Zsh documentation remains authoritative for shell semantics. Treat
+`PMSPEC` and similar manager capabilities as optional profiles rather than
+portable requirements. Namespace plugin-owned state, scope option changes, keep
+network activity out of the load path, and reverse only plugin-owned side
+effects during unload.
 
 ### Annex
 

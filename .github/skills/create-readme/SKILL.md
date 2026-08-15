@@ -13,11 +13,13 @@ Create an accurate, concise, and visually intentional repository landing page.
    model, and linked organization policy before drafting.
 2. Classify the repository. For a Zsh plugin, use
    [`templates/readme/zsh-plugin.md`](../../../templates/readme/zsh-plugin.md)
-   as the canonical structure.
+   as the canonical structure and read the
+   [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard).
 3. Verify every feature, setting, default, alias, lifecycle claim, command, and
    branch statement against the current implementation.
 4. Lead Zsh-plugin installation guidance with Zi. Keep other manager examples
    concise and include only intentionally supported or verified paths.
+   Distinguish optional manager profiles from portable plugin requirements.
 5. Keep long-form ecosystem guidance in the wiki and link to it.
 6. Preserve meaningful visual identity: a clear header, a restrained maintained
    badge set, accessible alt text, and an optional behavior-focused screenshot

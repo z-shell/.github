@@ -71,7 +71,8 @@ plugin capability, not merely an alternative spelling of the basic load. -->
 ### Other plugin managers
 
 <List only intentionally supported or verified loading methods. Keep this
-section compact and do not compare competing projects' feature sets.>
+section compact and do not compare competing projects' feature sets. Identify
+manager-specific APIs as optional profiles rather than portable requirements.>
 
 ## Configuration
 
@@ -90,8 +91,10 @@ option mappings.>
 ## Lifecycle and side effects
 
 - <State changed during load>
+- <Namespacing and option-scoping behavior>
 - <Behavior when a required dependency is unavailable>
 - <Unload function and the state it restores>
+- <Confirm that load performs no network activity>
 
 ## Verification
 
@@ -106,6 +109,8 @@ From the repository root:
 ## Documentation and support
 
 - [Z-Shell wiki](https://wiki.zshell.dev/)
+- [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
+- [Zsh documentation](https://zsh.sourceforge.io/Doc/)
 - [Report an issue](https://github.com/z-shell/<repository>/issues)
 
 ## Release model
@@ -126,8 +131,12 @@ This project is distributed under the terms in [LICENSE](LICENSE).
 - [ ] The purpose and feature claims match current implementation behavior.
 - [ ] Zi is the first installation path.
 - [ ] Other manager examples are intentionally supported or verified.
+- [ ] Manager-specific profiles are distinguished from portable requirements.
 - [ ] Public settings, aliases, functions, hooks, and defaults are complete.
 - [ ] Load failures and unload behavior are documented.
+- [ ] Plugin-owned state is namespaced, option changes are scoped, and unload
+      reverses every owned side effect.
+- [ ] Plugin load performs no network activity.
 - [ ] The verification command runs from a clean checkout.
 - [ ] Long-form guidance links to the wiki instead of being duplicated.
 - [ ] Badges are maintained signals rather than decoration.
