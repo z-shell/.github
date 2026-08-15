@@ -376,6 +376,18 @@
       "canonical_for": ["architecture-decision"]
     },
     {
+      "id": "runbook-cloudflare-wiki-policy",
+      "path": "runbooks/cloudflare-wiki-policy.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["cloudflare-wiki-policy", "cloudflare-pages-rollback"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["cloudflare-wiki-policy"]
+    },
+    {
       "id": "runbook-dependency-management",
       "path": "runbooks/dependency-management.md",
       "kind": "runbook",
