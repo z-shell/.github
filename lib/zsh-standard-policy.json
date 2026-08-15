@@ -1,0 +1,1044 @@
+{
+  "schema_version": 1,
+  "policy_id": "z-shell-zsh-scripting-standard",
+  "stable_release": {
+    "version": "5.9.2",
+    "release_date": "2026-07-12",
+    "manual_url": "https://zsh.sourceforge.io/Doc/Release/index.html",
+    "release_notes_url": "https://zsh.sourceforge.io/releases.html",
+    "semantic_review": {
+      "date": "2026-07-29",
+      "owner": "z-shell maintainers"
+    },
+    "source_artifact": null
+  },
+  "documentation_sources": {
+    "manual-index": {
+      "title": "Zsh 5.9.2 Manual",
+      "url": "https://zsh.sourceforge.io/Doc/Release/index.html",
+      "kind": "official-manual"
+    },
+    "release-notes": {
+      "title": "Zsh Release Notes",
+      "url": "https://zsh.sourceforge.io/releases.html",
+      "kind": "official-release-notes"
+    },
+    "shell-grammar": {
+      "title": "Shell Grammar",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Shell-Grammar.html",
+      "kind": "official-manual"
+    },
+    "redirection": {
+      "title": "Redirection",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Redirection.html",
+      "kind": "official-manual"
+    },
+    "shell-builtins": {
+      "title": "Shell Builtin Commands",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Shell-Builtin-Commands.html",
+      "kind": "official-manual"
+    },
+    "options": {
+      "title": "Options",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Options.html",
+      "kind": "official-manual"
+    },
+    "parameters": {
+      "title": "Parameters",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Parameters.html",
+      "kind": "official-manual"
+    },
+    "expansion": {
+      "title": "Expansion",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Expansion.html",
+      "kind": "official-manual"
+    },
+    "conditional-expressions": {
+      "title": "Conditional Expressions",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Conditional-Expressions.html",
+      "kind": "official-manual"
+    },
+    "arithmetic-evaluation": {
+      "title": "Arithmetic Evaluation",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Arithmetic-Evaluation.html",
+      "kind": "official-manual"
+    },
+    "functions": {
+      "title": "Functions",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Functions.html",
+      "kind": "official-manual"
+    },
+    "completion-system": {
+      "title": "Completion System",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Completion-System.html",
+      "kind": "official-manual"
+    },
+    "restricted-shell": {
+      "title": "Restricted Shell",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Restricted-Shell.html",
+      "kind": "official-manual"
+    },
+    "command-execution": {
+      "title": "Command Execution",
+      "url": "https://zsh.sourceforge.io/Doc/Release/Command-Execution.html",
+      "kind": "official-manual"
+    }
+  },
+  "execution_profiles": {
+    "standalone-executable": {
+      "title": "Standalone executable",
+      "description": "A directly invoked Zsh program that owns its initial shell state."
+    },
+    "startup-file": {
+      "title": "Startup file",
+      "description": "A Zsh startup or shutdown file read for a defined shell lifecycle phase that may make phase-owned effects."
+    },
+    "sourced-library": {
+      "title": "Sourced library",
+      "description": "A plugin or library loaded into and required to preserve caller state."
+    },
+    "autoload-function": {
+      "title": "Autoload function",
+      "description": "A function body loaded through Zsh autoload, including completions."
+    },
+    "test-fixture": {
+      "title": "Test fixture",
+      "description": "A Zsh test or fixture evaluated under an explicit production profile."
+    }
+  },
+  "rule_model": {
+    "levels": ["required", "recommended", "review"],
+    "bases": ["language-semantics", "organization-policy", "mixed"],
+    "enforcement_kinds": [
+      "native-syntax",
+      "classifier",
+      "lint",
+      "runtime-test",
+      "human-review"
+    ]
+  },
+  "normative_rules": [
+    {
+      "id": "zsh/authority/released-manual",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["manual-index", "release-notes"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/compatibility/respect-floor",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index", "release-notes"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/compatibility/annotate-version-sensitive",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["manual-index", "release-notes"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/context/classify",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["shell-grammar"],
+      "enforcement": ["classifier", "human-review"]
+    },
+    {
+      "id": "zsh/context/select-profile",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["shell-grammar", "functions"],
+      "enforcement": ["classifier", "human-review"]
+    },
+    {
+      "id": "zsh/context/no-cross-dialect-defaults",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-grammar", "expansion"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/review/report-without-rewrite",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/change/conform-touched-code",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/standalone/initialize",
+      "level": "required",
+      "profiles": ["standalone-executable"],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["shell-builtins", "options"],
+      "enforcement": ["native-syntax", "runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/standalone/no-startup-state",
+      "level": "required",
+      "profiles": ["standalone-executable"],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["options", "shell-grammar"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/sourced/preserve-caller-state",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["functions", "options", "parameters"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/autoload/initialize",
+      "level": "required",
+      "profiles": ["autoload-function"],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["functions", "shell-builtins", "options"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/autoload/suppress-alias-expansion",
+      "level": "recommended",
+      "profiles": ["autoload-function"],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["functions", "shell-builtins"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/completion/preserve-trust-boundaries",
+      "level": "required",
+      "profiles": ["startup-file", "autoload-function"],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["completion-system", "functions"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/test/isolate-environment",
+      "level": "required",
+      "profiles": ["test-fixture"],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["shell-grammar", "options"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/test/declare-negative-fixtures",
+      "level": "required",
+      "profiles": ["test-fixture"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["shell-grammar"],
+      "enforcement": ["classifier"]
+    },
+    {
+      "id": "zsh/test/match-production-profile",
+      "level": "required",
+      "profiles": ["test-fixture"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["functions", "options"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/options/declare-correctness-state",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["options"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/options/localize",
+      "level": "required",
+      "profiles": ["startup-file", "sourced-library", "autoload-function"],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-builtins", "options"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/options/no-top-level-leak",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["options", "functions"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/options/no-blanket-error-mode",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["options", "shell-grammar"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/options/constrain-multios",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["redirection", "options"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/parameters/declare-scope",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["parameters", "shell-builtins"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/parameters/account-dynamic-scope",
+      "level": "review",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["parameters", "functions"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/arrays/declare-kind",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["parameters"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/arrays/native-indexing",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["parameters"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/expansion/preserve-boundaries",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["expansion", "parameters"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/expansion/use-native-word-splitting",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["expansion"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/quoting/quote-boundaries",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["expansion", "redirection"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/associative/deterministic-order",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["parameters", "expansion"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/patterns/declare-interpretation",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["expansion", "conditional-expressions"],
+      "enforcement": ["lint", "human-review"]
+    },
+    {
+      "id": "zsh/conditions/use-native-form",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["conditional-expressions"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/conditions/declare-match-mode",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["conditional-expressions"],
+      "enforcement": ["lint", "human-review"]
+    },
+    {
+      "id": "zsh/arithmetic/handle-zero-status",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["arithmetic-evaluation"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/arithmetic/validate-input",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["arithmetic-evaluation", "parameters"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/arithmetic/declare-base",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["arithmetic-evaluation"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/status/check-critical",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["shell-grammar", "shell-builtins"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/status/check-pipeline-components",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-grammar", "parameters"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/status/preserve-command-substitution",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-grammar", "shell-builtins"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/cleanup/scope-traps",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["functions", "shell-grammar"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/cleanup/use-always",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-grammar"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/output/literal-vs-formatted",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-builtins"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/input/raw-mode",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-builtins"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/operands/end-options",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["shell-builtins"],
+      "enforcement": ["lint"]
+    },
+    {
+      "id": "zsh/redirection/order-and-quote",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["redirection", "expansion"],
+      "enforcement": ["lint", "human-review"]
+    },
+    {
+      "id": "zsh/fd/close-allocated",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["redirection", "parameters"],
+      "enforcement": ["lint", "runtime-test"]
+    },
+    {
+      "id": "zsh/security/treat-strings-as-data",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["expansion", "parameters"],
+      "enforcement": ["lint", "human-review"]
+    },
+    {
+      "id": "zsh/security/no-unreviewed-reevaluation",
+      "level": "review",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["expansion", "shell-builtins"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/security/no-restricted-shell-sandbox",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["restricted-shell"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/security/trust-paths",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": [
+        "command-execution",
+        "shell-builtins",
+        "functions",
+        "completion-system"
+      ],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/security/no-passive-network",
+      "level": "required",
+      "profiles": ["sourced-library", "autoload-function"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["functions"],
+      "enforcement": ["runtime-test"]
+    },
+    {
+      "id": "zsh/plugin/document-global-state",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["parameters", "functions"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/plugin/restore-state",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["functions", "parameters", "options"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/documentation/comment-invariants",
+      "level": "recommended",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/documentation/track-deferred-work",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/validation/native-authority",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": [
+        "manual-index",
+        "shell-grammar",
+        "options",
+        "shell-builtins"
+      ],
+      "enforcement": ["native-syntax", "human-review"]
+    },
+    {
+      "id": "zsh/validation/no-shellcheck",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["shell-grammar"],
+      "enforcement": ["classifier"]
+    },
+    {
+      "id": "zsh/validation/parser-gap",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    },
+    {
+      "id": "zsh/formatting/no-unproven-rewrite",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    }
+  ],
+  "source_classification": {
+    "tracked_files_only": true,
+    "nul_safe_output": true,
+    "suffix_match": "longest",
+    "suffixes": [
+      {
+        "value": ".plugin.zsh",
+        "profile": "sourced-library"
+      },
+      {
+        "value": ".zsh-theme",
+        "profile": "sourced-library"
+      },
+      {
+        "value": ".zunit",
+        "profile": "test-fixture"
+      },
+      {
+        "value": ".zsh",
+        "profile": null
+      }
+    ],
+    "startup_basenames": [
+      {
+        "value": ".zshenv",
+        "profile": "startup-file"
+      },
+      {
+        "value": ".zprofile",
+        "profile": "startup-file"
+      },
+      {
+        "value": ".zshrc",
+        "profile": "startup-file"
+      },
+      {
+        "value": ".zlogin",
+        "profile": "startup-file"
+      },
+      {
+        "value": ".zlogout",
+        "profile": "startup-file"
+      },
+      {
+        "value": "zshenv",
+        "profile": "startup-file"
+      },
+      {
+        "value": "zprofile",
+        "profile": "startup-file"
+      },
+      {
+        "value": "zshrc",
+        "profile": "startup-file"
+      },
+      {
+        "value": "zlogin",
+        "profile": "startup-file"
+      },
+      {
+        "value": "zlogout",
+        "profile": "startup-file"
+      }
+    ],
+    "directory_rules": [
+      {
+        "path_segment": "functions",
+        "basename_prefix": null,
+        "profile": "autoload-function"
+      },
+      {
+        "path_segment": "completions",
+        "basename_prefix": "_",
+        "profile": "autoload-function"
+      }
+    ],
+    "shebang": {
+      "interpreter": "zsh",
+      "direct": true,
+      "env": true,
+      "profile": "standalone-executable"
+    },
+    "exclusions": {
+      "binary_files": true,
+      "compiled_suffixes": [".zwc"],
+      "generated_paths_source": "repository-config"
+    },
+    "resolution": {
+      "explicit_override_precedence": "highest",
+      "ambiguous_evidence": "error",
+      "unassigned_profile": "error"
+    },
+    "path_globs": [
+      "**/*.zsh",
+      "**/*.plugin.zsh",
+      "**/*.zsh-theme",
+      "**/*.zunit",
+      "**/.zshenv",
+      "**/.zprofile",
+      "**/.zshrc",
+      "**/.zlogin",
+      "**/.zlogout",
+      "**/zshenv",
+      "**/zprofile",
+      "**/zshrc",
+      "**/zlogin",
+      "**/zlogout",
+      "**/functions/**",
+      "**/completions/**/_*"
+    ],
+    "repository_override_path": ".github/zsh-standard.json"
+  }
+}

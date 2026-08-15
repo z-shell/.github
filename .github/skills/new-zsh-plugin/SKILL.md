@@ -1,25 +1,33 @@
 ---
 name: new-zsh-plugin
-description: Scaffold a new Z-Shell-Standard-compliant Zsh plugin. Use when the user asks to create a new Zsh plugin, start a plugin from scratch, or add a plugin skeleton. Generates a compliant entry file (modeline, ZERO handling, capability-aware fpath setup, unload function) plus functions/ and docs/ layout.
+description: Use when a user asks to create a new Zsh plugin, start a plugin from scratch, or add a plugin skeleton.
 disable-model-invocation: true
 ---
 
 # Create a new Zsh plugin
 
-Scaffold a plugin that conforms to the [Z-Shell Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard), `z-shell/.github/AGENTS.md`, and the owning repository's local `AGENTS.md` when present.
-
-Official Zsh documentation is authoritative for shell semantics. The scaffold
-honors the optional `PMSPEC` capability signal without requiring a shared
-manager registry.
+Scaffold against the canonical Zsh standard and the owning repository's local
+contract. The skill supplies plugin-specific procedure, not independent Zsh
+semantics.
 
 ## Steps
 
-1. **Gather inputs** (ask only if not supplied):
+1. **Read context and classify**:
+   - Read `.github/instructions/zsh-scripting.instructions.md` and
+     `lib/zsh-standard-policy.json` first.
+   - Read root `AGENTS.md` and the owning repository's local `AGENTS.md` when
+     present.
+   - Identify the repository compatibility floor.
+   - Select `sourced-library` for the plugin entry point and
+     `autoload-function` for files beneath `functions/`.
+
+2. **Gather inputs** (ask only if not supplied):
    - An explicit target repository root. The caller must supply it; do not infer
      or default to a multi-repository checkout path.
    - Plugin name in kebab-case, e.g. `zsh-foo` → entry file `zsh-foo.plugin.zsh`.
+   - Derive `PLUGIN_KEY` = upper-snake of the name without a `zsh-` prefix, e.g. `zsh-foo` → `ZSH_FOO`.
 
-2. **Create the layout**:
+3. **Create the layout**:
 
    ```
    <target-repository-root>/
@@ -29,31 +37,43 @@ manager registry.
      docs/
    ```
 
-3. **Write the entry file** from `templates/plugin.plugin.zsh`, replacing
-   `__NAME__` (kebab name) and `__FPATH_VAR__` (a namespaced upper-snake
-   parameter such as `ZSH_FOO_FPATH`). Keep the modeline as the first two lines
-   verbatim.
+4. **Write the entry file** from `templates/plugin.plugin.zsh`, replacing
+   `__NAME__` (kebab name), `__KEY__` (PLUGIN_KEY), and `__FPATH_VAR__`
+   (`<KEY>_FPATH`). Keep the modelines as the first two lines verbatim. The
+   first source owns the `fpath` decision and `Plugins` snapshot; repeated
+   sources must not reset them.
 
-4. **Verify**: run `zsh -n <name>.plugin.zsh`. It must pass before reporting done. Source it in a subshell to confirm the unload function is defined:
+5. **Write autoload function bodies**: begin each generated function body with
+   `builtin emulate -L zsh`. Select only the correctness-affecting options that
+   function needs. Apply `zsh/autoload/initialize`, `zsh/options/localize`, and
+   the repository compatibility floor; do not copy a universal option bundle.
 
-   ```sh
-   zsh -ic 'source ./<name>.plugin.zsh; (( ${+functions[<name>_plugin_unload]} )) && echo unload-ok'
-   ```
+6. **Verify syntax and lifecycle**:
+   - Run `zsh -f -n <name>.plugin.zsh` for native syntax validation under
+     `zsh/validation/native-authority`.
+   - In an isolated shell with temporary `HOME` and `ZDOTDIR`, source the entry
+     file, verify its declared load effects, invoke `<name>_plugin_unload`, and
+     assert post-unload restoration of `fpath`, the `Plugins` key to its
+     pre-load state, scaffold parameters, functions, hooks, aliases, options,
+     and every other declared side effect. Test both an absent key and an
+     existing value.
+   - The scaffold removes the last exact `fpath` match that it appended. Do not
+     insert or reorder an indistinguishable equal entry after that append
+     before unloading; Zsh arrays do not retain occurrence identity.
+   - Remove the temporary directory. `zsh -f` suppresses normal RCS processing,
+     but a system `zshenv` may still execute.
 
-5. **Report** the created tree and remind the user to fill in `functions/` (autoloaded, strict-emulation header) and `lib/` (sourced) as needed.
+7. **Report** the created tree, execution profiles, syntax result, lifecycle
+   result, and any repository-floor decision.
 
-## Conventions to honor
+## Canonical links for scaffold decisions
 
-- The entry file's first two lines are the required modeline.
-- Autoloaded files under `functions/` must begin with:
-  ```zsh
-  builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
-  builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
-  ```
-- The unload function must reverse **every** side effect and self-destruct.
-- Namespace plugin-owned state, scope option changes, and perform no network
-  activity during load.
-- Keep portable behavior usable without optional manager capabilities. Track
-  whether the plugin changed shared state so unload preserves manager- or
-  user-owned state.
-- No build system — verify by sourcing in a Zsh session, not by running a build.
+- Caller-state preservation: `zsh/sourced/preserve-caller-state`.
+- Autoload body initialization: `zsh/autoload/initialize`.
+- Documented plugin effects: `zsh/plugin/document-global-state`.
+- Owned-effect cleanup: `zsh/plugin/restore-state`.
+- Controlled autoload paths: `zsh/security/trust-paths`.
+
+Keep the rule rationale in the canonical instruction. The scaffold must reverse
+every owned side effect and self-destruct; syntax success alone is not a
+behavioral result.

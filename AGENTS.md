@@ -59,6 +59,13 @@ When working in z-shell repositories, optimize for:
 ## Conventions
 
 - **Language:** Zsh-first. Bash-only constructs are bugs in Zsh code unless the file is explicitly POSIX `sh`.
+- **Zsh source:** Before reading, reviewing, diagnosing, creating, or changing Zsh source,
+  classify its dialect and execution profile, identify the
+  repository compatibility floor, and follow
+  `.github/instructions/zsh-scripting.instructions.md`. The current released official Zsh manual
+  is semantic authority. Native Zsh validity outranks
+  supplemental parser, linter, or formatter limitations. Report relevant
+  defects during read-only work, but that does not authorize unrelated cleanup.
 - **Naming:** plugins use `zsh-<name>`, annexes use `z-a-<name>`, modules keep short descriptive names.
 - **Plugin authoring:** read the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) for plugin creation, code changes, reviews, templates, and documentation. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.

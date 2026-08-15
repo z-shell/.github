@@ -19,11 +19,15 @@ on:
       - ".github/workflows/agent-instructions.yml"
       - "decisions/**"
       - "runbooks/**"
+      - "lib/zsh-standard-policy.json"
       - "scripts/validate-agent-policy.py"
       - "scripts/test_validate_agent_policy.py"
+      - "scripts/validate-zsh-standard-policy.py"
+      - "scripts/test_validate_zsh_standard_policy.py"
   push:
     branches:
       - main
+      - next
     paths:
       - "AGENTS.md"
       - "PATTERNS.md"
@@ -41,8 +45,11 @@ on:
       - ".github/workflows/agent-instructions.yml"
       - "decisions/**"
       - "runbooks/**"
+      - "lib/zsh-standard-policy.json"
       - "scripts/validate-agent-policy.py"
       - "scripts/test_validate_agent_policy.py"
+      - "scripts/validate-zsh-standard-policy.py"
+      - "scripts/test_validate_zsh_standard_policy.py"
 
 permissions:
   contents: read
@@ -64,11 +71,17 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Zsh
-        run: sudo apt-get update && sudo apt-get install --yes zsh
+      - name: Set up Zsh
+        uses: ./actions/setup-zsh
 
       - name: Run agent policy unit tests
         run: python3 -m unittest scripts/test_validate_agent_policy.py -v
+
+      - name: Run Zsh standard policy unit tests
+        run: python3 -m unittest scripts/test_validate_zsh_standard_policy.py -v
+
+      - name: Validate Zsh standard policy
+        run: python3 scripts/validate-zsh-standard-policy.py
 
       - name: Validate agent policy
         run: python3 scripts/validate-agent-policy.py

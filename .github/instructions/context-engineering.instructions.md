@@ -1,44 +1,24 @@
 ---
-description: "Guidelines for structuring code and projects to maximize GitHub Copilot effectiveness through better context management"
+description: "Guidelines for structuring repository context and prompting to maximize AI assistant efficiency across Z-Shell repositories"
 applyTo: "**"
 ---
 
-# Context Engineering
+# Context Engineering Guidelines
 
-Principles for helping GitHub Copilot understand your codebase and provide better suggestions.
+Best practices for providing concise, high-signal context to AI models working within Z-Shell repositories.
 
-## Project Structure
+---
 
-- **Use descriptive file paths**: `src/auth/middleware.ts` > `src/utils/m.ts`. Copilot uses paths to infer intent.
-- **Colocate related code**: Keep components, tests, types, and hooks together. One search pattern should find everything related.
-- **Export public APIs from index files**: What's exported is the contract; what's not is internal. This helps Copilot understand boundaries.
+## 1. Context Principles
 
-## Code Patterns
+- **Progressive Discovery**: Rely on root `AGENTS.md` for organization policy and load scoped `.github/instructions/*.instructions.md` only when modifying matched file patterns.
+- **Locality of Reference**: Focus context on the target repository and immediate dependencies. Avoid pulling unrelated child repository state into the active context.
+- **Symbol & Path Precision**: Reference exact file paths (e.g., `functions/z-a-patch`, `tests/zunit/test-load.zunit`) and exact function names to avoid ambiguity.
 
-- **Prefer explicit types over inference**: Type annotations are context. `function getUser(id: string): Promise<User>` tells Copilot more than `function getUser(id)`.
-- **Use semantic names**: `activeAdultUsers` > `x`. Self-documenting code is AI-readable code.
-- **Define constants**: `MAX_RETRY_ATTEMPTS = 3` > magic number `3`. Named values carry meaning.
+---
 
-## Working with Copilot
+## 2. Shell & Multi-Repo Context
 
-- **Provide explicit file context**: If using a CLI agent or non-IDE assistant, provide explicit file paths. If using an IDE assistant, keep relevant files open in tabs. Working on auth? Reference or open auth-related files.
-- **Position cursor intentionally**: Copilot prioritizes code near your cursor. Put cursor where context matters.
-- **Use Copilot Chat for complex tasks**: Inline completions have minimal context. Chat mode sees more files.
-
-## Context Hints
-
-- Use root AGENTS.md for repository policy and .github/instructions/\*.instructions.md only for matching scoped detail; explicitly open routed files when the runtime does not auto-load them.
-- **Use strategic comments**: At the top of complex modules, briefly describe the flow or purpose.
-- **Reference patterns explicitly**: "Follow the same pattern as `src/api/users.ts`" gives Copilot a concrete example.
-
-## Multi-File Changes
-
-- **Describe scope first**: Tell Copilot all files involved before asking for changes. "I need to update the User model, API endpoint, and tests."
-- **Work incrementally**: One file at a time, verifying each change. Don't ask for everything at once.
-- **Check understanding**: Ask "What files would you need to see?" before complex refactors.
-
-## When Copilot Struggles
-
-- **Missing context**: Open the relevant files in tabs, or explicitly paste code snippets.
-- **Stale suggestions**: Copilot may not see recent changes. Re-open files or restart the session.
-- **Generic answers**: Be more specific. Add constraints, mention frameworks, reference existing code.
+- **Declare Dialect Explicitly**: Specify whether the task targets native Zsh (for `zi` / annexes / plugins), POSIX `sh` (for bootstrap scripts), or Go (for `zsh-lint`).
+- **Provide Compatibility Floor**: When asking for syntax changes or refactoring, state the repository compatibility floor (e.g., Zsh 5.1+ or Zsh 5.8+).
+- **Separate Planning from Execution**: For multi-file changes or cross-repo modifications, align on a scoped plan before performing mutations.

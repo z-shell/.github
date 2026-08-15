@@ -2,31 +2,18 @@
 
 This file records implementation idioms already observed in multiple z-shell repositories. It exists to reduce drift, not to invent new style rules.
 
+The canonical Zsh requirements live in
+`.github/instructions/zsh-scripting.instructions.md`; machine-readable release,
+profile, rule, and source-class metadata lives in
+`lib/zsh-standard-policy.json`. Patterns below are observed examples, not a
+second policy source. When an observed pattern conflicts with a required rule,
+the canonical standard wins and the pattern must be corrected.
+
 Admission rule:
 
 - only record patterns already present in at least two real repositories
 - prefer linking to the wiki or plugin standard when a deeper explanation already exists
 - supersede patterns by updating this file, not by relying on private memory
-
-## Zsh plugin standard boundary
-
-The canonical public authoring contract is the
-[Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard).
-Official Zsh documentation remains authoritative for shell semantics. The
-patterns below are implementation examples, not a replacement for either
-source.
-
-Across Z-Shell plugins, preserve these organization-level expectations:
-
-- use Zsh-first syntax and namespace plugin-owned shell state
-- scope option changes and make load-time side effects explicit
-- reverse plugin-owned side effects during unload
-- keep network activity out of the load path
-- separate portable plugin behavior from optional manager APIs
-
-Zi is the reference manager for Z-Shell examples. `PMSPEC` and similar
-integration APIs form an optional manager profile; do not describe their
-absence as a portable-standard failure.
 
 ## Plugin entry-point skeleton
 
@@ -36,35 +23,44 @@ Observed in:
 - `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
 - `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 
-Pattern:
+Status: retired. Do not copy the observed entry-point snippet. Assigning
+special parameter `0` at sourced top level can replace caller state, and
+deriving a reusable path from `${0:h}` after entering a function can select the
+function name instead of the source file.
 
-1. Start `.zsh` entry files with the standard modeline.
-2. Resolve `$0` via the `ZERO`-aware absolute-path pattern.
-3. Keep path-sensitive initialization near the top of the file.
-
-```zsh
-# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
-# vim: ft=zsh sw=2 ts=2 et
-
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-```
+New work must follow
+`.github/instructions/zsh-scripting.instructions.md` and start from
+`.github/skills/new-zsh-plugin/templates/plugin.plugin.zsh`. No replacement is
+published here because a safe replacement has not yet been observed in at least
+two listed repositories.
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
 
-## Namespace and track plugin-owned state
+Relevant canonical rules: `zsh/context/select-profile` and
+`zsh/sourced/preserve-caller-state`.
 
-Use plugin-specific parameter names for paths and ownership markers. Preserve
-an existing ownership marker when an entry file is sourced repeatedly so the
-eventual unload still reverses the original plugin-owned change.
+## Register the repository directory in `Plugins`
 
-```zsh
-typeset -g ZSH_EXAMPLE_FPATH="${0:h}/functions"
-typeset -gi ZSH_EXAMPLE_FPATH_ADDED=${ZSH_EXAMPLE_FPATH_ADDED:-0}
-```
+Observed in:
 
-Do not register plugin state in a shared global registry. Clear namespaced
-parameters during unload after reversing only the state the plugin introduced.
+- `z-shell/zsh-eza:zsh-eza.plugin.zsh`
+- `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
+- `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
+
+Status: retired. Do not copy the observed unconditional `Plugins` assignment.
+It overwrites caller state without preserving whether the key was absent or its
+exact pre-load value, so an unload function cannot restore that state.
+
+New work must follow
+`.github/instructions/zsh-scripting.instructions.md` and use
+`.github/skills/new-zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
+not publish a replacement until the complete snapshot and restoration shape is
+observed in at least two listed repositories.
+
+Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash>
+
+Relevant canonical rules: `zsh/plugin/document-global-state` and
+`zsh/plugin/restore-state`.
 
 ## Guard `fpath` additions
 
@@ -74,26 +70,21 @@ Observed in:
 - `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 - `z-shell/zsh-eza:zsh-eza.plugin.zsh`
 
-Pattern:
+Status: retired. Do not copy either observed `fpath` snippet. The Zi-aware
+guard relies on loader metadata and does not independently inspect `fpath`;
+both observed shapes also derive the directory from caller-sensitive `${0:h}`.
+The localized literal-membership calculation alone does not make that path
+derivation or lifecycle ownership safe.
 
-```zsh
-if [[ ${PMSPEC-} != *f* ]] &&
-  (( ! ${fpath[(Ie)${ZSH_EXAMPLE_FPATH}]} )); then
-  fpath+=( "$ZSH_EXAMPLE_FPATH" )
-  ZSH_EXAMPLE_FPATH_ADDED=1
-fi
-```
+New work must follow
+`.github/instructions/zsh-scripting.instructions.md` and use
+`.github/skills/new-zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
+not publish a replacement because the complete first-source ownership and
+unload-restoration shape has not been observed in at least two listed
+repositories.
 
-The capability and membership checks preserve manager- or user-owned entries.
-Unload only when the ownership marker says the plugin added the path:
-
-```zsh
-if (( ZSH_EXAMPLE_FPATH_ADDED )); then
-  local fpath_index=${fpath[(Ie)${ZSH_EXAMPLE_FPATH}]}
-  (( fpath_index )) && fpath[$fpath_index]=()
-fi
-unset ZSH_EXAMPLE_FPATH ZSH_EXAMPLE_FPATH_ADDED
-```
+Relevant canonical rules: `zsh/security/trust-paths` and
+`zsh/plugin/restore-state`.
 
 ## Mandatory SHA-pinning for GitHub Actions
 
