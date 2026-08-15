@@ -1,26 +1,60 @@
 ---
 name: zunit-test
-description: Write and run z-shell/zunit tests for Zsh plugins. Use when the user asks to add tests for a plugin, write a .zunit test, or run the ZUnit suite. Covers ZUnit test syntax, the run/assert helpers, and the native test runner.
+description: Use when a user asks to add tests for a Zsh plugin, write a .zunit test, or run a ZUnit suite.
 disable-model-invocation: true
 ---
 
 # Write and run ZUnit tests
 
-ZUnit (`z-shell/zunit`) is the Zsh unit-testing framework used across Z-Shell repositories. Tests live in a plugin's `tests/` directory as `*.zunit` files and run via the `zunit` CLI or the `test-native.yml` workflow.
+ZUnit (`z-shell/zunit`) is the Zsh unit-testing framework used across Z-Shell
+repositories. Its syntax and helpers are framework-specific, not a second Zsh
+language standard.
+
+## Establish the test contract
+
+Before writing tests:
+
+1. Read `.github/instructions/zsh-scripting.instructions.md` and
+   `lib/zsh-standard-policy.json`.
+2. Classify each `.zunit` source as `test-fixture` and name the production
+   profile exercised by the fixture.
+3. Isolate temporary `HOME` and `ZDOTDIR` under
+   `zsh/test/isolate-environment`.
+4. Load the subject the same way production does under
+   `zsh/test/match-production-profile`.
+5. Test unload and actual restoration under `zsh/plugin/restore-state`.
+
+`zsh -f` is useful where applicable, but it does not prove every system startup
+source was skipped; a system `zshenv` may still execute.
 
 ## Test file shape
 
 ```zsh
 #!/usr/bin/env zunit
 
+typeset -ga saved_fpath
+
 @setup {
-  # Runs before each @test — load the plugin under test here.
+  # Runs before each @test; load the plugin as production does.
+  saved_fpath=("${fpath[@]}")
+  typeset -gA Plugins
+  unset 'Plugins[MY_PLUGIN]'
   load "../my-plugin.plugin.zsh"
 }
 
 @teardown {
-  # Runs after each @test — call the unload function to reset state.
-  my-plugin_plugin_unload 2>/dev/null
+  # A lifecycle test can already have invoked the self-destructing function.
+  if (( ${+functions[my-plugin_plugin_unload]} )); then
+    my-plugin_plugin_unload
+  fi
+}
+
+@test 'unload restores state and self-destructs' {
+  my-plugin_plugin_unload
+
+  assert "${(j:|:)fpath}" same_as "${(j:|:)saved_fpath}"
+  assert "${+Plugins[MY_PLUGIN]}" equals 0
+  assert "${+functions[my-plugin_plugin_unload]}" equals 0
 }
 
 @test 'descriptive name of the behavior' {
@@ -35,14 +69,25 @@ ZUnit (`z-shell/zunit`) is the Zsh unit-testing framework used across Z-Shell re
 
 - `run <cmd>` — execute a command; populates `$state` (exit code), `$output` (combined output), `$lines` (array).
 - Assertions: `assert $state equals 0`, `assert "$output" same_as '...'`, `assert "$output" is_empty`, `assert "$x" contains '...'`, `assert "$path" is_file`, `assert "$x" matches '<regex>'`.
-- Lifecycle blocks: `@setup`, `@teardown`, plus file-level `@setup`/`@teardown` if defined once.
+- A test file may define one `@setup` and one `@teardown`, each running around every test in that file.
 - Result helpers tests can assert against: `pass`, `fail '<msg>'` (state 1), `error '<msg>'` (state 78), `skip '<msg>'` (state 48).
 
-Cross-reference real examples in `z-shell/zunit:tests/` and `z-shell/zsh-eza:tests/zsh-eza.zunit`.
+Cross-reference real examples in `z-shell/zunit:tests/` and
+`z-shell/zsh-eza:tests/zsh-eza.zunit`.
+
+Add explicit lifecycle tests for each declared side effect. Assert that unload
+removes only plugin-owned state, restores the `Plugins` key to its pre-load
+state (absent stays absent and an existing value is restored), and
+self-destructs. Test both key states when the plugin registers one.
+
+Declare each intentional negative fixture in repository metadata under
+`zsh/test/declare-negative-fixtures`. Name the exact fixture and expected
+failure mode; do not exclude an entire tests directory.
 
 ## Running tests
 
-From the plugin repo (requires `zunit` on PATH and a `.zunit.yml` config):
+From the plugin repository (requires `zunit` on `PATH` and a `.zunit.yml`
+configuration):
 
 ```sh
 zunit                       # run the whole suite
@@ -54,6 +99,8 @@ CI runs them natively via the reusable workflow:
 
 ## Conventions
 
-- Always pair `@setup` (load plugin) with `@teardown` (call `<plugin>_plugin_unload`) so tests don't leak state between cases.
-- One behavior per `@test`; name it as a sentence describing the expected behavior.
+- Pair `@setup` production-equivalent loading with `@teardown` cleanup, and
+  assert the post-unload state rather than only invoking unload.
+- Keep one behavior per `@test`; name it as a sentence describing the expected
+  behavior.
 - Keep `.zunit` files under the plugin's `tests/` directory.

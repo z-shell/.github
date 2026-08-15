@@ -2,6 +2,13 @@
 
 This file records implementation idioms already observed in multiple z-shell repositories. It exists to reduce drift, not to invent new style rules.
 
+The canonical Zsh requirements live in
+`.github/instructions/zsh-scripting.instructions.md`; machine-readable release,
+profile, rule, and source-class metadata lives in
+`lib/zsh-standard-policy.json`. Patterns below are observed examples, not a
+second policy source. When an observed pattern conflicts with a required rule,
+the canonical standard wins and the pattern must be corrected.
+
 Admission rule:
 
 - only record patterns already present in at least two real repositories
@@ -16,21 +23,21 @@ Observed in:
 - `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
 - `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 
-Pattern:
+Status: retired. Do not copy the observed entry-point snippet. Assigning
+special parameter `0` at sourced top level can replace caller state, and
+deriving a reusable path from `${0:h}` after entering a function can select the
+function name instead of the source file.
 
-1. Start `.zsh` entry files with the standard modeline.
-2. Resolve `$0` via the `ZERO`-aware absolute-path pattern.
-3. Keep path-sensitive initialization near the top of the file.
-
-```zsh
-# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
-# vim: ft=zsh sw=2 ts=2 et
-
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-```
+New work must follow
+`.github/instructions/zsh-scripting.instructions.md` and start from
+`.github/skills/new-zsh-plugin/templates/plugin.plugin.zsh`. No replacement is
+published here because a safe replacement has not yet been observed in at least
+two listed repositories.
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling>
+
+Relevant canonical rules: `zsh/context/select-profile` and
+`zsh/sourced/preserve-caller-state`.
 
 ## Register the repository directory in `Plugins`
 
@@ -40,16 +47,20 @@ Observed in:
 - `z-shell/zsh-fancy-completions:zsh-fancy-completions.plugin.zsh`
 - `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 
-Pattern:
+Status: retired. Do not copy the observed unconditional `Plugins` assignment.
+It overwrites caller state without preserving whether the key was absent or its
+exact pre-load value, so an unload function cannot restore that state.
 
-```zsh
-typeset -gA Plugins
-Plugins[PLUGIN_KEY]="${0:h}"
-```
-
-Use a stable, repo-specific key and treat the registered directory as the root for cleanup and sibling-path resolution.
+New work must follow
+`.github/instructions/zsh-scripting.instructions.md` and use
+`.github/skills/new-zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
+not publish a replacement until the complete snapshot and restoration shape is
+observed in at least two listed repositories.
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash>
+
+Relevant canonical rules: `zsh/plugin/document-global-state` and
+`zsh/plugin/restore-state`.
 
 ## Guard `fpath` additions
 
@@ -59,26 +70,21 @@ Observed in:
 - `z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh`
 - `z-shell/zsh-eza:zsh-eza.plugin.zsh`
 
-Pattern:
+Status: retired. Do not copy either observed `fpath` snippet. The Zi-aware
+guard relies on loader metadata and does not independently inspect `fpath`;
+both observed shapes also derive the directory from caller-sensitive `${0:h}`.
+The localized literal-membership calculation alone does not make that path
+derivation or lifecycle ownership safe.
 
-- add `functions/` only when the plugin manager or current shell setup has not already done so
-- the common Zi-aware form is:
+New work must follow
+`.github/instructions/zsh-scripting.instructions.md` and use
+`.github/skills/new-zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
+not publish a replacement because the complete first-source ownership and
+unload-restoration shape has not been observed in at least two listed
+repositories.
 
-```zsh
-if [[ $PMSPEC != *f* ]]; then
-  fpath+=( "${0:h}/functions" )
-fi
-```
-
-- an explicit membership guard is also acceptable when the entry point must tolerate non-Zi loader paths:
-
-```zsh
-if [[ ${fpath[(r)${0:h}/functions]} != "${0:h}/functions" ]]; then
-  fpath+=( "${0:h}/functions" )
-fi
-```
-
-Prefer the simpler Zi-aware form when the repository is clearly targeting Zi-managed loading.
+Relevant canonical rules: `zsh/security/trust-paths` and
+`zsh/plugin/restore-state`.
 
 ## Mandatory SHA-pinning for GitHub Actions
 

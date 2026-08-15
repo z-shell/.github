@@ -1477,6 +1477,87 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_public_manifest_routes_zsh_scripting_standard(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        self.assertEqual(
+            surfaces["instruction-zsh-scripting"]["tasks"],
+            ["all"],
+        )
+        self.assertEqual(
+            surfaces["instruction-zsh-scripting"]["canonical_for"],
+            ["zsh-scripting"],
+        )
+        self.assertEqual(
+            surfaces["zsh-standard-policy"]["canonical_for"],
+            [
+                "zsh-release-metadata",
+                "zsh-rule-metadata",
+                "zsh-source-classification",
+            ],
+        )
+        self.assertEqual(
+            surfaces["zsh-standard-validator"]["canonical_for"],
+            ["zsh-standard-validation"],
+        )
+
+    def test_public_policy_requires_zsh_standard_for_read_and_write(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        required = (
+            "reading, reviewing, diagnosing, creating, or changing Zsh source",
+            ".github/instructions/zsh-scripting.instructions.md",
+            "current released official Zsh manual",
+            "Native Zsh validity",
+            "does not authorize unrelated cleanup",
+        )
+        for fragment in required:
+            self.assertIn(fragment, policy)
+
+    def test_public_repository_declares_proposed_zsh_standard_adr(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["decision-0015"],
+            {
+                "id": "decision-0015",
+                "path": "decisions/0015-zsh-scripting-standard.md",
+                "kind": "decision",
+                "authority": "canonical-detail",
+                "consumers": ["codex", "claude-code", "copilot", "human"],
+                "tasks": ["architecture-decision", "zsh-standard"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
+        )
+
+        adr = (PUBLIC_ROOT / "decisions/0015-zsh-scripting-standard.md").read_text()
+        required = (
+            "# 15. Adopt an organization-wide Zsh scripting standard",
+            "**Status:** PROPOSED",
+            "**Deciders:** Pending maintainer acceptance",
+            "Zsh 5.9.2",
+            "per-repository compatibility floor",
+            "five source classes",
+            "`startup-file`",
+            "startup and shutdown files are read by Zsh for defined "
+            "lifecycle phases",
+            "may make phase-owned effects",
+            "caller-preserving sourced libraries",
+            "https://zsh.sourceforge.io/Doc/Release/Files.html",
+            "generated, digest-checked delivery",
+            "ShellCheck is not used for Zsh",
+        )
+        for fragment in required:
+            self.assertIn(fragment, adr)
+        self.assertNotIn("**Status:** ACCEPTED", adr)
+
     def test_public_manifest_routes_recurring_operations_runbook(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
@@ -1613,7 +1694,7 @@ class PublicRepositoryTests(unittest.TestCase):
         required_fragments = (
             "name: Agent Instruction Validation\n",
             "on:\n  pull_request:\n    paths:\n",
-            "  push:\n    branches:\n      - main\n    paths:\n",
+            "  push:\n    branches:\n      - main\n      - next\n    paths:\n",
             "permissions:\n  contents: read\n",
             "concurrency:\n"
             "  group: ${{ github.workflow }}-${{ github.ref }}\n"
@@ -1629,9 +1710,16 @@ class PublicRepositoryTests(unittest.TestCase):
             "a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0\n"
             "        with:\n"
             '          python-version: "3.10"\n',
+            "      - name: Set up Zsh\n"
+            "        uses: ./actions/setup-zsh\n",
             "      - name: Run agent policy unit tests\n"
             "        run: python3 -m unittest "
             "scripts/test_validate_agent_policy.py -v\n",
+            "      - name: Run Zsh standard policy unit tests\n"
+            "        run: python3 -m unittest "
+            "scripts/test_validate_zsh_standard_policy.py -v\n",
+            "      - name: Validate Zsh standard policy\n"
+            "        run: python3 scripts/validate-zsh-standard-policy.py\n",
             "      - name: Validate agent policy\n"
             "        run: python3 scripts/validate-agent-policy.py\n",
         )
@@ -1657,6 +1745,9 @@ class PublicRepositoryTests(unittest.TestCase):
             "runbooks/**",
             "scripts/validate-agent-policy.py",
             "scripts/test_validate_agent_policy.py",
+            "lib/zsh-standard-policy.json",
+            "scripts/validate-zsh-standard-policy.py",
+            "scripts/test_validate_zsh_standard_policy.py",
         )
         for path in filtered_paths:
             self.assertEqual(workflow.count(f'      - "{path}"'), 2, path)
