@@ -64,6 +64,9 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Install Zsh
+        run: sudo apt-get update && sudo apt-get install --yes zsh
+
       - name: Run agent policy unit tests
         run: python3 -m unittest scripts/test_validate_agent_policy.py -v
 
