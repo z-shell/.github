@@ -37,8 +37,10 @@ Do not put any of the following in a public issue, pull request, or runbook:
 - account, zone, project, or deployment identifiers;
 - tokens, secret values, private settings, or internal hostnames;
 - screenshots that expose account or member details;
-- client IP addresses, cookies, request or response headers, referrers, or raw
-  user-agent strings from general traffic; or
+- client IP addresses, cookies, request headers, referrers, or raw user-agent
+  strings from general traffic;
+- response headers other than the public `Content-Type`, `Cache-Control`, and
+  `Content-Signal` fields explicitly used by this runbook; or
 - query strings, prompts, search text, or other personal data.
 
 Keep restricted evidence in the approved private incident or operations system.
@@ -210,11 +212,13 @@ comparisons, but it is not authoritative evidence that raw artifacts such as
 `robots.txt`, `llms.txt`, or `llms-full.txt` were requested. An absent Web
 Analytics row for one of those paths is not evidence of no requests.
 
-Cloudflare currently documents six months of Web Analytics access. It retains
-unsampled beacon data for seven days and then aggregates it to approximately
-10% for longer-term storage. Record the window observed during the inspection
-and recheck the provider documentation; do not assume those values describe a
-different analytics product or account capability.
+For documentation reference only, Cloudflare currently states that Web
+Analytics data is accessible for six months, with unsampled beacon data retained
+for seven days before aggregation to approximately 10%. These values are not
+evidence of this account's effective window or data granularity. Record what the
+Cloudflare UI actually shows during the inspection, or use the appropriate
+capability state when it cannot be observed. Recheck the provider documentation
+before interpreting the result.
 
 If server-side path evidence is required, check advanced HTTP traffic analytics
 or the logging surfaces below. Record unavailable plan features as
