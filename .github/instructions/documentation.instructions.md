@@ -54,6 +54,14 @@ identical prose or artwork. Zi remains the first installation path. Include a
 screenshot or short demo only when it materially explains behavior, and keep
 long-form ecosystem guidance in the wiki.
 
+The
+[Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
+is the canonical public plugin-authoring standard and should be linked from
+plugin documentation where authoring or lifecycle behavior is discussed.
+Summarize only repository-specific behavior. Official Zsh documentation remains
+authoritative for shell semantics, and manager-specific profiles must be
+identified as optional integrations rather than portable requirements.
+
 ## LLM/agent files
 
 Keep shared organization guidance in z-shell/.github. Keep child-repository AGENTS.md or .github/instructions files only for concise repository-specific behavior, and link to public canonical guidance rather than duplicating it.
@@ -61,5 +69,6 @@ Keep shared organization guidance in z-shell/.github. Keep child-repository AGEN
 ## See also
 
 - `decisions/0006-wiki-content-root-boundaries.md`
+- [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
 - `z-shell/wiki:.github/copilot-instructions.md` (wiki-local authoring rules)
 - `z-shell/wiki:.github/instructions/docs-authoring.instructions.md`

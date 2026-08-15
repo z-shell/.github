@@ -1565,7 +1565,7 @@ class PublicRepositoryTests(unittest.TestCase):
         recurring_operations_surfaces = [
             surface
             for surface in manifest["surfaces"]
-            if surface.get("canonical_for") == ["recurring-operations"]
+            if "recurring-operations" in surface.get("canonical_for", [])
         ]
 
         self.assertEqual(
@@ -1581,13 +1581,85 @@ class PublicRepositoryTests(unittest.TestCase):
                         "recurring-operations",
                         "scheduled-workflow-audit",
                         "automation-review",
+                        "zsh-plugin-standard-review",
                     ],
                     "file_patterns": ["**"],
                     "required": True,
                     "review_owner": "z-shell maintainers",
-                    "canonical_for": ["recurring-operations"],
+                    "canonical_for": [
+                        "recurring-operations",
+                        "zsh-plugin-standard-review",
+                    ],
                 }
             ],
+        )
+
+    def test_public_manifest_routes_zsh_plugin_standard(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {surface["id"]: surface for surface in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["instruction-zsh-plugin-standard"],
+            {
+                "id": "instruction-zsh-plugin-standard",
+                "path": ".github/instructions/zsh-plugin-standard.instructions.md",
+                "kind": "scoped-guidance",
+                "authority": "canonical-detail",
+                "consumers": [
+                    "codex",
+                    "claude-code",
+                    "copilot",
+                    "gemini-cli",
+                    "human",
+                ],
+                "tasks": [
+                    "zsh-plugin-creation",
+                    "zsh-plugin-review",
+                    "zsh-plugin-code-change",
+                    "zsh-plugin-template",
+                    "zsh-plugin-documentation",
+                    "zsh-plugin-scaffolding",
+                ],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": ["zsh-plugin-standard-application"],
+            },
+        )
+        self.assertEqual(
+            surfaces["instruction-zsh-plugin-standard-aliases"],
+            {
+                "id": "instruction-zsh-plugin-standard-aliases",
+                "path": (
+                    ".github/instructions/"
+                    "zsh-plugin-standard-aliases.instructions.md"
+                ),
+                "kind": "scoped-guidance",
+                "authority": "canonical-detail",
+                "consumers": [
+                    "codex",
+                    "claude-code",
+                    "copilot",
+                    "gemini-cli",
+                    "human",
+                ],
+                "tasks": [
+                    "code-review",
+                    "readme-authoring",
+                    "zsh-plugin-scaffolding",
+                ],
+                "file_patterns": [
+                    "**/*.plugin.zsh,**/init.zsh,"
+                    "templates/readme/zsh-plugin.md,"
+                    ".github/skills/new-zsh-plugin/**,"
+                    ".github/agents/zsh-plugin-standard-reviewer.agent.md"
+                ],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
         )
 
     def test_public_repository_documents_instruction_governance(self) -> None:

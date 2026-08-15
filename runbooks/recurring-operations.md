@@ -9,10 +9,12 @@ Recurring work should run only as often, and with only as much authority, as its
 value requires. This runbook separates deterministic automation from
 maintainer judgment and provides one evidence record for each classification.
 
-**Hard rule:** every review described here produces a draft only. Do not add
-labels, post comments, close or lock issues or pull requests, dispatch
-workflows, change settings, or modify repositories unless a maintainer approves
-that action as a separate, scoped step.
+**Hard rule:** except for the explicitly authorized
+[Zsh Plugin Standard review issue](#review-the-zsh-plugin-standard-twice-yearly),
+every review described here produces a draft only. Do not add labels, post
+comments, close or lock issues or pull requests, dispatch workflows, change
+settings, or modify repositories unless a maintainer approves that action as a
+separate, scoped step.
 
 This runbook does not create a Codex schedule or any other scheduler. Evaluate
 the scheduler's supported capabilities and authority before proposing one.
@@ -207,6 +209,92 @@ Before proposing a new tracker item:
 2. search Linear for a linked or equivalent item;
 3. attach new evidence to the existing owner when one exists;
 4. record cross-links and keep status, owner, and next step consistent.
+
+## Review the Zsh Plugin Standard twice yearly
+
+The canonical public standard is the
+[Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard).
+Review it in two planned windows each year. A coordinated `z-shell/wiki` change
+must own the schedule, structured review issue, page source, and deterministic
+checks. Land that wiki automation before or with any policy change that depends
+on an active review cycle. If this runbook lands first, record the wiki work as
+an unresolved dependency and do not claim the cycle is active. Do not add a
+second scheduled workflow to this repository.
+
+**Authorized exception:** the maintainer approved the wiki-owned workflow to run
+unattended twice yearly, execute deterministic read-only checks, and create
+exactly one structured review issue with `issues: write`. The issue contains the
+draft evidence and classifications for maintainer judgment. This authorization
+does not extend to editing the standard, adding labels, posting follow-up
+comments, closing or locking items, dispatching other workflows, or changing
+repository settings.
+
+The authorized workflow must be idempotent per UTC half-year review window. Use
+a stable window key and exact issue title, paginate the complete open and closed
+issue set before creation, exclude pull requests, and no-op when any issue
+exactly matches that title. Configure concurrency so overlapping scheduled or
+manual runs for the same workflow cannot both reach issue creation. Only POST
+the issue after the full duplicate lookup finds no match.
+
+### Collect evidence
+
+Use a bounded evidence window and record:
+
+- the current released official Zsh documentation and release notes;
+- changes to the canonical wiki page and its open issues or pull requests;
+- confirmed behavior and adoption across maintained Z-Shell plugins;
+- plugin load, unload, security, compatibility, and performance incidents;
+- current documentation and releases for Zi plus at least two other actively
+  maintained plugin managers; and
+- links, code examples, anchors, and deterministic-check results from the
+  coordinated wiki automation once it has landed.
+
+Official Zsh documentation is authoritative for shell semantics. Ecosystem
+practice can justify a portable plugin convention, but cannot redefine Zsh.
+Manager APIs belong to optional profiles and must not become portable
+requirements merely because one sampled manager supports them.
+
+### Classify each reviewed item
+
+Record both dimensions:
+
+```text
+Authority: official-zsh | portable-ecosystem | optional-manager-profile
+Status: retain | clarify | revise | deprecate | remove
+Adoption: established | emerging | legacy | unsupported
+Evidence:
+Affected examples and links:
+Cross-repository impact:
+Follow-up owner:
+```
+
+Use `established` only when multiple maintained implementations support the
+practice. Mark conflicting, obsolete, or unverified behavior explicitly rather
+than averaging incompatible manager behavior into a false consensus.
+
+### Complete the review
+
+The structured issue must include:
+
+1. link and anchor verification;
+2. native-Zsh validation of runnable examples;
+3. internal consistency across terminology, requirements, examples, and
+   portable-versus-profile labels;
+4. security review of trust boundaries, input handling, network behavior,
+   temporary resources, and cleanup;
+5. performance review of plugin load paths, repeated work, external processes,
+   and completion initialization;
+6. manager sampling results without treating manager APIs as shell semantics;
+7. cross-repository impact on this repository's policy, scoped instructions,
+   patterns, templates, agents, and skills;
+8. impact on affected plugin repositories, wiki navigation and automation, and
+   the private control workspace's routes and generated composite; and
+9. an owner and tracked follow-up for every proposed change.
+
+Deterministic checks provide evidence; maintainers decide normative changes.
+Keep the first pass draft-only. A review is complete only when the issue records
+the classification, unresolved evidence, cross-repository dependencies, and
+whether the next twice-yearly review remains warranted.
 
 ## Use draft-only prompt templates
 
