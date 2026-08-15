@@ -1694,7 +1694,7 @@ class PublicRepositoryTests(unittest.TestCase):
         required_fragments = (
             "name: Agent Instruction Validation\n",
             "on:\n  pull_request:\n    paths:\n",
-            "  push:\n    branches:\n      - main\n    paths:\n",
+            "  push:\n    branches:\n      - main\n      - next\n    paths:\n",
             "permissions:\n  contents: read\n",
             "concurrency:\n"
             "  group: ${{ github.workflow }}-${{ github.ref }}\n"
@@ -1710,6 +1710,8 @@ class PublicRepositoryTests(unittest.TestCase):
             "a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0\n"
             "        with:\n"
             '          python-version: "3.10"\n',
+            "      - name: Set up Zsh\n"
+            "        uses: ./actions/setup-zsh\n",
             "      - name: Run agent policy unit tests\n"
             "        run: python3 -m unittest "
             "scripts/test_validate_agent_policy.py -v\n",
