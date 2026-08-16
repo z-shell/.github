@@ -46,11 +46,16 @@ row is `next` → `main`. Skip repositories that are trunk-on-`main`.
       Keep this setting disabled as the required baseline for ordinary pull
       request merges. It is not a complete safeguard for GitHub's asynchronous
       stacked-merge path; see the caveat below.
-- [ ] **`renovate.json` has `"baseBranches": ["next"]`** if the repository
-      uses Renovate. See `dependency-management.md` for the full config
-      example. Check `.github/dependabot.yml`'s `target-branch` too — it is
-      easy to fix Dependabot's target and assume Renovate inherited the same
-      fix; they are independent configs.
+- [ ] **`renovate.json` has `"baseBranches": ["next"]`** (or its newer
+      equivalent `"baseBranchPatterns": ["next"]` — Renovate accepts either
+      key for the same override; `zsh-lint` uses the newer name) if the
+      repository uses Renovate. See `dependency-management.md` for the full
+      config example. Check `.github/dependabot.yml`'s `target-branch` too —
+      it is easy to fix Dependabot's target and assume Renovate inherited the
+      same fix; they are independent configs. A repository with **no**
+      Renovate config still needs `dependabot.yml`'s `target-branch` set for
+      every ecosystem it configures — an update block without one silently
+      targets the default branch (`zi#384`).
 - [ ] **`main` and `next` are each governed by exactly one Repository Ruleset**,
       not a mix of a ruleset and legacy classic branch protection. Classic
       protection and rulesets both apply when both are present, and their
