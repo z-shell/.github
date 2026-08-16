@@ -70,7 +70,7 @@ When working in z-shell repositories, optimize for:
 - **Plugin authoring:** read the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) for plugin creation, code changes, reviews, templates, and documentation. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
-- **Commit trailers:** Never include a `Co-authored-by` trailer. This organization-wide ban is author-enforced until [z-shell/.github#464](https://github.com/z-shell/.github/issues/464) lands.
+- **Commit trailers:** Never include a `Co-authored-by` trailer. CI-enforced on `z-shell/.github` via `commit-lint.yml`; org-wide rollout to other repositories is tracked in [z-shell/.github#464](https://github.com/z-shell/.github/issues/464), still author-enforced there until each repo adds the caller.
 - **Branch selection:** Follow `decisions/0008-branching-model.md` and verify the live state of the owning repository; do not assume one universal default branch.
 - **Documentation placement:** keep long-form docs in the wiki when practical; keep repo-local docs focused on policy, workflow, and source-adjacent guidance.
 - **Workflow files:** follow the org workflow conventions and keep permissions explicit, actions pinned, and concurrency defined.

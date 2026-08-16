@@ -1,0 +1,115 @@
+---
+name: Commit Lint
+
+# Org-wide commit-message, PR-title, and branch-naming policy, promoted from
+# z-shell/zi's next-branch-only commit-lint.yml (z-shell/.github#464). Enforces
+# the AGENTS.md rules that were previously "author-enforced" only: the
+# disallowed Co-authored-by trailer (organization-wide ban, decisions/0003),
+# Conventional Commits (decisions/0003), and feature-<id>/bug-<id>/hotfix-<id>
+# branch naming (decisions/0008).
+
+on:
+  workflow_call:
+    inputs:
+      disallowed-trailer-pattern:
+        description: Case-insensitive grep -E pattern for a banned commit trailer.
+        required: false
+        type: string
+        default: "^[[:space:]]*Co-authored-by:"
+      branch-pattern:
+        description: >
+          grep -E pattern a PR head branch must match. dependabot/*,
+          renovate/*, and next are always allowed regardless of this pattern.
+        required: false
+        type: string
+        default: "^(feature|bug|hotfix)-[1-9][0-9]*$"
+
+permissions: {}
+
+jobs:
+  commit-message:
+    name: Validate Commits
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: 📝 Lint commit messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DISALLOWED_TRAILER_PATTERN: ${{ inputs.disallowed-trailer-pattern }}
+        run: |
+          set -euo pipefail
+
+          CONVENTIONAL_PATTERN='^(feat|fix|perf|refactor|docs|test|build|ci|style|chore|revert)(\([^)]+\))?!?: .{1,72}$'
+
+          errors=0
+          checked=0
+
+          while IFS= read -r sha; do
+            if git show -s --format='%B' "$sha" | grep -qiE "$DISALLOWED_TRAILER_PATTERN"; then
+              echo "::error::Disallowed trailer found (${sha:0:7}): remove before merging. A squash merge without an explicit --subject/--body can also reintroduce it — see runbooks/branch-protection.md."
+              errors=$((errors + 1))
+            fi
+
+            parent_count=$(git cat-file -p "$sha" | grep -c '^parent' || true)
+            [ "$parent_count" -gt 1 ] && continue
+
+            subject=$(git show -s --format='%s' "$sha")
+            checked=$((checked + 1))
+
+            if ! echo "$subject" | grep -qE "$CONVENTIONAL_PATTERN"; then
+              echo "::error::Invalid commit message (${sha:0:7}): expected type(scope): description <=72 chars"
+              errors=$((errors + 1))
+            fi
+          done < <(git log --format='%H' "${BASE_SHA}..${HEAD_SHA}")
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors commit(s) failed validation — run: git rebase -i ${BASE_SHA}"
+            exit 1
+          fi
+
+          echo "✅ $checked commit(s) validated"
+
+  pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: 📋 Check PR title follows Conventional Commits
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          PATTERN='^(feat|fix|perf|refactor|docs|test|build|ci|style|chore|revert)(\([^)]+\))?!?: .{1,72}$'
+          if ! echo "$PR_TITLE" | grep -qE "$PATTERN"; then
+            echo "::error::PR title must follow Conventional Commits: type(scope): description"
+            exit 1
+          fi
+          echo "✅ PR title valid"
+
+  branch-naming:
+    name: Validate Branch Name
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: 🌿 Check branch naming convention
+        env:
+          BRANCH: ${{ github.head_ref }}
+          BRANCH_PATTERN: ${{ inputs.branch-pattern }}
+        run: |
+          if echo "$BRANCH" | grep -qE '^(dependabot|renovate)/' || \
+             [ "$BRANCH" = "next" ]; then
+            echo "✅ OK"
+            exit 0
+          fi
+          if ! echo "$BRANCH" | grep -qE "$BRANCH_PATTERN"; then
+            echo "::error::Branch name must match ${BRANCH_PATTERN} (see decisions/0008-branching-model.md)"
+            exit 1
+          fi
+          echo "✅ Branch name valid"
