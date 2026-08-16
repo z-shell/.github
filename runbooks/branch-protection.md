@@ -107,15 +107,28 @@ decision for any dependent pull request that must remain retargeted.
 
 ## Squash-merge trailers
 
-When squash-merging a `next` → `main` promotion PR without an explicit
-`--body`, GitHub synthesizes one by aggregating the squashed commits'
-trailers — which reliably reintroduces `Co-authored-by` and `Signed-off-by`
-trailers even when no individual commit you authored had one. Only
-`Co-authored-by` is organization-disallowed (`AGENTS.md`); letting a
-synthesized body reintroduce it violates that policy regardless of which
-squashed commit it came from. Always pass both `--subject` and an explicit
-one-line `--body` (e.g. `gh pr merge <n> --squash --subject "..." --body "..."`) to suppress
-the synthesized body. Verify with
+`AGENTS.md` does not ban `Co-authored-by` trailers outright. A trailer
+crediting a real human — including the PR author crediting themselves via a
+GitHub-synthesized trailer — is fine. The ban is specifically on crediting a
+**bot, AI agent, or automation** as a co-author (for example a coding
+assistant's default identity, or a `[bot]` GitHub account); those must never
+appear regardless of merge method.
+
+When squash-merging a PR without an explicit `--body`, GitHub synthesizes
+one by aggregating the squashed commits' trailers, which can carry forward
+a bot/agent `Co-authored-by` from an individual commit even when the PR
+subject and description don't mention one. Separately — confirmed
+empirically on `z-shell/.github#519` — GitHub appends a `Co-authored-by`
+trailer for the merger even with the repository's
+`squash_merge_commit_message` set to `BLANK` and an otherwise-empty default
+body (`decisions/0013-repository-settings-baseline.md`); that setting
+reduces the aggregation risk but does not eliminate this second, apparently
+independent mechanism. Neither is a problem when the credited party is the
+human author/merger. It is a problem if any commit in the PR carries a
+bot/agent trailer, since squash synthesis can promote it into the merge
+commit. Always pass both `--subject` and an explicit one-line `--body`
+(e.g. `gh pr merge <n> --squash --subject "..." --body "..."`) when that
+risk exists, and verify with
 `gh api repos/<org>/<repo>/commits/<sha> --jq .commit.message` before
 considering the promotion done.
 

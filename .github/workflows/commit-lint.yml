@@ -4,18 +4,24 @@ name: Commit Lint
 # Org-wide commit-message, PR-title, and branch-naming policy, promoted from
 # z-shell/zi's next-branch-only commit-lint.yml (z-shell/.github#464). Enforces
 # the AGENTS.md rules that were previously "author-enforced" only: the
-# disallowed Co-authored-by trailer (organization-wide ban, decisions/0003),
-# Conventional Commits (decisions/0003), and feature-<id>/bug-<id>/hotfix-<id>
-# branch naming (decisions/0008).
+# disallowed bot/AI-agent Co-authored-by trailer -- a human co-author is
+# allowed, only a bot/agent identity is banned (AGENTS.md) -- Conventional
+# Commits (decisions/0003), and feature-<id>/bug-<id>/hotfix-<id> branch
+# naming (decisions/0008).
 
 on:
   workflow_call:
     inputs:
       disallowed-trailer-pattern:
-        description: Case-insensitive grep -E pattern for a banned commit trailer.
+        description: >
+          Case-insensitive grep -E pattern for a banned commit trailer. A
+          Co-authored-by trailer crediting a real human is allowed; only a
+          bot/AI-agent/automation identity is disallowed (AGENTS.md), so the
+          default matches known bot/agent trailer shapes rather than every
+          Co-authored-by line. Extend as new agent identities show up.
         required: false
         type: string
-        default: "^[[:space:]]*Co-authored-by:"
+        default: '^[[:space:]]*Co-authored-by:.*(\[bot\]|noreply@anthropic\.com|noreply@openai\.com|noreply@x\.ai|codex@openai\.com|copilot@github\.com|claude@anthropic\.com)'
       branch-pattern:
         description: >
           grep -E pattern a PR head branch must match. dependabot/*,
@@ -54,7 +60,7 @@ jobs:
 
           while IFS= read -r sha; do
             if git show -s --format='%B' "$sha" | grep -qiE "$DISALLOWED_TRAILER_PATTERN"; then
-              echo "::error::Disallowed trailer found (${sha:0:7}): remove before merging. A squash merge without an explicit --subject/--body can also reintroduce it — see runbooks/branch-protection.md."
+              echo "::error::Bot/agent Co-authored-by trailer found (${sha:0:7}): remove before merging. A human co-author is fine; only bot/AI-agent identities are banned (AGENTS.md). A squash merge without an explicit --subject/--body can also reintroduce one — see runbooks/branch-protection.md."
               errors=$((errors + 1))
             fi
 
