@@ -1,0 +1,17 @@
+---
+name: Lint Commits
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  commit-lint:
+    uses: ./.github/workflows/commit-lint.yml

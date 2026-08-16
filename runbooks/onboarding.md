@@ -46,9 +46,13 @@ Grant only what the role requires; record the grant:
 - Clone the owning repository directly. Separate multi-repository tooling is
   optional and outside this public runbook.
 - Configure commit signing: commits are signed (`gpg.format=ssh`); set a
-  `user.signingkey`. Never add a `Co-authored-by` trailer — this is org policy,
-  and note that no default-branch CI currently enforces it, so it is the
-  author's responsibility, not a gate that will catch a mistake.
+  `user.signingkey`. Never add a `Co-authored-by` trailer — this is org policy.
+  `z-shell/.github` enforces it in CI (`commit-lint.yml`, PRs into `main`);
+  most other repositories do not have the caller wired in yet
+  ([z-shell/.github#464](https://github.com/z-shell/.github/issues/464)), so
+  it remains the author's responsibility there — including watching for a
+  squash merge silently reintroducing the trailer even when no individual
+  commit had one (`runbooks/branch-protection.md`).
 - Follow Conventional Commits and the branch model for the repo's class
   (ADR-0008).
 
