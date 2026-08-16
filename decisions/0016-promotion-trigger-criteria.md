@@ -1,8 +1,8 @@
 # 16. Next-to-Main Promotion Trigger Criteria
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-08-16
-- **Deciders:** Pending maintainer acceptance
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
