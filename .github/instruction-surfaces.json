@@ -83,6 +83,18 @@
       "canonical_for": ["code-review"]
     },
     {
+      "id": "instruction-generator-verifier-workflow",
+      "path": ".github/instructions/generator-verifier-workflow.instructions.md",
+      "kind": "scoped-guidance",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["generator-verifier-workflow", "architecture", "concurrency"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["generator-verifier-workflow"]
+    },
+    {
       "id": "instruction-context-engineering",
       "path": ".github/instructions/context-engineering.instructions.md",
       "kind": "scoped-guidance",
