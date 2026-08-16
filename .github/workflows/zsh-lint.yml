@@ -1,0 +1,81 @@
+---
+name: Zsh Lint
+
+on:
+  workflow_call:
+    inputs:
+      paths:
+        description: Newline-delimited repository-relative files or directories to lint.
+        required: true
+        type: string
+      zsh-lint-ref:
+        description: Immutable 40-character zsh-lint commit SHA to build.
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zsh-lint:
+    name: Zsh Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out calling repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: target
+          persist-credentials: false
+
+      - name: Check out zsh-lint
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: z-shell/zsh-lint
+          ref: ${{ inputs.zsh-lint-ref }}
+          path: zsh-lint
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.25"
+
+      - name: Build zsh-lint
+        working-directory: zsh-lint
+        run: go build -o "$RUNNER_TEMP/zsh-lint" ./cmd/zsh-lint
+
+      - name: Run strict Zsh lint
+        working-directory: target
+        shell: bash
+        env:
+          ZSH_LINT_PATHS: ${{ inputs.paths }}
+          ZSH_LINT_REF: ${{ inputs.zsh-lint-ref }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$ZSH_LINT_REF" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::zsh-lint-ref must be a full 40-character lowercase commit SHA"
+            exit 1
+          fi
+          mapfile -t targets < <(printf '%s\n' "$ZSH_LINT_PATHS" | sed '/^[[:space:]]*$/d')
+          if [[ ${#targets[@]} -eq 0 ]]; then
+            echo "::error::paths must list at least one file or directory"
+            exit 1
+          fi
+          for target in "${targets[@]}"; do
+            if [[ ! -e "$target" ]]; then
+              echo "::error file=$target::configured zsh-lint target does not exist"
+              exit 1
+            fi
+          done
+          find -- "${targets[@]}" -type f -print0 | sort -z > "$RUNNER_TEMP/zsh-lint-files"
+          mapfile -d '' files < "$RUNNER_TEMP/zsh-lint-files"
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "::error::configured zsh-lint targets contain no files"
+            exit 1
+          fi
+          "$RUNNER_TEMP/zsh-lint" "${files[@]}"
