@@ -1,0 +1,29 @@
+# Canonical per-repository ADR-0007 release class, used by
+# scripts/repo-settings-audit.rb to select the decisions/0013-repository-settings-baseline.md
+# row for a repository.
+#
+# Repositories not listed here use default_class. That matches the
+# "presumptively class 3" methodology already used for the manual audits
+# recorded on z-shell/.github#478: class 3 (git-consumed source) is the
+# largest and lowest-ceremony group, and every repository named explicitly in
+# decisions/0007-release-publication-flow.md or decisions/0008-branching-model.md
+# is listed below so it is never silently defaulted.
+#
+# Updating this file does not change decisions/0007 or decisions/0008 -- it is
+# a machine-readable mirror of their per-repo tables, kept in sync by hand.
+# Add a repository here when it is added to either ADR's table, and note the
+# addition in the owning ADR change, not only here.
+default_class: 3
+repositories:
+  z-shell/wiki: 1
+  z-shell/src: 1
+  z-shell/zd: 1
+  z-shell/zunit: 2
+  z-shell/zsh-lint: 2
+  z-shell/zpmod: 2
+  z-shell/zsh: 2
+  z-shell/zi: 3
+  z-shell/zsh-eza: 3
+  z-shell/z-a-meta-plugins: 3
+  z-shell/zsh-fancy-completions: 3
+  z-shell/.github: 4

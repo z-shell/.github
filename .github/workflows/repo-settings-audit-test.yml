@@ -1,0 +1,46 @@
+---
+name: Repo Settings Audit Tests
+on:
+  workflow_call: {}
+  push:
+    paths:
+      - "scripts/repo-settings-audit.rb"
+      - "scripts/test-repo-settings-audit.rb"
+      - "lib/repository-classes.yml"
+      - ".github/workflows/repo-settings-audit-test.yml"
+  pull_request:
+    paths:
+      - "scripts/repo-settings-audit.rb"
+      - "scripts/test-repo-settings-audit.rb"
+      - "lib/repository-classes.yml"
+      - ".github/workflows/repo-settings-audit-test.yml"
+  workflow_dispatch: {}
+
+# The suite runs entirely against an injected fixture client (see
+# scripts/test-repo-settings-audit.rb); it makes no live `gh api` calls, so it
+# needs no repository permissions beyond checkout.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repo-settings-audit-test:
+    name: Repo Settings Audit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: "⤵️ Check out code from GitHub"
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: "⚙️ Report Ruby version"
+        run: ruby --version
+
+      - name: "🧹 Syntax check"
+        run: |
+          ruby -c scripts/repo-settings-audit.rb
+          ruby -c scripts/test-repo-settings-audit.rb
+
+      - name: "🧪 Run repo-settings-audit unit tests"
+        run: ruby scripts/test-repo-settings-audit.rb
