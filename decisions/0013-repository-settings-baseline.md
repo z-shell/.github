@@ -116,28 +116,32 @@ Rationale for the differences:
 - **Squash merge default message** is required uniformly, unlike the other
   rows, because it isn't a class-scaled risk — it's a plain repository API
   setting (`squash_merge_commit_title`/`squash_merge_commit_message`), not a
-  ruleset rule, and it fails the same way regardless of class. When
-  `squash_merge_commit_message` is `COMMIT_MESSAGES` (GitHub's default),
-  squashing a PR without an explicit `--body` aggregates every squashed
-  commit's full message — trailers included — into the merge commit, which
-  reliably reintroduces `Co-authored-by` even when no individual commit
-  carried one (`runbooks/branch-protection.md`'s "Squash-merge trailers"
-  section documents the same mechanism for `next` → `main` promotions). This
-  is not a theoretical risk: it hit the ADR-0016 acceptance PR
-  ([z-shell/.github#516](https://github.com/z-shell/.github/pull/516)) and,
-  within the same day, the PR that added org-wide commit-trailer CI
-  enforcement itself
-  ([z-shell/.github#517](https://github.com/z-shell/.github/pull/517)) — a
-  lint check on pre-merge commits structurally cannot catch this, since
-  GitHub synthesizes the trailer into a commit that doesn't exist until
-  merge time. Setting `squash_merge_commit_title=PR_TITLE` and
-  `squash_merge_commit_message=BLANK` (`gh api -X PATCH repos/<org>/<repo>
---field squash_merge_commit_title=PR_TITLE --field
-squash_merge_commit_message=BLANK`) removes the default body entirely, so
-  there is nothing to synthesize a trailer from regardless of whether a
-  human remembers `--body`. Applied to `z-shell/.github` itself
-  2026-08-16; auditing and applying it to the rest of the org is open
-  follow-up, not covered by this change.
+  ruleset rule, and it fails the same way regardless of class. `AGENTS.md`
+  bans a `Co-authored-by` trailer crediting a bot, AI agent, or automation;
+  a trailer crediting a real human (including the PR's own author) is
+  allowed. When `squash_merge_commit_message` is `COMMIT_MESSAGES` (GitHub's
+  default), squashing a PR without an explicit `--body` aggregates every
+  squashed commit's full message into the merge commit, which can carry a
+  bot/agent trailer forward from an individual commit
+  (`runbooks/branch-protection.md`'s "Squash-merge trailers" section
+  documents the same mechanism for `next` → `main` promotions). Setting
+  `squash_merge_commit_title=PR_TITLE` and `squash_merge_commit_message=BLANK`
+  (`gh api -X PATCH repos/<org>/<repo> --field
+squash_merge_commit_title=PR_TITLE --field squash_merge_commit_message=BLANK`)
+  removes that aggregated body, reducing the risk. **It does not eliminate
+  it**: confirmed empirically on
+  [z-shell/.github#519](https://github.com/z-shell/.github/pull/519) itself,
+  merged with `BLANK` already active from a source commit with no trailer at
+  all, GitHub still appended a `Co-authored-by` trailer for the merger alone
+  in an otherwise-empty body — a separate, apparently independent mechanism.
+  That specific case is harmless (the merger crediting themselves is
+  allowed); the setting is still worth having because it closes the larger
+  aggregated-history exposure, not because it's a complete fix. `--subject`/
+  `--body` passed explicitly remains the only confirmed way to fully control
+  the resulting message. Applied to `z-shell/.github` itself 2026-08-16;
+  auditing and applying it to the rest of the org is open follow-up
+  ([z-shell/.github#518](https://github.com/z-shell/.github/issues/518)),
+  not covered by this change.
 
 ### Expressed as rulesets, not classic protection
 
