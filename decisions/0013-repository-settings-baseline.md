@@ -89,6 +89,7 @@ recommended for this class.
 | Linear history                                               | -       | S       | S       | S       |
 | Signed commits                                               | S       | S       | S       | S       |
 | Copilot code review                                          | R       | R       | S       | R       |
+| Squash merge default message: title only, no body            | R       | R       | R       | R       |
 
 Rationale for the differences:
 
@@ -112,6 +113,31 @@ Rationale for the differences:
   (trunk-only classes 3-4), so linear history stays recommended there.
 - **Copilot code review** is required wherever a change reaches users or other
   repositories without a second human necessarily reading it.
+- **Squash merge default message** is required uniformly, unlike the other
+  rows, because it isn't a class-scaled risk — it's a plain repository API
+  setting (`squash_merge_commit_title`/`squash_merge_commit_message`), not a
+  ruleset rule, and it fails the same way regardless of class. When
+  `squash_merge_commit_message` is `COMMIT_MESSAGES` (GitHub's default),
+  squashing a PR without an explicit `--body` aggregates every squashed
+  commit's full message — trailers included — into the merge commit, which
+  reliably reintroduces `Co-authored-by` even when no individual commit
+  carried one (`runbooks/branch-protection.md`'s "Squash-merge trailers"
+  section documents the same mechanism for `next` → `main` promotions). This
+  is not a theoretical risk: it hit the ADR-0016 acceptance PR
+  ([z-shell/.github#516](https://github.com/z-shell/.github/pull/516)) and,
+  within the same day, the PR that added org-wide commit-trailer CI
+  enforcement itself
+  ([z-shell/.github#517](https://github.com/z-shell/.github/pull/517)) — a
+  lint check on pre-merge commits structurally cannot catch this, since
+  GitHub synthesizes the trailer into a commit that doesn't exist until
+  merge time. Setting `squash_merge_commit_title=PR_TITLE` and
+  `squash_merge_commit_message=BLANK` (`gh api -X PATCH repos/<org>/<repo>
+--field squash_merge_commit_title=PR_TITLE --field
+squash_merge_commit_message=BLANK`) removes the default body entirely, so
+  there is nothing to synthesize a trailer from regardless of whether a
+  human remembers `--body`. Applied to `z-shell/.github` itself
+  2026-08-16; auditing and applying it to the rest of the org is open
+  follow-up, not covered by this change.
 
 ### Expressed as rulesets, not classic protection
 
