@@ -15,10 +15,8 @@ on:
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+# The calling workflow owns concurrency. Reusing its group here deadlocks
+# GitHub Actions because the called workflow cannot acquire the active group.
 jobs:
   zsh-lint:
     name: Zsh Lint
