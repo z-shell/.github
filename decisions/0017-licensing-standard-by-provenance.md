@@ -60,11 +60,14 @@ Infrastructure, documentation, container images, standalone tools, and CI
 assets. **GPL-3 required.** Copyleft costs nothing here because the consumer
 runs the artifact rather than linking their own code into it.
 
-**Class L2: organization-authored, loaded into a user's shell process.**
-Plugin managers, plugins, annexes, and shell modules. **Permissive (MIT) by
-deliberate choice.** The derivative-work boundary for sourced shell code is
-unsettled, and the organization's own ecosystem depends on third parties
-loading this code alongside their own.
+**Class L2: organization-authored, combined as source with a user's own shell
+code.** Plugin managers, plugins, and annexes. **Permissive (MIT) by deliberate
+choice.** The derivative-work boundary for sourced shell code is unsettled, and
+the organization's own ecosystem depends on third parties loading this code
+alongside their own.
+
+The discriminator is source combination, not merely running in the shell
+process. A compiled module is dlopened as a binary and is therefore L1, not L2.
 
 **Class L3: third-party forks and repackaging.** **Upstream license retained,
 never relicensed.** The organization does not hold the copyright.
@@ -75,31 +78,43 @@ never relicensed.** The organization does not hold the copyright.
 | ----------------------- | ----- | ------- | ---------------------------- |
 | `.github`               | L1    | GPL-3   | compliant                    |
 | `wiki`                  | L1    | GPL-3   | compliant                    |
-| `z-a-meta-plugins`      | L2    | GPL-3   | see open question 1          |
-| `zsh-fancy-completions` | L2    | GPL-3   | see open question 1          |
+| `z-a-meta-plugins`      | L2    | GPL-3   | open question 1              |
+| `zsh-fancy-completions` | L2    | GPL-3   | open question 1              |
 | `zi`                    | L2    | MIT     | compliant, deliberately      |
 | `zunit`                 | L3    | MIT     | compliant, upstream retained |
 | `zsh`                   | L3    | MIT     | compliant, upstream retained |
-| `src`                   | ?     | GPL-3   | see open question 2          |
-| `zd`                    | L1    | MIT     | relicense to GPL-3           |
-| `zsh-lint`              | L1    | MIT     | relicense to GPL-3           |
+| `src`                   | L1    | GPL-3   | compliant, settled 2026-08-18 |
+| `zd`                    | L1    | MIT     | relicense, approved          |
+| `zsh-lint`              | L1    | MIT     | relicense, approved          |
 | `zsh-eza`               | L2    | MIT     | compliant                    |
 
 Every repository records its class, so a license becomes a deliberate recorded
 choice rather than whatever the bootstrapping session happened to pick.
 
-### Open questions for the accepting maintainer
+### Settled by the maintainer, 2026-08-18
+
+**`src` is L1 and stays GPL-3.** A compiled module is dlopened as a binary
+rather than merged as text into a user's script, so the sourced-script
+derivative-work ambiguity that justifies permissive L2 does not arise. Being
+loaded into the shell process is not sufficient on its own to make something
+L2; the discriminator is whether third-party source is combined with it.
+
+**`zd` and `zsh-lint` relicense from MIT to GPL-3.** Both are
+organization-authored with no third-party copyright barrier, and neither is
+sourced into a user's shell: `zd` is a container environment and `zsh-lint` is
+a standalone analyzer. MIT permits sublicensing, so no contributor consent is
+required, and every previously published release remains available under MIT.
+
+### Open question for the accepting maintainer
 
 1. `z-a-meta-plugins` and `zsh-fancy-completions` are L2 by consumption model
    but already carry GPL-3. Relicensing toward permissive would require the
    same contributor analysis in reverse and is not proposed here. Either accept
    them as documented L2 exceptions, or reclassify plugins as L1 and require
    `zi` and `zsh-eza` to move to GPL-3 instead.
-2. `src` is the compiled Zsh module. It is loaded into the shell like L2, but
-   is a compiled artifact rather than sourced script, and already carries
-   GPL-3. It needs an explicit class rather than an inferred one.
-3. `zd` and `zsh-lint` are the only two this ADR proposes actively changing.
-   Both are organization-authored with no third-party copyright barrier.
+
+   This question decides the shape of L2 and therefore the size of the class.
+   It is the only item blocking acceptance.
 
 ## Consequences
 
