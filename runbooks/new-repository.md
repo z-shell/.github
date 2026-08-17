@@ -35,7 +35,25 @@ README.md
   workflows/
 ```
 
-Use the organization-approved license for the artifact. For a Zsh plugin,
+Select the license deliberately and record the choice on the owning issue from
+Step 1. Do not leave it to whatever the repository template happens to create;
+that is how the organization accumulated six differing licenses against an
+intent nobody had written down.
+
+Per [`decisions/0017-licensing-standard-by-provenance.md`](../decisions/0017-licensing-standard-by-provenance.md):
+
+| The repository is                                     | License                        |
+| ----------------------------------------------------- | ------------------------------ |
+| organization-authored, not loaded into a user's shell | GPL-3                          |
+| organization-authored, sourced into a user's shell    | permissive (MIT), deliberately |
+| a fork or repackaging of third-party work             | upstream license, unchanged    |
+
+A fork never gets relicensed: the organization does not hold the copyright.
+For organization-authored code, note that the choice is effectively permanent,
+since a license grant already published cannot be revoked and a later change
+reaches only future releases.
+
+For a Zsh plugin,
 start from [`templates/readme/zsh-plugin.md`](../templates/readme/zsh-plugin.md).
 The initial README must state the purpose, features, install path, supported
 shell/runtime, public configuration, lifecycle behavior, verification command,

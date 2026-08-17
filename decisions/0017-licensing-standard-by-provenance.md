@@ -148,5 +148,6 @@ decision actually gets made.
   framing
 - `decisions/0007-release-publication-flow.md`, whose classes describe
   publication rather than licensing and are deliberately not reused here
-- `runbooks/new-repository.md`, which needs a licensing step once this is
-  accepted
+- `runbooks/new-repository.md`, whose licensing step is added in the same
+  change; it previously said only "use the organization-approved license",
+  pointing at a policy that did not exist
