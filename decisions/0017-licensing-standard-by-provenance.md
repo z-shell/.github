@@ -1,8 +1,8 @@
 # 17. Licensing Standard by Provenance and Consumption
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-08-18
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -78,8 +78,8 @@ never relicensed.** The organization does not hold the copyright.
 | ----------------------- | ----- | ------- | ---------------------------- |
 | `.github`               | L1    | GPL-3   | compliant                    |
 | `wiki`                  | L1    | GPL-3   | compliant                    |
-| `z-a-meta-plugins`      | L2    | GPL-3   | open question 1              |
-| `zsh-fancy-completions` | L2    | GPL-3   | open question 1              |
+| `z-a-meta-plugins`      | L2    | GPL-3   | documented L2 exception      |
+| `zsh-fancy-completions` | L2    | GPL-3   | documented L2 exception      |
 | `zi`                    | L2    | MIT     | compliant, deliberately      |
 | `zunit`                 | L3    | MIT     | compliant, upstream retained |
 | `zsh`                   | L3    | MIT     | compliant, upstream retained |
@@ -105,16 +105,12 @@ sourced into a user's shell: `zd` is a container environment and `zsh-lint` is
 a standalone analyzer. MIT permits sublicensing, so no contributor consent is
 required, and every previously published release remains available under MIT.
 
-### Open question for the accepting maintainer
-
-1. `z-a-meta-plugins` and `zsh-fancy-completions` are L2 by consumption model
-   but already carry GPL-3. Relicensing toward permissive would require the
-   same contributor analysis in reverse and is not proposed here. Either accept
-   them as documented L2 exceptions, or reclassify plugins as L1 and require
-   `zi` and `zsh-eza` to move to GPL-3 instead.
-
-   This question decides the shape of L2 and therefore the size of the class.
-   It is the only item blocking acceptance.
+**`z-a-meta-plugins` and `zsh-fancy-completions` stay GPL-3 as documented L2
+exceptions.** L2 sets a default, not a prohibition. An existing copyleft
+license inside L2 is preserved rather than reversed, because relicensing from
+GPL-3 toward permissive is the direction that genuinely requires every
+contributor's consent, unlike MIT toward GPL-3 which MIT's sublicense grant
+already permits. New L2 repositories still start permissive.
 
 ## Consequences
 
