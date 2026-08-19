@@ -1,0 +1,135 @@
+name: Project Reconcile
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Apply project membership changes after reviewing the report
+        required: true
+        default: false
+        type: boolean
+  schedule:
+    - cron: '17 3 * * *'
+
+concurrency:
+  group: project-reconcile
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    name: Reconcile Project 28
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Reconcile organization issues
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          APPLY: ${{ inputs.apply || false }}
+          ORGANIZATION: z-shell
+          PROJECT_NUMBER: '28'
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo 'PROJECT_TOKEN is not configured; refusing to run without a project-scoped credential.' >&2
+            exit 1
+          fi
+
+          project_id="$(gh api graphql -f query='
+            query($org: String!, $number: Int!) {
+              organization(login: $org) {
+                projectV2(number: $number) { id }
+              }
+            }' -f org="${ORGANIZATION}" -F number="${PROJECT_NUMBER}" --jq '.data.organization.projectV2.id')"
+
+          gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            "/search/issues?q=org%3A${ORGANIZATION}%20is%3Aissue%20is%3Aopen&per_page=100" \
+            --jq '.items[] | {url: .html_url, node_id: .node_id, title: .title, repository: .repository_url, author: .user.login, labels: [.labels[].name]}' \
+            > open-issues.ndjson
+
+          : > project-items.ndjson
+          cursor=''
+          while :; do
+            response="$(gh api graphql -f query='
+              query($project: ID!, $cursor: String) {
+                node(id: $project) {
+                  ... on ProjectV2 {
+                    items(first: 100, after: $cursor) {
+                      pageInfo { hasNextPage endCursor }
+                      nodes {
+                        id
+                        content {
+                          ... on Issue { url node_id title repository { nameWithOwner } }
+                          ... on PullRequest { url node_id title repository { nameWithOwner } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }' -f project="${project_id}" -f cursor="${cursor}")"
+            jq -c '.data.node.items.nodes[] | select(.content != null) | {item_id: .id, url: .content.url, node_id: .content.node_id, title: .content.title, repository: .content.repository.nameWithOwner}' <<<"${response}" >> project-items.ndjson
+            if [[ "$(jq -r '.data.node.items.pageInfo.hasNextPage' <<<"${response}")" != 'true' ]]; then
+              break
+            fi
+            cursor="$(jq -r '.data.node.items.pageInfo.endCursor' <<<"${response}")"
+          done
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          def read_ndjson(name):
+              path = Path(name)
+              return [json.loads(line) for line in path.read_text().splitlines() if line]
+
+          issues = read_ndjson('open-issues.ndjson')
+          items = read_ndjson('project-items.ndjson')
+          item_nodes = {item['node_id'] for item in items}
+          missing = [issue for issue in issues if issue['node_id'] not in item_nodes]
+          report = {
+              'organization': 'z-shell',
+              'project_number': 28,
+              'apply_requested': '${{ inputs.apply || false }}' == 'true',
+              'open_issue_count': len(issues),
+              'project_content_count': len(items),
+              'missing_open_issues': missing,
+          }
+          Path('project-reconcile-report.json').write_text(json.dumps(report, indent=2) + '\n')
+          print(json.dumps({
+              'open_issue_count': len(issues),
+              'project_content_count': len(items),
+              'missing_open_issue_count': len(missing),
+          }, indent=2))
+          PY
+
+          if [[ "${APPLY}" != 'true' ]]; then
+            echo 'Dry run only; no project mutations requested.'
+            exit 0
+          fi
+
+          while IFS= read -r issue; do
+            node_id="$(jq -r '.node_id' <<<"${issue}")"
+            gh api graphql -f query='
+              mutation($project: ID!, $content: ID!) {
+                addProjectV2ItemById(input: {projectId: $project, contentId: $content}) {
+                  item { id }
+                }
+              }' -f project="${project_id}" -f content="${node_id}" >/dev/null
+          done < <(jq -c '.missing_open_issues[]' project-reconcile-report.json)
+
+          echo 'Project membership reconciliation applied.'
+
+      - name: Upload reconciliation report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-reconcile-report
+          path: |
+            open-issues.ndjson
+            project-items.ndjson
+            project-reconcile-report.json
+          if-no-files-found: warn
