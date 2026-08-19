@@ -1,0 +1,54 @@
+---
+name: Labeler Config Audit Tests
+on:
+  workflow_call: {}
+  push:
+    paths:
+      - "scripts/labeler-config-audit.rb"
+      - "scripts/test-labeler-config-audit.rb"
+      - "lib/labels.yml"
+      - ".github/workflows/labeler-config-audit-test.yml"
+  pull_request:
+    paths:
+      - "scripts/labeler-config-audit.rb"
+      - "scripts/test-labeler-config-audit.rb"
+      - "lib/labels.yml"
+      - ".github/workflows/labeler-config-audit-test.yml"
+  workflow_dispatch: {}
+
+# The suite runs entirely against an injected fixture client (see
+# scripts/test-labeler-config-audit.rb); it makes no live `gh api` calls, so it
+# needs no repository permissions beyond checkout.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  labeler-config-audit-test:
+    name: Labeler Config Audit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: "⤵️ Check out code from GitHub"
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: "⚙️ Report Ruby version"
+        run: ruby --version
+
+      - name: "🧹 Syntax check"
+        run: |
+          ruby -c scripts/labeler-config-audit.rb
+          ruby -c scripts/test-labeler-config-audit.rb
+
+      - name: "🧪 Run labeler-config-audit unit tests"
+        run: ruby scripts/test-labeler-config-audit.rb
+
+      # This repository's own labeler config must satisfy the canonical set.
+      # Auditing it here makes the gate self-applying rather than advisory,
+      # without reaching across repository boundaries from CI.
+      - name: "🔎 Audit this repository's labeler config"
+        run: ruby scripts/labeler-config-audit.rb --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ github.token }}
