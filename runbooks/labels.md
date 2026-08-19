@@ -2,6 +2,28 @@
 
 Use this runbook when cleaning or syncing labels across z-shell repositories.
 
+## Sync scope
+
+Canonical label sync targets **active, public, non-fork** repositories only.
+`scripts/labels-sync.rb --all-repos` audits every repository the token can see,
+so its raw output is wider than the sync scope. Filter before reading drift
+totals, or private and fork repositories will keep reporting as regressions
+when they are simply out of scope.
+
+Excluded, and why:
+
+- **Private repositories.** Not part of the public contributor-facing label
+  surface. Currently `z-shell/.github-private` and `z-shell/.trunk`.
+- **Forks.** Their label sets largely belong to the upstream project, and
+  rewriting them loses that provenance without benefiting z-shell contributors.
+- **Archived repositories.** Read-only by definition.
+
+The exclusion is deliberate, not a backlog. Do not treat drift in these
+repositories as a finding, and do not include them in org-wide totals without
+saying which scope the number uses. If a repository leaves fork or private
+status and becomes an active public repository, it enters scope at that point
+and should be synced like any other.
+
 ## Source of truth
 
 `lib/labels.yml` is the canonical organization label set.
