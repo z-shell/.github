@@ -63,15 +63,15 @@ jobs:
                       nodes {
                         id
                         content {
-                          ... on Issue { url node_id title repository { nameWithOwner } }
-                          ... on PullRequest { url node_id title repository { nameWithOwner } }
+                          ... on Issue { url id title repository { nameWithOwner } }
+                          ... on PullRequest { url id title repository { nameWithOwner } }
                         }
                       }
                     }
                   }
                 }
               }' -f project="${project_id}" -f cursor="${cursor}")"
-            jq -c '.data.node.items.nodes[] | select(.content != null) | {item_id: .id, url: .content.url, node_id: .content.node_id, title: .content.title, repository: .content.repository.nameWithOwner}' <<<"${response}" >> project-items.ndjson
+            jq -c '.data.node.items.nodes[] | select(.content != null) | {item_id: .id, url: .content.url, node_id: .content.id, title: .content.title, repository: .content.repository.nameWithOwner}' <<<"${response}" >> project-items.ndjson
             if [[ "$(jq -r '.data.node.items.pageInfo.hasNextPage' <<<"${response}")" != 'true' ]]; then
               break
             fi
