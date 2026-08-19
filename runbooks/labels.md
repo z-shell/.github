@@ -138,6 +138,47 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
 
 Do not delete unknown labels in bulk. If a repository has a local label that is not obviously legacy, open or update an issue before removing it.
 
+`labels-sync.rb` enforces this: `sync_policy.delete_unknown_labels` is `false`
+and the script never deletes an unknown label. Leave that setting alone. An
+approved sweep is a one-off operation, not a reason to make deletion the
+default.
+
+### Exception: an approved unknown-label sweep
+
+The prohibition above is the default and stays the default. A bulk deletion is
+permitted only as a separately approved operation that meets every condition
+below. Missing any one of them means the sweep does not proceed.
+
+1. **Explicit maintainer approval**, given against figures measured at approval
+   time rather than against an earlier report.
+2. **Usage measured live from `repos/OWNER/REPO/issues?state=all`**, counting
+   items in every state. Never use the issue search API: its index lags bulk
+   label changes badly enough to report labels as in use months after they were
+   removed, and it fails in both directions.
+3. **Delete only definitions attached to zero items.** A label carrying even one
+   item is migrated or left alone, never deleted.
+4. **Preserve anything referenced by configuration**, verified by reading the
+   files rather than assuming. At minimum check `.github/labeler.yml` and the
+   `stale-*-label` and `exempt-*-labels` inputs of any stale or lock workflow.
+   Deleting a referenced label does not fail loudly; `actions/labeler` recreates
+   it on the next matching pull request, so the sweep quietly undoes itself.
+5. **Archive every label definition** in the affected repositories, including
+   color and description, before the first write, so any deletion is
+   restorable.
+6. **Pilot on one low-traffic repository** and verify it by hand before the
+   remaining repositories.
+7. **Batch per repository with per-operation logging**, so a failure is
+   contained and attributable.
+8. **Re-audit afterwards and re-derive the justification for every survivor**,
+   rather than trusting the plan that was executed.
+
+Record the result on the owning issue, including the counts before and after
+and the exclusion list actually applied.
+
+The 2026-08-19 sweep is the reference execution: 1,483 unknown definitions
+across the 86 in-scope repositories reduced to 93, with 1,390 deleted and every
+survivor re-verified as in use or configuration-referenced.
+
 ## Label sync script
 
 `scripts/labels-sync.rb` is the canonical entrypoint. The older `scripts/labels-dry-run.rb` name remains as a compatibility wrapper for existing local commands, but new runbook examples should use `scripts/labels-sync.rb`.
