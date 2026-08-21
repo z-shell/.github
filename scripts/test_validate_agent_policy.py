@@ -1703,6 +1703,43 @@ class PublicRepositoryTests(unittest.TestCase):
         for fragment in required_fragments:
             self.assertIn(fragment, policy)
 
+    def test_public_repository_deduplicates_loaded_content_and_gates_external_writes(
+        self,
+    ) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        memory = (PUBLIC_ROOT / ".github/AGENT_MEMORY.md").read_text()
+
+        policy_fragments = (
+            "Treat byte-exact instruction content already present in the active "
+            "instruction context as loaded.",
+            "Manifest ownership entries and repository links do not request a "
+            "second read.",
+            "Creating or updating issues, comments, pull requests, or tracker "
+            "records requires explicit external-write authority.",
+            "Without that authority, report the proposed external write instead.",
+            "If no issue exists for non-trivial planned work, propose one.",
+        )
+        for fragment in policy_fragments:
+            self.assertIn(fragment, policy)
+
+        memory_fragments = (
+            "External writes require explicit authorization.",
+            "Without it, report the proposed issue, comment, or tracker update "
+            "instead of performing it.",
+            "If no issue exists for planned or deferred work, propose one.",
+        )
+        for fragment in memory_fragments:
+            self.assertIn(fragment, memory)
+
+        self.assertNotIn(
+            "If no issue exists for non-trivial planned work, create one",
+            policy,
+        )
+        self.assertNotIn(
+            "If no issue exists for planned or deferred work, create one",
+            memory,
+        )
+
     def test_public_repository_declares_learning_capture_surfaces(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()

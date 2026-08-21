@@ -13,12 +13,15 @@ Z-Shell uses GitHub-native records as the shared memory between humans and LLM a
 
 ## Agent Workflow
 
+External writes require explicit authorization. Without it, report the proposed issue, comment, or tracker update instead of performing it.
+
 Before starting non-trivial work:
 
 1. Search the owning repository for open issues and pull requests related to the task.
 2. Check linked tracker items and previous handoff comments.
 3. Prefer the most recent GitHub-visible state over local notes or LLM memory.
-4. If no issue exists for planned or deferred work, create one in the owning repository.
+4. If no issue exists for planned or deferred work, propose one. Create it only
+   when explicit external-write authority is present.
 
 While working:
 

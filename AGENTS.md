@@ -13,6 +13,8 @@ This file is intentionally short. It complements, not replaces:
 
 Before non-trivial work, inspect `.github/instruction-surfaces.json`. This applies to every supported runtime. Match the current task categories and repository-relative file patterns against each manifest surface. When a surface declares both task and path dimensions, both dimensions must match before selecting it. Read every matched required surface before acting. If a runtime does not auto-load scoped guidance, open each matched required surface explicitly. Repeat this selection whenever the task, path, or repository scope changes.
 
+Treat byte-exact instruction content already present in the active instruction context as loaded. Manifest ownership entries and repository links do not request a second read. Re-evaluate only when the task, path, repository scope, or content changes.
+
 ## Agent-file placement
 
 Organization repository roots use `AGENTS.md` and permitted `.github/*` instruction surfaces. They must not contain root `CLAUDE.md` or `GEMINI.md`.
@@ -83,7 +85,10 @@ When working in z-shell repositories, optimize for:
 3. Check linked tracker items and previous handoff comments.
 4. Read the relevant ADRs, patterns, and runbooks.
 5. For cross-repo questions, search the organization before assuming the local repo is unique.
-6. If no issue exists for non-trivial planned work, create one in the owning repository.
+6. If no issue exists for non-trivial planned work, propose one. Create it only
+   when explicit external-write authority is present.
+
+Creating or updating issues, comments, pull requests, or tracker records requires explicit external-write authority. Without that authority, report the proposed external write instead.
 
 ## While editing
 
@@ -155,7 +160,9 @@ cannot own this mandatory rule.
 
 ## When this file is wrong
 
-Do not silently work around drift. Open or update an issue in `z-shell/.github`, explain what is wrong, and link the contradicting repository state.
+Do not silently work around drift. Propose an issue in `z-shell/.github` that
+explains what is wrong and links the contradicting repository state. Open or
+update it only when explicit external-write authority is present.
 
 ## See also
 
