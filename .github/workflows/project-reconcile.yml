@@ -24,10 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Check out reconciliation source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
       - name: Reconcile organization issues
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          APPLY: ${{ inputs.apply || false }}
+          APPLY: ${{ github.event_name == 'schedule' || inputs.apply || false }}
           ORGANIZATION: z-shell
           PROJECT_NUMBER: '28'
         run: |
@@ -48,7 +51,7 @@ jobs:
           gh api --paginate \
             -H 'Accept: application/vnd.github+json' \
             "/search/issues?q=org%3A${ORGANIZATION}%20is%3Aissue%20is%3Aopen&per_page=100" \
-            --jq '.items[] | {url: .html_url, node_id: .node_id, title: .title, repository: .repository_url, author: .user.login, labels: [.labels[].name]}' \
+            --jq '.items[] | {url: .html_url, node_id: .node_id, title: .title, repository: .repository_url, author: .user.login, updated_at: .updated_at, labels: [.labels[].name]}' \
             > open-issues.ndjson
 
           : > project-items.ndjson
@@ -78,33 +81,11 @@ jobs:
             cursor="$(jq -r '.data.node.items.pageInfo.endCursor' <<<"${response}")"
           done
 
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          def read_ndjson(name):
-              path = Path(name)
-              return [json.loads(line) for line in path.read_text().splitlines() if line]
-
-          issues = read_ndjson('open-issues.ndjson')
-          items = read_ndjson('project-items.ndjson')
-          item_nodes = {item['node_id'] for item in items}
-          missing = [issue for issue in issues if issue['node_id'] not in item_nodes]
-          report = {
-              'organization': 'z-shell',
-              'project_number': 28,
-              'apply_requested': '${{ inputs.apply || false }}' == 'true',
-              'open_issue_count': len(issues),
-              'project_content_count': len(items),
-              'missing_open_issues': missing,
-          }
-          Path('project-reconcile-report.json').write_text(json.dumps(report, indent=2) + '\n')
-          print(json.dumps({
-              'open_issue_count': len(issues),
-              'project_content_count': len(items),
-              'missing_open_issue_count': len(missing),
-          }, indent=2))
-          PY
+          python3 scripts/project_reconcile.py \
+            --open-issues open-issues.ndjson \
+            --project-items project-items.ndjson \
+            --output project-reconcile-report.json \
+            --stale-after-days 5
 
           if [[ "${APPLY}" != 'true' ]]; then
             echo 'Dry run only; no project mutations requested.'

@@ -50,29 +50,52 @@ its filter language cannot exclude bot authors and the GitHub Free plan allows
 only one auto-add workflow. Keep it narrow while the central reconciler is
 introduced.
 
-The staged reconciler is read-only by default. It uses a project-scoped
-credential supplied as `PROJECT_TOKEN` and accepts an explicit `apply=true`
-manual dispatch only after review. It must be idempotent, emit a drift report,
-and never overwrite human-set field values without a documented rule.
+The scheduled reconciler uses a project-scoped credential supplied as
+`PROJECT_TOKEN` to add every missing open organization issue to Project 28. It
+is additive and idempotent, emits a drift report, and never overwrites
+human-set field values. Manual dispatch remains read-only unless a maintainer
+sets `apply=true` after reviewing the report.
 
 The target implementation is an organization-owned GitHub App with Project
 read/write permission, installed on all repositories, receiving only the
 required issue, pull-request, repository, and installation events. A scheduled
 reconciliation remains as recovery for missed webhook deliveries.
 
+## Managed progress
+
+Project membership prevents work from disappearing. It does not prove that work
+is managed. Every substantive task must have an owning issue, visible Project
+28 triage state, and material progress recorded on its issue or pull request.
+Record a next action or blocker when work starts, becomes blocked, is ready for
+review, or is handed off. Assignment alone is not active management.
+
+The reconciliation artifact lists `stale_open_issues`: open issues without an
+update for five days. Items labeled `status:blocked` are excluded so that the
+blocked workflow remains explicit. This is a review queue only. It must never
+automatically comment, label, close, or otherwise mutate an issue.
+
+At least weekly, review missing, stale, blocked, and untriaged work. Resolve
+each candidate by recording a next action, blocker, deferral, or closure, then
+publish a Project status update that states portfolio health and material risks.
+Configure Project 28's built-in workflows to set new items to `Todo` and closed
+issues or merged pull requests to `Done`. Archive completed items only after
+the agreed retention period.
+
 ## Verification
 
-Run the dry-run workflow manually and inspect its artifact before enabling any
-write mode. The report must identify:
+Run the workflow manually without `apply=true` and inspect its artifact before
+changing reconciliation behavior. The report must identify:
 
 - open organization issues missing from Project 28
 - project items whose source issue or pull request is no longer visible
 - unclassified workstream records
 - bot and dependency-dashboard records
 - project items with conflicting or missing relationship data
+- open issues that have been stale for five days, excluding `status:blocked`
 
 Any project membership, field, label, issue, repository, organization setting,
-or workflow-setting mutation still requires explicit maintainer approval.
+or workflow-setting mutation outside the scheduled additive reconciliation still
+requires explicit maintainer approval.
 
 ## See also
 

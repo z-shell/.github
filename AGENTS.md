@@ -84,6 +84,8 @@ When working in z-shell repositories, optimize for:
 4. Read the relevant ADRs, patterns, and runbooks.
 5. For cross-repo questions, search the organization before assuming the local repo is unique.
 6. If no issue exists for non-trivial planned work, create one in the owning repository.
+7. For substantive work, verify that the owning issue is in Z-shell Delivery
+   (Project 28), with its triage state visible before implementation starts.
 
 ## While editing
 
@@ -91,6 +93,9 @@ When working in z-shell repositories, optimize for:
 - Keep changes reviewable and scoped; separate mechanical cleanup from behavioral change.
 - Update nearby docs, templates, or runbooks when your change makes them inaccurate.
 - Avoid creating a second conflicting source of truth. Extend the canonical file instead.
+- Record material progress, blockers, review readiness, and handoff on the
+  owning issue or pull request. Assignment alone is not evidence of active
+  management.
 
 ## Before claiming done
 
