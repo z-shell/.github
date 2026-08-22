@@ -85,9 +85,12 @@ When working in z-shell repositories, optimize for:
 3. Check linked tracker items and previous handoff comments.
 4. Read the relevant ADRs, patterns, and runbooks.
 5. For cross-repo questions, search the organization before assuming the local repo is unique.
-6. If no issue exists for non-trivial planned work, create one in the owning repository.
+6. If no issue exists for non-trivial planned work, propose one. Create it only
+   when explicit external-write authority is present.
 7. For substantive work, verify that the owning issue is in Z-shell Delivery
    (Project 28), with its triage state visible before implementation starts.
+
+Creating or updating issues, comments, pull requests, or tracker records requires explicit external-write authority. Without that authority, report the proposed external write instead.
 
 ## While editing
 

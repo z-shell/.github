@@ -20,7 +20,8 @@ Before starting non-trivial work:
 1. Search the owning repository for open issues and pull requests related to the task.
 2. Check linked tracker items and previous handoff comments.
 3. Prefer the most recent GitHub-visible state over local notes or LLM memory.
-4. If no issue exists for planned or deferred work, create one in the owning repository.
+4. If no issue exists for planned or deferred work, propose one. Create it only
+   when explicit external-write authority is present.
 5. Verify the owning issue is visible in Z-shell Delivery before substantive
    implementation starts. If it is missing, restore membership or record the
    blocker on the issue.
