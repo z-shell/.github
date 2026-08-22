@@ -13,6 +13,8 @@ Z-Shell uses GitHub-native records as the shared memory between humans and LLM a
 
 ## Agent Workflow
 
+External writes require explicit authorization. Without it, report the proposed issue, comment, or tracker update instead of performing it.
+
 Before starting non-trivial work:
 
 1. Search the owning repository for open issues and pull requests related to the task.
