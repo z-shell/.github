@@ -22,12 +22,17 @@ Before starting non-trivial work:
 3. Prefer the most recent GitHub-visible state over local notes or LLM memory.
 4. If no issue exists for planned or deferred work, propose one. Create it only
    when explicit external-write authority is present.
+5. Verify the owning issue is visible in Z-shell Delivery before substantive
+   implementation starts. If it is missing, restore membership or record the
+   blocker on the issue.
 
 While working:
 
 1. Keep progress attached to the relevant issue or pull request.
 2. Update the thread when status changes materially, especially when work becomes blocked.
 3. Link branches, pull requests, CI runs, and follow-up issues instead of relying on prose-only status.
+4. Record a next action or blocker for active work. Assignment alone does not
+   represent managed progress.
 
 Before stopping or handing off:
 

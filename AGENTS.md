@@ -87,6 +87,8 @@ When working in z-shell repositories, optimize for:
 5. For cross-repo questions, search the organization before assuming the local repo is unique.
 6. If no issue exists for non-trivial planned work, propose one. Create it only
    when explicit external-write authority is present.
+7. For substantive work, verify that the owning issue is in Z-shell Delivery
+   (Project 28), with its triage state visible before implementation starts.
 
 Creating or updating issues, comments, pull requests, or tracker records requires explicit external-write authority. Without that authority, report the proposed external write instead.
 
@@ -96,6 +98,9 @@ Creating or updating issues, comments, pull requests, or tracker records require
 - Keep changes reviewable and scoped; separate mechanical cleanup from behavioral change.
 - Update nearby docs, templates, or runbooks when your change makes them inaccurate.
 - Avoid creating a second conflicting source of truth. Extend the canonical file instead.
+- Record material progress, blockers, review readiness, and handoff on the
+  owning issue or pull request. Assignment alone is not evidence of active
+  management.
 
 ## Before claiming done
 
