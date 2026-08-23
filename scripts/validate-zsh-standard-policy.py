@@ -2682,7 +2682,7 @@ def _expected_manifest_surfaces(apply_to: str) -> dict[str, dict[str, object]]:
             "kind": "enforcement",
             "authority": "canonical-detail",
             "consumers": ["codex", "claude-code", "copilot", "human", "ci"],
-            "tasks": ["instruction-change", "zsh-standard"],
+            "tasks": ["zsh-standard"],
             "file_patterns": ["**"],
             "required": True,
             "review_owner": "z-shell maintainers",

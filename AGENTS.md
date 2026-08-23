@@ -11,9 +11,9 @@ This file is intentionally short. It complements, not replaces:
 
 ## Required instruction routing
 
-Before non-trivial work, inspect `.github/instruction-surfaces.json`. This applies to every supported runtime. Match the current task categories and repository-relative file patterns against each manifest surface. When a surface declares both task and path dimensions, both dimensions must match before selecting it. Read every matched required surface before acting. If a runtime does not auto-load scoped guidance, open each matched required surface explicitly. Repeat this selection whenever the task, path, or repository scope changes.
+Before non-trivial work, inspect `.github/instruction-surfaces.json`. This applies to every supported runtime. Match the current task categories and repository-relative file patterns against each manifest surface. When a surface declares both task and path dimensions, both dimensions must match before selecting it. Read every matched required surface before acting. If a runtime does not auto-load scoped guidance, open each matched required surface explicitly. Cache the result by `(repository, task class, normalized matched path set, relevant content hashes)`. Reuse it only while every key component is unchanged; otherwise reselect. When several routes select the same physical file, read it once and retain their combined provenance.
 
-Treat byte-exact instruction content already present in the active instruction context as loaded. Manifest ownership entries and repository links do not request a second read. Re-evaluate only when the task, path, repository scope, or content changes.
+Treat byte-exact instruction content already present in the active instruction context as loaded. Manifest ownership entries and repository links do not request a second read. A byte-identical generation source already embedded in an active composite counts as loaded.
 
 ## Agent-file placement
 
@@ -109,31 +109,12 @@ Creating or updating issues, comments, pull requests, or tracker records require
 - If work is unfinished, blocked, or likely to be resumed later, leave an `Agent handoff` comment using `.github/AGENT_MEMORY.md`.
 - Convert deferred follow-up work into issues instead of leaving it only in local notes.
 
-## Triage and prioritization
+## Triage and recurring operations
 
-Use `runbooks/triage.md` for the full process.
-
-Short version:
-
-- Classify issues by work type, area, and severity.
-- Use the canonical labels from `lib/labels.yml`.
-- Search for prior art across the org before responding.
-- Put cross-repo, release-blocking, security, or strategic work on Linear.
-
-## Draft-only workflows
-
-For recurring organization workflows, prefer the runbooks and keep the first pass non-destructive:
-
-- weekly org review: `runbooks/org-review.md`
-- issue and PR triage: `runbooks/triage.md`
-- label maintenance: `runbooks/labels.md`
-- dependency management: `runbooks/dependency-management.md`
-- project tracker automation: `runbooks/project-tracker.md`
-- new-repository bootstrap: `runbooks/new-repository.md`
-- ADR drafting: `runbooks/adr.md`
-- release coordination and release-model classification: `runbooks/release.md`
-
-Unless a maintainer asks otherwise, these workflows produce drafts only.
+Use `runbooks/triage.md` for issue and pull-request triage and
+`runbooks/recurring-operations.md` for recurring organization workflows. Keep
+the first pass non-destructive and, unless a maintainer asks otherwise, produce
+drafts only.
 
 ## Security
 

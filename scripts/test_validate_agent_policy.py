@@ -1697,8 +1697,12 @@ class PublicRepositoryTests(unittest.TestCase):
             "Read every matched required surface before acting.",
             "does not auto-load scoped guidance, open each matched required "
             "surface explicitly.",
-            "Repeat this selection whenever the task, path, or repository scope "
-            "changes.",
+            "(repository, task class, normalized matched path set, relevant "
+            "content hashes)",
+            "Reuse it only while every key component is unchanged",
+            "same physical file, read it once and retain their combined provenance",
+            "byte-identical generation source already embedded in an active "
+            "composite counts as loaded",
         )
         for fragment in required_fragments:
             self.assertIn(fragment, policy)
@@ -1739,6 +1743,35 @@ class PublicRepositoryTests(unittest.TestCase):
             "If no issue exists for planned or deferred work, create one",
             memory,
         )
+
+    def test_public_policy_routes_triage_and_recurring_procedure_detail(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+
+        self.assertIn("## Triage and recurring operations", policy)
+        self.assertIn("`runbooks/triage.md`", policy)
+        self.assertIn("`runbooks/recurring-operations.md`", policy)
+        self.assertIn("Keep\nthe first pass non-destructive", policy)
+        self.assertIn("produce\ndrafts only", policy)
+        self.assertNotIn("Short version:", policy)
+        self.assertNotIn("weekly org review:", policy)
+
+    def test_public_manifest_uses_workflow_specific_task_labels(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertIn("code-review", surfaces["organization-patterns"]["tasks"])
+        self.assertNotIn("review", surfaces["organization-patterns"]["tasks"])
+        self.assertEqual(
+            surfaces["instruction-generator-verifier-workflow"]["tasks"],
+            [
+                "generator-verifier-workflow",
+                "generator-verifier-architecture",
+                "generator-verifier-concurrency",
+            ],
+        )
+        self.assertEqual(surfaces["zsh-standard-policy"]["tasks"], ["zsh-standard"])
 
     def test_public_repository_declares_learning_capture_surfaces(self) -> None:
         manifest = json.loads(
