@@ -2,7 +2,9 @@
 
 How to classify, prioritize, and respond to issues and pull requests across the z-shell organization.
 
-**Hard rule:** LLM agents draft; humans apply labels, post comments, and close items.
+**Hard rule:** LLM agents may apply canonical labels when a maintainer
+explicitly authorizes the specific triage scope. Otherwise, agents draft label
+changes. Humans post comments and close items.
 
 ## When triage happens
 
