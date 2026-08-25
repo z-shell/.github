@@ -13,14 +13,14 @@ still let `main` and `next` diverge, or lose the `next` branch outright,
 because the gaps are in _repository settings_ and _automation defaults_ that
 rulesets do not cover. Two incidents motivated this runbook:
 
-1. `src` and `zsh-eza` both had `renovate.json` with no `baseBranches`
+1. `src` and `zsh-eza` both had repository config with no `baseBranchPatterns`
    override. Renovate defaulted to the repository's default branch (`main`),
    opening routine dependency-update PRs that bypassed `next` entirely. Over
    time, enough of these (plus a few manually-merged feature branches) landed
    directly on `main` to diverge it from `next` by more than a dozen commits
    in `zsh-eza`'s case, with real merge conflicts to resolve before `next`
    could be promoted again. `dependency-management.md` already documents the
-   `baseBranches` override as an example — the actual gap was that nothing
+   `baseBranchPatterns` override as an example. The actual gap was that nothing
    audited whether a `next`-model repository had actually applied it.
 2. Promoting `zsh-eza`'s `next` into `main` via a PR merge (`next` as the PR's
    head branch) triggered GitHub's "Automatically delete head branches" repo
@@ -46,11 +46,9 @@ row is `next` → `main`. Skip repositories that are trunk-on-`main`.
       Keep this setting disabled as the required baseline for ordinary pull
       request merges. It is not a complete safeguard for GitHub's asynchronous
       stacked-merge path; see the caveat below.
-- [ ] **`renovate.json` has `"baseBranches": ["next"]`** (or its newer
-      equivalent `"baseBranchPatterns": ["next"]` — Renovate accepts either
-      key for the same override; `zsh-lint` uses the newer name) if the
+- [ ] **`.github/renovate.json` has `"baseBranchPatterns": ["next"]`** if the
       repository uses Renovate. See `dependency-management.md` for the full
-      config example. Check `.github/dependabot.yml`'s `target-branch` too —
+      config example. Check `.github/dependabot.yml`'s `target-branch` too:
       it is easy to fix Dependabot's target and assume Renovate inherited the
       same fix; they are independent configs. A repository with **no**
       Renovate config still needs `dependabot.yml`'s `target-branch` set for

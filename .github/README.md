@@ -193,8 +193,9 @@ This repository is the right place for any **organization-level** configuration:
 - **Changing contribution or security policies** — edit the corresponding file in `.github/`
 - **Updating dependency automation** — edit `renovate-config.json` and follow `../runbooks/dependency-management.md`
 
-For a repository-specific Renovate exception, add a minimal `renovate.json` that
-extends the organization preset and contains only the required override.
+For a repository-specific Renovate exception, add a minimal
+`.github/renovate.json` that extends the organization preset and contains only
+the required override.
 
 ## Links
 
