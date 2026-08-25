@@ -16,20 +16,22 @@ on:
         type: string
         default: ""
       cache:
-        description: Cache Trunk downloads and linter artifacts on ephemeral runners.
+        description: >
+          Deprecated compatibility input. Safe Trunk runtime state is always
+          disposable and is not cached between jobs.
         required: false
         type: boolean
         default: true
       check-mode:
         description: >
-          Trunk check mode. Leave empty to let trunk-action infer the correct
+          Trunk check mode. Leave empty to infer the correct
           mode for pull_request, push, schedule, and merge queue events. Set to
           'all' only when the caller intentionally wants a full-repository scan.
         required: false
         type: string
         default: ""
       debug:
-        description: Enable trunk-action debug mode.
+        description: Report the selected safe check mode without printing environment data.
         required: false
         type: boolean
         default: false
@@ -49,7 +51,7 @@ on:
         type: string
         default: ""
       setup-deps:
-        description: Let trunk-action run .trunk/setup-ci dependency setup.
+        description: Run the caller repository's .trunk/setup-ci action when present.
         required: false
         type: boolean
         default: false
@@ -124,28 +126,84 @@ jobs:
     name: Trunk Code Quality
     runs-on: ${{ inputs['runs-on'] }}
     permissions:
-      actions: read
-      checks: write
       contents: read
     steps:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Prepare repository dependencies
         if: ${{ inputs['setup-command'] != '' || inputs.get_dependencies != '' }}
         shell: bash
         run: ${{ inputs['setup-command'] != '' && inputs['setup-command'] || inputs.get_dependencies }}
 
-      - name: Run Trunk Code Quality
-        uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
+      # GitHub exposes the called workflow identity through job.workflow_*.
+      # Serialize the context because actionlint 1.7.12 does not model those
+      # current properties yet, then validate the values before checkout.
+      - name: Resolve called workflow source
+        id: workflow-source
+        shell: bash
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: |
+          repository=$(jq -r '.workflow_repository // empty' <<<"$JOB_CONTEXT")
+          sha=$(jq -r '.workflow_sha // empty' <<<"$JOB_CONTEXT")
+          [[ $repository =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ $sha =~ ^[0-9a-f]{40}$ ]]
+          printf 'repository=%s\n' "$repository" >>"$GITHUB_OUTPUT"
+          printf 'sha=%s\n' "$sha" >>"$GITHUB_OUTPUT"
+
+      - name: Check out safe Trunk tooling
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          arguments: ${{ inputs.arguments }}
-          cache: ${{ inputs.cache }}
-          check-mode: ${{ inputs['check-mode'] }}
-          debug: ${{ inputs.debug }}
-          post-init: ${{ inputs['post-init'] }}
-          setup-deps: ${{ inputs['setup-deps'] }}
-          timeout-seconds: ${{ inputs['timeout-seconds'] }}
+          repository: ${{ steps.workflow-source.outputs.repository }}
+          ref: ${{ steps.workflow-source.outputs.sha }}
+          path: .z-shell-workflow
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/trunk-safe-check.sh
+            scripts/trunk-safe-ci.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Install safe Trunk tooling
+        shell: bash
+        run: |
+          install -d -m 700 "$RUNNER_TEMP/z-shell-trunk-safe"
+          install -m 700 .z-shell-workflow/scripts/trunk-safe-check.sh \
+            "$RUNNER_TEMP/z-shell-trunk-safe/trunk-safe-check.sh"
+          install -m 700 .z-shell-workflow/scripts/trunk-safe-ci.sh \
+            "$RUNNER_TEMP/z-shell-trunk-safe/trunk-safe-ci.sh"
+          rm -rf -- .z-shell-workflow
+
+      - name: Set up Trunk launcher
+        uses: trunk-io/trunk-action/setup@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
+        with:
           trunk-path: ${{ inputs['trunk-path'] != '' && inputs['trunk-path'] || inputs.trunk_path }}
+
+      - name: Set up Trunk dependencies
+        if: ${{ inputs['setup-deps'] && hashFiles('.trunk/setup-ci/action.yaml') != '' }}
+        uses: ./.trunk/setup-ci
+
+      - name: Run post-init commands
+        if: ${{ inputs['post-init'] != '' }}
+        shell: bash
+        run: ${{ inputs['post-init'] }}
+
+      - name: Run Trunk Code Quality safely
+        shell: bash
+        env:
+          TRUNK_PATH: ${{ env.TRUNK_PATH }}
+          TRUNK_SAFE_AFTER: ${{ github.event.after }}
+          TRUNK_SAFE_ARGUMENTS: ${{ inputs.arguments }}
+          TRUNK_SAFE_BEFORE: ${{ github.event.before }}
+          TRUNK_SAFE_CHECK_MODE: ${{ inputs['check-mode'] }}
+          TRUNK_SAFE_DEBUG: ${{ inputs.debug }}
+          TRUNK_SAFE_EVENT_NAME: ${{ github.event_name }}
+          TRUNK_SAFE_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          TRUNK_SAFE_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          TRUNK_SAFE_REF_NAME: ${{ github.ref_name }}
+          TRUNK_SAFE_TIMEOUT_SECONDS: ${{ inputs['timeout-seconds'] }}
+          TRUNK_SAFE_WRAPPER: ${{ runner.temp }}/z-shell-trunk-safe/trunk-safe-check.sh
+        run: "$RUNNER_TEMP/z-shell-trunk-safe/trunk-safe-ci.sh"
