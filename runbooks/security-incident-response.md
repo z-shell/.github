@@ -66,12 +66,36 @@ ephemeral notes):
 - the fix and any mitigation used
 - one concrete follow-up action to prevent recurrence (file a tracker issue)
 
+## Safe local lint diagnostics
+
+Run Trunk through the repository wrapper so the linter process receives only a
+documented minimal environment and disposable runtime directories:
+
+```sh
+scripts/trunk-safe-check.sh -- check --no-fix
+```
+
+The wrapper forwards only `CI`, `HOME`, `LANG`, `LC_ALL`, `NO_COLOR`, `PATH`,
+`TERM`, `TMPDIR`, `TRUNK_CACHE`, `TRUNK_LAUNCHER_QUIET`, and the XDG cache,
+config, and data locations. Directory values other than `PATH` are generated
+inside a private temporary runtime directory. It does not forward GitHub
+tokens, credentials, proxy settings, or unrelated caller variables. Do not put
+secrets in command-line arguments.
+
+If Trunk reports an internal tool-execution failure, the wrapper suppresses the
+verbose diagnostic and deletes the runtime directory. Never print or attach a
+raw Trunk failure report. If an earlier run exposed a credential-bearing value,
+rotate that credential through its owning system and keep the incident details
+in the access-controlled record.
+
 ## Anti-patterns
 
 - discussing exploit details on a public thread
 - silent fixes with no reporter coordination or credit
 - skipping the post-incident review for a Critical incident
 - leaving severity untriaged past the SLA
+- invoking Trunk directly from a credential-bearing environment
+- printing or attaching raw internal Trunk failure diagnostics
 
 ## See also
 

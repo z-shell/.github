@@ -52,7 +52,7 @@ body:
       label: Verification
       description: Commands, checks, CI runs, or review performed. Say "Not run" if nothing was run.
       placeholder: |
-        - trunk check --no-fix: passed
+        - scripts/trunk-safe-check.sh -- check --no-fix: passed
         - CI: pending
     validations:
       required: true
