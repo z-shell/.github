@@ -208,6 +208,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "zsh/options/no-blanket-error-mode",
             "zsh/options/constrain-multios",
             "zsh/parameters/declare-scope",
+            "zsh/parameters/avoid-special-name-collisions",
             "zsh/parameters/account-dynamic-scope",
             "zsh/arrays/declare-kind",
             "zsh/arrays/native-indexing",
@@ -248,7 +249,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             [rule["id"] for rule in matching_rules],
             expected_rule_ids,
         )
-        self.assertEqual(len(matching_rules), 47)
+        self.assertEqual(len(matching_rules), 48)
         for rule in matching_rules:
             with self.subTest(rule_id=rule["id"]):
                 if rule["id"] == "zsh/completion/preserve-trust-boundaries":
@@ -1107,6 +1108,23 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, prose)
 
+    def test_special_parameter_rule_names_collision_failure_modes(self) -> None:
+        root = self.make_fixture()
+        block = self.instruction_rule_block(
+            root,
+            "zsh/parameters/avoid-special-name-collisions",
+        )
+        prose = " ".join(block.split())
+
+        for fragment in (
+            "Zsh special parameter name",
+            "`status` is read-only",
+            "`path` is tied to `PATH`",
+            "change command lookup",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, prose)
+
     def test_instruction_declares_autoload_loader_and_compilation_modes(self) -> None:
         root = self.make_fixture()
         block = self.instruction_rule_block(
@@ -1959,7 +1977,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             },
             "parsed_rules": validator._markdown_rules(instruction),
         }
-        self.assertEqual(len(snapshot["rule_blocks"]), 59)
+        self.assertEqual(len(snapshot["rule_blocks"]), 60)
         digest = hashlib.sha256(
             json.dumps(
                 snapshot,
@@ -1971,7 +1989,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "7ff668025cf5131fe846750b2f1a9379a136c381dfba0ead3a4f9b95ba0fbc07",
+            "4a32a4cdbbdb4efec978371f65b8c8389a7ce17e646bac2fceaee72564456b01",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
