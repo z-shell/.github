@@ -10,12 +10,14 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/lychee.toml"
       - "**.md"
       - "**.mdx"
       - "**.html"
   pull_request_target:
     branches: [main]
     paths:
+      - ".github/lychee.toml"
       - "**.md"
       - "**.mdx"
       - "**.html"
