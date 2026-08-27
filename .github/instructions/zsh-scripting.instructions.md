@@ -406,6 +406,21 @@ Constrain or disable `MULTIOS` when implicit fan-out is not intended.
 
 Declare function-local parameters and intentional globals explicitly.
 
+### `zsh/parameters/avoid-special-name-collisions`
+
+- Level: `required`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
+- Minimum Zsh: `null`
+- Basis: `language-semantics`
+- Evidence: `parameters`
+- Enforcement: `lint`, `human-review`
+
+Do not repurpose a Zsh special parameter name for unrelated local or scratch
+data. Check the Special Parameters inventory before declaring a new name. For
+example, `status` is read-only, and `path` is tied to `PATH`; assignment can
+fail or change command lookup. Use purpose-specific names such as
+`command_status` and `candidate_paths`.
+
 ### `zsh/parameters/account-dynamic-scope`
 
 - Level: `review`
