@@ -16,9 +16,9 @@ Do not configure both services to create routine version updates in the same
 repository. The split avoids duplicate pull requests, lock-file conflicts, and
 unnecessary CI runs.
 
-The governing decision is `decisions/0012-hybrid-dependency-management.md`.
-ADR 0004 remains the live policy until the superseding ADR and its
-configuration reach `main`.
+The governing live decision is
+`decisions/0012-hybrid-dependency-management.md`. ADR 0012 supersedes ADR 0004;
+ADR 0004 remains only as historical rationale.
 
 ## Required GitHub security settings
 
@@ -50,22 +50,28 @@ also reference it explicitly:
 }
 ```
 
-Keep repository configuration small. Add `renovate.json` only for a real
-exception, such as a non-default target branch:
+Repository consumer configuration belongs at `.github/renovate.json`.
+Renovate also recognizes `renovate.json` at the repository root, but searches
+that location first and stops after the first match. Never keep both paths; a
+migration must remove the root file in the same change that adds the preferred
+file.
+
+Keep repository configuration small. Add `.github/renovate.json` only for a
+real exception, such as a non-default target branch:
 
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["local>z-shell/.github:renovate-config"],
-  "baseBranches": ["next"]
+  "baseBranchPatterns": ["next"]
 }
 ```
 
 Custom managers and specialized package grouping also belong in the repository
 that needs them.
 
-For any repository whose `decisions/0008-branching-model.md` row is `next` →
-`main`, this `baseBranches` override is not optional: without it Renovate
+For any repository whose `decisions/0008-branching-model.md` row is `next` to
+`main`, this `baseBranchPatterns` override is not optional: without it Renovate
 opens routine update PRs against `main` directly, bypassing `next`. This was
 found live (not theoretical) in two repositories — see
 `runbooks/branch-protection.md` for the full audit checklist.
@@ -79,7 +85,8 @@ Do not remove Dependabot version updates until Renovate coverage is proven.
    the repository using the organization preset.
 3. Confirm dependency graph, Dependabot alerts, and Dependabot security updates
    remain enabled in GitHub settings.
-4. Add a minimal `renovate.json` only when the repository needs an override.
+4. Add a minimal `.github/renovate.json` only when the repository needs an
+   override.
 5. Delete `.github/dependabot.yml` to stop routine Dependabot version updates.
 6. Confirm subsequent routine update pull requests come only from Renovate.
 
@@ -94,7 +101,8 @@ Validate the shared preset or a repository override with Renovate itself:
 npx --yes --package renovate renovate-config-validator renovate-config.json
 ```
 
-For a repository override, replace the final path with `renovate.json`.
+For a repository override, replace the final path with
+`.github/renovate.json`.
 `jq empty` checks JSON syntax, but it does not prove that Renovate recognizes
 every option.
 

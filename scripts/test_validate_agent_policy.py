@@ -96,6 +96,30 @@ BASE_MANIFEST = {
             "review_owner": "z-shell maintainers",
             "canonical_for": [],
         },
+        {
+            "id": "claude-adapter",
+            "path": ".claude/CLAUDE.md",
+            "kind": "adapter",
+            "authority": "adapter-only",
+            "consumers": ["claude-code"],
+            "tasks": ["all"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
+        {
+            "id": "gemini-adapter",
+            "path": ".gemini/settings.json",
+            "kind": "adapter",
+            "authority": "adapter-only",
+            "consumers": ["gemini-cli"],
+            "tasks": ["all"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
     ],
 }
 
@@ -121,6 +145,12 @@ def make_repository(root: Path) -> dict[str, object]:
     write_file(root, ".github/AGENT_MEMORY.md", "# Agent handoffs\n")
     write_file(root, ".github/README.md", "# Public agent catalog\n")
     write_file(root, ".github/copilot-instructions.md", "@../AGENTS.md\n")
+    write_file(root, ".claude/CLAUDE.md", "@../AGENTS.md\n")
+    write_file(
+        root,
+        ".gemini/settings.json",
+        '{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n',
+    )
     write_manifest(root, manifest)
     return manifest
 
@@ -554,7 +584,7 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
             errors = validator.validate(self.root)
 
-        self.assert_error_contains(errors, "AGENTS.md", "escapes repository")
+        self.assert_error_contains(errors, "AGENTS.md", "symlink")
 
     def test_rejects_private_reference_in_active_surface(self) -> None:
         with (self.root / "AGENTS.md").open("a", encoding="utf-8") as policy:
@@ -764,6 +794,98 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             ".github/copilot-instructions.md",
             "exact template",
         )
+
+    def test_rejects_wrong_runtime_adapter_contract(self) -> None:
+        surface = next(
+            item for item in self.manifest["surfaces"] if item["id"] == "gemini-adapter"
+        )
+        surface["consumers"] = ["human"]
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "gemini-adapter", "delivery contract")
+
+    def test_rejects_parallel_runtime_instruction_carriers(self) -> None:
+        cases = (
+            ".claude/rules/hidden.md",
+            "src/CLAUDE.md",
+            ".agents/skills/hidden/SKILL.md",
+            ".gemini/GEMINI.md",
+        )
+        for relative_path in cases:
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    write_file(root, relative_path, "# Hidden policy\n")
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        "runtime-specific instruction carrier",
+                    )
+
+    def test_rejects_invalid_exclude_agent_frontmatter(self) -> None:
+        path = ".github/instructions/review.instructions.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "review-guidance",
+                path,
+                kind="scoped-guidance",
+                authority="canonical-detail",
+                consumers=["copilot"],
+                file_patterns=["**"],
+            )
+        )
+        write_file(
+            self.root,
+            path,
+            '---\napplyTo: "**"\nexcludeAgent: ["coding-agent"]\n---\n',
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, path, "excludeAgent", "scalar")
+
+    def test_accepts_supported_exclude_agent_frontmatter(self) -> None:
+        for value in ("cloud-agent", "code-review"):
+            with self.subTest(value=value):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    path = ".github/instructions/review.instructions.md"
+                    manifest["surfaces"].append(
+                        make_surface(
+                            "review-guidance",
+                            path,
+                            kind="scoped-guidance",
+                            authority="canonical-detail",
+                            consumers=["copilot"],
+                            file_patterns=["**"],
+                        )
+                    )
+                    write_file(
+                        root,
+                        path,
+                        f'---\napplyTo: "**"\nexcludeAgent: "{value}"\n---\n',
+                    )
+                    write_manifest(root, manifest)
+
+                    self.assertEqual(validator.validate(root), [])
+
+    def test_rejects_unknown_manifest_and_surface_fields(self) -> None:
+        self.manifest["unexpected"] = True
+        self.manifest["surfaces"][0]["unexpected"] = True
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "unknown top-level field", "unexpected")
+        self.assert_error_contains(errors, "organization-policy", "unknown field")
 
     def test_rejects_missing_apply_to(self) -> None:
         path = ".github/instructions/python.instructions.md"
@@ -1515,7 +1637,7 @@ class PublicRepositoryTests(unittest.TestCase):
         for fragment in required:
             self.assertIn(fragment, policy)
 
-    def test_public_repository_declares_proposed_zsh_standard_adr(self) -> None:
+    def test_public_repository_declares_accepted_zsh_standard_adr(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
         )
@@ -1540,8 +1662,8 @@ class PublicRepositoryTests(unittest.TestCase):
         adr = (PUBLIC_ROOT / "decisions/0015-zsh-scripting-standard.md").read_text()
         required = (
             "# 15. Adopt an organization-wide Zsh scripting standard",
-            "**Status:** PROPOSED",
-            "**Deciders:** Pending maintainer acceptance",
+            "**Status:** ACCEPTED",
+            "**Deciders:** ss-o",
             "Zsh 5.9.2",
             "per-repository compatibility floor",
             "five source classes",
@@ -1556,7 +1678,7 @@ class PublicRepositoryTests(unittest.TestCase):
         )
         for fragment in required:
             self.assertIn(fragment, adr)
-        self.assertNotIn("**Status:** ACCEPTED", adr)
+        self.assertNotIn("Pending maintainer acceptance", adr)
 
     def test_public_manifest_routes_recurring_operations_runbook(self) -> None:
         manifest = json.loads(
@@ -1816,6 +1938,32 @@ class PublicRepositoryTests(unittest.TestCase):
             },
         )
 
+    def test_public_repository_routes_portable_worktree_management(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["instruction-worktree-management"]["tasks"],
+            ["worktree-management"],
+        )
+        self.assertEqual(
+            surfaces["runbook-worktrees"]["path"],
+            "runbooks/worktrees.md",
+        )
+        self.assertIn("worktree-management", surfaces["decision-0018"]["tasks"])
+        self.assertIn(
+            "`git worktree list --porcelain` as the authoritative inventory",
+            (PUBLIC_ROOT / "AGENTS.md").read_text(),
+        )
+        self.assertIn(
+            "- **Status:** PROPOSED",
+            (
+                PUBLIC_ROOT / "decisions/0018-portable-worktree-management.md"
+            ).read_text(),
+        )
+
     def test_public_repository_prohibits_vendor_root_instruction_files(self) -> None:
         policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
         self.assertIn(
@@ -1852,8 +2000,7 @@ class PublicRepositoryTests(unittest.TestCase):
             "a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0\n"
             "        with:\n"
             '          python-version: "3.10"\n',
-            "      - name: Set up Zsh\n"
-            "        uses: ./actions/setup-zsh\n",
+            "      - name: Set up Zsh\n" "        uses: ./actions/setup-zsh\n",
             "      - name: Run agent policy unit tests\n"
             "        run: python3 -m unittest "
             "scripts/test_validate_agent_policy.py -v\n",
@@ -1873,6 +2020,8 @@ class PublicRepositoryTests(unittest.TestCase):
             "PATTERNS.md",
             "CLAUDE.md",
             "GEMINI.md",
+            ".claude/**",
+            ".gemini/**",
             ".github/AGENT_MEMORY.md",
             ".github/README.md",
             ".github/copilot-instructions.md",
@@ -1897,14 +2046,20 @@ class PublicRepositoryTests(unittest.TestCase):
     def test_public_repository_has_no_validation_errors(self) -> None:
         self.assertEqual(validator.validate(PUBLIC_ROOT), [])
 
-    def test_public_repository_uses_only_the_copilot_adapter(self) -> None:
+    def test_public_repository_uses_manifest_declared_runtime_adapters(self) -> None:
         self.assertFalse((PUBLIC_ROOT / "CLAUDE.md").exists())
         self.assertFalse((PUBLIC_ROOT / "GEMINI.md").exists())
-        self.assertFalse((PUBLIC_ROOT / ".github/copilot-instructions.md").is_symlink())
-        self.assertEqual(
-            (PUBLIC_ROOT / ".github/copilot-instructions.md").read_text(),
-            "@../AGENTS.md\n",
-        )
+        expected = {
+            ".github/copilot-instructions.md": "@../AGENTS.md\n",
+            ".claude/CLAUDE.md": "@../AGENTS.md\n",
+            ".gemini/settings.json": (
+                '{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n'
+            ),
+        }
+        for relative_path, content in expected.items():
+            path = PUBLIC_ROOT / relative_path
+            self.assertFalse(path.is_symlink())
+            self.assertEqual(path.read_text(), content)
 
 
 if __name__ == "__main__":

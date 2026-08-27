@@ -22,10 +22,9 @@ An audit on 2026-07-18 found that all repositories listed at that time use
 2026-08-14 `zpmod` audit adds `zpmod` as trunk on `main`. In this ADR, **GitHub
 default branch** and **development branch** are therefore separate concepts.
 
-The private meta-workspace catalog (`workspace/repos.yml`) is still out of date. Its
-`default_branch` field conflates those concepts, and some entries name `next`
-for repositories that do not have that branch. The catalog has not yet been
-reconciled; that is a separate meta-workspace change tracked outside this ADR.
+The private meta-workspace catalog originally conflated GitHub default branches
+with development branches. It was reconciled on 2026-07-25 to record both
+concepts and to follow this ADR's per-repository table.
 
 `decisions/0007-release-publication-flow.md` already defines four repository
 classes by delivery model. Those classes constrain publication behavior, but
@@ -45,20 +44,20 @@ trunk-based. Changing a repository's assigned model requires amending this ADR
 
 ### Canonical branch model
 
-| Repo                    | Class | Branch model    | Development branch | Publication boundary                      |
-| ----------------------- | ----- | --------------- | ------------------ | ----------------------------------------- |
-| `wiki`                  | 1     | `next` → `main` | `next`             | merge to `main` (deploy)                  |
-| `src`                   | 1     | `next` → `main` | `next`             | merge to `main` (deploy)                  |
-| `zd`                    | 1     | trunk on `main` | `main`             | push to `main` (image)                    |
-| `zunit`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag                              |
-| `zsh-lint`              | 2     | `next` → `main` | `next`             | `vX.Y.Z` tag                              |
-| `zpmod`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag; Pages from reviewed `main`  |
-| packaged `zsh`          | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag (deferred)                   |
-| `zi`                    | 3     | `next` → `main` | `next`             | `main` is consumable ref                  |
-| `zsh-eza`               | 3     | `next` → `main` | `next`             | `main` is consumable ref                  |
-| `z-a-meta-plugins`      | 3     | trunk on `main` | `main`             | `main` is consumable ref                  |
-| `zsh-fancy-completions` | 3     | trunk on `main` | `main`             | `main` is consumable ref                  |
-| `.github`               | 4     | trunk on `main` | `main`             | n/a                                       |
+| Repo                    | Class | Branch model    | Development branch | Publication boundary                     |
+| ----------------------- | ----- | --------------- | ------------------ | ---------------------------------------- |
+| `wiki`                  | 1     | `next` → `main` | `next`             | merge to `main` (deploy)                 |
+| `src`                   | 1     | `next` → `main` | `next`             | merge to `main` (deploy)                 |
+| `zd`                    | 1     | trunk on `main` | `main`             | push to `main` (image)                   |
+| `zunit`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag                             |
+| `zsh-lint`              | 2     | `next` → `main` | `next`             | `vX.Y.Z` tag                             |
+| `zpmod`                 | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag; Pages from reviewed `main` |
+| packaged `zsh`          | 2     | trunk on `main` | `main`             | `vX.Y.Z` tag (deferred)                  |
+| `zi`                    | 3     | `next` → `main` | `next`             | `main` is consumable ref                 |
+| `zsh-eza`               | 3     | `next` → `main` | `next`             | `main` is consumable ref                 |
+| `z-a-meta-plugins`      | 3     | trunk on `main` | `main`             | `main` is consumable ref                 |
+| `zsh-fancy-completions` | 3     | trunk on `main` | `main`             | `main` is consumable ref                 |
+| `.github`               | 4     | trunk on `main` | `main`             | n/a                                      |
 
 The publication-boundary column states the policy, not a complete inventory of
 live workflow triggers. At the 2026-07-18 audit, `src` and `zd` also had
@@ -83,9 +82,8 @@ not scheduled for removal by this decision.
   branch (the "Development branch" column). For trunk repos, feature branches also
   start from `main`.
 
-The private catalog/schema and root agent guidance need a separate
-meta-workspace reconciliation. They are deliberately not changed by this
-public factual-reconciliation change.
+The private catalog/schema and root agent guidance consume this table and must
+be kept aligned when a repository's branch model changes.
 
 ## Consequences
 
@@ -93,12 +91,8 @@ public factual-reconciliation change.
   the ADR alone does not prevent catalog or repository drift.
 - New repositories are added to the table (with their ADR-0007 class) as part
   of repository creation, before the first branch is cut.
-- **Pending action:** the private meta-workspace root guidance currently
-  states "default development branch: `next` … all other work branches from
-  `next`" as a universal rule. That guidance should be updated to reference
-  this ADR's per-repository table so agents do not get conflicting instructions
-  for trunk-only repositories. This separate meta-workspace change has not yet
-  been made.
+- The private meta-workspace root guidance references this ADR rather than
+  asserting one universal development branch.
 - Promotion from `next` to `main` is a publication trigger for class-1 deploy
   repositories; the live tag-trigger exceptions above are accepted alongside
   it. For other classes the merge validates but does not mint a release

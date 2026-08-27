@@ -24,11 +24,11 @@ definitions come from `decisions/0007-release-publication-flow.md`.
   least-privilege `permissions:`, `concurrency:` on push/PR, no-emoji workflow/
   job `name:` (ADR-0005), kebab-case filenames.
 - Zsh sources pass `zsh -n` and `zcompile`.
-- Conventional Commits (ADR-0003) and the disallowed-trailer rule are target
-  policy: follow them by habit when authoring commits and PR titles. A sweep
-  of all 86 active repositories found no workflow enforcing either one on a
-  default branch (see `decisions/0009-testing-ci-strategy.md` and issue
-  #454), so do not assume CI will catch a violation.
+- Conventional Commits, PR-title validation, and the disallowed-trailer rule
+  are target gates. Enforcement is repository-scoped. Verify the owning
+  repository's live caller and required-check or ruleset configuration before
+  relying on CI. Where no verified gate exists, authors and reviewers remain
+  responsible.
 
 ## By class
 
@@ -39,9 +39,10 @@ definitions come from `decisions/0007-release-publication-flow.md`.
   exact tag commit and gates release publication**. ZUnit for Zsh tools;
   `go test` for the `zsh-lint` Go CLI; the repository-defined full suite for
   `zpmod`. Never cut a `vX.Y.Z` tag from a red commit.
-- **Class 3 — git-consumed:** **validation-only.** Baseline checks plus ZUnit
-  where the plugin ships tests. No release automation, no coverage gate. The bar
-  is "loads and parses cleanly."
+- **Class 3, git-consumed:** **validation-only as the required organization
+  gate.** Run existing repository-owned tests and add regression coverage when
+  behavior changes, but do not impose a release suite or coverage gate. The
+  baseline remains syntax, compilation, and clean loading.
 - **Class 4 — meta:** baseline plus workflow/markdown linting.
 
 ## Coverage
@@ -51,10 +52,12 @@ Do not add an org-wide coverage number.
 
 ## Writing Zsh tests
 
-- Use ZUnit; keep one behavior per test.
-- Test by sourcing the plugin in a clean Zsh session — there is no build step.
-- For annex/handler functions, assert side effects are reversed by the unload
-  function (`<plugin>_plugin_unload`).
+- Use ZUnit for Zsh unit tests and keep one behavior per test. Standalone Zsh
+  integration or system tests are also valid when they exercise boundaries that
+  do not fit a unit test.
+- Test plugins by sourcing them in a clean Zsh session; there is no build step.
+- When unload is part of the subject's contract, assert that its unload function
+  reverses the owned side effects.
 
 ## Required checks
 

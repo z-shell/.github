@@ -23,8 +23,6 @@ The sources of truth are:
 
 - the live workflow definition, state, and recent runs in the owning repository;
 - repository activity and the owning GitHub issue or pull request;
-- Linear for cross-repository, security, release-blocking, strategic, or
-  organization-infrastructure work;
 - the relevant organization runbook, accepted decision record, and
   [recurring-operations coordination issue](https://github.com/z-shell/.github/issues/485).
 
@@ -199,7 +197,7 @@ communication, recovery path, and owner.
 ## Reconcile tracker ownership
 
 Every follow-up has one owning GitHub issue or pull request. Link to that owner
-instead of opening duplicates. Use Linear in addition to the GitHub owner only
+instead of opening duplicates. Use a linked Linear mirror only
 for cross-repository, security, release-blocking, strategic, or
 organization-infrastructure work.
 
@@ -312,7 +310,7 @@ record.
 - classify each workflow as retain, event-driven, reusable, manual, or remove
 - name an owner, decision evidence, and retirement condition
 - keep private evidence in a restricted private artifact
-- reconcile each follow-up with its owning GitHub and Linear records
+- reconcile each follow-up with its owning GitHub record and any linked Linear mirror
 
 Return a draft only. Do not dispatch, enable, disable, edit, label, comment,
 close, lock, or create tracker items.
@@ -328,7 +326,7 @@ draft-disposition policy.
 - output candidate lists with age, activity, owner, and recovery context
 - exclude security reports, regressions, release blockers, roadmap items,
   pinned discussions, and status:blocked
-- identify existing owning GitHub and Linear records
+- identify the existing owning GitHub record and any linked Linear mirror
 - state where maintainer judgment is required
 
 Return a draft only. Do not add labels, post comments, close items, lock
@@ -355,7 +353,7 @@ tracker records only after reconciliation.
 
 - [ ] Confirm the repository class, default branch, live workflow state, and
       recent repository activity.
-- [ ] Identify the owning runbook, GitHub issue or pull request, Linear item,
+- [ ] Identify the owning runbook, GitHub issue or pull request, any linked Linear mirror,
       maintainer, and retirement condition.
 - [ ] Classify the operation with the decision tree and complete every record
       field.
@@ -380,7 +378,7 @@ tracker records only after reconciliation.
 - [ ] Observe the next expected event or scheduled trigger before declaring a
       replacement healthy.
 - [ ] Recheck live state after the observation window.
-- [ ] Reconcile GitHub and Linear owner, status, evidence, and next step.
+- [ ] Reconcile the owning GitHub record with any linked Linear mirror.
 - [ ] Confirm public output contains no private identity, administrative
       detail, credential, secret, local path, or unresolved placeholder.
 - [ ] Record whether the workflow or recurring review met its retirement

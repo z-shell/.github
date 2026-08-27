@@ -8,4 +8,4 @@ This document lists the members of the Organization's Steering Committee. Voting
 
 ---
 
-Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).
+Licensed under the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

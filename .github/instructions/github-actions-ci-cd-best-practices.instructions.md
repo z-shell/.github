@@ -37,6 +37,7 @@ permissions:
 ## 2. Security Hardening & Supply-Chain Integrity
 
 ### Action Pinning
+
 - **Immutable Commit SHAs**: Every external action `uses:` reference MUST be pinned to a full 40-character commit SHA.
 - **Version Comments**: Append a human-readable version comment after the SHA for auditability.
 - **Prohibited**: Never use mutable tags (e.g., `@v4`, `@main`, `@latest`).
@@ -50,10 +51,12 @@ permissions:
 ```
 
 ### Permissions (Least Privilege)
+
 - **Top-Level Baseline**: Declare `permissions: { contents: read }` (or stricter `permissions: {}`) at the root workflow level.
 - **Job-Level Overrides**: Elevate permissions only on the specific jobs that require them (e.g., `packages: write`, `id-token: write`).
 
 ### Secrets & Authentication
+
 - Pass secrets strictly through environment variables (`env:`); never inline secrets into `run:` scripts.
 - Use OpenID Connect (OIDC) for cloud integrations instead of long-lived credentials (`id-token: write`).
 
@@ -74,9 +77,12 @@ permissions:
 
 ---
 
-## 5. Deprecated Patterns & Tool Ban
+## 5. Organization-Retired Patterns
 
-Do not introduce or retain the following deprecated patterns across Z-Shell workflows:
+The following patterns are retired by Z-Shell policy. This is an organization
+decision, not a claim that each upstream project is deprecated. Do not introduce
+new uses; migrate existing uses through their owning rollout and runbook.
+
 - `actions/labeler` (label management is handled centrally via `runbooks/labels.md`)
 - `sync-labels.yml`, `pr-labels.yml`
 - `stale.yml`, `lock.yml`, `rebase.yml`

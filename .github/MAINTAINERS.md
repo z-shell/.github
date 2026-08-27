@@ -8,4 +8,4 @@ This document lists the Maintainers of the Project. Maintainers may be added onc
 
 ---
 
-Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).
+Licensed under the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

@@ -107,5 +107,5 @@ exclude_link_local = false
 # Exclude loopback IP address range and localhost from checking.
 exclude_loopback = true
 
-# Exclude all mail addresses from checking.
-exclude_mail = false
+# Do not check mail addresses.
+include_mail = false

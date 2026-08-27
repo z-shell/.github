@@ -100,9 +100,9 @@ Typical next steps:
 
 Do not promise delivery dates.
 
-## Step 5 — Decide whether it belongs on the tracker
+## Step 5: Decide whether it needs a Linear mirror
 
-Add the work to Linear when it:
+Mirror the owning GitHub issue in Linear only when it:
 
 - crosses repositories
 - blocks a release
@@ -110,6 +110,9 @@ Add the work to Linear when it:
 - has strategic or roadmap significance
 
 Linear's native GitHub integration will automatically ingest tracking issues based on configuration. Do not apply broad sync to ordinary single-repository bugs, questions, or cleanup tasks. See `runbooks/project-tracker.md`.
+
+The owning GitHub issue remains authoritative. Keep any Linear item linked to
+that issue and reconcile the mirror from the GitHub record.
 
 In Linear, populate:
 

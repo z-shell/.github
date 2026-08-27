@@ -36,9 +36,8 @@ Create an accurate, concise, and visually intentional repository landing page.
 - Do not use decorative link clusters, excessive badges, emoji-heavy headings,
   or images without useful alt text.
 - Prefer repository-owned assets.
-- Screenshot and terminal-demo automation is tracked in Linear ZSH-18; until it
-  lands, manually maintained visuals must be reviewed when documented output
-  changes.
+- Until repository-owned screenshot or terminal-demo automation is verified,
+  manually maintained visuals must be reviewed when documented output changes.
 
 ## Scope
 

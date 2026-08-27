@@ -37,7 +37,7 @@ Use the right home for each kind of knowledge:
 
 | Kind of information                   | Source of truth                                                              |
 | ------------------------------------- | ---------------------------------------------------------------------------- |
-| Active work, blockers, next steps     | GitHub issues, pull requests, and Linear                                     |
+| Active work, blockers, next steps     | GitHub issues and pull requests                                              |
 | Organization policy                   | AGENTS.md in this repository                                                 |
 | Instruction routing and impact review | .github/instruction-surfaces.json and runbooks/instruction-update.md         |
 | Durable architectural decisions       | `decisions/` in this repo                                                    |
@@ -72,8 +72,9 @@ When working in z-shell repositories, optimize for:
 - **Plugin authoring:** read the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) for plugin creation, code changes, reviews, templates, and documentation. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
-- **Commit trailers:** `Co-authored-by` crediting a real human — including the PR author crediting themselves — is fine. Never credit a bot, AI agent, or automation as a co-author. CI-enforced on `z-shell/.github` via `commit-lint.yml`; org-wide rollout to other repositories is tracked in [z-shell/.github#464](https://github.com/z-shell/.github/issues/464), still author-enforced there until each repo adds the caller.
+- **Commit trailers:** `Co-authored-by` crediting a real human, including the PR author crediting themselves, is fine. Never credit a bot, AI agent, or automation as a co-author. `z-shell/.github` and `z-shell/zi` enforce this in CI. Other repositories remain author-enforced until their own verified caller is live; do not infer enforcement from organization policy alone.
 - **Branch selection:** Follow `decisions/0008-branching-model.md` and verify the live state of the owning repository; do not assume one universal default branch.
+- **Worktrees:** Treat `git worktree list --porcelain` as the authoritative inventory. Use the owning repository's declared helper and stable worktree root; do not create worktrees in `/tmp` or another ad hoc location. Do not use a linked superproject checkout for work that needs initialized submodules. Follow `runbooks/worktrees.md`.
 - **Documentation placement:** keep long-form docs in the wiki when practical; keep repo-local docs focused on policy, workflow, and source-adjacent guidance.
 - **Workflow files:** follow the org workflow conventions and keep permissions explicit, actions pinned, and concurrency defined.
 - **Dependency updates:** Renovate owns routine version updates; GitHub Dependabot owns vulnerability alerts and security updates. See `runbooks/dependency-management.md`.

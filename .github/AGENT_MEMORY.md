@@ -4,12 +4,13 @@ Z-Shell uses GitHub-native records as the shared memory between humans and LLM a
 
 ## Sources of Truth
 
-| State                                    | Source of truth                                               |
-| ---------------------------------------- | ------------------------------------------------------------- |
-| Active work, blockers, and next steps    | GitHub issues, pull requests, and the Z-Shell Tracker project |
-| Deferred or planned work                 | GitHub issues in the owning repository                        |
-| Durable decisions and long-form guidance | Z-Shell wiki                                                  |
-| Local agent recall                       | Optional cache only; must not be the only record              |
+| State                                    | Source of truth                                          |
+| ---------------------------------------- | -------------------------------------------------------- |
+| Active work, blockers, and next steps    | GitHub issues and pull requests in the owning repository |
+| Organization portfolio view              | Z-Shell Delivery, Project 28                             |
+| Deferred or planned work                 | GitHub issues in the owning repository                   |
+| Durable decisions and long-form guidance | Z-Shell wiki                                             |
+| Local agent recall                       | Optional cache only; must not be the only record         |
 
 ## Agent Workflow
 
@@ -22,7 +23,7 @@ Before starting non-trivial work:
 3. Prefer the most recent GitHub-visible state over local notes or LLM memory.
 4. If no issue exists for planned or deferred work, propose one. Create it only
    when explicit external-write authority is present.
-5. Verify the owning issue is visible in Z-shell Delivery before substantive
+5. Verify the owning issue is visible in Z-Shell Delivery before substantive
    implementation starts. If it is missing, restore membership or record the
    blocker on the issue.
 

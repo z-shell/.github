@@ -4,7 +4,10 @@ This Project welcomes contributions, suggestions, and feedback. All contribution
 
 You represent that if you do not own copyright in the code that you have the authority to submit it under the [Project's license](../LICENSE). All feedback, suggestions, or contributions are not confidential.
 
-[Should be further filled in by the project - including defining the requirements to reach maintainer status]
+Before contributing, read [`../AGENTS.md`](../AGENTS.md), the applicable
+repository instructions, and the relevant issue or pull request. Maintainer
+roles and responsibilities are defined in [GOVERNANCE.md](GOVERNANCE.md) and
+[MAINTAINERS.md](MAINTAINERS.md).
 
 The Project abides by the Organization's [code of conduct](CODE_OF_CONDUCT.md) and [trademark policy](TRADEMARKS.md).
 
@@ -26,4 +29,4 @@ Role-specific expectations, responsibilities.
 
 ---
 
-Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).
+Licensed under the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

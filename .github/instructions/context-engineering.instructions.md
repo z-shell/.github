@@ -11,7 +11,7 @@ Best practices for providing concise, high-signal context to AI models working w
 
 ## 1. Context Principles
 
-- **Progressive Discovery**: Rely on root `AGENTS.md` for organization policy and load scoped `.github/instructions/*.instructions.md` only when modifying matched file patterns.
+- **Progressive Discovery**: Rely on root `AGENTS.md` for organization policy and load scoped `.github/instructions/*.instructions.md` whenever the task and path routes match, including read-only review and diagnosis.
 - **Locality of Reference**: Focus context on the target repository and immediate dependencies. Avoid pulling unrelated child repository state into the active context.
 - **Symbol & Path Precision**: Reference exact file paths (e.g., `functions/z-a-patch`, `tests/zunit/test-load.zunit`) and exact function names to avoid ambiguity.
 

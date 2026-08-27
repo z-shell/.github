@@ -45,13 +45,10 @@ rollout status per repository is tracked in issue #454, not restated here.
   ADR-0012. ADR-0012 does **not** establish organization-wide secret-scanning
   coverage; that requires separately configured and verified controls.
 - Conventional Commits (ADR-0003), PR-title validation, and the
-  disallowed-trailer rule are enforced in CI. None of these is a live org-wide
-  gate today: a sweep of the default branches of all 86 active, non-fork,
-  non-archived repositories found no workflow that runs the
-  `DISALLOWED_TRAILER_PATTERN` check or validates commit messages. Non-default
-  branches were not swept. The only implementation is a `commit-lint` workflow
-  on the `next` branch of `z-shell/zi`, which has never reached a default
-  branch.
+  disallowed-trailer rule are target CI gates. Live enforcement is
+  repository-scoped and must be verified from the owning repository's caller,
+  required checks, and rulesets. A workflow file alone is not proof that the
+  gate is required or effective.
 
 ### By class
 
@@ -104,11 +101,9 @@ that a ruleset enforces it.
 - "Validation-only for git-consumed repositories" becomes an explicit rule,
   discouraging release machinery in class-3 repositories (consistent with
   ADR-0007).
-- The testing instruction file (`.github/instructions/testing.instructions.md`)
-  currently reads as present-tense enforcement (for example, it states
-  Conventional Commits and the disallowed-trailer check "are enforced"). That
-  is target-state language, not evidence of current conformance, and the file
-  should be reconciled to say so. It is not changed by this decision.
+- The testing instruction distinguishes the organization target from verified
+  repository-local enforcement so agents do not infer live gates from policy
+  prose or workflow-file presence.
 
 ## Alternatives considered
 

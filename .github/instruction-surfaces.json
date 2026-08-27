@@ -28,6 +28,30 @@
       "canonical_for": []
     },
     {
+      "id": "claude-adapter",
+      "path": ".claude/CLAUDE.md",
+      "kind": "adapter",
+      "authority": "adapter-only",
+      "consumers": ["claude-code"],
+      "tasks": ["all"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
+      "id": "gemini-adapter",
+      "path": ".gemini/settings.json",
+      "kind": "adapter",
+      "authority": "adapter-only",
+      "consumers": ["gemini-cli"],
+      "tasks": ["all"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "agent-memory",
       "path": ".github/AGENT_MEMORY.md",
       "kind": "runbook",
@@ -88,7 +112,11 @@
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["generator-verifier-workflow", "generator-verifier-architecture", "generator-verifier-concurrency"],
+      "tasks": [
+        "generator-verifier-workflow",
+        "generator-verifier-architecture",
+        "generator-verifier-concurrency"
+      ],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -112,7 +140,7 @@
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["documentation-placement"],
+      "tasks": ["documentation", "documentation-placement"],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -124,7 +152,7 @@
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["github-actions"],
+      "tasks": ["ci", "github-actions", "workflow"],
       "file_patterns": [".github/workflows/*.yml,.github/workflows/*.yaml"],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -148,18 +176,30 @@
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["tool-integration-guidance"],
+      "tasks": ["external-service", "tool-integration-guidance"],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["tool-integration-guidance"]
     },
     {
+      "id": "instruction-worktree-management",
+      "path": ".github/instructions/worktree-management.instructions.md",
+      "kind": "scoped-guidance",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["worktree-management"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["worktree-management"]
+    },
+    {
       "id": "instruction-shell-dialect-dispatch",
       "path": ".github/instructions/shell.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
-      "consumers": ["codex", "claude-code", "copilot", "human"],
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": ["shell"],
       "file_patterns": ["**/*.sh"],
       "required": true,
@@ -171,7 +211,7 @@
       "path": ".github/instructions/zsh-scripting.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
-      "consumers": ["codex", "claude-code", "copilot", "human"],
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": ["all"],
       "file_patterns": [
         "**/*.zsh,**/*.plugin.zsh,**/*.zsh-theme,**/*.zunit,**/.zshenv,**/.zprofile,**/.zshrc,**/.zlogin,**/.zlogout,**/zshenv,**/zprofile,**/zshrc,**/zlogin,**/zlogout,**/functions/**,**/completions/**/_*"
@@ -471,7 +511,13 @@
       "kind": "runbook",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["organization-review"],
+      "tasks": [
+        "organization-review",
+        "project-health",
+        "repository-health",
+        "repository-health-audit",
+        "repository-health-check"
+      ],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -504,10 +550,7 @@
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
-      "canonical_for": [
-        "recurring-operations",
-        "zsh-plugin-standard-review"
-      ]
+      "canonical_for": ["recurring-operations", "zsh-plugin-standard-review"]
     },
     {
       "id": "runbook-release",
@@ -532,6 +575,18 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["security-incident"]
+    },
+    {
+      "id": "runbook-worktrees",
+      "path": "runbooks/worktrees.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["worktree-management"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["worktree-management-procedure"]
     },
     {
       "id": "runbook-triage",
@@ -744,6 +799,18 @@
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": ["architecture-decision"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
+      "id": "decision-0018",
+      "path": "decisions/0018-portable-worktree-management.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "worktree-management"],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",

@@ -1971,7 +1971,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "3860eff9c2566b91ec593c527f28046c615302a52e56ad0af9151405117f9953",
+            "7ff668025cf5131fe846750b2f1a9379a136c381dfba0ead3a4f9b95ba0fbc07",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
@@ -3455,7 +3455,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             rendered = (
                 template_path.read_text(encoding="utf-8")
                 .replace("__NAME__", "demo")
-                .replace("__KEY__", "DEMO")
                 .replace("__FPATH_VAR__", "DEMO_FPATH")
             )
             entry_path.write_text(rendered, encoding="utf-8")
@@ -3493,12 +3492,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 check_scaffold_removed() {
                     (( ! ${+functions[demo_plugin_unload]} )) &&
                     (( ! ${+parameters[DEMO_FPATH]} )) &&
-                    (( ! ${+parameters[DEMO_FPATH_ADDED]} )) &&
-                    (( ! ${+parameters[DEMO_FPATH_PLUGINS_KEY_EXISTED]} )) &&
-                    (( ! ${+parameters[DEMO_FPATH_PLUGINS_KEY_VALUE]} ))
+                    (( ! ${+parameters[DEMO_FPATH_ADDED]} ))
                 }
-
-                unset PMSPEC
                 """)
             cases = {
                 "default-native": textwrap.dedent(r"""
@@ -3507,11 +3502,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     unset PMSPEC
                     . "$1" || exit 10
                     check_fpath /baseline "$2" || exit 11
-                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 12
                     (( DEMO_FPATH_ADDED == 1 )) || exit 13
                     demo_plugin_unload || exit 14
                     check_fpath /baseline || exit 15
-                    (( ! ${+Plugins[DEMO]} )) || exit 16
                     [[ ${Plugins[OTHER]} == caller-other ]] || exit 17
                     check_scaffold_removed || exit 18
                     """),
@@ -3566,7 +3559,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     . "$1" || exit 60
                     [[ ! -o FUNCTION_ARGZERO ]] || exit 61
                     [[ $0 == "$caller_zero" ]] || exit 62
-                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 63
                     demo_plugin_unload || exit 64
                     [[ ! -o FUNCTION_ARGZERO ]] || exit 65
                     [[ $0 == "$caller_zero" ]] || exit 66
@@ -3583,7 +3575,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     check_fpath /baseline "$2" || exit 74
                     demo_plugin_unload || exit 75
                     check_fpath /baseline || exit 76
-                    (( ! ${+Plugins[DEMO]} )) || exit 77
                     check_scaffold_removed || exit 78
                     """),
                 "preexisting-plugin-key": textwrap.dedent(r"""
@@ -3593,7 +3584,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                       OTHER caller-other
                     )
                     . "$1" || exit 80
-                    [[ ${Plugins[DEMO]} == ${1:h} ]] || exit 81
+                    [[ ${Plugins[DEMO]} == 'caller original [literal]*? value' ]] ||
+                      exit 81
                     . "$1" || exit 82
                     demo_plugin_unload || exit 83
                     [[ ${Plugins[DEMO]} == 'caller original [literal]*? value' ]] ||
@@ -3612,17 +3604,13 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     check_fpath "$2" /baseline || exit 93
                     check_scaffold_removed || exit 94
                     """),
-                "loader-handled-first-source": textwrap.dedent(r"""
+                "manager-profile-does-not-suppress-portable-path": textwrap.dedent(r"""
                     typeset -ga fpath=( /baseline )
                     typeset -gA Plugins
                     PMSPEC=f
                     . "$1" || exit 100
-                    (( DEMO_FPATH_ADDED == 0 )) || exit 101
-                    check_fpath /baseline || exit 102
-                    unset PMSPEC
-                    . "$1" || exit 103
-                    (( DEMO_FPATH_ADDED == 0 )) || exit 104
-                    check_fpath /baseline || exit 105
+                    (( DEMO_FPATH_ADDED == 1 )) || exit 101
+                    check_fpath /baseline "$2" || exit 102
                     demo_plugin_unload || exit 106
                     check_fpath /baseline || exit 107
                     (( ! ${+Plugins[DEMO]} )) || exit 108
@@ -3772,10 +3760,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         self.assertNotIn('\n0="', template)
         self.assertEqual(template.count("builtin emulate -L zsh"), 2)
         for fragment in (
-            "${PMSPEC-}",
             "__FPATH_VAR___ADDED",
-            "__FPATH_VAR___PLUGINS_KEY_EXISTED",
-            "__FPATH_VAR___PLUGINS_KEY_VALUE",
             "fpath[(Ie)${__FPATH_VAR__}]",
             "unfunction __NAME___plugin_unload",
             "zsh/security/trust-paths",
@@ -3783,6 +3768,9 @@ class PublicZshStandardContractTests(unittest.TestCase):
         ):
             with self.subTest(template_contract=fragment):
                 self.assertIn(fragment, template)
+        for fragment in ("${PMSPEC-}", "Plugins[", "__KEY__"):
+            with self.subTest(portable_template_excludes=fragment):
+                self.assertNotIn(fragment, template)
 
         readme = (PUBLIC_ROOT / ".github/README.md").read_text(encoding="utf-8")
         self.assertIn("scripts/validate-zsh-standard-policy.py", readme)
@@ -3794,7 +3782,6 @@ class PublicZshStandardContractTests(unittest.TestCase):
     def test_consumers_define_plugins_restoration_as_preload_state(self) -> None:
         consumers = (
             ".github/agents/zsh-plugin-standard-reviewer.agent.md",
-            ".github/skills/new-zsh-plugin/SKILL.md",
             ".github/skills/zunit-test/SKILL.md",
         )
         for relative_path in consumers:
@@ -3859,7 +3846,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         requirements = (
             ('environment.pop("ZERO", None)', 1),
             ("timeout=10", 2),
-            ('"loader-handled-first-source"', 1),
+            ('"manager-profile-does-not-suppress-portable-path"', 1),
             ("PMSPEC=f", 1),
             ("[[ ! -o UNSET ]]", 2),
             ("[[ ! -o FUNCTION_ARGZERO ]]", 2),

@@ -8,7 +8,7 @@
   </p>
   <p>
     <a href="https://github.com/z-shell/.github/blob/main/LICENSE">
-      <img src="https://img.shields.io/badge/License-MIT-23c88a?style=flat-square" alt="License" />
+      <img src="https://img.shields.io/badge/License-GPL--3.0-23c88a?style=flat-square" alt="License" />
     </a>
   </p>
 </div>
@@ -183,7 +183,7 @@ This repository is the right place for any **organization-level** configuration:
 - **Adding a new default issue/PR template** — add it to `.github/ISSUE_TEMPLATE/`
 - **Updating agent instructions, ADRs, runbooks, or patterns** — edit `AGENTS.md`, `decisions/`, `runbooks/`, or `PATTERNS.md`
 - **Defining weekly review, ADR, or release coordination workflows** — add or update the relevant file under `runbooks/`
-- **Recording cross-agent progress** — follow `.github/AGENT_MEMORY.md` and keep active state in issues, pull requests, and Linear
+- **Recording cross-agent progress:** follow `.github/AGENT_MEMORY.md` and keep authoritative state in the owning GitHub issue or pull request; add a Linear mirror only when `../runbooks/project-tracker.md` calls for one
 - **Managing organization task tracking** — follow `../runbooks/project-tracker.md`
 - **Updating the shared label set** — edit `lib/labels.yml` and roll it out via the org's maintenance automation
 - **Cleaning legacy labels** — follow `../runbooks/labels.md` before deleting labels from live repositories
@@ -193,8 +193,9 @@ This repository is the right place for any **organization-level** configuration:
 - **Changing contribution or security policies** — edit the corresponding file in `.github/`
 - **Updating dependency automation** — edit `renovate-config.json` and follow `../runbooks/dependency-management.md`
 
-For a repository-specific Renovate exception, add a minimal `renovate.json` that
-extends the organization preset and contains only the required override.
+For a repository-specific Renovate exception, add a minimal
+`.github/renovate.json` that extends the organization preset and contains only
+the required override.
 
 ## Links
 

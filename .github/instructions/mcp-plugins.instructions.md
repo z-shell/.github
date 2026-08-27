@@ -18,8 +18,10 @@ and otherwise consult official documentation or search the local repository.
   Greptile) as touching a **live external service**. Read-only by default;
   confirm with the user before any write, deploy, secret change, or other
   outward-facing action.
-- GitHub, the wiki, and the Z-Shell Tracker remain the source of truth. Record
-  tool-derived findings in PRs and issues, not only in local agent memory.
+- GitHub issues and pull requests remain authoritative for active work, and the
+  wiki remains authoritative for durable long-form documentation. Project 28
+  and any Linear mirror are views, not independent authorities. Record
+  tool-derived findings in the owning GitHub record, not only in local memory.
 
 ## Context7 (no auth)
 

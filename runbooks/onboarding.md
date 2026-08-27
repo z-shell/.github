@@ -21,8 +21,9 @@ Before touching anything, read, in order:
 
 ## Step 2 — Understand the source of truth
 
-- Active progress lives in **GitHub issues, PRs, and Linear** — not
-  in local notes or agent memory.
+- Active progress lives in **GitHub issues and pull requests**, not in local
+  notes or agent memory. Project 28 is the portfolio view; Linear is a selective
+  mirror, not an authority.
 - This public repository's `AGENTS.md`, ADRs, and runbooks are the organization
   source for policy and operational guidance.
 - Live source, repository-specific instructions, and active project state live
@@ -48,10 +49,10 @@ Grant only what the role requires; record the grant:
 - Configure commit signing: commits are signed (`gpg.format=ssh`); set a
   `user.signingkey`. A `Co-authored-by` trailer crediting a real human is
   fine — never credit a bot, AI agent, or automation as a co-author; that is
-  org policy. `z-shell/.github` enforces it in CI (`commit-lint.yml`, PRs
-  into `main`); most other repositories do not have the caller wired in yet
-  ([z-shell/.github#464](https://github.com/z-shell/.github/issues/464)), so
-  it remains the author's responsibility there — including watching for a
+  org policy. `z-shell/.github` and `z-shell/zi` currently enforce it in CI.
+  Verify every other repository's live caller and required-check configuration;
+  where no verified gate exists, it remains the author's responsibility,
+  including watching for a
   squash merge silently promoting a bot/agent trailer from an individual
   commit into the merge commit (`runbooks/branch-protection.md`).
 - Follow Conventional Commits and the branch model for the repo's class
