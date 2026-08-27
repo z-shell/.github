@@ -42,4 +42,4 @@ Amendments to this governance policy may be made by affirmative vote of 2/3 of a
 
 ---
 
-Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).
+Licensed under the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

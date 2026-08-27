@@ -139,7 +139,7 @@ Follow `runbooks/dependency-management.md`:
    updates in GitHub settings.
 4. Add `.github/renovate.json` only for a repository-specific exception such
    as a `next` target branch. If `decisions/0008-branching-model.md` assigns
-   this repository the `next` → `main` model, this exception is mandatory,
+   this repository the `next` to `main` model, this exception is mandatory,
    not optional. See `runbooks/branch-protection.md`.
 5. Do not add `.github/dependabot.yml` for routine version updates.
 

@@ -13,7 +13,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v1.7.6
+      ref: v1.11.0
 lint:
   disabled:
     - terrascan
@@ -49,8 +49,17 @@ lint:
 runtimes:
   enabled:
     - python@3.10.8
-    - go@1.21.0
+    - go@1.25.13
     - node@22.16.0
+  definitions:
+    - type: go
+      linter_environment:
+        - name: PATH
+          list: ["${linter}/bin"]
+        - name: GOPATH
+          value: ${linter}
+        - name: GOBIN
+          value: ${linter}/bin
 actions:
   disabled:
     - trunk-check-pre-push

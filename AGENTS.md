@@ -11,9 +11,9 @@ This file is intentionally short. It complements, not replaces:
 
 ## Required instruction routing
 
-Before non-trivial work, inspect `.github/instruction-surfaces.json`. This applies to every supported runtime. Match the current task categories and repository-relative file patterns against each manifest surface. When a surface declares both task and path dimensions, both dimensions must match before selecting it. Read every matched required surface before acting. If a runtime does not auto-load scoped guidance, open each matched required surface explicitly. Repeat this selection whenever the task, path, or repository scope changes.
+Before non-trivial work, inspect `.github/instruction-surfaces.json`. This applies to every supported runtime. Match the current task categories and repository-relative file patterns against each manifest surface. When a surface declares both task and path dimensions, both dimensions must match before selecting it. Read every matched required surface before acting. If a runtime does not auto-load scoped guidance, open each matched required surface explicitly. Cache the result by `(repository, task class, normalized matched path set, relevant content hashes)`. Reuse it only while every key component is unchanged; otherwise reselect. When several routes select the same physical file, read it once and retain their combined provenance.
 
-Treat byte-exact instruction content already present in the active instruction context as loaded. Manifest ownership entries and repository links do not request a second read. Re-evaluate only when the task, path, repository scope, or content changes.
+Treat byte-exact instruction content already present in the active instruction context as loaded. Manifest ownership entries and repository links do not request a second read. A byte-identical generation source already embedded in an active composite counts as loaded.
 
 ## Agent-file placement
 
@@ -37,7 +37,7 @@ Use the right home for each kind of knowledge:
 
 | Kind of information                   | Source of truth                                                              |
 | ------------------------------------- | ---------------------------------------------------------------------------- |
-| Active work, blockers, next steps     | GitHub issues, pull requests, and Linear                                     |
+| Active work, blockers, next steps     | GitHub issues and pull requests                                              |
 | Organization policy                   | AGENTS.md in this repository                                                 |
 | Instruction routing and impact review | .github/instruction-surfaces.json and runbooks/instruction-update.md         |
 | Durable architectural decisions       | `decisions/` in this repo                                                    |
@@ -72,8 +72,9 @@ When working in z-shell repositories, optimize for:
 - **Plugin authoring:** read the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) for plugin creation, code changes, reviews, templates, and documentation. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
-- **Commit trailers:** `Co-authored-by` crediting a real human — including the PR author crediting themselves — is fine. Never credit a bot, AI agent, or automation as a co-author. CI-enforced on `z-shell/.github` via `commit-lint.yml`; org-wide rollout to other repositories is tracked in [z-shell/.github#464](https://github.com/z-shell/.github/issues/464), still author-enforced there until each repo adds the caller.
+- **Commit trailers:** `Co-authored-by` crediting a real human, including the PR author crediting themselves, is fine. Never credit a bot, AI agent, or automation as a co-author. `z-shell/.github` and `z-shell/zi` enforce this in CI. Other repositories remain author-enforced until their own verified caller is live; do not infer enforcement from organization policy alone.
 - **Branch selection:** Follow `decisions/0008-branching-model.md` and verify the live state of the owning repository; do not assume one universal default branch.
+- **Worktrees:** Treat `git worktree list --porcelain` as the authoritative inventory. Use the owning repository's declared helper and stable worktree root; do not create worktrees in `/tmp` or another ad hoc location. Do not use a linked superproject checkout for work that needs initialized submodules. Follow `runbooks/worktrees.md`.
 - **Documentation placement:** keep long-form docs in the wiki when practical; keep repo-local docs focused on policy, workflow, and source-adjacent guidance.
 - **Workflow files:** follow the org workflow conventions and keep permissions explicit, actions pinned, and concurrency defined.
 - **Dependency updates:** Renovate owns routine version updates; GitHub Dependabot owns vulnerability alerts and security updates. See `runbooks/dependency-management.md`.
@@ -109,31 +110,12 @@ Creating or updating issues, comments, pull requests, or tracker records require
 - If work is unfinished, blocked, or likely to be resumed later, leave an `Agent handoff` comment using `.github/AGENT_MEMORY.md`.
 - Convert deferred follow-up work into issues instead of leaving it only in local notes.
 
-## Triage and prioritization
+## Triage and recurring operations
 
-Use `runbooks/triage.md` for the full process.
-
-Short version:
-
-- Classify issues by work type, area, and severity.
-- Use the canonical labels from `lib/labels.yml`.
-- Search for prior art across the org before responding.
-- Put cross-repo, release-blocking, security, or strategic work on Linear.
-
-## Draft-only workflows
-
-For recurring organization workflows, prefer the runbooks and keep the first pass non-destructive:
-
-- weekly org review: `runbooks/org-review.md`
-- issue and PR triage: `runbooks/triage.md`
-- label maintenance: `runbooks/labels.md`
-- dependency management: `runbooks/dependency-management.md`
-- project tracker automation: `runbooks/project-tracker.md`
-- new-repository bootstrap: `runbooks/new-repository.md`
-- ADR drafting: `runbooks/adr.md`
-- release coordination and release-model classification: `runbooks/release.md`
-
-Unless a maintainer asks otherwise, these workflows produce drafts only.
+Use `runbooks/triage.md` for issue and pull-request triage and
+`runbooks/recurring-operations.md` for recurring organization workflows. Keep
+the first pass non-destructive and, unless a maintainer asks otherwise, produce
+drafts only.
 
 ## Security
 

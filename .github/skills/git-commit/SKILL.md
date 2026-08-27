@@ -2,7 +2,6 @@
 name: git-commit
 description: 'Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping'
 license: MIT
-allowed-tools: Bash
 ---
 
 # Git Commit with Conventional Commits
@@ -14,7 +13,7 @@ Create standardized, semantic git commits using the Conventional Commits specifi
 ## Conventional Commit Format
 
 ```
-<type>[optional scope]: <description>
+<type>(<optional-scope>): <description>
 
 [optional body]
 
@@ -72,15 +71,12 @@ If nothing is staged or you want to group changes differently:
 # Stage specific files
 git add path/to/file1 path/to/file2
 
-# Stage by pattern
-git add *.test.*
-git add src/components/*
-
 # Interactive staging
 git add -p
 ```
 
-**Never commit secrets** (.env, credentials.json, private keys).
+Stage only explicit, reviewed paths. Never commit secrets (`.env`, credential
+files, private keys, or generated secret-bearing artifacts).
 
 ### 3. Generate Commit Message
 
@@ -92,20 +88,14 @@ Analyze the diff to determine:
 
 ### 4. Execute Commit
 
+Write the exact message to a temporary file, inspect it, and commit with:
+
 ```bash
-# Single line
-git commit -m "<type>[scope]: <description>"
-
-# Multi-line with body/footer
-git commit -m "$(cat <<'EOF'
-<type>[scope]: <description>
-
-<optional body>
-
-<optional footer>
-EOF
-)"
+git commit -F /path/to/reviewed-message-file
 ```
+
+Use `<type>: <description>` when there is no scope and
+`<type>(<scope>): <description>` when there is one.
 
 ## Best Practices
 
@@ -122,3 +112,6 @@ EOF
 - NEVER skip hooks (--no-verify) unless user asks
 - NEVER force push to main/master
 - If commit fails due to hooks, fix and create NEW commit (don't amend)
+- A commit request does not authorize a push, pull request, merge, or release
+- Allow legitimate human `Co-authored-by` trailers; never add one for a bot, AI
+  agent, or automation

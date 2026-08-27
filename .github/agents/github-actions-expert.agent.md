@@ -50,7 +50,8 @@ Before creating or modifying workflows:
 - A commit SHA is immutable: once set, it cannot be changed or redirected, providing a cryptographic guarantee about exactly what code will run
 - Add a version comment (e.g., `# v4.3.1`) next to the SHA so humans can quickly understand what version is pinned
 - This applies to **all** actions, including first-party (`actions/`) and especially third-party actions where you have no control over tag mutations
-- Use `dependabot` or Renovate to automate SHA updates when new action versions are released
+- Use Renovate for routine action SHA updates. Dependabot remains responsible
+  for vulnerability alerts and security updates.
 
 **Secrets**:
 
@@ -129,7 +130,8 @@ Eliminate long-lived credentials:
 11. Enable secret scanning
 12. Generate SBOMs for transparency
 13. Audit third-party actions
-14. Keep actions updated with Dependabot
+14. Keep routine action SHA updates under Renovate; retain Dependabot for
+    vulnerability alerts and security updates
 15. Test in forks first
 
 ## Important Reminders

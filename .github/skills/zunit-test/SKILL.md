@@ -22,12 +22,17 @@ Before writing tests:
    `zsh/test/isolate-environment`.
 4. Load the subject the same way production does under
    `zsh/test/match-production-profile`.
-5. Test unload and actual restoration under `zsh/plugin/restore-state`.
+5. When unload is part of the subject's contract, test actual restoration under
+   `zsh/plugin/restore-state`.
 
 `zsh -f` is useful where applicable, but it does not prove every system startup
 source was skipped; a system `zshenv` may still execute.
 
 ## Test file shape
+
+The example below exercises a subject that declares an unload contract and an
+optional `Plugins` registration. Omit those parts when the subject declares
+neither behavior.
 
 ```zsh
 #!/usr/bin/env zunit
@@ -75,10 +80,11 @@ typeset -ga saved_fpath
 Cross-reference real examples in `z-shell/zunit:tests/` and
 `z-shell/zsh-eza:tests/zsh-eza.zunit`.
 
-Add explicit lifecycle tests for each declared side effect. Assert that unload
-removes only plugin-owned state, restores the `Plugins` key to its pre-load
-state (absent stays absent and an existing value is restored), and
-self-destructs. Test both key states when the plugin registers one.
+When unload is part of the subject's contract, add explicit lifecycle tests for
+each declared side effect. Assert that unload removes only plugin-owned state,
+restores any registered `Plugins` key to its pre-load state, and
+self-destructs. Test absent and existing key states when the plugin registers
+one. Omit unload-specific fixtures for subjects without that contract.
 
 Declare each intentional negative fixture in repository metadata under
 `zsh/test/declare-negative-fixtures`. Name the exact fixture and expected
@@ -94,13 +100,15 @@ zunit                       # run the whole suite
 zunit tests/my-plugin.zunit # run one file
 ```
 
-CI runs them natively via the reusable workflow:
-`uses: z-shell/zd/.github/workflows/test-native.yml@main` (accepts `zi_repo` / `zi_ref` inputs).
+Follow the canonical GitHub Actions policy when wiring CI. Do not copy a mutable
+reusable-workflow reference; select an immutable ref only after its owning
+rollout has approved and published one.
 
 ## Conventions
 
-- Pair `@setup` production-equivalent loading with `@teardown` cleanup, and
-  assert the post-unload state rather than only invoking unload.
+- Pair `@setup` production-equivalent loading with `@teardown` cleanup. When
+  unload is part of the contract, assert post-unload state rather than only
+  invoking the unload function.
 - Keep one behavior per `@test`; name it as a sentence describing the expected
   behavior.
 - Keep `.zunit` files under the plugin's `tests/` directory.

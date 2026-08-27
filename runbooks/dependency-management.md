@@ -16,9 +16,9 @@ Do not configure both services to create routine version updates in the same
 repository. The split avoids duplicate pull requests, lock-file conflicts, and
 unnecessary CI runs.
 
-The governing decision is `decisions/0012-hybrid-dependency-management.md`.
-ADR 0004 remains the live policy until the superseding ADR and its
-configuration reach `main`.
+The governing live decision is
+`decisions/0012-hybrid-dependency-management.md`. ADR 0012 supersedes ADR 0004;
+ADR 0004 remains only as historical rationale.
 
 ## Required GitHub security settings
 
@@ -70,7 +70,7 @@ real exception, such as a non-default target branch:
 Custom managers and specialized package grouping also belong in the repository
 that needs them.
 
-For any repository whose `decisions/0008-branching-model.md` row is `next` →
+For any repository whose `decisions/0008-branching-model.md` row is `next` to
 `main`, this `baseBranchPatterns` override is not optional: without it Renovate
 opens routine update PRs against `main` directly, bypassing `next`. This was
 found live (not theoretical) in two repositories — see

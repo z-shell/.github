@@ -1,7 +1,7 @@
 ---
 description: "Canonical code review standards for Z-Shell repositories covering shell dialects, plugin standards, security, and verification"
 applyTo: "**"
-excludeAgent: ["coding-agent"]
+excludeAgent: "cloud-agent"
 ---
 
 # Code Review Guidelines
@@ -15,18 +15,21 @@ Structured review standards for inspecting pull requests, patches, and code chan
 Evaluate findings according to the following hierarchy:
 
 ### 🔴 CRITICAL (Blocks merge)
+
 - **Security**: Untrusted input execution, unreviewed `eval`, exposed tokens/secrets, unsafe temporary file creation.
-- **State Integrity**: Uncontrolled global shell state contamination, missing unload lifecycle hooks (`_plugin_unload`), irreversible side effects.
+- **State Integrity**: Uncontrolled global shell state contamination, failure to honor a declared unload contract, irreversible side effects.
 - **Dialect Violations**: Bash-only syntax in native Zsh files, or non-POSIX constructs in `/bin/sh` scripts.
 - **Breaking Changes**: Undocumented modifications to plugin loading interfaces, CLI arguments, or configuration schemas.
 
 ### 🟡 IMPORTANT (Requires resolution before merge)
+
 - **Compatibility Floor**: Using language features above the repository's declared minimum Zsh/tool version floor without fallback.
 - **Execution Profiles**: Misclassifying source execution profiles (`sourced-library` vs `autoload-function` vs `startup-file`).
 - **Test Coverage**: Lack of regression or unit tests (`.zunit` or Go test fixtures) for new features or bug fixes.
 - **CI / Workflow Compliance**: Violations of action SHA pinning or permissions baselines.
 
 ### 🟢 SUGGESTION (Non-blocking improvements)
+
 - **Idiomatic Optimization**: Leveraging native parameter expansions over subshells (`$(...)`) where performance matters.
 - **Readability & Style**: Minor naming inconsistencies, comment clarity, or file structure formatting.
 
@@ -52,7 +55,7 @@ Evaluate findings according to the following hierarchy:
 
 Structure code review feedback with concrete evidence and actionable fixes:
 
-```markdown
+````markdown
 - **Severity**: [CRITICAL | IMPORTANT | SUGGESTION]
 - **Rule / Category**: [e.g., zsh/plugin/restore-state or security/untrusted-eval]
 - **Location**: `path/to/file:line`
@@ -61,4 +64,8 @@ Structure code review feedback with concrete evidence and actionable fixes:
   ```zsh
   # Proposed fix
   ```
+````
+
+```
+
 ```

@@ -25,13 +25,13 @@ version, follow the manual and report the documentation drift.
 - Scope option changes with `emulate -L zsh` or save and restore the prior
   option state when a change must outlive one function call.
 - Make load-time side effects explicit, minimal, and documented.
-- Provide lifecycle cleanup that reverses plugin-owned side effects, including
-  hooks, functions, parameters, aliases, widgets, path entries, and temporary
-  resources.
+- When the plugin declares an unload contract, provide lifecycle cleanup that
+  reverses plugin-owned side effects, including hooks, functions, parameters,
+  aliases, widgets, path entries, and temporary resources.
 - Do not perform network activity during plugin load. Network access must be an
   explicit user action.
-- Validate syntax with native Zsh and exercise load and unload behavior in a
-  clean Zsh process.
+- Validate syntax with native Zsh. When unload is part of the contract, exercise
+  load and unload behavior in a clean Zsh process.
 
 ## Portable requirements and manager profiles
 

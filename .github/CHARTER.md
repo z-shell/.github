@@ -11,7 +11,7 @@ The Z-Shell Organization members contribute to the instruments, services, other 
 
 **2.1 Purpose**. The Steering Committee will be responsible for all technical oversight, project approval and oversight, policy oversight, and trademark management for the Organization.
 
-**2.2 Composition**. The Steering Committee voting members are listed in the steering-committee.md file in the repository.
+**2.2 Composition**. The Steering Committee voting members are listed in [STEERING_COMMITTEE.md](STEERING_COMMITTEE.md).
 Voting members may be added or removed by no less than 3/4 affirmative vote of the Steering Committee.
 The Steering Committee will appoint a Chair responsible for organizing Steering Committee activity.
 
@@ -59,4 +59,4 @@ Amendments to this charter, the [antitrust policy](./ANTITRUST.md), the [tradema
 
 ---
 
-Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).
+Licensed under the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

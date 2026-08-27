@@ -32,7 +32,20 @@ ALLOWED_CONSUMERS = {
     "human",
     "ci",
 }
-COPILOT_ADAPTER = "@../AGENTS.md\n"
+ADAPTER_TEMPLATES = {
+    "copilot-adapter": (
+        ".github/copilot-instructions.md",
+        b"@../AGENTS.md\n",
+    ),
+    "claude-adapter": (
+        ".claude/CLAUDE.md",
+        b"@../AGENTS.md\n",
+    ),
+    "gemini-adapter": (
+        ".gemini/settings.json",
+        b'{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n',
+    ),
+}
 FORBIDDEN_PUBLIC_TOKENS = (
     "repos/org/z-shell-dot-github",
     "workspace/repos.yml",
@@ -69,6 +82,8 @@ REQUIRED_SURFACE_FIELDS = (
 BASE_INVENTORY = {
     "AGENTS.md": "shared-policy",
     "PATTERNS.md": "shared-policy",
+    ".claude/CLAUDE.md": "adapter",
+    ".gemini/settings.json": "adapter",
     ".github/AGENT_MEMORY.md": "runbook",
     ".github/README.md": "runbook",
     ".github/copilot-instructions.md": "adapter",
@@ -84,6 +99,9 @@ ENFORCEMENT_INVENTORY = {
     "scripts/validate-agent-policy.py": "enforcement",
 }
 PUBLIC_SCAN_EXEMPTIONS = {"scripts/validate-agent-policy.py"}
+ALLOWED_MANIFEST_FIELDS = {"version", "repository", "canonical_policy", "surfaces"}
+ALLOWED_SURFACE_FIELDS = set(REQUIRED_SURFACE_FIELDS)
+ALLOWED_EXCLUDE_AGENTS = {"cloud-agent", "code-review"}
 
 
 def error(path: str, rule: str, fix: str) -> str:
@@ -435,6 +453,15 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
             )
         ]
 
+    for field in sorted(set(manifest) - ALLOWED_MANIFEST_FIELDS):
+        errors.append(
+            error(
+                MANIFEST_PATH,
+                f"unknown top-level field {field!r}",
+                f"remove {field!r} from {MANIFEST_PATH}",
+            )
+        )
+
     if type(manifest.get("version")) is not int or manifest.get("version") != 1:
         errors.append(
             error(
@@ -482,6 +509,14 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
 
         surface = surface_value
         name = _surface_name(surface, index)
+        for field in sorted(set(surface) - ALLOWED_SURFACE_FIELDS):
+            errors.append(
+                error(
+                    MANIFEST_PATH,
+                    f"surface {name!r} has unknown field {field!r}",
+                    f"remove {field!r} from surface {name!r} in {MANIFEST_PATH}",
+                )
+            )
         for field in REQUIRED_SURFACE_FIELDS:
             if field not in surface:
                 errors.append(
@@ -643,8 +678,28 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
         relative_path = _surface_path(surface)
         if relative_path is None:
             continue
+        declared_path = root / relative_path
         try:
-            resolved = (root / relative_path).resolve(strict=False)
+            if declared_path.is_symlink():
+                errors.append(
+                    error(
+                        relative_path,
+                        "declared surface must be a regular file, not a symlink",
+                        f"replace {relative_path} with a regular file inside the repository",
+                    )
+                )
+                continue
+        except OSError as exc:
+            errors.append(
+                error(
+                    relative_path,
+                    f"cannot inspect declared path: {exc}",
+                    f"restore a readable regular file at {relative_path}",
+                )
+            )
+            continue
+        try:
+            resolved = declared_path.resolve(strict=False)
         except (OSError, RuntimeError, ValueError) as exc:
             errors.append(
                 error(
@@ -1013,7 +1068,7 @@ def _parse_apply_to_scalar(value: str) -> str | None:
     return None
 
 
-def _frontmatter_apply_to(text: str) -> list[str]:
+def _frontmatter_scalar_values(text: str, field: str) -> list[str]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
         return []
@@ -1030,12 +1085,16 @@ def _frontmatter_apply_to(text: str) -> list[str]:
 
     values: list[str] = []
     for line in lines[1:closing_index]:
-        match = re.match(r"^applyTo\s*:\s*(.*?)\s*$", line)
+        match = re.match(rf"^{re.escape(field)}\s*:\s*(.*?)\s*$", line)
         if match is None:
             continue
         parsed = _parse_apply_to_scalar(match.group(1))
         values.append(parsed or "")
     return values
+
+
+def _frontmatter_apply_to(text: str) -> list[str]:
+    return _frontmatter_scalar_values(text, "applyTo")
 
 
 def validate_scoped_instructions(root: Path, manifest: dict[str, object]) -> list[str]:
@@ -1098,6 +1157,20 @@ def validate_scoped_instructions(root: Path, manifest: dict[str, object]) -> lis
                     f"make applyTo and file_patterns both {expected_pattern!r}",
                 )
             )
+
+        exclude_agent_values = _frontmatter_scalar_values(text, "excludeAgent")
+        if len(exclude_agent_values) > 1 or any(
+            value not in ALLOWED_EXCLUDE_AGENTS for value in exclude_agent_values
+        ):
+            errors.append(
+                error(
+                    relative_path,
+                    "frontmatter excludeAgent must be one scalar value from "
+                    f"{sorted(ALLOWED_EXCLUDE_AGENTS)!r}",
+                    'set excludeAgent to "cloud-agent" or "code-review", or '
+                    "remove it",
+                )
+            )
     return errors
 
 
@@ -1126,81 +1199,133 @@ def validate_adapters(root: Path, manifest: dict[str, object]) -> list[str]:
                 )
             )
 
-    copilot_surface = next(
-        (
-            surface
-            for surface in _declared_surfaces(manifest)
-            if surface.get("id") == "copilot-adapter"
-        ),
-        None,
+    surfaces = {
+        str(surface.get("id")): surface for surface in _declared_surfaces(manifest)
+    }
+    unexpected_adapter_ids = sorted(
+        str(surface.get("id"))
+        for surface in _declared_surfaces(manifest)
+        if surface.get("kind") == "adapter"
+        and surface.get("id") not in ADAPTER_TEMPLATES
     )
-    if copilot_surface is None:
-        errors.append(
-            error(
-                ".github/copilot-instructions.md",
-                "copilot-adapter surface is not declared",
-                f"declare copilot-adapter in {MANIFEST_PATH}",
-            )
-        )
-        return errors
-
-    if not (
-        copilot_surface.get("kind") == "adapter"
-        and copilot_surface.get("authority") == "adapter-only"
-        and copilot_surface.get("canonical_for") == []
-    ):
+    for surface_id in unexpected_adapter_ids:
         errors.append(
             error(
                 MANIFEST_PATH,
-                "copilot-adapter must be an adapter with adapter-only authority "
-                "and an empty canonical_for list",
-                "set copilot-adapter kind to adapter, authority to adapter-only, "
-                "and canonical_for to []",
+                f"undeclared adapter contract {surface_id!r}",
+                f"remove {surface_id!r} or add its exact contract to the validator",
             )
         )
-
-    relative_path = _surface_path(copilot_surface)
-    if relative_path != ".github/copilot-instructions.md":
-        errors.append(
-            error(
-                relative_path or MANIFEST_PATH,
-                "copilot-adapter must use .github/copilot-instructions.md",
-                "set the copilot-adapter path to .github/copilot-instructions.md",
+    expected_consumers = {
+        "copilot-adapter": ["copilot"],
+        "claude-adapter": ["claude-code"],
+        "gemini-adapter": ["gemini-cli"],
+    }
+    for surface_id, (expected_path, expected_content) in ADAPTER_TEMPLATES.items():
+        surface = surfaces.get(surface_id)
+        if surface is None:
+            errors.append(
+                error(
+                    expected_path,
+                    f"{surface_id} surface is not declared",
+                    f"declare {surface_id} in {MANIFEST_PATH}",
+                )
             )
-        )
-        return errors
-
-    path = root / relative_path
-    try:
-        if path.is_symlink() or not path.is_file():
+            continue
+        if not (
+            surface.get("kind") == "adapter"
+            and surface.get("authority") == "adapter-only"
+            and surface.get("consumers") == expected_consumers[surface_id]
+            and surface.get("tasks") == ["all"]
+            and surface.get("file_patterns") == ["**"]
+            and surface.get("required") is True
+            and surface.get("canonical_for") == []
+        ):
+            errors.append(
+                error(
+                    MANIFEST_PATH,
+                    f"{surface_id} does not match its required delivery contract "
+                    "(adapter, adapter-only, one consumer, all tasks, required)",
+                    f"repair the {surface_id} declaration in {MANIFEST_PATH}",
+                )
+            )
+        relative_path = _surface_path(surface)
+        if relative_path != expected_path:
+            errors.append(
+                error(
+                    relative_path or MANIFEST_PATH,
+                    f"{surface_id} must use {expected_path}",
+                    f"set the {surface_id} path to {expected_path}",
+                )
+            )
+            continue
+        path = root / relative_path
+        try:
+            if path.is_symlink() or not path.is_file():
+                errors.append(
+                    error(
+                        relative_path,
+                        "adapter must be a regular file, not a symlink",
+                        f"replace {relative_path} with the required regular file",
+                    )
+                )
+                continue
+            content = path.read_bytes()
+        except OSError as exc:
             errors.append(
                 error(
                     relative_path,
-                    "copilot adapter must be a regular file, not a symlink",
-                    f"replace {relative_path} with a regular file containing "
-                    f"{COPILOT_ADAPTER!r}",
+                    f"cannot read adapter: {exc}",
+                    f"restore {relative_path} as a readable regular file",
                 )
             )
-            return errors
-        content = path.read_bytes()
-    except OSError as exc:
-        errors.append(
-            error(
-                relative_path,
-                f"cannot read copilot adapter: {exc}",
-                f"restore {relative_path} as a readable regular file",
+            continue
+        if content != expected_content:
+            errors.append(
+                error(
+                    relative_path,
+                    "content does not match exact template for the adapter",
+                    f"replace the entire file with {expected_content!r}",
+                )
             )
-        )
-        return errors
+    return errors
 
-    if content != COPILOT_ADAPTER.encode("utf-8"):
-        errors.append(
-            error(
-                relative_path,
-                "content does not match exact template",
-                f"replace the entire file with {COPILOT_ADAPTER!r}",
+
+def validate_runtime_guidance_layout(
+    root: Path, _manifest: dict[str, object]
+) -> list[str]:
+    errors: list[str] = []
+    root = root.resolve()
+    allowed = {path for path, _content in ADAPTER_TEMPLATES.values()}
+    scan_errors: list[OSError] = []
+    for directory, directory_names, file_names in os.walk(
+        root,
+        topdown=True,
+        followlinks=False,
+        onerror=scan_errors.append,
+    ):
+        directory_names[:] = [name for name in directory_names if name != ".git"]
+        directory_path = Path(directory)
+        for filename in file_names:
+            path = directory_path / filename
+            relative_path = path.relative_to(root).as_posix()
+            is_vendor_memory = filename in {"CLAUDE.md", "GEMINI.md"}
+            is_claude_rule = relative_path.startswith(".claude/rules/")
+            is_generic_skill = (
+                relative_path.startswith(".agents/skills/") and filename == "SKILL.md"
             )
-        )
+            if not (is_vendor_memory or is_claude_rule or is_generic_skill):
+                continue
+            if relative_path in allowed:
+                continue
+            errors.append(
+                error(
+                    relative_path,
+                    "undeclared runtime-specific instruction carrier is forbidden",
+                    f"remove {relative_path} or route it through {MANIFEST_PATH}",
+                )
+            )
+    errors.extend(_codex_guidance_scan_error(root, exc) for exc in scan_errors)
     return errors
 
 
@@ -1229,6 +1354,7 @@ def validate(root: Path) -> list[str]:
         validate_public_policy_size,
         validate_scoped_instructions,
         validate_adapters,
+        validate_runtime_guidance_layout,
     ):
         errors.extend(validator(root, manifest))
     return sorted(set(errors))

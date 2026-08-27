@@ -49,20 +49,20 @@ satisfy the workflow.
 
 ## Destination matrix
 
-| Finding                                                       | Preferred owner                                                |
-| ------------------------------------------------------------- | -------------------------------------------------------------- |
-| A recurrence that can be detected mechanically                | Code, test, type, schema, lint rule, validator, or script      |
-| A mandatory rule that applies broadly                         | Root `AGENTS.md`                                               |
-| Mandatory detail limited by task or path                      | Routed scoped instruction                                      |
-| A reusable multi-step agent workflow                          | Skill                                                          |
-| An implementation idiom observed in at least two repositories | `PATTERNS.md`                                                  |
-| A significant or difficult-to-reverse decision                | Proposed ADR                                                   |
-| A repeatable operational procedure                            | Runbook                                                        |
-| Active work, blocker, or deferred work                        | Owning GitHub issue or pull request, plus Linear when required |
-| An unfinished session another agent must resume               | GitHub-native agent handoff                                    |
-| Durable long-form user or maintainer guidance                 | Appropriate documentation or wiki area                         |
-| A private maintainer preference or private heuristic          | Private memory, with explicit maintainer request or consent    |
-| A one-time detail already clear from code or history          | No additional artifact                                         |
+| Finding                                                       | Preferred owner                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| A recurrence that can be detected mechanically                | Code, test, type, schema, lint rule, validator, or script                      |
+| A mandatory rule that applies broadly                         | Root `AGENTS.md`                                                               |
+| Mandatory detail limited by task or path                      | Routed scoped instruction                                                      |
+| A reusable multi-step agent workflow                          | Skill                                                                          |
+| An implementation idiom observed in at least two repositories | `PATTERNS.md`                                                                  |
+| A significant or difficult-to-reverse decision                | Proposed ADR                                                                   |
+| A repeatable operational procedure                            | Runbook                                                                        |
+| Active work, blocker, or deferred work                        | Owning GitHub issue or pull request, plus a linked Linear mirror when required |
+| An unfinished session another agent must resume               | GitHub-native agent handoff                                                    |
+| Durable long-form user or maintainer guidance                 | Appropriate documentation or wiki area                                         |
+| A private maintainer preference or private heuristic          | Private memory, with explicit maintainer request or consent                    |
+| A one-time detail already clear from code or history          | No additional artifact                                                         |
 
 Prefer executable prevention over prose. Extend an existing canonical owner
 instead of creating a second source of truth.

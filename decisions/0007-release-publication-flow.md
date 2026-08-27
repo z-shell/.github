@@ -58,9 +58,9 @@ Per-repo application:
 
 - **`zunit`** — reference implementation (builds the `zunit` binary, verifies
   the tag against `--version`). Already in place.
-- **`zsh-lint`** — a Zsh plugin consumed from source, with **no build artifact**.
-  Its release is a tagged GitHub release with generated notes only (no upload).
-  (`zsh-lint#21`.)
+- **`zsh-lint`**: a standalone Go semantic-analyzer CLI. Its exact tag commit
+  must pass the repository-owned Go tests and build verification before any
+  release is published. Artifact packaging remains owned by that repository.
 - **`zpmod`**: class 2, with annotated `vX.Y.Z` tags created only from reviewed,
   green `main` commits. Pages and documentation publish only from reviewed
   `main` commits; that continuous documentation surface does not replace the
@@ -87,7 +87,7 @@ Per-repo application:
 
 - **`release-please` as the org standard.** Rejected for now: heavier machinery
   (bot-maintained release PRs, version-bump commits) than the tag boundary
-  requires, and `runbooks/release.md` lists it only as a *pilot candidate*, not a
+  requires, and `runbooks/release.md` lists it only as a _pilot candidate_, not a
   decision. Can be piloted per repo later without contradicting this ADR.
 - **One release model for all repos.** Rejected: continuously-deployed and
   git-consumed repos do not benefit from tag-driven release artifacts.

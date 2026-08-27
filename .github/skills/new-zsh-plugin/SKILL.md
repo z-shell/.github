@@ -24,8 +24,8 @@ semantics.
 2. **Gather inputs** (ask only if not supplied):
    - An explicit target repository root. The caller must supply it; do not infer
      or default to a multi-repository checkout path.
-   - Plugin name in kebab-case, e.g. `zsh-foo` → entry file `zsh-foo.plugin.zsh`.
-   - Derive `PLUGIN_KEY` = upper-snake of the name without a `zsh-` prefix, e.g. `zsh-foo` → `ZSH_FOO`.
+   - Plugin name in kebab-case, for example `zsh-foo` with entry file
+     `zsh-foo.plugin.zsh`.
 
 3. **Create the layout**:
 
@@ -38,10 +38,11 @@ semantics.
    ```
 
 4. **Write the entry file** from `templates/plugin.plugin.zsh`, replacing
-   `__NAME__` (kebab name), `__KEY__` (PLUGIN_KEY), and `__FPATH_VAR__`
-   (`<KEY>_FPATH`). Keep the modelines as the first two lines verbatim. The
-   first source owns the `fpath` decision and `Plugins` snapshot; repeated
-   sources must not reset them.
+   `__NAME__` (kebab name) and `__FPATH_VAR__` (an upper-snake project-owned
+   parameter such as `ZSH_FOO_FPATH`). Keep the modelines as the first two lines
+   verbatim. The first source owns the `fpath` decision; repeated sources must
+   not reset it. Add manager-specific registration only when the user requests
+   and identifies that optional profile.
 
 5. **Write autoload function bodies**: begin each generated function body with
    `builtin emulate -L zsh`. Select only the correctness-affecting options that
@@ -53,10 +54,8 @@ semantics.
      `zsh/validation/native-authority`.
    - In an isolated shell with temporary `HOME` and `ZDOTDIR`, source the entry
      file, verify its declared load effects, invoke `<name>_plugin_unload`, and
-     assert post-unload restoration of `fpath`, the `Plugins` key to its
-     pre-load state, scaffold parameters, functions, hooks, aliases, options,
-     and every other declared side effect. Test both an absent key and an
-     existing value.
+     assert post-unload restoration of `fpath`, scaffold parameters, functions,
+     hooks, aliases, options, and every other declared side effect.
    - The scaffold removes the last exact `fpath` match that it appended. Do not
      insert or reorder an indistinguishable equal entry after that append
      before unloading; Zsh arrays do not retain occurrence identity.

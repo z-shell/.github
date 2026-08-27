@@ -1,8 +1,8 @@
 # 15. Adopt an organization-wide Zsh scripting standard
 
-- **Status:** PROPOSED
-- **Date:** 2026-07-29
-- **Deciders:** Pending maintainer acceptance
+- **Status:** ACCEPTED
+- **Date:** 2026-08-27
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
