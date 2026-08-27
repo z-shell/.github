@@ -85,7 +85,15 @@ method = "get"
 #glob_ignore_case = false
 
 # Exclude URLs and mail addresses from checking (supports regex).
-exclude = ['/z-shell/.github/actions', '/daweedkob', '/tondrejk']
+# The README template placeholders resolve only after the template is copied
+# into its owning repository. Keep the rest of that template under link checks.
+exclude = [
+  '/z-shell/.github/actions',
+  '/daweedkob',
+  '/tondrejk',
+  'github\.com/z-shell/%3Crepository%3E',
+  'templates/readme/(?:LICENSE|repository-owned-asset-path)$',
+]
 
 # Exclude these filesystem paths from getting checked.
 #exclude_path = ["clip"]
