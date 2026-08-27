@@ -71,6 +71,19 @@ The organization label set in `lib/labels.yml` is the source of truth. Apply at 
 | duplicate              | `duplicate`        |
 | not planned            | `wontfix`          |
 
+### Priority definitions
+
+Apply `priority:high` only for the top two bands. Everything below is tracked by
+project-board `Priority` rather than by a label.
+
+| Priority     | Meaning                                                                    |
+| ------------ | -------------------------------------------------------------------------- |
+| **Critical** | Data loss, security vulnerability, or complete breakage with no workaround |
+| **High**     | Significantly impacts users or blocks important work; schedule next        |
+| **Medium**   | Important but not urgent; prioritize against other planned work            |
+| **Low**      | Nice to have; no fixed timeline                                            |
+| **None**     | Not yet triaged or genuinely optional                                      |
+
 ## Step 3 — Cross-reference
 
 Before responding:
