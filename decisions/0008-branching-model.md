@@ -4,7 +4,7 @@
 - **Date:** 2026-07-25
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** `decisions/0019-trunk-on-main-default.md`
 
 ## Context
 

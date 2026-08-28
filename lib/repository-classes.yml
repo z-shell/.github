@@ -6,14 +6,19 @@
 # "presumptively class 3" methodology already used for the manual audits
 # recorded on z-shell/.github#478: class 3 (git-consumed source) is the
 # largest and lowest-ceremony group, and every repository named explicitly in
-# decisions/0007-release-publication-flow.md or decisions/0008-branching-model.md
+# decisions/0007-release-publication-flow.md or decisions/0019-trunk-on-main-default.md
 # is listed below so it is never silently defaulted.
 #
-# Updating this file does not change decisions/0007 or decisions/0008 -- it is
+# Updating this file does not change decisions/0007 or decisions/0019. It is
 # a machine-readable mirror of their per-repo tables, kept in sync by hand.
 # Add a repository here when it is added to either ADR's table, and note the
 # addition in the owning ADR change, not only here.
 default_class: 3
+settings_overrides:
+  # ADR-0019 requires merge commits for persistent next-to-main promotion.
+  # Linear history on main would make that ancestry-preserving merge illegal.
+  z-shell/zi:
+    linear_history: "-"
 repositories:
   z-shell/wiki: 1
   z-shell/src: 1

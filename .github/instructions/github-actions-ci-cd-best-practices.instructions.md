@@ -21,7 +21,7 @@ Canonical guidelines for authoring, reviewing, and hardening GitHub Actions work
 name: CI
 on:
   push:
-    branches: [main, next]
+    branches: [main]
   pull_request:
 
 concurrency:

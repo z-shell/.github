@@ -4,7 +4,7 @@
 - **Date:** 2026-08-16
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** `decisions/0019-trunk-on-main-default.md`
 
 ## Context
 
@@ -18,7 +18,7 @@ those documents states **when** a promotion should happen. That decision is
 currently pure maintainer judgment, undocumented and unaudited — a gap
 identified in [z-shell/.github#513](https://github.com/z-shell/.github/issues/513).
 
-A working precedent already exists for automating a readiness *signal*
+A working precedent already exists for automating a readiness _signal_
 without automating the merge decision itself: `release-prepare.yml`
 (class 2, ADR-0007) opens or updates a proposal issue with a draft changelog
 when releasable commits land on the default branch, but a maintainer still
@@ -70,13 +70,13 @@ mechanism for every `next` → `main` repository, implemented as a reusable
 The bake window is the only per-repository parameter; everything else about
 the mechanism is uniform.
 
-| Repo        | Class | Bake window | Rationale                                                        |
-| ----------- | ----- | ----------- | ------------------------------------------------------------------ |
-| `wiki`      | 1     | 2 hours     | Gives delayed CI/nightly checks a chance to fail before a deploy. |
-| `src`       | 1     | 2 hours     | Same as `wiki`; installer/loader validation can be slow.          |
-| `zi`        | 3     | 0 (none)    | `main` is the consumable ref; staleness costs consumers directly. |
-| `zsh-eza`   | 3     | 0 (none)    | Same rationale as `zi`.                                            |
-| `zsh-lint`  | 2     | 0 (none)    | Readiness already gated by `release-prepare.yml`'s own signal.    |
+| Repo       | Class | Bake window | Rationale                                                         |
+| ---------- | ----- | ----------- | ----------------------------------------------------------------- |
+| `wiki`     | 1     | 2 hours     | Gives delayed CI/nightly checks a chance to fail before a deploy. |
+| `src`      | 1     | 2 hours     | Same as `wiki`; installer/loader validation can be slow.          |
+| `zi`       | 3     | 0 (none)    | `main` is the consumable ref; staleness costs consumers directly. |
+| `zsh-eza`  | 3     | 0 (none)    | Same rationale as `zi`.                                           |
+| `zsh-lint` | 2     | 0 (none)    | Readiness already gated by `release-prepare.yml`'s own signal.    |
 
 These are starting values, not load-bearing constants — a maintainer can tune
 a given repository's bake window without amending this ADR, the same way

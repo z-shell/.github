@@ -16,8 +16,8 @@ statement of _what level of testing each repository class owes_, which makes it
 hard to know whether a repo is under- or over-tested, and what a reviewer should
 require before merge.
 
-ADR-0007 classified repositories by delivery model and ADR-0008 establishes a
-branch model informed by those classes. This ADR similarly establishes a
+ADR-0007 classified repositories by delivery model and ADR-0019 establishes a
+trunk-on-main branch model with one named integration exception. This ADR establishes a
 target CI scope by class, accepted with owned rollout gaps: it does not claim
 that every listed control is already live or configured as a required check.
 
@@ -53,7 +53,8 @@ rollout status per repository is tracked in issue #454, not restated here.
 ### By class
 
 1. **Continuously deployed artifacts** (`wiki`, `src`, `zd`) — the build succeeds
-   on the development branch before deploy. The target checks cover the wiki's
+   on pull requests into `main` and on the merged `main` commit before deploy.
+   The target checks cover the wiki's
    lint and production build, `zd`'s Docker build matrix, and `src`'s
    installer/loader validation, plus CodeQL where a supported language is
    present.
@@ -85,10 +86,11 @@ ratcheting is a per-repo maintainer decision.
 ### Required checks
 
 Under the target policy, each repository marks its class-appropriate checks as
-required for merge to its publication branch (`main`, or `next` → `main` per
-ADR-0008). Validation-only repositories require the baseline; class-2
-repositories additionally require the functional suite. Required checks,
-development-branch validation, SAST coverage, and the release-suite gate are
+required for merge to its integration branch (`main`, or `zi`'s named `next`
+exception per ADR-0019). Validation-only repositories require the baseline;
+class-2 repositories additionally require the functional suite on the exact
+commit before publishing a tag. Required checks,
+integration-branch validation, SAST coverage, and the release-suite gate are
 each verified repository by repository through owning issues; the presence of
 a workflow file is not by itself treated as proof that a check is required or
 that a ruleset enforces it.
@@ -119,7 +121,7 @@ that a ruleset enforces it.
 ## References
 
 - `decisions/0007-release-publication-flow.md` — repository classes.
-- `decisions/0008-branching-model.md` — branch model per class.
+- `decisions/0019-trunk-on-main-default.md` - branch model and named exception.
 - `decisions/0005-workflow-naming-conventions.md` — workflow naming baseline.
 - `decisions/0012-hybrid-dependency-management.md` — dependency-update and
   vulnerability-remediation ownership.

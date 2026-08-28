@@ -817,6 +817,23 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0019",
+      "path": "decisions/0019-trunk-on-main-default.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": [
+        "architecture-decision",
+        "branch-protection",
+        "repository-bootstrap",
+        "release"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["branching-model"]
+    },
+    {
       "id": "zsh-standard-policy",
       "path": "lib/zsh-standard-policy.json",
       "kind": "enforcement",

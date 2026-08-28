@@ -46,15 +46,29 @@ class RepoSettingsAuditTest
     assert_equal("default", resolver.source_for("z-shell/some-new-plugin"))
   end
 
+  def test_class_resolver_returns_named_settings_overrides
+    resolver = RepoSettingsAudit::ClassResolver.load(CLASSES_FILE)
+
+    assert_equal({ "linear_history" => "-" }, resolver.settings_overrides_for("z-shell/zi"))
+    assert_equal({}, resolver.settings_overrides_for("z-shell/wiki"))
+  end
+
   # --- Baseline ----------------------------------------------------------
 
   def test_baseline_disposition_matches_the_adr_0013_table
     assert_equal("R", RepoSettingsAudit::Baseline.disposition(1, "required_status_checks"))
-    assert_equal("S", RepoSettingsAudit::Baseline.disposition(3, "required_status_checks"))
-    assert_equal("-", RepoSettingsAudit::Baseline.disposition(1, "linear_history"))
+    assert_equal("R", RepoSettingsAudit::Baseline.disposition(3, "required_status_checks"))
+    assert_equal("S", RepoSettingsAudit::Baseline.disposition(1, "linear_history"))
     assert_equal("S", RepoSettingsAudit::Baseline.disposition(2, "linear_history"))
     assert_equal("R", RepoSettingsAudit::Baseline.disposition(4, "copilot_code_review"))
     assert_equal("S", RepoSettingsAudit::Baseline.disposition(3, "copilot_code_review"))
+  end
+
+  def test_baseline_applies_a_named_repository_override
+    disposition = RepoSettingsAudit::Baseline.disposition(
+      3, "linear_history", overrides: { "linear_history" => "-" }
+    )
+    assert_equal("-", disposition)
   end
 
   def test_baseline_rejects_an_unknown_class
@@ -96,21 +110,29 @@ class RepoSettingsAuditTest
     assert_equal("pass", row.fetch("status"))
   end
 
-  def test_evaluator_fails_class_one_linear_history_when_present
-    # This is the exact z-shell/wiki and z-shell/src regression ADR-0013 and
-    # issue #478 both call out: class 1's disposition is "-" (not required,
-    # not recommended) specifically because it breaks next -> main promotion.
+  def test_evaluator_passes_class_one_linear_history_when_present
     row = RepoSettingsAudit::Evaluator.evaluate_setting(
       klass: 1, setting: "linear_history", live: true, has_ci: true
     )
-    assert_equal("fail", row.fetch("status"))
+    assert_equal("pass", row.fetch("status"))
   end
 
-  def test_evaluator_passes_class_one_linear_history_when_absent
+  def test_evaluator_warns_when_class_one_linear_history_is_absent
     row = RepoSettingsAudit::Evaluator.evaluate_setting(
       klass: 1, setting: "linear_history", live: false, has_ci: true
     )
-    assert_equal("pass", row.fetch("status"))
+    assert_equal("warn", row.fetch("status"))
+  end
+
+  def test_evaluator_rejects_linear_history_for_persistent_integration_override
+    row = RepoSettingsAudit::Evaluator.evaluate_setting(
+      klass: 3,
+      setting: "linear_history",
+      live: true,
+      has_ci: true,
+      overrides: { "linear_history" => "-" }
+    )
+    assert_equal("fail", row.fetch("status"))
   end
 
   def test_evaluator_marks_required_status_checks_na_when_repo_has_no_ci
@@ -143,7 +165,7 @@ class RepoSettingsAuditTest
     )
 
     assert_equal(RepoSettingsAudit::Baseline::SETTINGS.length, result.fetch("settings").length)
-    assert_equal({ "pass" => 3, "warn" => 4, "fail" => 0, "na" => 0 }, result.fetch("summary"))
+    assert_equal({ "pass" => 3, "warn" => 3, "fail" => 1, "na" => 0 }, result.fetch("summary"))
   end
 
   # --- SettingsExtractor ---------------------------------------------------
@@ -161,6 +183,10 @@ class RepoSettingsAuditTest
         "parameters" => { "required_status_checks" => [{ "context" => "ci" }] } }
     ]
   }.freeze
+
+  FULL_RULESET_WITH_LINEAR = FULL_RULESET.merge(
+    "rules" => FULL_RULESET.fetch("rules") + [{ "type" => "required_linear_history" }]
+  ).freeze
 
   def test_extractor_derives_live_settings_from_an_applicable_active_ruleset
     extracted = RepoSettingsAudit::SettingsExtractor.extract(
@@ -360,7 +386,7 @@ class RepoSettingsAuditTest
       client: FixtureClient.new(
         "/repos/z-shell/wiki" => { "default_branch" => "main" },
         "/repos/z-shell/wiki/rulesets" => [{ "id" => 1, "target" => "branch" }],
-        "/repos/z-shell/wiki/rulesets/1" => FULL_RULESET,
+        "/repos/z-shell/wiki/rulesets/1" => FULL_RULESET_WITH_LINEAR,
         "/repos/z-shell/wiki/branches/main/protection" => GitHubErrorResponse.new(status: 404),
         "/repos/z-shell/wiki/actions/workflows" => { "total_count" => 1 }
       ),

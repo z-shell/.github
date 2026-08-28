@@ -77,6 +77,6 @@ After the transition window:
 ## See also
 
 - `decisions/0007-release-publication-flow.md`
-- `decisions/0008-branching-model.md`
+- `decisions/0019-trunk-on-main-default.md`
 - `runbooks/release.md`
 - `runbooks/triage.md`

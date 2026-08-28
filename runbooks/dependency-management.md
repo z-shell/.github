@@ -70,11 +70,12 @@ real exception, such as a non-default target branch:
 Custom managers and specialized package grouping also belong in the repository
 that needs them.
 
-For any repository whose `decisions/0008-branching-model.md` row is `next` to
-`main`, this `baseBranchPatterns` override is not optional: without it Renovate
-opens routine update PRs against `main` directly, bypassing `next`. This was
-found live (not theoretical) in two repositories — see
-`runbooks/branch-protection.md` for the full audit checklist.
+For a repository with an explicitly approved persistent integration branch
+under `decisions/0019-trunk-on-main-default.md`, this override is mandatory.
+Without it Renovate opens routine update pull requests against default `main`,
+bypassing the integration branch. The current exception is `zi`; trunk-on-main
+repositories must omit the override unless they have another documented need.
+See `runbooks/branch-protection.md` for the full audit checklist.
 
 ## Migrating a repository
 

@@ -41,7 +41,7 @@ shell? CI container? a single plugin?).
 
 ## Step 4 — Remediate
 
-1. Fix on a branch per ADR-0008. Critical fixes may use `hotfix-<id>` from the
+1. Fix on a branch per ADR-0019. Critical fixes may use `hotfix-<id>` from the
    publication branch.
 2. Add a regression test where the class allows it (ADR-0009).
 3. For release-bearing repos (ADR-0007 class 2), cut a patched `vX.Y.Z` tag and
