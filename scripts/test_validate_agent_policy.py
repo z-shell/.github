@@ -1984,7 +1984,7 @@ class PublicRepositoryTests(unittest.TestCase):
         required_fragments = (
             "name: Agent Instruction Validation\n",
             "on:\n  pull_request:\n    paths:\n",
-            "  push:\n    branches:\n      - main\n      - next\n    paths:\n",
+            "  push:\n    branches:\n      - main\n    paths:\n",
             "permissions:\n  contents: read\n",
             "concurrency:\n"
             "  group: ${{ github.workflow }}-${{ github.ref }}\n"

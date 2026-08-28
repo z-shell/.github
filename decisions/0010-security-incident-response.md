@@ -97,7 +97,7 @@ published version tag.
 
 ### Remediation and disclosure
 
-- Fixes land through the normal branch model (ADR-0008); critical fixes may use a
+- Fixes land through the normal branch model (ADR-0019); critical fixes may use a
   `hotfix-<id>` branch from the publication branch.
 - Coordinate disclosure with the reporter per `.github/SECURITY.md`: no public disclosure
   until a fix is published or the report is declined, and credit the reporter.
@@ -193,7 +193,7 @@ decision, is a maintainer call this ADR cannot make for itself.
 - `.github/SECURITY.md` — reporter-facing reporting and disclosure policy.
 - `runbooks/security-incident-response.md` — step-by-step responder runbook.
 - `decisions/0007-release-publication-flow.md` — how patched releases are cut.
-- `decisions/0008-branching-model.md` — hotfix branching for critical fixes.
+- `decisions/0019-trunk-on-main-default.md` - hotfix branching for critical fixes.
 - [GitHub repository security advisories](https://docs.github.com/en/code-security/concepts/vulnerability-reporting-and-management/repository-security-advisories)
 - [Configuring private vulnerability reporting](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository)
 - [GitHub immutable releases](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases)

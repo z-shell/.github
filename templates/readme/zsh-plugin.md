@@ -115,8 +115,9 @@ From the repository root:
 
 ## Release model
 
-<State the stable branch, development branch when applicable, and whether the
-plugin is consumed directly from Git or published as a versioned artifact.>
+<State that contributions integrate on `main` and whether the plugin is consumed
+directly from Git or published as a versioned artifact. A persistent integration
+branch requires an accepted organization ADR naming the repository.>
 
 ## Contributing and license
 

@@ -32,8 +32,9 @@ definitions come from `decisions/0007-release-publication-flow.md`.
 
 ## By class
 
-- **Class 1 — deployed:** the build must pass on the development branch before
-  deploy. Wiki: ESLint + Stylelint + production build. `zd`: Docker build matrix.
+- **Class 1, deployed:** the build must pass on pull requests into `main` and
+  on the merged `main` commit before deploy. Wiki: ESLint + Stylelint +
+  production build. `zd`: Docker build matrix.
   `src`: installer/loader validation. Add CodeQL where a supported language exists.
 - **Class 2, versioned tools:** a **full functional suite is required on the
   exact tag commit and gates release publication**. ZUnit for Zsh tools;
@@ -61,9 +62,13 @@ Do not add an org-wide coverage number.
 
 ## Required checks
 
-Mark the class-appropriate checks as required for merge to the publication branch
-(`main`, or `next`→`main` per ADR-0008). Class-3 repos require the baseline;
-class-2 repos additionally require the functional suite before a release tag.
+Mark the class-appropriate checks as required on the integration branch
+(`main`, or `zi`'s named `next` exception per ADR-0019). Class-3 repositories
+require the baseline; class-2 repositories additionally re-run the functional
+suite against the exact commit before a release tag is published.
+
+For `zi`, ordinary pull requests validate against `next`; the promotion pull
+request into `main` runs the full stable-branch check set on its exact head SHA.
 
 ## See also
 

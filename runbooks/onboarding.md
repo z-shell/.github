@@ -16,7 +16,7 @@ Before touching anything, read, in order:
    The accepted ADRs include:
    - 0001 meta-repo pattern, 0002 zi canonical, 0003 Conventional Commits,
      0005 workflow naming, 0006 wiki content roots, 0007 release flow,
-     0008 branching model, 0009 testing/CI, 0010 security response.
+     0009 testing/CI, 0010 security response, 0019 trunk-on-main branching.
 3. `PATTERNS.md` and the relevant `runbooks/`.
 
 ## Step 2 — Understand the source of truth
@@ -55,13 +55,13 @@ Grant only what the role requires; record the grant:
   including watching for a
   squash merge silently promoting a bot/agent trailer from an individual
   commit into the merge commit (`runbooks/branch-protection.md`).
-- Follow Conventional Commits and the branch model for the repo's class
-  (ADR-0008).
+- Follow Conventional Commits and the repository model in ADR-0019. Branch
+  from `main` unless contributing to the named `zi` integration exception.
 
 ## Step 5 — First contribution
 
 - Pick a `good first issue` or a triaged item.
-- Branch per ADR-0008 (`feature-<id>` from `next` or `main` by class).
+- Branch per ADR-0019 (`feature-<id>` from `main`, or from `next` for `zi`).
 - Run the class-appropriate checks locally (ADR-0009) before opening a PR.
 - Leave an `Agent handoff` comment if the work will be resumed by someone else.
 

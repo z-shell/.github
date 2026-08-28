@@ -87,12 +87,17 @@ module RepoSettingsAudit
       data = YAML.safe_load_file(path, permitted_classes: [], permitted_symbols: [], aliases: false)
       raise ArgumentError, "#{path} must contain a mapping" unless data.is_a?(Hash)
 
-      new(default_class: data.fetch("default_class"), repositories: data.fetch("repositories", {}))
+      new(
+        default_class: data.fetch("default_class"),
+        repositories: data.fetch("repositories", {}),
+        settings_overrides: data.fetch("settings_overrides", {})
+      )
     end
 
-    def initialize(default_class:, repositories:)
+    def initialize(default_class:, repositories:, settings_overrides: {})
       @default_class = default_class
       @repositories = repositories
+      @settings_overrides = settings_overrides
     end
 
     def class_for(repo)
@@ -102,12 +107,15 @@ module RepoSettingsAudit
     def source_for(repo)
       @repositories.key?(repo) ? "explicit" : "default"
     end
+
+    def settings_overrides_for(repo)
+      @settings_overrides.fetch(repo, {})
+    end
   end
 
   # The decisions/0013-repository-settings-baseline.md R/S/- table, expressed
-  # per setting per class. "-" appears only for class 1's linear_history: not
-  # required, not recommended, and per the ADR's own rationale actively
-  # contradicts the next -> main promotion model when present.
+  # per setting per class. Named repository exceptions are loaded from
+  # lib/repository-classes.yml and override only the explicitly listed setting.
   class Baseline
     SETTINGS = %w[
       pr_required
@@ -121,22 +129,23 @@ module RepoSettingsAudit
 
     TABLE = {
       1 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
-             "required_status_checks" => "R", "linear_history" => "-", "signed_commits" => "S",
+             "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "R" },
       2 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "R" },
       3 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
-             "required_status_checks" => "S", "linear_history" => "S", "signed_commits" => "S",
+             "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "S" },
       4 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "S", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "R" }
     }.freeze
 
-    def self.disposition(klass, setting)
+    def self.disposition(klass, setting, overrides: {})
       row = TABLE.fetch(klass) { raise ArgumentError, "unknown ADR-0007 class: #{klass.inspect}" }
-      row.fetch(setting) { raise ArgumentError, "unknown baseline setting: #{setting.inspect}" }
+      baseline = row.fetch(setting) { raise ArgumentError, "unknown baseline setting: #{setting.inspect}" }
+      overrides.fetch(setting, baseline)
     end
   end
 
@@ -148,8 +157,8 @@ module RepoSettingsAudit
     # reported as n/a rather than a failure, regardless of disposition.
     NO_CI_EXEMPT_SETTINGS = %w[required_status_checks].freeze
 
-    def self.evaluate_setting(klass:, setting:, live:, has_ci:)
-      disposition = Baseline.disposition(klass, setting)
+    def self.evaluate_setting(klass:, setting:, live:, has_ci:, overrides: {})
+      disposition = Baseline.disposition(klass, setting, overrides: overrides)
 
       status =
         if NO_CI_EXEMPT_SETTINGS.include?(setting) && !has_ci
@@ -161,9 +170,15 @@ module RepoSettingsAudit
       { "name" => setting, "disposition" => disposition, "live" => live, "status" => status }
     end
 
-    def self.evaluate(klass:, live:, has_ci:)
+    def self.evaluate(klass:, live:, has_ci:, overrides: {})
       settings = Baseline::SETTINGS.map do |setting|
-        evaluate_setting(klass: klass, setting: setting, live: live.fetch(setting, false), has_ci: has_ci)
+        evaluate_setting(
+          klass: klass,
+          setting: setting,
+          live: live.fetch(setting, false),
+          has_ci: has_ci,
+          overrides: overrides
+        )
       end
 
       summary = %w[pass fail warn na].to_h { |status| [status, settings.count { |row| row.fetch("status") == status }] }
@@ -287,7 +302,12 @@ module RepoSettingsAudit
 
       extracted = SettingsExtractor.extract(default_branch: default_branch, rulesets: rulesets, classic_protection: classic_protection)
       klass = class_resolver.class_for(repo)
-      evaluation = Evaluator.evaluate(klass: klass, live: extracted.fetch("live"), has_ci: has_ci)
+      evaluation = Evaluator.evaluate(
+        klass: klass,
+        live: extracted.fetch("live"),
+        has_ci: has_ci,
+        overrides: class_resolver.settings_overrides_for(repo)
+      )
 
       {
         "schema" => SCHEMA,

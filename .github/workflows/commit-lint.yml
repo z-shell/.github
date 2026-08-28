@@ -6,8 +6,8 @@ name: Commit Lint
 # the AGENTS.md rules that were previously "author-enforced" only: the
 # disallowed bot/AI-agent Co-authored-by trailer -- a human co-author is
 # allowed, only a bot/agent identity is banned (AGENTS.md) -- Conventional
-# Commits (decisions/0003), and feature-<id>/bug-<id>/hotfix-<id> branch
-# naming (decisions/0008).
+# Commits (decisions/0003), and issue-linked topic-branch naming
+# (decisions/0019).
 
 on:
   workflow_call:
@@ -24,8 +24,8 @@ on:
         default: '^[[:space:]]*Co-authored-by:.*(\[bot\]|noreply@anthropic\.com|noreply@openai\.com|noreply@x\.ai|codex@openai\.com|copilot@github\.com|claude@anthropic\.com)'
       branch-pattern:
         description: >
-          grep -E pattern a PR head branch must match. dependabot/*,
-          renovate/*, and next are always allowed regardless of this pattern.
+          grep -E pattern a PR head branch must match. dependabot/* and
+          renovate/* are always allowed. next is allowed only for z-shell/zi.
         required: false
         type: string
         default: "^(feature|bug|hotfix)-[1-9][0-9]*$"
@@ -108,14 +108,15 @@ jobs:
         env:
           BRANCH: ${{ github.head_ref }}
           BRANCH_PATTERN: ${{ inputs.branch-pattern }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           if echo "$BRANCH" | grep -qE '^(dependabot|renovate)/' || \
-             [ "$BRANCH" = "next" ]; then
+             { [ "$REPOSITORY" = "z-shell/zi" ] && [ "$BRANCH" = "next" ]; }; then
             echo "✅ OK"
             exit 0
           fi
           if ! echo "$BRANCH" | grep -qE "$BRANCH_PATTERN"; then
-            echo "::error::Branch name must match ${BRANCH_PATTERN} (see decisions/0008-branching-model.md)"
+            echo "::error::Branch name must match ${BRANCH_PATTERN} (see decisions/0019-trunk-on-main-default.md)"
             exit 1
           fi
           echo "✅ Branch name valid"

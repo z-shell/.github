@@ -137,19 +137,21 @@ Follow `runbooks/dependency-management.md`:
 2. Confirm Renovate discovers `z-shell/.github/renovate-config.json`.
 3. Enable the dependency graph, Dependabot alerts, and Dependabot security
    updates in GitHub settings.
-4. Add `.github/renovate.json` only for a repository-specific exception such
-   as a `next` target branch. If `decisions/0008-branching-model.md` assigns
-   this repository the `next` to `main` model, this exception is mandatory,
-   not optional. See `runbooks/branch-protection.md`.
+4. Add `.github/renovate.json` only for a repository-specific exception. New
+   repositories use trunk-on-`main` by default. A persistent integration
+   branch first requires the explicit ADR amendment described by
+   `decisions/0019-trunk-on-main-default.md`; its target override is then
+   mandatory. See `runbooks/branch-protection.md`.
 5. Do not add `.github/dependabot.yml` for routine version updates.
 
 ## Step 5a — Provision branch rulesets
 
-If this repository uses the `next` → `main` model
-(`decisions/0008-branching-model.md`), follow `runbooks/branch-protection.md`
-in full before opening the bootstrap pull request. Trunk-on-`main`
-repositories still need a `main` ruleset, but can skip the `next`-specific
-items (the guard workflow, `.github/renovate.json` override).
+Provision the class-appropriate `main` ruleset from
+`decisions/0013-repository-settings-baseline.md` and create short-lived topic
+branches from `main`. A persistent integration branch is an approved exception,
+not a bootstrap option. If an ADR amendment explicitly names the repository,
+follow `runbooks/branch-protection.md` in full before opening the bootstrap
+pull request.
 
 ## Step 6 — Verify before publication
 

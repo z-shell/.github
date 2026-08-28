@@ -101,5 +101,5 @@ registry remains the common inventory that every runtime can query.
 ## See also
 
 - `decisions/0018-portable-worktree-management.md`
-- `decisions/0008-branching-model.md`
+- `decisions/0019-trunk-on-main-default.md`
 - `runbooks/instruction-update.md`

@@ -25,8 +25,9 @@ formalizes.
 
 ### Repository classes and release policy
 
-1. **Continuously deployed artifacts** (`wiki`, `src`, `zd` images): validate on
-   the development branch; deploy via the repo's existing delivery model. No
+1. **Continuously deployed artifacts** (`wiki`, `src`, `zd` images): validate
+   pull requests into `main` and the merged `main` commit; deploy via the
+   repository's existing delivery controls. No
    tag-driven changelog/release automation unless a separate packaged artifact
    appears.
 2. **Versioned tools and packages** (`zunit`, `zsh-lint`, `zpmod`, packaged
@@ -70,8 +71,8 @@ Per-repo application:
   metadata) before wiring a release, since the artifact determines the steps.
   (`zsh#8`.)
 - **`zi`** — class 3, git-consumed; **no release automation added**. Its
-  `next → main → tag` boundary (`zi#346`) is governed by this policy but no
-  workflow or code change is made to `zi` under this ADR.
+  `next` to stable `main` promotion (`zi#346`) is governed by ADR-0019, while
+  this ADR adds no tag-driven release workflow to `zi`.
 
 ## Consequences
 

@@ -85,36 +85,31 @@ recommended for this class.
 | Pull request required to the default branch                  | R       | R       | R       | R       |
 | Deletion of the default branch blocked                       | R       | R       | R       | R       |
 | Force push to the default branch blocked                     | R       | R       | R       | R       |
-| Required status checks                                       | R       | R       | S       | S       |
-| Linear history                                               | -       | S       | S       | S       |
+| Required status checks                                       | R       | R       | R       | S       |
+| Linear history                                               | S       | S       | S       | S       |
 | Signed commits                                               | S       | S       | S       | S       |
 | Copilot code review                                          | R       | R       | S       | R       |
 | Squash merge default message: title only, no body            | R       | R       | R       | R       |
 
 Rationale for the differences:
 
-- **Required status checks** are mandatory only where a failing artifact reaches
-  users automatically (class 1) or is published under a version tag (class 2).
-  Class 3 is consumed from source at a ref the consumer chooses.
-- **Linear history** is deliberately excluded from class 1, the opposite of an
-  earlier draft of this baseline. Class-1 repositories promote a persistent
-  development branch (ADR-0008's `next`) into the deployed branch repeatedly,
-  not a disposable feature branch once. Squash and rebase both mint commits
-  the development branch does not have, so requiring linear history on the
-  deployed branch forces the two branches to diverge after every promotion,
-  by construction. [Issue #473](https://github.com/z-shell/.github/issues/473)
-  hit this on `z-shell/wiki` today: the only
-  available fix was a direct, admin-bypassing push to realign `next`, and a
-  bypass warning was once silently truncated by piping the push through
-  `tail`. A merge commit is the one merge strategy that preserves ancestry
-  between the two branches, and requiring linear history is exactly what
-  forbids it. Classes 2-4 do not carry this cost the same way: their
-  promotions are either infrequent (class 2 release tags) or nonexistent
-  (trunk-only classes 3-4), so linear history stays recommended there.
+- **Required status checks** are mandatory for classes 1-3 when the repository
+  has CI. A class-1 failure reaches deployment, a class-2 failure can reach a
+  versioned artifact, and class-3 consumers may execute the selected Git ref
+  directly. Class 4 remains recommended because it has no uniform runtime
+  artifact or consumer boundary.
+- **Linear history** is recommended for trunk-on-`main` repositories in every
+  class because ordinary short-lived pull requests can use squash merge without
+  creating a second persistent line of development. It remains recommended,
+  not required, so a repository may retain meaningful merge commits. ADR-0019
+  explicitly overrides this row to `-` for `z-shell/zi`: its persistent
+  `next` branch must be promoted with a merge commit to preserve ancestry, and
+  linear history on `main` would forbid that method. The read-only settings
+  audit applies that named override from `lib/repository-classes.yml`.
 - **Copilot code review** is required wherever a change reaches users or other
   repositories without a second human necessarily reading it.
 - **Squash merge default message** is required uniformly, unlike the other
-  rows, because it isn't a class-scaled risk — it's a plain repository API
+  rows, because it isn't a class-scaled risk: it is a plain repository API
   setting (`squash_merge_commit_title`/`squash_merge_commit_message`), not a
   ruleset rule, and it fails the same way regardless of class. `AGENTS.md`
   bans a `Co-authored-by` trailer crediting a bot, AI agent, or automation;
@@ -123,8 +118,8 @@ Rationale for the differences:
   default), squashing a PR without an explicit `--body` aggregates every
   squashed commit's full message into the merge commit, which can carry a
   bot/agent trailer forward from an individual commit
-  (`runbooks/branch-protection.md`'s "Squash-merge trailers" section
-  documents the same mechanism for `next` → `main` promotions). Setting
+  (`runbooks/branch-protection.md` documents the same mechanism for ordinary
+  topic branches). Setting
   `squash_merge_commit_title=PR_TITLE` and `squash_merge_commit_message=BLANK`
   (`gh api -X PATCH repos/<org>/<repo> --field
 squash_merge_commit_title=PR_TITLE --field squash_merge_commit_message=BLANK`)
@@ -228,8 +223,9 @@ With that row excluded, nothing the audit applies is irreversible.
 - `enforce_admins` is deliberately left out of the baseline. Enabling it would
   have made the `wiki` deadlock unrecoverable without changing settings under
   pressure.
-- The baseline says nothing about branch names other than the default, so
-  ADR-0008's `next` branch model is unaffected.
+- Branch naming and persistent-integration exceptions are governed by ADR-0019.
+  The machine-readable audit contains only the settings override needed to
+  enforce that accepted decision for `zi`.
 
 ## Alternatives considered
 
@@ -250,6 +246,8 @@ With that row excluded, nothing the audit applies is irreversible.
 
 - `decisions/0007-release-publication-flow.md` — the repository classes this
   baseline is keyed to.
+- `decisions/0019-trunk-on-main-default.md` - the trunk default and `zi`
+  persistent-integration exception.
 - `decisions/0009-testing-ci-strategy.md` — declares the class-2 test requirement
   that is currently unenforced.
 - `runbooks/new-repository.md` — bootstrap procedure that should gain a settings

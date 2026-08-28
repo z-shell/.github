@@ -29,7 +29,6 @@ on:
   push:
     branches:
       - main
-      - next
     paths:
       - "AGENTS.md"
       - "PATTERNS.md"
