@@ -50,8 +50,8 @@ RETIRED_PATTERN_SECTIONS = {
             "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
         ),
         "rules": (
-            "zsh/plugin/document-global-state",
-            "zsh/plugin/restore-state",
+            "zsh/plugin/no-shared-registry",
+            "zsh/plugin/exact-lifecycle",
         ),
     },
     "Guard `fpath` additions": {
@@ -62,7 +62,7 @@ RETIRED_PATTERN_SECTIONS = {
         ),
         "rules": (
             "zsh/security/trust-paths",
-            "zsh/plugin/restore-state",
+            "zsh/plugin/exact-lifecycle",
         ),
     },
 }
@@ -180,8 +180,11 @@ NORMATIVE_RULE_IDS = (
     "zsh/security/no-restricted-shell-sandbox",
     "zsh/security/trust-paths",
     "zsh/security/no-passive-network",
-    "zsh/plugin/document-global-state",
-    "zsh/plugin/restore-state",
+    "zsh/plugin/stable-namespace",
+    "zsh/plugin/coherent-configuration",
+    "zsh/plugin/no-shared-registry",
+    "zsh/plugin/document-load-surface",
+    "zsh/plugin/exact-lifecycle",
     "zsh/documentation/comment-invariants",
     "zsh/documentation/track-deferred-work",
     "zsh/validation/native-authority",

@@ -75,19 +75,22 @@ template cannot express.
 
 ```text
 zsh-<name>.plugin.zsh
-functions/                 # only when autoloaded functions are needed
-lib/                       # only when sourced helpers are needed
-docs/                      # short repository-local usage only
+lib/                       # optional private, eagerly sourced helpers
+functions/                 # optional autoload functions
+completions/               # optional native completion functions
+bin/                       # optional user-invoked executables
 ```
 
-Follow the entry-point, `ZERO`, namespaced state, ownership-tracked `fpath`, and
-unload patterns in `PATTERNS.md` and the
+Omit every optional directory the plugin does not need. Follow the entrypoint,
+namespaced state, coherent `zstyle` configuration, and exact lifecycle contract
+in the
 [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard).
 Official Zsh documentation remains authoritative for shell semantics. Treat
 `PMSPEC` and similar manager capabilities as optional profiles rather than
-portable requirements. Namespace plugin-owned state, scope option changes, keep
-network activity out of the load path, and reverse only plugin-owned side
-effects during unload.
+portable requirements. Portable code neither requires nor mutates a shared
+plugin registry. Namespace plugin-owned state with one documented ASCII
+identifier, scope option changes, keep network activity out of the load path,
+and reverse only plugin-owned side effects during unload.
 
 ### Annex
 
@@ -160,10 +163,14 @@ Before opening the bootstrap pull request:
 1. Run `git diff --check`.
 2. Parse every workflow YAML file.
 3. Run the repository's syntax and smoke checks.
-4. Confirm action references are immutable SHAs.
-5. Confirm no generic AI orchestration files, secrets, local paths, or generated
+4. For plugins, run the released zsh-lint Standard 2 profile and the released
+   ZUnit lifecycle assertions against repeated source, partial failure, hostile
+   state, and post-load user changes.
+5. Confirm action and reusable-workflow references are immutable SHAs from
+   published releases where a versioned organization tool is required.
+6. Confirm no generic AI orchestration files, secrets, local paths, or generated
    output were added.
-6. Link the tracker issue and leave an `Agent handoff` comment for deferred
+7. Link the tracker issue and leave an `Agent handoff` comment for deferred
    template or release work.
 
 ## Deferred scaffold assets

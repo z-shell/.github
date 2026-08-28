@@ -846,6 +846,24 @@
       "canonical_for": ["branching-model"]
     },
     {
+      "id": "decision-0020",
+      "path": "decisions/0020-adopt-zsh-plugin-standard-2.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": [
+        "architecture-decision",
+        "zsh-plugin-creation",
+        "zsh-plugin-review",
+        "zsh-plugin-code-change",
+        "zsh-plugin-template"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["zsh-plugin-standard-adoption"]
+    },
+    {
       "id": "zsh-standard-policy",
       "path": "lib/zsh-standard-policy.json",
       "kind": "enforcement",

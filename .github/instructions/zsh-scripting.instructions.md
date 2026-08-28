@@ -806,19 +806,60 @@ Plugin and completion load paths perform no implicit network activity.
 
 ## Plugin lifecycle and documentation
 
-### `zsh/plugin/document-global-state`
+### `zsh/plugin/stable-namespace`
 
 - Level: `required`
 - Profiles: `sourced-library`
 - Minimum Zsh: `null`
 - Basis: `organization-policy`
 - Evidence: `parameters`, `functions`
-- Enforcement: `human-review`
+- Enforcement: `lint`, `human-review`
 
-Document every intentional global parameter, hook, widget, alias, function,
-option, path, descriptor, and directory effect.
+Choose one portable ASCII project identifier. Derive every persistent public
+and private shell-visible name from it, with a leading underscore for private
+state and callbacks. Do not retain punctuation-only semantic roles or a second
+legacy namespace in refactored plugins.
 
-### `zsh/plugin/restore-state`
+### `zsh/plugin/coherent-configuration`
+
+- Level: `required`
+- Profiles: `sourced-library`
+- Minimum Zsh: `null`
+- Basis: `organization-policy`
+- Evidence: `parameters`
+- Enforcement: `lint`, `human-review`
+
+Use one namespaced `zstyle` context for ordinary public configuration. Keep
+project parameters private and do not expose scattered global parameters or
+environment variables as a parallel configuration interface.
+
+### `zsh/plugin/no-shared-registry`
+
+- Level: `required`
+- Profiles: `sourced-library`
+- Minimum Zsh: `null`
+- Basis: `organization-policy`
+- Evidence: `parameters`
+- Enforcement: `lint`, `runtime-test`, `human-review`
+
+Portable plugin code neither requires nor mutates a shared manager or plugin
+registry parameter. Manager-owned registries and capabilities belong to
+optional, independently tested profiles.
+
+### `zsh/plugin/document-load-surface`
+
+- Level: `required`
+- Profiles: `sourced-library`
+- Minimum Zsh: `null`
+- Basis: `organization-policy`
+- Evidence: `parameters`, `functions`
+- Enforcement: `runtime-test`, `human-review`
+
+Document and test every intentional persistent function, parameter, hook,
+widget, alias, style, option, path, descriptor, module, and directory effect.
+Setup-only helpers do not remain after loading.
+
+### `zsh/plugin/exact-lifecycle`
 
 - Level: `required`
 - Profiles: `sourced-library`
@@ -827,8 +868,11 @@ option, path, descriptor, and directory effect.
 - Evidence: `functions`, `parameters`, `options`
 - Enforcement: `runtime-test`, `human-review`
 
-When unload is part of the contract, reverse every owned side effect and remove
-the unload function.
+Provide an idempotent, partial-load-safe unload function that reverses every
+owned side effect and removes itself. Restore prior state only while the value
+installed by the plugin remains unchanged; preserve newer user state. Prove the
+contract in a clean process after observer priming, including repeated source,
+hostile caller state, partial failure, and post-load user changes.
 
 ### `zsh/documentation/comment-invariants`
 

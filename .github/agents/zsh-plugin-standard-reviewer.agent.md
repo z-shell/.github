@@ -30,33 +30,37 @@ Check the plugin entry file and its supporting files:
 2. **Entry-path resolution**: verify that the `ZERO`-aware source-path
    expression is evaluated at the call site and passed into localized work
    without assigning special parameter `0` or using function-local `${0:h}`.
-3. **Plugin registration**: if the plugin uses the optional `Plugins` profile,
-   verify a unique key and the snapshot needed to restore it. Do not require
-   manager-specific registration for a portable plugin. Document every
-   intentional global effect. Cite `zsh/plugin/document-global-state`.
+3. **Plugin registration**: if the plugin uses a shared `Plugins` parameter,
+   report it as non-portable migration debt. Portable code neither requires nor
+   mutates a shared manager or plugin registry. Do not require manager-specific
+   registration for a portable plugin.
 4. **Autoload path**: verify that a controlled `functions/` directory is added
    only when the loader has not already handled it and the exact entry is
    absent. Cite `zsh/security/trust-paths`.
-5. **Unload lifecycle**: when unload is part of the plugin contract, verify that
-   it reverses every owned side effect, restores any `Plugins` key it owns to
-   its pre-load state, and self-destructs. When cleanup identifies an appended
-   `fpath` entry as the last exact match, require an invariant against inserting
-   or reordering an indistinguishable equal entry after it. Cite
-   `zsh/plugin/restore-state`.
-6. **Passive loading**: verify that plugin and completion load paths perform no
+5. **Namespace and configuration**: verify one documented portable ASCII
+   identifier, project-prefixed persistent names, one namespaced `zstyle`
+   configuration context, and no scattered public configuration parameters.
+6. **Unload lifecycle**: verify an idempotent, partial-load-safe unload function
+   that reverses every owned side effect and self-destructs. It restores a prior
+   pre-load state only when the installed value is unchanged and preserves
+   newer user state.
+7. **Passive loading**: verify that plugin and completion load paths perform no
    implicit network activity. Cite `zsh/security/no-passive-network`.
-7. **Autoloaded functions**: evaluate function initialization under the
+8. **Autoloaded functions**: evaluate function initialization under the
    canonical `autoload-function` rules. Do not impose a universal option
    bundle.
-8. **Native syntax**: when a Zsh file is intended to parse independently, run:
+9. **Runtime proof**: require a clean-process lifecycle test for the declared
+   load surface, repeated source, partial failure, hostile state, and post-load
+   user changes. Static analysis does not prove runtime restoration.
+10. **Native syntax**: when a Zsh file is intended to parse independently, run:
 
-   ```sh
-   zsh -f -n <file>
-   ```
+```sh
+zsh -f -n <file>
+```
 
-   This is native syntax validation only. It is not behavioral validation and
-   does not prove every system startup source was skipped. Distinguish
-   native-invalid Zsh from gaps in supplemental tools.
+This is native syntax validation only. It is not behavioral validation and
+does not prove every system startup source was skipped. Distinguish
+native-invalid Zsh from gaps in supplemental tools.
 
 Do not add ShellCheck or `shfmt` as Zsh validators.
 

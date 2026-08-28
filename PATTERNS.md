@@ -59,8 +59,8 @@ observed in at least two listed repositories.
 
 Reference: <https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash>
 
-Relevant canonical rules: `zsh/plugin/document-global-state` and
-`zsh/plugin/restore-state`.
+Relevant canonical rules: `zsh/plugin/no-shared-registry` and
+`zsh/plugin/exact-lifecycle`.
 
 ## Guard `fpath` additions
 
@@ -84,7 +84,7 @@ unload-restoration shape has not been observed in at least two listed
 repositories.
 
 Relevant canonical rules: `zsh/security/trust-paths` and
-`zsh/plugin/restore-state`.
+`zsh/plugin/exact-lifecycle`.
 
 ## Mandatory SHA-pinning for GitHub Actions
 

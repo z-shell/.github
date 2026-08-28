@@ -22,44 +22,53 @@ Before writing tests:
    `zsh/test/isolate-environment`.
 4. Load the subject the same way production does under
    `zsh/test/match-production-profile`.
-5. When unload is part of the subject's contract, test actual restoration under
-   `zsh/plugin/restore-state`.
+5. Prime the plugin contract observer before the baseline, then test exact
+   ownership-aware restoration under `zsh/plugin/exact-lifecycle`.
 
 `zsh -f` is useful where applicable, but it does not prove every system startup
 source was skipped; a system `zshenv` may still execute.
 
 ## Test file shape
 
-The example below exercises a subject that declares an unload contract and an
-optional `Plugins` registration. Omit those parts when the subject declares
-neither behavior.
+The example below exercises a Standard 2 plugin with one documented public
+function and its unload function.
 
 ```zsh
 #!/usr/bin/env zunit
 
-typeset -ga saved_fpath
-
 @setup {
-  # Runs before each @test; load the plugin as production does.
-  saved_fpath=("${fpath[@]}")
-  typeset -gA Plugins
-  unset 'Plugins[MY_PLUGIN]'
+  zunit_plugin_contract_prime
+  zunit_plugin_contract_snapshot before
   load "../my-plugin.plugin.zsh"
+  zunit_plugin_contract_snapshot loaded
 }
 
 @teardown {
   # A lifecycle test can already have invoked the self-destructing function.
-  if (( ${+functions[my-plugin_plugin_unload]} )); then
-    my-plugin_plugin_unload
+  if (( ${+functions[my_plugin_plugin_unload]} )); then
+    my_plugin_plugin_unload
   fi
 }
 
-@test 'unload restores state and self-destructs' {
-  my-plugin_plugin_unload
+@test 'load exposes only the documented surface' {
+  assert before plugin_load_surface loaded \
+    function:my_plugin_action \
+    function:my_plugin_plugin_unload
+}
 
-  assert "${(j:|:)fpath}" same_as "${(j:|:)saved_fpath}"
-  assert "${+Plugins[MY_PLUGIN]}" equals 0
-  assert "${+functions[my-plugin_plugin_unload]}" equals 0
+@test 'repeated source is harmless' {
+  load "../my-plugin.plugin.zsh"
+  zunit_plugin_contract_snapshot repeated
+
+  assert loaded plugin_restored repeated
+}
+
+@test 'unload restores owned state and self-destructs' {
+  zunit_plugin_contract_snapshot user_state
+  my_plugin_plugin_unload
+  zunit_plugin_contract_snapshot after
+
+  assert before plugin_unloaded loaded user_state after
 }
 
 @test 'descriptive name of the behavior' {
@@ -80,11 +89,12 @@ typeset -ga saved_fpath
 Cross-reference real examples in `z-shell/zunit:tests/` and
 `z-shell/zsh-eza:tests/zsh-eza.zunit`.
 
-When unload is part of the subject's contract, add explicit lifecycle tests for
-each declared side effect. Assert that unload removes only plugin-owned state,
-restores any registered `Plugins` key to its pre-load state, and
-self-destructs. Test absent and existing key states when the plugin registers
-one. Omit unload-specific fixtures for subjects without that contract.
+Add explicit lifecycle tests for each declared side effect. Test partial
+initialization failure, hostile caller options, non-interactive loading, and a
+post-load user change. Assert that unload removes only plugin-owned state,
+restores pre-load state only when still owned, preserves the user's newer state,
+and self-destructs. Portable fixtures do not create or mutate a shared
+`Plugins` parameter.
 
 Declare each intentional negative fixture in repository metadata under
 `zsh/test/declare-negative-fixtures`. Name the exact fixture and expected
@@ -100,15 +110,14 @@ zunit                       # run the whole suite
 zunit tests/my-plugin.zunit # run one file
 ```
 
-Follow the canonical GitHub Actions policy when wiring CI. Do not copy a mutable
-reusable-workflow reference; select an immutable ref only after its owning
-rollout has approved and published one.
+Follow the canonical GitHub Actions policy when wiring CI. Pin ZUnit only to an
+exact commit from a published release. Do not copy a mutable reusable-workflow
+reference or an unreleased pull-request commit.
 
 ## Conventions
 
-- Pair `@setup` production-equivalent loading with `@teardown` cleanup. When
-  unload is part of the contract, assert post-unload state rather than only
-  invoking the unload function.
+- Pair `@setup` production-equivalent loading with `@teardown` cleanup. Assert
+  post-unload state rather than only invoking the unload function.
 - Keep one behavior per `@test`; name it as a sentence describing the expected
   behavior.
 - Keep `.zunit` files under the plugin's `tests/` directory.

@@ -831,16 +831,43 @@
       "enforcement": ["runtime-test"]
     },
     {
-      "id": "zsh/plugin/document-global-state",
+      "id": "zsh/plugin/stable-namespace",
       "level": "required",
       "profiles": ["sourced-library"],
       "minimum_zsh": null,
       "basis": "organization-policy",
       "evidence": ["parameters", "functions"],
-      "enforcement": ["human-review"]
+      "enforcement": ["lint", "human-review"]
     },
     {
-      "id": "zsh/plugin/restore-state",
+      "id": "zsh/plugin/coherent-configuration",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["parameters"],
+      "enforcement": ["lint", "human-review"]
+    },
+    {
+      "id": "zsh/plugin/no-shared-registry",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["parameters"],
+      "enforcement": ["lint", "runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/plugin/document-load-surface",
+      "level": "required",
+      "profiles": ["sourced-library"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["parameters", "functions"],
+      "enforcement": ["runtime-test", "human-review"]
+    },
+    {
+      "id": "zsh/plugin/exact-lifecycle",
       "level": "required",
       "profiles": ["sourced-library"],
       "minimum_zsh": null,
