@@ -1938,6 +1938,47 @@ class PublicRepositoryTests(unittest.TestCase):
             },
         )
 
+    def test_public_repository_declares_sub_issue_policy(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["runbook-sub-issues"],
+            {
+                "id": "runbook-sub-issues",
+                "path": "runbooks/sub-issues.md",
+                "kind": "runbook",
+                "authority": "canonical-detail",
+                "consumers": [
+                    "codex",
+                    "claude-code",
+                    "copilot",
+                    "gemini-cli",
+                    "human",
+                ],
+                "tasks": ["project-tracking", "sub-issue-management"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": ["sub-issue-management"],
+            },
+        )
+
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        runbook = (PUBLIC_ROOT / "runbooks/sub-issues.md").read_text()
+        labels = (PUBLIC_ROOT / "lib/labels.yml").read_text()
+        issue_form = (
+            PUBLIC_ROOT / ".github/ISSUE_TEMPLATE/07_delivery_initiative.yml"
+        ).read_text()
+
+        self.assertIn("follow `runbooks/sub-issues.md`", policy)
+        self.assertIn("Apply `meta:initiative` to the parent only.", runbook)
+        self.assertIn("- name: meta:initiative", labels)
+        self.assertIn('  - "meta:initiative"', issue_form)
+        self.assertIn('  - "meta:org-tracked"', issue_form)
+
     def test_public_repository_routes_portable_worktree_management(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()

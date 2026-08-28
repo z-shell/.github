@@ -70,6 +70,7 @@ The organization label set in `lib/labels.yml` is the source of truth. Apply at 
 | invalid                | `invalid`          |
 | duplicate              | `duplicate`        |
 | not planned            | `wontfix`          |
+| parent initiative      | `meta:initiative`  |
 
 ### Priority definitions
 
@@ -83,6 +84,13 @@ project-board `Priority` rather than by a label.
 | **Medium**   | Important but not urgent; prioritize against other planned work            |
 | **Low**      | Nice to have; no fixed timeline                                            |
 | **None**     | Not yet triaged or genuinely optional                                      |
+
+### Parent initiatives
+
+Apply `meta:initiative` only to a parent issue that coordinates at least two
+independently deliverable issues. Do not apply it to sub-issues, ordinary
+epics, or issues that only need a checklist. Follow `runbooks/sub-issues.md`
+for ownership, native relationship, status, and closing rules.
 
 ## Step 3 — Cross-reference
 
@@ -177,3 +185,4 @@ Do not handle exploit details publicly.
 - `decisions/`
 - `runbooks/labels.md`
 - `runbooks/project-tracker.md`
+- `runbooks/sub-issues.md`

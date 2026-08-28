@@ -117,6 +117,9 @@ Use `runbooks/triage.md` for issue and pull-request triage and
 the first pass non-destructive and, unless a maintainer asks otherwise, produce
 drafts only.
 
+For coordinated outcomes, parent issues, sub-issues, and issue dependencies,
+follow `runbooks/sub-issues.md`.
+
 ## Security
 
 - Never print, commit, or hand off secrets, tokens, or personal data.
@@ -168,4 +171,5 @@ update it only when explicit external-write authority is present.
 - `runbooks/new-repository.md`
 - `runbooks/project-tracker.md`
 - `runbooks/release.md`
+- `runbooks/sub-issues.md`
 - `runbooks/triage.md`

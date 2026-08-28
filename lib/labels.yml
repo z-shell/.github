@@ -106,6 +106,9 @@ labels:
   - name: wontfix
     color: ffffff
     description: Acknowledged but not planned for implementation.
+  - name: meta:initiative
+    color: "5319e7"
+    description: Marks a parent issue coordinating two or more independently deliverable sub-issues.
   - name: meta:org-tracked
     color: "5319e7"
     description: Indicates this issue has cross-repository tracking implications (synced to Linear).

@@ -41,7 +41,8 @@ coordinated outcomes, and native issue dependencies for blockers.
 
 Keep cross-repository parent issues in `z-shell/.github` and implementation
 issues in their owning repositories. Link implementation pull requests with a
-closing keyword.
+closing keyword. Apply `meta:initiative` only to qualifying parent issues and
+follow `runbooks/sub-issues.md` for ownership, status, and closing rules.
 
 ## Automation model
 
@@ -102,4 +103,5 @@ requires explicit maintainer approval.
 - `AGENTS.md`
 - `runbooks/triage.md`
 - `runbooks/labels.md`
+- `runbooks/sub-issues.md`
 - `decisions/`
