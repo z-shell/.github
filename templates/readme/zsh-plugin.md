@@ -57,6 +57,16 @@ available and the asset must be reviewed manually when output changes. -->
 - `<required-command>` available on `PATH`
 - <platform or terminal constraint, if any>
 
+## Portable shell contract
+
+- Project identifier: `<portable_ascii_identifier>`
+- Authoritative entrypoint: `<repository>.plugin.zsh`
+- Public configuration context: `:<portable_ascii_identifier>:config`
+- Public functions: `<identifier_function>`
+- Unload function: `<portable_ascii_identifier>_plugin_unload`
+- Optional directories: <list only used `lib/`, `functions/`, `completions/`,
+  and `bin/` roles>
+
 ## Installation
 
 ### Zi
@@ -76,12 +86,12 @@ manager-specific APIs as optional profiles rather than portable requirements.>
 
 ## Configuration
 
-<State which values must be set before loading. Document only the public
-contract.>
+<Document the one namespaced zstyle configuration model. Do not expose
+scattered global parameters or environment variables as parallel settings.>
 
-| Name               | Type     | Default     | Effect              |
+| Style property     | Type     | Default     | Effect              |
 | ------------------ | -------- | ----------- | ------------------- |
-| `<public-setting>` | `<type>` | `<default>` | <Observable effect> |
+| `<style-property>` | `<type>` | `<default>` | <Observable effect> |
 
 ## Usage
 
@@ -133,8 +143,11 @@ This project is distributed under the terms in [LICENSE](LICENSE).
 - [ ] Zi is the first installation path.
 - [ ] Other manager examples are intentionally supported or verified.
 - [ ] Manager-specific profiles are distinguished from portable requirements.
+- [ ] One portable ASCII identifier owns every persistent shell-visible name.
+- [ ] Ordinary public configuration uses one namespaced `zstyle` context.
+- [ ] Portable code neither requires nor mutates a shared plugin registry.
 - [ ] Public settings, aliases, functions, hooks, and defaults are complete.
-- [ ] Load failures and unload behavior are documented.
+- [ ] Load failures, partial cleanup, and ownership-aware unload behavior are documented.
 - [ ] Plugin-owned state is namespaced, option changes are scoped, and unload
       reverses every owned side effect.
 - [ ] Plugin load performs no network activity.

@@ -26,23 +26,28 @@ semantics.
      or default to a multi-repository checkout path.
    - Plugin name in kebab-case, for example `zsh-foo` with entry file
      `zsh-foo.plugin.zsh`.
+   - One portable ASCII project identifier, for example `zsh_foo`. This owns
+     every persistent public and private shell name and the
+     `:zsh_foo:config` style context.
 
-3. **Create the layout**:
+3. **Create the layout**. Create only the authoritative entrypoint initially.
+   Add each optional directory only when its execution role is required:
 
    ```
-   <target-repository-root>/
+     <target-repository-root>/
      <name>.plugin.zsh
-     functions/
-     lib/
-     docs/
+     lib/          # optional private eager sources
+     functions/    # optional autoload functions
+     completions/  # optional native completion functions
+     bin/          # optional user-invoked executables
    ```
 
 4. **Write the entry file** from `templates/plugin.plugin.zsh`, replacing
-   `__NAME__` (kebab name) and `__FPATH_VAR__` (an upper-snake project-owned
-   parameter such as `ZSH_FOO_FPATH`). Keep the modelines as the first two lines
-   verbatim. The first source owns the `fpath` decision; repeated sources must
-   not reset it. Add manager-specific registration only when the user requests
-   and identifies that optional profile.
+   `__IDENTIFIER__` with the ASCII project identifier. Keep the modelines as the
+   first two lines verbatim. Do not create shared `Plugins` state, scattered
+   public configuration parameters, or a second legacy namespace. Add
+   manager-specific behavior only when the user requests and identifies that
+   optional profile, and keep it outside the portable contract.
 
 5. **Write autoload function bodies**: begin each generated function body with
    `builtin emulate -L zsh`. Select only the correctness-affecting options that
@@ -52,13 +57,12 @@ semantics.
 6. **Verify syntax and lifecycle**:
    - Run `zsh -f -n <name>.plugin.zsh` for native syntax validation under
      `zsh/validation/native-authority`.
-   - In an isolated shell with temporary `HOME` and `ZDOTDIR`, source the entry
-     file, verify its declared load effects, invoke `<name>_plugin_unload`, and
-     assert post-unload restoration of `fpath`, scaffold parameters, functions,
-     hooks, aliases, options, and every other declared side effect.
-   - The scaffold removes the last exact `fpath` match that it appended. Do not
-     insert or reorder an indistinguishable equal entry after that append
-     before unloading; Zsh arrays do not retain occurrence identity.
+   - In an isolated shell with temporary `HOME` and `ZDOTDIR`, prime the ZUnit
+     lifecycle observer, snapshot the baseline, source the entry file, and
+     assert the exact documented load allowlist.
+   - Test repeated source, partial initialization failure, hostile caller
+     options, non-interactive loading, and post-load user changes. Invoke
+     `<identifier>_plugin_unload` and assert ownership-aware restoration.
    - Remove the temporary directory. `zsh -f` suppresses normal RCS processing,
      but a system `zshenv` may still execute.
 
@@ -69,10 +73,13 @@ semantics.
 
 - Caller-state preservation: `zsh/sourced/preserve-caller-state`.
 - Autoload body initialization: `zsh/autoload/initialize`.
-- Documented plugin effects: `zsh/plugin/document-global-state`.
-- Owned-effect cleanup: `zsh/plugin/restore-state`.
+- Stable namespace: `zsh/plugin/stable-namespace`.
+- Coherent configuration: `zsh/plugin/coherent-configuration`.
+- Documented plugin effects: `zsh/plugin/document-load-surface`.
+- Owned-effect cleanup: `zsh/plugin/exact-lifecycle`.
 - Controlled autoload paths: `zsh/security/trust-paths`.
 
 Keep the rule rationale in the canonical instruction. The scaffold must reverse
 every owned side effect and self-destruct; syntax success alone is not a
-behavioral result.
+behavioral result. Pin zsh-lint and ZUnit only to commits from published
+releases when wiring required CI.

@@ -69,7 +69,7 @@ When working in z-shell repositories, optimize for:
   supplemental parser, linter, or formatter limitations. Report relevant
   defects during read-only work, but that does not authorize unrelated cleanup.
 - **Naming:** plugins use `zsh-<name>`, annexes use `z-a-<name>`, modules keep short descriptive names.
-- **Plugin authoring:** read the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) for plugin creation, code changes, reviews, templates, and documentation. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
+- **Plugin authoring:** maintained plugins and new scaffolds follow version 2 of the canonical [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) as one clean portable contract. Refactored plugins do not retain legacy declaration systems. Official Zsh documentation remains authoritative for shell semantics; manager-specific profiles are optional.
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
 - **Commit trailers:** `Co-authored-by` crediting a real human, including the PR author crediting themselves, is fine. Never credit a bot, AI agent, or automation as a co-author. `z-shell/.github` and `z-shell/zi` enforce this in CI. Other repositories remain author-enforced until their own verified caller is live; do not infer enforcement from organization policy alone.

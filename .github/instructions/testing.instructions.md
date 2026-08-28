@@ -42,8 +42,9 @@ definitions come from `decisions/0007-release-publication-flow.md`.
   `zpmod`. Never cut a `vX.Y.Z` tag from a red commit.
 - **Class 3, git-consumed:** **validation-only as the required organization
   gate.** Run existing repository-owned tests and add regression coverage when
-  behavior changes, but do not impose a release suite or coverage gate. The
-  baseline remains syntax, compilation, and clean loading.
+  behavior changes, but do not impose a release suite or coverage gate. A
+  maintained plugin also proves its Standard 2 load surface and exact lifecycle
+  contract in a clean process.
 - **Class 4 — meta:** baseline plus workflow/markdown linting.
 
 ## Coverage
@@ -57,8 +58,15 @@ Do not add an org-wide coverage number.
   integration or system tests are also valid when they exercise boundaries that
   do not fit a unit test.
 - Test plugins by sourcing them in a clean Zsh session; there is no build step.
-- When unload is part of the subject's contract, assert that its unload function
-  reverses the owned side effects.
+- Prime lifecycle observers before the baseline. Compare functions, parameters
+  and attributes, aliases, options, traps, modules, hooks, widgets, bindings,
+  styles, `path`, and `fpath` without printing captured values.
+- Assert the documented load allowlist, harmless repeated source, cleanup after
+  partial failure, hostile caller options, non-interactive behavior, and exact
+  unload restoration.
+- Use ownership-aware cleanup assertions: restore the pre-load value only when
+  the user did not change the installed value, otherwise preserve the user's
+  newer state.
 
 ## Required checks
 
@@ -69,6 +77,10 @@ suite against the exact commit before a release tag is published.
 
 For `zi`, ordinary pull requests validate against `next`; the promotion pull
 request into `main` runs the full stable-branch check set on its exact head SHA.
+
+Organization templates must pin zsh-lint and ZUnit to exact commits belonging
+to published releases. Do not use mutable branches, tags, or unreleased pull
+request commits as a required organization gate.
 
 ## See also
 

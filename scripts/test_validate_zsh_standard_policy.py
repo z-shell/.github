@@ -1977,7 +1977,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             },
             "parsed_rules": validator._markdown_rules(instruction),
         }
-        self.assertEqual(len(snapshot["rule_blocks"]), 60)
+        self.assertEqual(len(snapshot["rule_blocks"]), 63)
         digest = hashlib.sha256(
             json.dumps(
                 snapshot,
@@ -1989,7 +1989,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "4a32a4cdbbdb4efec978371f65b8c8389a7ce17e646bac2fceaee72564456b01",
+            "15d3c2c6f7bcf5192f8fe4beb1b8e324262f0ea5779407b0c0609beadc13151c",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
@@ -2813,8 +2813,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     "z-shell/z-a-meta-plugins:z-a-meta-plugins.plugin.zsh",
                 ),
                 (
-                    "zsh/plugin/document-global-state",
-                    "zsh/plugin/restore-state",
+                    "zsh/plugin/no-shared-registry",
+                    "zsh/plugin/exact-lifecycle",
                 ),
             ),
             "Guard `fpath` additions": (
@@ -2825,7 +2825,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 ),
                 (
                     "zsh/security/trust-paths",
-                    "zsh/plugin/restore-state",
+                    "zsh/plugin/exact-lifecycle",
                 ),
             ),
         }
@@ -3463,222 +3463,80 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         template_path = (
             PUBLIC_ROOT / ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
         )
-        temporary_path: Path
         with tempfile.TemporaryDirectory() as temporary_directory:
-            temporary_path = Path(temporary_directory)
-            plugin_root = temporary_path / "plugin [literal]*? space"
-            functions_path = plugin_root / "functions"
-            functions_path.mkdir(parents=True)
+            plugin_root = Path(temporary_directory) / "plugin [literal]*? space"
+            plugin_root.mkdir(parents=True)
             entry_path = plugin_root / "demo.plugin.zsh"
-            rendered = (
-                template_path.read_text(encoding="utf-8")
-                .replace("__NAME__", "demo")
-                .replace("__FPATH_VAR__", "DEMO_FPATH")
+            rendered = template_path.read_text(encoding="utf-8").replace(
+                "__IDENTIFIER__",
+                "demo",
             )
             entry_path.write_text(rendered, encoding="utf-8")
 
             environment = os.environ.copy()
             environment.pop("ZERO", None)
-            try:
-                syntax = subprocess.run(  # nosec B603
-                    [zsh_path, "-f", "-n", str(entry_path)],
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    env=environment,
-                    timeout=10,
-                )
-            except subprocess.TimeoutExpired as exc:
-                self.fail(f"template syntax timed out after {exc.timeout} seconds")
-            self.assertEqual(
-                syntax.returncode,
-                0,
-                syntax.stdout + syntax.stderr,
+            syntax = subprocess.run(  # nosec B603
+                [zsh_path, "-f", "-n", str(entry_path)],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=environment,
+                timeout=10,
             )
+            self.assertEqual(syntax.returncode, 0, syntax.stdout + syntax.stderr)
 
-            common = textwrap.dedent(r"""
-                check_fpath() {
-                  builtin emulate -L zsh
-                  local actual=${(j:|:)fpath}
-                  local expected=${(j:|:)argv}
-                  [[ $actual == $expected ]] || {
-                    print -u2 -r -- "fpath mismatch: actual=${actual} expected=${expected}"
-                    return 1
-                  }
-                }
+            lifecycle = textwrap.dedent(r"""
+                typeset caller_zero=$0
+                typeset -ga fpath=( /baseline )
+                typeset -gA Plugins=( OTHER caller-other )
 
-                check_scaffold_removed() {
-                    (( ! ${+functions[demo_plugin_unload]} )) &&
-                    (( ! ${+parameters[DEMO_FPATH]} )) &&
-                    (( ! ${+parameters[DEMO_FPATH_ADDED]} ))
-                }
+                . "$1" || exit 10
+                (( ${+functions[demo_plugin_unload]} )) || exit 11
+                [[ ${(j:|:)fpath} == /baseline ]] || exit 12
+                [[ ${Plugins[OTHER]} == caller-other ]] || exit 13
+                [[ $0 == "$caller_zero" ]] || exit 14
+
+                . "$1" || exit 20
+                (( ${+functions[demo_plugin_unload]} )) || exit 21
+                [[ ${(j:|:)fpath} == /baseline ]] || exit 22
+                [[ ${Plugins[OTHER]} == caller-other ]] || exit 23
+
+                demo_plugin_unload || exit 30
+                (( ! ${+functions[demo_plugin_unload]} )) || exit 31
+                [[ ${(j:|:)fpath} == /baseline ]] || exit 32
+                [[ ${Plugins[OTHER]} == caller-other ]] || exit 33
+                [[ $0 == "$caller_zero" ]] || exit 34
                 """)
             cases = {
-                "default-native": textwrap.dedent(r"""
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins=( OTHER caller-other )
-                    unset PMSPEC
-                    . "$1" || exit 10
-                    check_fpath /baseline "$2" || exit 11
-                    (( DEMO_FPATH_ADDED == 1 )) || exit 13
-                    demo_plugin_unload || exit 14
-                    check_fpath /baseline || exit 15
-                    [[ ${Plugins[OTHER]} == caller-other ]] || exit 17
-                    check_scaffold_removed || exit 18
-                    """),
-                "preexisting-single": textwrap.dedent(r"""
-                    typeset -ga fpath=( "$2" /tail )
-                    typeset -gA Plugins
-                    . "$1" || exit 20
-                    (( DEMO_FPATH_ADDED == 0 )) || exit 21
-                    check_fpath "$2" /tail || exit 22
-                    demo_plugin_unload || exit 23
-                    check_fpath "$2" /tail || exit 24
-                    check_scaffold_removed || exit 25
-                    """),
-                "preexisting-duplicates": textwrap.dedent(r"""
-                    typeset -ga fpath=( "$2" /middle "$2" )
-                    typeset -gA Plugins
-                    . "$1" || exit 30
-                    (( DEMO_FPATH_ADDED == 0 )) || exit 31
-                    demo_plugin_unload || exit 32
-                    check_fpath "$2" /middle "$2" || exit 33
-                    check_scaffold_removed || exit 34
-                    """),
-                "unset-pmspec-no-unset": textwrap.dedent(r"""
-                    setopt no_unset
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins
-                    unset PMSPEC
-                    . "$1" || exit 40
-                    [[ ! -o UNSET ]] || exit 41
-                    demo_plugin_unload || exit 42
-                    [[ ! -o UNSET ]] || exit 43
-                    check_fpath /baseline || exit 44
-                    check_scaffold_removed || exit 45
-                    """),
-                "caller-ksh-arrays": textwrap.dedent(r"""
-                    setopt ksh_arrays
-                    typeset -ga fpath=( "$2" /tail )
-                    typeset -gA Plugins
-                    . "$1" || exit 50
-                    [[ -o KSH_ARRAYS ]] || exit 51
-                    check_fpath "$2" /tail || exit 52
-                    demo_plugin_unload || exit 53
-                    [[ -o KSH_ARRAYS ]] || exit 54
-                    check_fpath "$2" /tail || exit 55
-                    check_scaffold_removed || exit 56
-                    """),
-                "caller-no-function-argzero": textwrap.dedent(r"""
-                    unsetopt function_argzero
-                    typeset caller_zero=$0
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins
-                    . "$1" || exit 60
-                    [[ ! -o FUNCTION_ARGZERO ]] || exit 61
-                    [[ $0 == "$caller_zero" ]] || exit 62
-                    demo_plugin_unload || exit 64
-                    [[ ! -o FUNCTION_ARGZERO ]] || exit 65
-                    [[ $0 == "$caller_zero" ]] || exit 66
-                    check_fpath /baseline || exit 67
-                    check_scaffold_removed || exit 68
-                    """),
-                "repeated-source": textwrap.dedent(r"""
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins
-                    . "$1" || exit 70
-                    (( DEMO_FPATH_ADDED == 1 )) || exit 71
-                    . "$1" || exit 72
-                    (( DEMO_FPATH_ADDED == 1 )) || exit 73
-                    check_fpath /baseline "$2" || exit 74
-                    demo_plugin_unload || exit 75
-                    check_fpath /baseline || exit 76
-                    check_scaffold_removed || exit 78
-                    """),
-                "preexisting-plugin-key": textwrap.dedent(r"""
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins=(
-                      DEMO 'caller original [literal]*? value'
-                      OTHER caller-other
-                    )
-                    . "$1" || exit 80
-                    [[ ${Plugins[DEMO]} == 'caller original [literal]*? value' ]] ||
-                      exit 81
-                    . "$1" || exit 82
-                    demo_plugin_unload || exit 83
-                    [[ ${Plugins[DEMO]} == 'caller original [literal]*? value' ]] ||
-                      exit 84
-                    [[ ${Plugins[OTHER]} == caller-other ]] || exit 85
-                    check_fpath /baseline || exit 86
-                    check_scaffold_removed || exit 87
-                    """),
-                "equal-entry-inserted-before-owned-append": textwrap.dedent(r"""
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins
-                    . "$1" || exit 90
-                    fpath=( "$2" "${fpath[@]}" )
-                    check_fpath "$2" /baseline "$2" || exit 91
-                    demo_plugin_unload || exit 92
-                    check_fpath "$2" /baseline || exit 93
-                    check_scaffold_removed || exit 94
-                    """),
-                "manager-profile-does-not-suppress-portable-path": textwrap.dedent(r"""
-                    typeset -ga fpath=( /baseline )
-                    typeset -gA Plugins
-                    PMSPEC=f
-                    . "$1" || exit 100
-                    (( DEMO_FPATH_ADDED == 1 )) || exit 101
-                    check_fpath /baseline "$2" || exit 102
-                    demo_plugin_unload || exit 106
-                    check_fpath /baseline || exit 107
-                    (( ! ${+Plugins[DEMO]} )) || exit 108
-                    check_scaffold_removed || exit 109
-                    """),
+                "default-native": "",
+                "caller-no-function-argzero": "unsetopt function_argzero",
+                "caller-posix-argzero": "setopt posix_argzero",
+                "caller-ksh-arrays": "setopt ksh_arrays",
+                "caller-no-unset": "setopt no_unset",
+                "caller-hostile-globbing": "setopt glob_subst glob_assign",
             }
-            for case_name, body in cases.items():
-                with self.subTest(case=case_name):
-                    home = temporary_path / f"home-{case_name}"
-                    zdotdir = temporary_path / f"zdot-{case_name}"
-                    home.mkdir()
-                    zdotdir.mkdir()
-                    child_environment = environment.copy()
-                    child_environment.update(
-                        {
-                            "HOME": str(home),
-                            "ZDOTDIR": str(zdotdir),
-                        }
+            for name, setup in cases.items():
+                with self.subTest(case=name):
+                    completed = subprocess.run(  # nosec B603
+                        [
+                            zsh_path,
+                            "-f",
+                            "-c",
+                            setup + "\n" + lifecycle,
+                            "zsh",
+                            str(entry_path),
+                        ],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                        env=environment,
+                        timeout=10,
                     )
-                    try:
-                        completed = subprocess.run(  # nosec B603
-                            [
-                                zsh_path,
-                                "-f",
-                                "-c",
-                                common + body,
-                                case_name,
-                                str(entry_path),
-                                str(functions_path),
-                            ],
-                            check=False,
-                            capture_output=True,
-                            text=True,
-                            env=child_environment,
-                            timeout=10,
-                        )
-                    except subprocess.TimeoutExpired as exc:
-                        self.fail(
-                            f"{case_name} timed out after " f"{exc.timeout} seconds"
-                        )
                     self.assertEqual(
                         completed.returncode,
                         0,
                         completed.stdout + completed.stderr,
                     )
-
-        self.assertFalse(
-            temporary_path.exists(),
-            "TemporaryDirectory must remove the rendered template tree",
-        )
 
     def test_consumer_contract_uses_safe_text_reads(self) -> None:
         root = self.make_fixture()
@@ -3751,8 +3609,8 @@ class PublicZshStandardContractTests(unittest.TestCase):
             "sourced-library",
             "autoload-function",
             "isolated",
-            "invoke `<name>_plugin_unload`",
-            "assert post-unload restoration",
+            "Invoke\n     `<identifier>_plugin_unload`",
+            "assert ownership-aware restoration",
         ):
             with self.subTest(new_plugin_contract=fragment):
                 self.assertIn(fragment, new_plugin_skill)
@@ -3764,7 +3622,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
             "test-fixture",
             "zsh/test/isolate-environment",
             "zsh/test/match-production-profile",
-            "zsh/plugin/restore-state",
+            "zsh/plugin/exact-lifecycle",
             "Declare each intentional negative fixture",
         ):
             with self.subTest(zunit_contract=fragment):
@@ -3778,11 +3636,9 @@ class PublicZshStandardContractTests(unittest.TestCase):
         self.assertNotIn('\n0="', template)
         self.assertEqual(template.count("builtin emulate -L zsh"), 2)
         for fragment in (
-            "__FPATH_VAR___ADDED",
-            "fpath[(Ie)${__FPATH_VAR__}]",
-            "unfunction __NAME___plugin_unload",
-            "zsh/security/trust-paths",
-            "zsh/plugin/restore-state",
+            "__IDENTIFIER___plugin_unload",
+            "unfunction __IDENTIFIER___plugin_unload",
+            ":__IDENTIFIER__:config",
         ):
             with self.subTest(template_contract=fragment):
                 self.assertIn(fragment, template)
@@ -3839,7 +3695,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
             ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh",
             "not publish a replacement",
             "zsh/sourced/preserve-caller-state",
-            "zsh/plugin/restore-state",
+            "zsh/plugin/exact-lifecycle",
             "zsh/security/trust-paths",
         ):
             with self.subTest(retirement_contract=fragment):
@@ -3864,10 +3720,10 @@ class PublicZshStandardContractTests(unittest.TestCase):
         requirements = (
             ('environment.pop("ZERO", None)', 1),
             ("timeout=10", 2),
-            ('"manager-profile-does-not-suppress-portable-path"', 1),
-            ("PMSPEC=f", 1),
-            ("[[ ! -o UNSET ]]", 2),
-            ("[[ ! -o FUNCTION_ARGZERO ]]", 2),
+            ('"caller-posix-argzero"', 1),
+            ('"caller-no-function-argzero"', 1),
+            ('"caller-hostile-globbing"', 1),
+            ("[[ ${Plugins[OTHER]} == caller-other ]]", 2),
         )
         for fragment, minimum_count in requirements:
             with self.subTest(fragment=fragment):
@@ -3885,22 +3741,22 @@ class PublicZshStandardContractTests(unittest.TestCase):
         )
 
         self.assertIn(
-            "if (( ${+functions[my-plugin_plugin_unload]} )); then",
+            "if (( ${+functions[my_plugin_plugin_unload]} )); then",
             text,
         )
         self.assertIn(
-            "@test 'unload restores state and self-destructs'",
+            "@test 'unload restores owned state and self-destructs'",
             text,
         )
         self.assertIn(
-            'assert "${(j:|:)fpath}" same_as "${(j:|:)saved_fpath}"',
+            "assert before plugin_load_surface loaded",
             text,
         )
-        self.assertIn('assert "${+Plugins[MY_PLUGIN]}" equals 0', text)
         self.assertIn(
-            'assert "${+functions[my-plugin_plugin_unload]}" equals 0',
+            "assert before plugin_unloaded loaded user_state after",
             text,
         )
+        self.assertNotIn("typeset -gA Plugins", text)
         self.assertIn(
             "one `@setup` and one `@teardown`, each running around every test",
             text,

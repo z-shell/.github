@@ -18,6 +18,18 @@ version, follow the manual and report the documentation drift.
 
 ## Organization requirements
 
+- Treat version 2 as one clean portable contract. Do not preserve an older
+  namespace, shared registry, configuration parameter, or directory convention
+  merely as a compatibility path in a refactored plugin.
+- Choose and document one portable ASCII project identifier. Derive every
+  persistent public or private shell-visible name from it, using a leading
+  underscore for private state and callbacks.
+- Use one project-owned `zstyle` context for ordinary public configuration.
+  Keep project parameters private and do not expose scattered configuration
+  globals or environment variables as a parallel interface.
+- Portable code must neither require nor mutate a shared manager or plugin
+  registry parameter. Manager integration belongs to an optional, independently
+  tested profile.
 - Write Zsh-first code; do not substitute Bash syntax or portability advice for
   documented Zsh behavior.
 - Namespace plugin-owned functions, parameters, aliases, hooks, widgets, and
@@ -25,21 +37,24 @@ version, follow the manual and report the documentation drift.
 - Scope option changes with `emulate -L zsh` or save and restore the prior
   option state when a change must outlive one function call.
 - Make load-time side effects explicit, minimal, and documented.
-- When the plugin declares an unload contract, provide lifecycle cleanup that
-  reverses plugin-owned side effects, including hooks, functions, parameters,
-  aliases, widgets, path entries, and temporary resources.
+- Provide idempotent lifecycle cleanup that tolerates partial initialization
+  and reverses plugin-owned side effects, including hooks, functions,
+  parameters, aliases, widgets, path entries, and temporary resources. Restore
+  prior state only while the installed value remains unchanged; preserve newer
+  user state.
 - Do not perform network activity during plugin load. Network access must be an
   explicit user action.
-- Validate syntax with native Zsh. When unload is part of the contract, exercise
-  load and unload behavior in a clean Zsh process.
+- Validate syntax with native Zsh. Separately exercise the declared load
+  surface, repeated source, partial failure, hostile caller state, and exact
+  unload behavior in a clean Zsh process.
 
 ## Portable requirements and manager profiles
 
 Keep portable plugin requirements separate from optional plugin-manager
-profiles. Manager APIs such as Zi metadata, `PMSPEC`, or a manager-maintained
-plugin registry may improve integration, but they are not portable Zsh
-requirements. Use them only behind an intentional profile or capability guard,
-and never present one manager's API as shell semantics.
+profiles. Manager APIs such as Zi metadata or `PMSPEC` may improve integration,
+but they are not portable Zsh requirements. Use them only behind an intentional
+profile or capability guard, never mutate a manager-owned registry from the
+portable entrypoint, and never present one manager's API as shell semantics.
 
 Zi is the Z-Shell reference manager for examples and testing under
 `decisions/0002-zi-as-canonical-plugin-manager.md`. This affects defaults, not

@@ -57,7 +57,7 @@ Structure code review feedback with concrete evidence and actionable fixes:
 
 ````markdown
 - **Severity**: [CRITICAL | IMPORTANT | SUGGESTION]
-- **Rule / Category**: [e.g., zsh/plugin/restore-state or security/untrusted-eval]
+- **Rule / Category**: [e.g., zsh/plugin/exact-lifecycle or security/untrusted-eval]
 - **Location**: `path/to/file:line`
 - **Impact**: Explanation of the concrete failure mode or risk.
 - **Correction**:
