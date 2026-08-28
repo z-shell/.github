@@ -35,7 +35,8 @@ Use compact namespace names:
 - `priority:high`, not `priority: high`
 - `status:triage`, not `status: triage`
 
-The org tracker auto-add label is `meta:org-tracked`.
+The org tracker auto-add label is `meta:org-tracked`. The parent-only delivery
+label is `meta:initiative`; follow `runbooks/sub-issues.md` before applying it.
 
 ## Canonical groups
 
@@ -76,6 +77,10 @@ The org tracker auto-add label is `meta:org-tracked`.
 - `invalid`
 - `duplicate`
 - `wontfix`
+
+### Coordination metadata
+
+- `meta:initiative`
 - `meta:org-tracked`
 
 ## Retire old labels
@@ -246,3 +251,4 @@ scripts/labels-sync.rb \
 - `lib/labels.yml`
 - `runbooks/triage.md`
 - `runbooks/org-review.md`
+- `runbooks/sub-issues.md`

@@ -536,6 +536,18 @@
       "canonical_for": ["project-tracking"]
     },
     {
+      "id": "runbook-sub-issues",
+      "path": "runbooks/sub-issues.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["project-tracking", "sub-issue-management"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["sub-issue-management"]
+    },
+    {
       "id": "runbook-recurring-operations",
       "path": "runbooks/recurring-operations.md",
       "kind": "runbook",
