@@ -320,6 +320,21 @@
       "enforcement": ["runtime-test"]
     },
     {
+      "id": "zsh/options/canonical-spelling",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "mixed",
+      "evidence": ["options"],
+      "enforcement": ["human-review"]
+    },
+    {
       "id": "zsh/options/declare-correctness-state",
       "level": "required",
       "profiles": [
