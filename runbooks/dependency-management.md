@@ -16,6 +16,10 @@ Do not configure both services to create routine version updates in the same
 repository. The split avoids duplicate pull requests, lock-file conflicts, and
 unnecessary CI runs.
 
+The shared Renovate preset explicitly disables Renovate vulnerability-alert
+pull requests. Keep that setting in the central preset so Dependabot remains
+the sole security-remediation owner for every inheriting repository.
+
 The governing live decision is
 `decisions/0012-hybrid-dependency-management.md`. ADR 0012 supersedes ADR 0004;
 ADR 0004 remains only as historical rationale.

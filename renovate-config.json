@@ -1,7 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Z-Shell organization preset for routine dependency version updates",
-  "extends": ["config:best-practices", ":semanticCommits"],
+  "extends": [
+    "config:best-practices",
+    ":semanticCommits",
+    ":disableVulnerabilityAlerts"
+  ],
   "timezone": "UTC",
   "schedule": ["* 0-4 * * 1"],
   "minimumReleaseAge": "3 days",
