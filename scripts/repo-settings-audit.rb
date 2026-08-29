@@ -118,6 +118,7 @@ module RepoSettingsAudit
   # lib/repository-classes.yml and override only the explicitly listed setting.
   class Baseline
     SETTINGS = %w[
+      default_branch_main
       pr_required
       deletion_blocked
       force_push_blocked
@@ -128,16 +129,16 @@ module RepoSettingsAudit
     ].freeze
 
     TABLE = {
-      1 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
+      1 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "R" },
-      2 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
+      2 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "R" },
-      3 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
+      3 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "S" },
-      4 => { "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
+      4 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "S", "linear_history" => "S", "signed_commits" => "S",
              "copilot_code_review" => "R" }
     }.freeze
@@ -217,6 +218,7 @@ module RepoSettingsAudit
       from_classic = live_from_classic(classic_protection)
 
       live = Baseline::SETTINGS.to_h { |setting| [setting, from_rulesets.fetch(setting, false) || from_classic.fetch(setting, false)] }
+      live["default_branch_main"] = default_branch == "main"
 
       {
         "live" => live,
