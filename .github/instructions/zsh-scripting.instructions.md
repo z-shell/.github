@@ -326,6 +326,21 @@ execution profile.
 
 ## Options and emulation
 
+### `zsh/options/canonical-spelling`
+
+- Level: `required`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
+- Minimum Zsh: `null`
+- Basis: `official-manual`, `organization-policy`
+- Evidence: `options`
+- Enforcement: `human-review`
+
+Write option names in the canonical underscore-separated form used by the Zsh
+manual, including in `setopt`, `unsetopt`, option tests, and documentation. For
+example, use `local_options`, `no_auto_pushd`, and `warn_create_global`, not
+accepted separator-free aliases such as `localoptions`, `noautopushd`, and
+`warncreateglobal`.
+
 ### `zsh/options/declare-correctness-state`
 
 - Level: `required`
