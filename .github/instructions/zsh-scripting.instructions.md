@@ -236,9 +236,12 @@ function:
 ```zsh
 () {
   builtin emulate -L zsh
-  setopt local_options
+
+  local -r source_path=${1:a}
+  local -r plugin_dir=${source_path:h}
+
   # Reusable work.
-}
+} "${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 ```
 
 ## Autoload functions and completions

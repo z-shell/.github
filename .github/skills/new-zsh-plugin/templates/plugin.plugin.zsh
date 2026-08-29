@@ -6,8 +6,8 @@
 () {
   builtin emulate -L zsh
 
-  typeset -r source_path="${${(M)1:#/*}:-$PWD/$1}"
-  typeset -r plugin_dir=${source_path:a:h}
+  local -r source_path=${1:a}
+  local -r plugin_dir=${source_path:h}
 
   # Source private eager helpers from "$plugin_dir/lib" only when required.
   # Keep setup-only functions local to this loader. Autoloaded functions and

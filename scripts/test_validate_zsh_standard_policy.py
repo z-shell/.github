@@ -1990,7 +1990,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "e385f4d4c34496495e808b602b59adb88d5ace192619e04669c70f4020afc981",
+            "1a958a39d678afef3c4a42fa8163a131d8799e7adbc457403147c31eeff0ec19",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
@@ -3472,6 +3472,20 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 "__IDENTIFIER__",
                 "demo",
             )
+            rendered = rendered.replace(
+                '  # Source private eager helpers from "$plugin_dir/lib" only when required.',
+                textwrap.indent(
+                    textwrap.dedent(r"""
+                        [[ $source_path == ${DEMO_EXPECTED_SOURCE_PATH-} ]] || return 90
+                        [[ $plugin_dir == ${DEMO_EXPECTED_PLUGIN_DIR-} ]] || return 91
+                        [[ ${(t)source_path} == *readonly* ]] || return 92
+                        [[ ${(t)plugin_dir} == *readonly* ]] || return 93
+
+                        # Source private eager helpers from "$plugin_dir/lib" only when required.
+                        """).strip(),
+                    "  ",
+                ),
+            )
             entry_path.write_text(rendered, encoding="utf-8")
 
             environment = os.environ.copy()
@@ -3490,6 +3504,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 typeset caller_zero=$0
                 typeset -ga fpath=( /baseline )
                 typeset -gA Plugins=( OTHER caller-other )
+                typeset -g DEMO_EXPECTED_SOURCE_PATH=$2
+                typeset -g DEMO_EXPECTED_PLUGIN_DIR=$3
 
                 . "$1" || exit 10
                 (( ${+functions[demo_plugin_unload]} )) || exit 11
@@ -3508,15 +3524,70 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 [[ ${Plugins[OTHER]} == caller-other ]] || exit 33
                 [[ $0 == "$caller_zero" ]] || exit 34
                 """)
+            direct_source = str(entry_path)
+            direct_relative_source = str(
+                entry_path.relative_to(temporary_directory)
+            )
+            manager_source = str(
+                plugin_root / "manager [literal]*? plugin.plugin.zsh"
+            )
+            manager_raw_source = str(
+                plugin_root
+                / "discarded [literal]*? segment"
+                / ".."
+                / "manager [literal]*? plugin.plugin.zsh"
+            )
             cases = {
-                "default-native": "",
-                "caller-no-function-argzero": "unsetopt function_argzero",
-                "caller-posix-argzero": "setopt posix_argzero",
-                "caller-ksh-arrays": "setopt ksh_arrays",
-                "caller-no-unset": "setopt no_unset",
-                "caller-hostile-globbing": "setopt glob_subst glob_assign",
+                "default-native": ("", direct_source, direct_source, direct_source),
+                "direct-relative-special-path": (
+                    "",
+                    direct_relative_source,
+                    direct_source,
+                    direct_source,
+                ),
+                "manager-zero-normalized": (
+                    "ZERO=$4",
+                    direct_source,
+                    manager_source,
+                    manager_raw_source,
+                ),
+                "caller-no-function-argzero": (
+                    "unsetopt function_argzero",
+                    direct_source,
+                    direct_source,
+                    direct_source,
+                ),
+                "caller-posix-argzero": (
+                    "setopt posix_argzero",
+                    direct_source,
+                    direct_source,
+                    direct_source,
+                ),
+                "caller-ksh-arrays": (
+                    "setopt ksh_arrays",
+                    direct_source,
+                    direct_source,
+                    direct_source,
+                ),
+                "caller-no-unset": (
+                    "setopt no_unset",
+                    direct_source,
+                    direct_source,
+                    direct_source,
+                ),
+                "caller-hostile-globbing": (
+                    "setopt glob_subst glob_assign",
+                    direct_source,
+                    direct_source,
+                    direct_source,
+                ),
             }
-            for name, setup in cases.items():
+            for name, (
+                setup,
+                source,
+                expected_source,
+                manager_source_arg,
+            ) in cases.items():
                 with self.subTest(case=name):
                     completed = subprocess.run(  # nosec B603
                         [
@@ -3525,12 +3596,16 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                             "-c",
                             setup + "\n" + lifecycle,
                             "zsh",
-                            str(entry_path),
+                            source,
+                            expected_source,
+                            str(Path(expected_source).parent),
+                            manager_source_arg,
                         ],
                         check=False,
                         capture_output=True,
                         text=True,
                         env=environment,
+                        cwd=temporary_directory,
                         timeout=10,
                     )
                     self.assertEqual(
@@ -3637,6 +3712,8 @@ class PublicZshStandardContractTests(unittest.TestCase):
         self.assertNotIn('\n0="', template)
         self.assertEqual(template.count("builtin emulate -L zsh"), 2)
         for fragment in (
+            "local -r source_path=${1:a}",
+            "local -r plugin_dir=${source_path:h}",
             "__IDENTIFIER___plugin_unload",
             "unfunction __IDENTIFIER___plugin_unload",
             ":__IDENTIFIER__:config",
@@ -3646,6 +3723,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         for fragment in ("${PMSPEC-}", "Plugins[", "__KEY__"):
             with self.subTest(portable_template_excludes=fragment):
                 self.assertNotIn(fragment, template)
+        self.assertNotIn("${${(M)1:#/*}:-$PWD/$1}", template)
 
         readme = (PUBLIC_ROOT / ".github/README.md").read_text(encoding="utf-8")
         self.assertIn("scripts/validate-zsh-standard-policy.py", readme)
@@ -3724,6 +3802,9 @@ class PublicZshStandardContractTests(unittest.TestCase):
             ('"caller-posix-argzero"', 1),
             ('"caller-no-function-argzero"', 1),
             ('"caller-hostile-globbing"', 1),
+            ('"direct-relative-special-path"', 1),
+            ('"manager-zero-normalized"', 1),
+            ("[[ ${(t)source_path} == *readonly* ]]", 1),
             ("[[ ${Plugins[OTHER]} == caller-other ]]", 2),
         )
         for fragment, minimum_count in requirements:
