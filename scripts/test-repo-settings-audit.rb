@@ -165,7 +165,14 @@ class RepoSettingsAuditTest
     )
 
     assert_equal(RepoSettingsAudit::Baseline::SETTINGS.length, result.fetch("settings").length)
-    assert_equal({ "pass" => 3, "warn" => 3, "fail" => 1, "na" => 0 }, result.fetch("summary"))
+    assert_equal({ "pass" => 3, "warn" => 3, "fail" => 2, "na" => 0 }, result.fetch("summary"))
+  end
+
+  def test_evaluator_reports_default_branch_drift_as_required
+    row = RepoSettingsAudit::Evaluator.evaluate_setting(
+      klass: 4, setting: "default_branch_main", live: false, has_ci: true
+    )
+    assert_equal("fail", row.fetch("status"))
   end
 
   # --- SettingsExtractor ---------------------------------------------------
