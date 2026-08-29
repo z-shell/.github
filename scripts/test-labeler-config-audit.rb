@@ -120,6 +120,22 @@ class LabelerConfigAuditTest
     assert(error.message.include?("not valid YAML"), "unexpected message: #{error.message}")
   end
 
+  def test_non_mapping_config_is_malformed
+    files = { "z-shell/list:.github/labeler.yml" => "- type:bug\n" }
+    audit("z-shell/list", files)
+    raise "expected GitHubError"
+  rescue LabelerConfigAudit::GitHubError => error
+    assert(error.message.include?("must be a mapping"), "unexpected message: #{error.message}")
+  end
+
+  def test_empty_label_key_is_malformed
+    files = { "z-shell/empty:.github/labeler.yml" => "\"\":\n  - '*.rb'\n" }
+    audit("z-shell/empty", files)
+    raise "expected GitHubError"
+  rescue LabelerConfigAudit::GitHubError => error
+    assert(error.message.include?("non-empty strings"), "unexpected message: #{error.message}")
+  end
+
   def test_json_output_and_exit_code_on_drift
     io = StringIO.new
     code = LabelerConfigAudit.run(
