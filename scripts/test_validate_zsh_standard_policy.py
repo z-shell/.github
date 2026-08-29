@@ -203,6 +203,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "zsh/review/report-without-rewrite",
             "zsh/change/conform-touched-code",
             "zsh/completion/preserve-trust-boundaries",
+            "zsh/options/canonical-spelling",
             "zsh/options/declare-correctness-state",
             "zsh/options/localize",
             "zsh/options/no-blanket-error-mode",
@@ -249,7 +250,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             [rule["id"] for rule in matching_rules],
             expected_rule_ids,
         )
-        self.assertEqual(len(matching_rules), 48)
+        self.assertEqual(len(matching_rules), 49)
         for rule in matching_rules:
             with self.subTest(rule_id=rule["id"]):
                 if rule["id"] == "zsh/completion/preserve-trust-boundaries":
@@ -1977,7 +1978,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             },
             "parsed_rules": validator._markdown_rules(instruction),
         }
-        self.assertEqual(len(snapshot["rule_blocks"]), 63)
+        self.assertEqual(len(snapshot["rule_blocks"]), 64)
         digest = hashlib.sha256(
             json.dumps(
                 snapshot,
@@ -1989,7 +1990,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "15d3c2c6f7bcf5192f8fe4beb1b8e324262f0ea5779407b0c0609beadc13151c",
+            "e385f4d4c34496495e808b602b59adb88d5ace192619e04669c70f4020afc981",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:

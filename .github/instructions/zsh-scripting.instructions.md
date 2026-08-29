@@ -331,7 +331,7 @@ execution profile.
 - Level: `required`
 - Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
 - Minimum Zsh: `null`
-- Basis: `official-manual`, `organization-policy`
+- Basis: `mixed`
 - Evidence: `options`
 - Enforcement: `human-review`
 
