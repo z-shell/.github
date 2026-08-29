@@ -864,6 +864,18 @@
       "canonical_for": ["zsh-plugin-standard-adoption"]
     },
     {
+      "id": "decision-0021",
+      "path": "decisions/0021-derive-chroma-knowledge-at-runtime.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "chroma-command-knowledge"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["chroma-command-knowledge"]
+    },
+    {
       "id": "zsh-standard-policy",
       "path": "lib/zsh-standard-policy.json",
       "kind": "enforcement",
