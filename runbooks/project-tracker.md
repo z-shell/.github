@@ -16,12 +16,14 @@ organization-infrastructure work; it is not the source of truth.
 
 ## Inclusion policy
 
-The organization-wide reconciler tracks all open organization issues so that
-work cannot disappear between repositories. Project views separate workstreams:
+The organization-wide reconciler tracks actionable open organization issues so
+that work cannot disappear between repositories. It excludes Renovate
+Dependency Dashboard issues, which remain available in their owning
+repositories as automation control surfaces. Project views separate workstreams:
 
 - `Human delivery`: ordinary bugs, features, maintenance, and documentation
-- `Automation`: bot dashboards and recurring automation records
-- `Dependency maintenance`: routine dependency updates and dashboards
+- `Automation`: recurring automation records requiring maintainer action
+- `Dependency maintenance`: actionable routine dependency work
 - `Security`: security work requiring maintainer attention
 - `Administrative`: organization and repository governance
 
@@ -52,10 +54,12 @@ only one auto-add workflow. Keep it narrow while the central reconciler is
 introduced.
 
 The scheduled reconciler uses a project-scoped credential supplied as
-`PROJECT_TOKEN` to add every missing open organization issue to Project 28. It
-is additive and idempotent, emits a drift report, and never overwrites
-human-set field values. Manual dispatch remains read-only unless a maintainer
-sets `apply=true` after reviewing the report.
+`PROJECT_TOKEN` to add every missing actionable open organization issue to
+Project 28. It also removes only exact Renovate Dependency Dashboard matches,
+identified by bot type, bot login, and title. It is otherwise additive and
+idempotent, emits a drift report, and never overwrites human-set field values.
+Manual dispatch remains read-only unless a maintainer sets `apply=true` after
+reviewing the report.
 
 The target implementation is an organization-owned GitHub App with Project
 read/write permission, installed on all repositories, receiving only the
@@ -90,7 +94,7 @@ changing reconciliation behavior. The report must identify:
 - open organization issues missing from Project 28
 - project items whose source issue or pull request is no longer visible
 - unclassified workstream records
-- bot and dependency-dashboard records
+- excluded Renovate Dependency Dashboard records and any matching Project items
 - project items with conflicting or missing relationship data
 - open issues that have been stale for five days, excluding `status:blocked`
 

@@ -9,7 +9,7 @@ on:
         default: false
         type: boolean
   schedule:
-    - cron: '17 3 * * *'
+    - cron: "17 3 * * *"
 
 concurrency:
   group: project-reconcile
@@ -32,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
           APPLY: ${{ github.event_name == 'schedule' || inputs.apply || false }}
           ORGANIZATION: z-shell
-          PROJECT_NUMBER: '28'
+          PROJECT_NUMBER: "28"
         run: |
           set -euo pipefail
 
@@ -51,7 +51,7 @@ jobs:
           gh api --paginate \
             -H 'Accept: application/vnd.github+json' \
             "/search/issues?q=org%3A${ORGANIZATION}%20is%3Aissue%20is%3Aopen&per_page=100" \
-            --jq '.items[] | {url: .html_url, node_id: .node_id, title: .title, repository: .repository_url, author: .user.login, updated_at: .updated_at, labels: [.labels[].name]}' \
+            --jq '.items[] | {url: .html_url, node_id: .node_id, title: .title, repository: .repository_url, author: .user.login, author_type: .user.type, updated_at: .updated_at, labels: [.labels[].name]}' \
             > open-issues.ndjson
 
           : > project-items.ndjson
@@ -101,6 +101,16 @@ jobs:
                 }
               }' -f project="${project_id}" -f content="${node_id}" >/dev/null
           done < <(jq -c '.missing_open_issues[]' project-reconcile-report.json)
+
+          while IFS= read -r item; do
+            item_id="$(jq -r '.item_id' <<<"${item}")"
+            gh api graphql -f query='
+              mutation($project: ID!, $item: ID!) {
+                deleteProjectV2Item(input: {projectId: $project, itemId: $item}) {
+                  deletedItemId
+                }
+              }' -f project="${project_id}" -f item="${item_id}" >/dev/null
+          done < <(jq -c '.excluded_project_items[]' project-reconcile-report.json)
 
           echo 'Project membership reconciliation applied.'
 

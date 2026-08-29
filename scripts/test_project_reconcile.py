@@ -12,7 +12,9 @@ import project_reconcile
 
 
 class ProjectReconcileTest(unittest.TestCase):
-    def write_ndjson(self, directory: Path, name: str, records: list[dict[str, object]]) -> Path:
+    def write_ndjson(
+        self, directory: Path, name: str, records: list[dict[str, object]]
+    ) -> Path:
         path = directory / name
         path.write_text("".join(json.dumps(record) + "\n" for record in records))
         return path
@@ -58,7 +60,10 @@ class ProjectReconcileTest(unittest.TestCase):
             )
 
         self.assertEqual(3, report["open_issue_count"])
+        self.assertEqual(3, report["tracked_open_issue_count"])
         self.assertEqual(1, report["project_content_count"])
+        self.assertEqual([], report["excluded_open_issues"])
+        self.assertEqual([], report["excluded_project_items"])
         self.assertEqual(
             [
                 "https://github.com/z-shell/example/issues/1",
@@ -77,7 +82,13 @@ class ProjectReconcileTest(unittest.TestCase):
             open_issues = self.write_ndjson(
                 directory,
                 "open-issues.ndjson",
-                [{"url": "https://github.com/z-shell/example/issues/1", "node_id": "issue-1", "labels": []}],
+                [
+                    {
+                        "url": "https://github.com/z-shell/example/issues/1",
+                        "node_id": "issue-1",
+                        "labels": [],
+                    }
+                ],
             )
             project_items = self.write_ndjson(directory, "project-items.ndjson", [])
 
@@ -88,6 +99,86 @@ class ProjectReconcileTest(unittest.TestCase):
                     now="2026-08-21T00:00:00Z",
                     stale_after_days=5,
                 )
+
+    def test_report_excludes_only_exact_renovate_dependency_dashboards(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            directory = Path(temporary_directory)
+            open_issues = self.write_ndjson(
+                directory,
+                "open-issues.ndjson",
+                [
+                    {
+                        "url": "https://github.com/z-shell/example/issues/1",
+                        "node_id": "dashboard",
+                        "title": "Dependency Dashboard",
+                        "author": "renovate[bot]",
+                        "author_type": "Bot",
+                        "updated_at": "2026-08-01T00:00:00Z",
+                        "labels": [],
+                    },
+                    {
+                        "url": "https://github.com/z-shell/example/issues/2",
+                        "node_id": "human-dashboard",
+                        "title": "Dependency Dashboard",
+                        "author": "maintainer",
+                        "author_type": "User",
+                        "updated_at": "2026-08-01T00:00:00Z",
+                        "labels": [],
+                    },
+                    {
+                        "url": "https://github.com/z-shell/example/issues/3",
+                        "node_id": "renovate-warning",
+                        "title": "Renovate configuration warning",
+                        "author": "renovate[bot]",
+                        "author_type": "Bot",
+                        "updated_at": "2026-08-01T00:00:00Z",
+                        "labels": [],
+                    },
+                ],
+            )
+            project_items = self.write_ndjson(
+                directory,
+                "project-items.ndjson",
+                [
+                    {
+                        "item_id": "project-dashboard",
+                        "node_id": "dashboard",
+                        "url": "https://github.com/z-shell/example/issues/1",
+                    }
+                ],
+            )
+
+            report = project_reconcile.build_report(
+                open_issues,
+                project_items,
+                now="2026-08-21T00:00:00Z",
+                stale_after_days=5,
+            )
+
+        self.assertEqual(3, report["open_issue_count"])
+        self.assertEqual(2, report["tracked_open_issue_count"])
+        self.assertEqual(
+            ["https://github.com/z-shell/example/issues/1"],
+            [issue["url"] for issue in report["excluded_open_issues"]],
+        )
+        self.assertEqual(
+            ["project-dashboard"],
+            [item["item_id"] for item in report["excluded_project_items"]],
+        )
+        self.assertEqual(
+            [
+                "https://github.com/z-shell/example/issues/2",
+                "https://github.com/z-shell/example/issues/3",
+            ],
+            [issue["url"] for issue in report["missing_open_issues"]],
+        )
+        self.assertEqual(
+            [
+                "https://github.com/z-shell/example/issues/2",
+                "https://github.com/z-shell/example/issues/3",
+            ],
+            [issue["url"] for issue in report["stale_open_issues"]],
+        )
 
 
 if __name__ == "__main__":
