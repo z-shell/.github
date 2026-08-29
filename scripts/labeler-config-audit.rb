@@ -96,9 +96,12 @@ module LabelerConfigAudit
   # label names in either, so read those and ignore the values entirely.
   def self.label_keys(source)
     parsed = YAML.safe_load(source, aliases: true)
-    return [] unless parsed.is_a?(Hash)
+    raise GitHubError, "labeler config must be a mapping" unless parsed.is_a?(Hash)
 
-    parsed.keys.map(&:to_s).reject(&:empty?)
+    keys = parsed.keys
+    raise GitHubError, "labeler config labels must be non-empty strings" unless keys.all? { |key| key.is_a?(String) && !key.empty? }
+
+    keys
   rescue Psych::Exception => error
     raise GitHubError, "labeler config is not valid YAML: #{error.message}"
   end
