@@ -1823,6 +1823,8 @@ class PublicRepositoryTests(unittest.TestCase):
             "content hashes)",
             "Reuse it only while every key component is unchanged",
             "same physical file, read it once and retain their combined provenance",
+            "selected guidance at distinct paths is byte-identical, load its "
+            "content once and retain the combined provenance of every matching route",
             "byte-identical generation source already embedded in an active "
             "composite counts as loaded",
         )
