@@ -1,43 +1,118 @@
-# Simple workflow for deploying static content to GitHub Pages
+---
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: [main]
+    paths:
+      - .github/workflows/static.yml
+      - profile/**
+  workflow_run:
+    workflows:
+      - Z Metrics
+      - Z Reader
+      - Z PageSpeed Insights
+    types: [completed]
+  workflow_dispatch: {}
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+permissions: {}
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Check out main
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          # Upload entire repository
-          path: '.'
+          ref: main
+          path: main
+
+      - name: Check out generated metrics assets
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: metrics
+          path: metrics-branch
+
+      - name: Stage curated asset set
+        env:
+          SITE: ${{ runner.temp }}/site
+        run: |
+          set -euo pipefail
+          rm -rf "${SITE}"
+          mkdir -p "${SITE}"
+          # Organization profile imagery published from main.
+          if [ -d main/profile/img ]; then
+            mkdir -p "${SITE}/profile"
+            cp -R main/profile/img "${SITE}/profile/img"
+          fi
+          # Generated metrics SVGs published from the metrics branch.
+          if [ -d metrics-branch/metrics ]; then
+            cp -R metrics-branch/metrics "${SITE}/metrics"
+          fi
+          # Publish nothing that is not an image or the generated index.
+          find "${SITE}" -type f \
+            ! -name '*.svg' ! -name '*.png' ! -name '*.jpg' \
+            ! -name '*.jpeg' ! -name '*.webp' ! -name '*.ico' \
+            -print -delete
+          find "${SITE}" -type d -empty -delete
+          echo "Staged asset set:"
+          find "${SITE}" -type f | sort
+
+      - name: Generate index
+        env:
+          SITE: ${{ runner.temp }}/site
+        run: |
+          set -euo pipefail
+          {
+            printf '%s\n' '<!DOCTYPE html>'
+            printf '%s\n' '<html lang="en">'
+            printf '%s\n' '<head>'
+            printf '%s\n' '<meta charset="utf-8">'
+            printf '%s\n' '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            printf '%s\n' '<title>z-shell assets</title>'
+            printf '%s\n' '</head>'
+            printf '%s\n' '<body>'
+            printf '%s\n' '<h1>z-shell published assets</h1>'
+            printf '%s\n' '<p>Generated metrics and organization imagery.</p>'
+            printf '%s\n' '<ul>'
+          } >"${SITE}/index.html"
+          (
+            cd "${SITE}"
+            find . -type f \( -name '*.svg' -o -name '*.png' \) \
+              | sed 's|^\./||' | sort \
+              | while IFS= read -r asset; do
+                  printf '<li><a href="%s">%s</a></li>\n' "${asset}" "${asset}"
+                done
+          ) >>"${SITE}/index.html"
+          {
+            printf '%s\n' '</ul>'
+            printf '%s\n' '</body>'
+            printf '%s\n' '</html>'
+          } >>"${SITE}/index.html"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: ${{ runner.temp }}/site
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
