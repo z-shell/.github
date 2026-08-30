@@ -28,7 +28,6 @@ jobs:
       metrics_svg: metrics/plugin/metrics.svg
       repositories_metrics_svg: metrics/plugin/repositories_metrics.svg
       followup_svg: metrics/plugin/followup/followup.svg
-      stargazers_worldmap_svg: metrics/plugin/stargazers/worldmap.svg
       zi_followup_svg: metrics/plugin/followup/zi_followup.svg
       wiki_followup_svg: metrics/plugin/followup/wiki_followup.svg
       f-sy-h_followup_svg: metrics/plugin/followup/f-sy-h_followup.svg
@@ -37,37 +36,32 @@ jobs:
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.metrics_svg }}
-          token: ${{ github.token }}
+          token: ${{ secrets.METRICS_TOKEN }}
+          committer_token: ${{ github.token }}
           user: ${{ github.repository_owner }}
           committer_branch: metrics
           base: header
+          plugins_errors_fatal: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.repositories_metrics_svg }}
-          token: ${{ github.token }}
+          token: ${{ secrets.METRICS_TOKEN }}
+          committer_token: ${{ github.token }}
           user: ${{ github.repository_owner }}
           committer_branch: metrics
           base: repositories
-      - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
-        with:
-          filename: ${{ env.stargazers_worldmap_svg }}
-          token: ${{ github.token }}
-          base: ""
-          user: ${{ github.repository_owner }}
-          committer_branch: metrics
-          plugin_stargazers: true
-          plugin_stargazers_charts: no
-          plugin_stargazers_worldmap: yes
-          plugin_stargazers_worldmap_token: ${{ secrets.GOOGLE_MAP_TOKEN }}
+          plugins_errors_fatal: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.followup_svg }}
-          token: ${{ github.token }}
+          token: ${{ secrets.METRICS_TOKEN }}
+          committer_token: ${{ github.token }}
           base: ""
           user: ${{ github.repository_owner }}
           committer_branch: metrics
           plugin_followup: yes
           plugin_followup_indepth: yes
+          plugins_errors_fatal: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.zi_followup_svg }}
@@ -79,6 +73,7 @@ jobs:
           committer_branch: metrics
           repo: zi
           plugin_followup: yes
+          plugins_errors_fatal: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.wiki_followup_svg }}
@@ -90,6 +85,7 @@ jobs:
           committer_branch: metrics
           repo: wiki
           plugin_followup: yes
+          plugins_errors_fatal: yes
       - uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6
         with:
           filename: ${{ env.f-sy-h_followup_svg }}
@@ -101,3 +97,4 @@ jobs:
           committer_branch: metrics
           repo: f-sy-h
           plugin_followup: yes
+          plugins_errors_fatal: yes
