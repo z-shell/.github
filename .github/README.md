@@ -208,5 +208,5 @@ the required override.
 ---
 
 <div align="center">
-  <sub>Part of the <a href="https://github.com/z-shell">Z-Shell</a> organization</sub>
+  <p>Developed with ❤️ by the <a href="https://github.com/z-shell">Z-Shell Community</a>.</p>
 </div>
