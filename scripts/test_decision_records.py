@@ -87,6 +87,28 @@ class DecisionRecordTests(unittest.TestCase):
         self.write_record("0001-proposed.md", text)
         self.assertEqual(self.errors(), [])
 
+    def test_rejects_ai_agent_decider(self) -> None:
+        for identity in (
+            "Claude Code",
+            "Gemini CLI",
+            "Copilot",
+            "Codex",
+            "renovate[bot]",
+        ):
+            with self.subTest(identity=identity):
+                self.write_record(
+                    "0001-agent-decider.md",
+                    VALID_RECORD.replace("ss-o", f"ss-o, {identity}"),
+                )
+                errors = self.errors()
+                self.assertTrue(any("automation identity" in e for e in errors), errors)
+
+    def test_allows_human_deciders(self) -> None:
+        self.write_record(
+            "0001-humans.md", VALID_RECORD.replace("ss-o", "ss-o, wicoop")
+        )
+        self.assertEqual(self.errors(), [])
+
     def test_rejects_unknown_status(self) -> None:
         self.write_record("0001-unknown.md", VALID_RECORD.replace("ACCEPTED", "MAYBE"))
         errors = self.errors()

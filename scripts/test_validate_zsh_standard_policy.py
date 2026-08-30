@@ -3525,12 +3525,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 [[ $0 == "$caller_zero" ]] || exit 34
                 """)
             direct_source = str(entry_path)
-            direct_relative_source = str(
-                entry_path.relative_to(temporary_directory)
-            )
-            manager_source = str(
-                plugin_root / "manager [literal]*? plugin.plugin.zsh"
-            )
+            direct_relative_source = str(entry_path.relative_to(temporary_directory))
+            manager_source = str(plugin_root / "manager [literal]*? plugin.plugin.zsh")
             manager_raw_source = str(
                 plugin_root
                 / "discarded [literal]*? segment"

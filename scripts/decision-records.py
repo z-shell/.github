@@ -48,6 +48,17 @@ ALLOWED_STATUSES = (
 UNRESOLVED_DECIDERS = ("TBD", "None", "")
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
+# A decision record names the humans who hold decision authority. Organization
+# policy bans crediting a bot or AI agent as a co-author, and runbooks/adr.md
+# reserves acceptance for a maintainer, so an automation identity can never be
+# a decider. The commit-msg hook enforces the same rule for commit trailers;
+# this is the decision-record half of it.
+AGENT_DECIDER_PATTERN = re.compile(
+    r"\[bot\]|\b(?:claude(?:\s+code)?|copilot|gemini(?:\s+cli)?|codex|cursor"
+    r"|devin|openai|anthropic|chatgpt|gpt-\d)\b",
+    re.IGNORECASE,
+)
+
 INDEX_HEADER = """<!--
 GENERATED FILE. DO NOT EDIT DIRECTLY.
 Regenerate: python3 scripts/decision-records.py
@@ -194,6 +205,18 @@ def _validate_record(
                 "an ACCEPTED record must name the accepting maintainer",
                 "record the accepting maintainer's handle in Deciders "
                 "(see runbooks/adr.md)",
+            )
+        )
+
+    agent_match = AGENT_DECIDER_PATTERN.search(record.deciders)
+    if agent_match is not None:
+        errors.append(
+            error(
+                path,
+                f"Deciders credits the automation identity "
+                f"{agent_match.group(0)!r}",
+                "list only the humans who hold decision authority; an agent "
+                "may draft a record but never decides it (see runbooks/adr.md)",
             )
         )
 
