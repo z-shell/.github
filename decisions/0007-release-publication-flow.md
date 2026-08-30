@@ -2,7 +2,7 @@
 
 - **Status:** ACCEPTED
 - **Date:** 2026-05-26
-- **Deciders:** ss-o, Claude Code
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 

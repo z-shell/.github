@@ -2,7 +2,7 @@
 
 - **Status:** ACCEPTED
 - **Date:** 2026-05-20
-- **Deciders:** ss-o, Gemini CLI
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** `decisions/0012-hybrid-dependency-management.md`
 
