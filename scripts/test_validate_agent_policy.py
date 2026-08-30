@@ -2000,12 +2000,13 @@ class PublicRepositoryTests(unittest.TestCase):
             "`git worktree list --porcelain` as the authoritative inventory",
             (PUBLIC_ROOT / "AGENTS.md").read_text(),
         )
-        self.assertIn(
-            "- **Status:** PROPOSED",
-            (
-                PUBLIC_ROOT / "decisions/0018-portable-worktree-management.md"
-            ).read_text(),
-        )
+        record = (
+            PUBLIC_ROOT / "decisions/0018-portable-worktree-management.md"
+        ).read_text()
+        # The record is accepted; scripts/decision-records.py owns the general
+        # header contract, so this only pins the routed decision's own state.
+        self.assertIn("- **Status:** ACCEPTED", record)
+        self.assertIn("- **Deciders:** ss-o", record)
 
     def test_public_repository_prohibits_vendor_root_instruction_files(self) -> None:
         policy = (PUBLIC_ROOT / "AGENTS.md").read_text()

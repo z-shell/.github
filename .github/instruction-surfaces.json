@@ -876,6 +876,18 @@
       "canonical_for": ["chroma-command-knowledge"]
     },
     {
+      "id": "decision-index",
+      "path": "decisions/README.md",
+      "kind": "runbook",
+      "authority": "advisory",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "onboarding"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "zsh-standard-policy",
       "path": "lib/zsh-standard-policy.json",
       "kind": "enforcement",
@@ -914,6 +926,18 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["public-policy-validation"]
+    },
+    {
+      "id": "decision-records-validator",
+      "path": "scripts/decision-records.py",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["ci", "human"],
+      "tasks": ["architecture-decision", "validation"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["decision-record-validation"]
     },
     {
       "id": "agent-instruction-workflow",
