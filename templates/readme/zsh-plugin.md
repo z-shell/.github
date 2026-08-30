@@ -137,6 +137,10 @@ This project is distributed under the terms in [LICENSE](LICENSE).
 
 ---
 
+<div align="center">
+  <p>Developed with ❤️ by the <a href="https://github.com/z-shell">Z-Shell Community</a>.</p>
+</div>
+
 ## Maintainer checklist
 
 - [ ] The purpose and feature claims match current implementation behavior.
