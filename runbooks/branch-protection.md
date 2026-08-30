@@ -71,14 +71,30 @@ branch name. Run the guard on a real pull request before adding its context to
 Promotion preserves Git ancestry. Never squash or rebase a persistent branch
 into its stable branch.
 
-1. Fetch both remote branches and verify that `main` is an ancestor of `next`.
-   This proves that no hotfix or other stable-only commit was omitted:
+1. Fetch both remote branches and verify that the stable branch carries no
+   content the candidate lacks. This proves that no hotfix or other
+   stable-only commit was omitted:
 
    ```sh
    git fetch origin main next
-   git merge-base --is-ancestor origin/main origin/next
+   test -z "$(git diff --name-only origin/next...origin/main)"
    git log --left-right --graph --oneline origin/main...origin/next
    ```
+
+   Do **not** test `git merge-base --is-ancestor origin/main origin/next`. That
+   check cannot pass after a successful promotion and does not mean the branches
+   have diverged in content. Promotion creates a merge commit on `main`, and
+   that commit never exists on `next`, so `main` stops being an ancestor of
+   `next` the moment a promotion lands. Treating the failure as drift produces a
+   no-content reconciliation merge before every promotion, which is exactly the
+   routine back-merge ADR-0019 removed.
+
+   The empty three-dot diff is the real precondition: it is satisfied both
+   immediately after a promotion and after ordinary work continues on `next`,
+   and it still fails when a genuine stable-only commit, such as an unmerged
+   hotfix, exists on `main`. When it fails, inspect
+   `git log --oneline origin/next..origin/main` to identify the omitted commit
+   and merge it forward through the hotfix synchronization procedure below.
 
 2. Open or update a pull request with base `main`, head `next`, and a
    Conventional Commit title such as `chore: promote next to main`.
@@ -120,6 +136,13 @@ continues, synchronize it into `next`:
 2. merge current `main` into that branch with a signed merge commit;
 3. open a pull request into `next` and preserve the merge commit; and
 4. verify `git merge-base --is-ancestor origin/main origin/next` after merge.
+
+This is the one direction in which the ancestor test is correct, because
+synchronization merges `main` into `next` and preserves the merge commit. It is
+the mirror image of the promotion precondition, where the same test is wrong.
+Keep the two straight: synchronization makes `main` an ancestor of `next`, and
+promotion makes `next` an ancestor of `main`. Neither relationship survives in
+both directions at once.
 
 Do not reset, rebase, or force-push the persistent branch to synchronize a
 hotfix. If the trees conflict, resolve them in the reviewed synchronization
