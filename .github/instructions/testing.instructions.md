@@ -58,6 +58,9 @@ Do not add an org-wide coverage number.
   integration or system tests are also valid when they exercise boundaries that
   do not fit a unit test.
 - Test plugins by sourcing them in a clean Zsh session; there is no build step.
+- Before testing autoloaded functions, clear or rebuild inherited `FPATH` and
+  `fpath` from the subject checkout. A same-named entry from another worktree
+  or installation can make tests exercise stale code.
 - Prime lifecycle observers before the baseline. Compare functions, parameters
   and attributes, aliases, options, traps, modules, hooks, widgets, bindings,
   styles, `path`, and `fpath` without printing captured values.
