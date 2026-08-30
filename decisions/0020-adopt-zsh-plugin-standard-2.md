@@ -1,6 +1,6 @@
 # 20. Adopt Zsh Plugin Standard 2 as a Clean Portable Contract
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-08-28
 - **Deciders:** ss-o
 - **Supersedes:** None

@@ -1,6 +1,6 @@
 # 21. Derive Chroma Command Knowledge at Runtime
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-08-29
 - **Deciders:** ss-o
 - **Supersedes:** None

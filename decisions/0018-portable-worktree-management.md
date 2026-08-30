@@ -1,6 +1,6 @@
 # 18. Adopt Portable Worktree Management
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-08-27
 - **Deciders:** ss-o
 - **Supersedes:** None

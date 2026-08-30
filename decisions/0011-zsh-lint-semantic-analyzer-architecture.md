@@ -1,12 +1,10 @@
 # 11. zsh-lint Conditional Semantic Analysis Pipeline
 
-Date: 2026-07-25
-
-Deciders: ss-o
-
-## Status
-
-ACCEPTED
+- **Status:** ACCEPTED
+- **Date:** 2026-07-25
+- **Deciders:** ss-o
+- **Supersedes:** None
+- **Superseded by:** None
 
 ## Context
 

@@ -88,6 +88,12 @@ BASE_INVENTORY = {
     ".github/README.md": "runbook",
     ".github/copilot-instructions.md": "adapter",
 }
+# Generated outputs that live inside a scanned inventory directory but are not
+# records of that directory's kind. The inventory scan discovers them when they
+# exist, so they are not unconditionally required here.
+GENERATED_INVENTORY = {
+    "decisions/README.md": "runbook",
+}
 INVENTORY_RULES = (
     (".github/instructions", ".instructions.md", "scoped-guidance", True),
     (".github/agents", ".md", "agent", False),
@@ -97,6 +103,7 @@ INVENTORY_RULES = (
 ENFORCEMENT_INVENTORY = {
     ".github/workflows/agent-instructions.yml": "enforcement",
     "scripts/validate-agent-policy.py": "enforcement",
+    "scripts/decision-records.py": "enforcement",
 }
 PUBLIC_SCAN_EXEMPTIONS = {"scripts/validate-agent-policy.py"}
 ALLOWED_MANIFEST_FIELDS = {"version", "repository", "canonical_policy", "surfaces"}
@@ -260,8 +267,10 @@ def _inventory_path(relative_path: str) -> str:
 
 def _expected_inventory_kind(relative_path: str) -> str | None:
     inventory_path = _inventory_path(relative_path)
-    exact_kind = BASE_INVENTORY.get(inventory_path) or ENFORCEMENT_INVENTORY.get(
-        inventory_path
+    exact_kind = (
+        BASE_INVENTORY.get(inventory_path)
+        or GENERATED_INVENTORY.get(inventory_path)
+        or ENFORCEMENT_INVENTORY.get(inventory_path)
     )
     if exact_kind is not None:
         return exact_kind
