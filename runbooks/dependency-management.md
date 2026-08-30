@@ -54,6 +54,18 @@ also reference it explicitly:
 }
 ```
 
+The organization preset builds on Renovate's `config:best-practices` and weekly
+schedule presets. It leaves Renovate's curated monorepo and related-package
+groups in place instead of grouping every dependency handled by the same
+manager. Broad manager-wide groups make one unrelated failure block all other
+updates and make the cause harder to isolate.
+
+GitHub Actions are the narrow exception. Their non-major updates are grouped to
+reduce workflow-only pull request volume, while major updates remain isolated
+and require Dependency Dashboard approval. Renovate is configured not to open
+parallel major and non-major branches for the same action: when both are
+available, it proposes only the highest release.
+
 Repository consumer configuration belongs at `.github/renovate.json`.
 Renovate also recognizes `renovate.json` at the repository root, but searches
 that location first and stops after the first match. Never keep both paths; a

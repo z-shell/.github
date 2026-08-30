@@ -4,10 +4,11 @@
   "extends": [
     "config:best-practices",
     ":semanticCommits",
+    ":approveMajorUpdates",
+    "schedule:weekly",
     ":disableVulnerabilityAlerts"
   ],
   "timezone": "UTC",
-  "schedule": ["* 0-4 * * 1"],
   "minimumReleaseAge": "3 days",
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Dependency Dashboard",
@@ -17,10 +18,9 @@
   "automerge": false,
   "packageRules": [
     {
-      "description": "Group non-major updates by package manager",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "groupName": "{{manager}} non-major updates",
-      "groupSlug": "{{manager}}-non-major"
+      "description": "Propose only the highest available GitHub Actions release",
+      "matchManagers": ["github-actions"],
+      "separateMajorMinor": false
     },
     {
       "description": "Group non-major GitHub Actions updates",
