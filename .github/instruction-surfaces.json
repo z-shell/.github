@@ -343,7 +343,7 @@
       "kind": "skill",
       "authority": "advisory",
       "consumers": ["copilot"],
-      "tasks": ["issue-management"],
+      "tasks": ["issue-investigation", "issue-management"],
       "file_patterns": ["**"],
       "required": false,
       "review_owner": "z-shell maintainers",
@@ -606,11 +606,11 @@
       "kind": "runbook",
       "authority": "canonical-detail",
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
-      "tasks": ["triage"],
+      "tasks": ["issue-investigation", "triage"],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
-      "canonical_for": ["triage"]
+      "canonical_for": ["issue-investigation", "triage"]
     },
     {
       "id": "decision-0001",

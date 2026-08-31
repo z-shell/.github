@@ -1,6 +1,6 @@
 ---
 name: github-issues
-description: Read, draft, create, or update GitHub issues with runtime capability discovery, exact authorization boundaries, and verification of every external write.
+description: Investigate, assess, read, draft, create, or update GitHub issues with current-state verification, value-versus-cost analysis, runtime capability discovery, and exact write boundaries.
 ---
 
 # GitHub Issues
@@ -35,6 +35,28 @@ Use a high-level command when the installed version supports the required
 field. Current GitHub CLI versions may support issue types directly through
 `gh issue create --type`; verify with `gh issue create --help`. Use `gh api`
 only for capabilities the installed high-level command does not expose.
+
+## Investigation workflow
+
+For z-shell work, follow the routed canonical `runbooks/triage.md`. This skill
+owns the operational procedure, not disposition policy.
+
+1. Resolve the issue and its live state, project fields, dependencies, and
+   blockers.
+2. Fetch the current target branch, record its exact commit, and inspect the
+   current source instead of trusting a stale checkout.
+3. Search related issues, pull requests, commits, ADRs, and accepted patterns.
+4. Trace the affected implementation and its callers. Reproduce the behavior
+   or record the evidence gap, then run the smallest meaningful checks.
+5. Compare expected user, correctness, security, performance, and maintenance
+   value with implementation cost, regression risk, and ongoing ownership.
+6. Recommend exactly one disposition: implement, defer, close as completed,
+   close as not planned, or request more information.
+
+Structure the report as: recommendation and disposition, current reality and
+history, confirmed finding, value versus cost, verification and evidence gaps,
+and the next authorized action. Investigation does not authorize a tracker
+write.
 
 ## Read or draft workflow
 

@@ -23,6 +23,31 @@ For each item, answer:
 
 If classification takes more than a few minutes, mark it for investigation and move on.
 
+## Investigation and value gate
+
+An open issue is a hypothesis, not proof that work remains or that
+implementation is worthwhile. Before recommending work:
+
+1. Verify the live issue, project fields, dependencies, and blockers.
+2. Inspect the current target branch at an exact commit and search related
+   issues, pull requests, commits, ADRs, and established patterns.
+3. Trace the affected code and callers. Reproduce the behavior or state why
+   reproduction is unavailable, then run the smallest meaningful checks.
+4. Compare expected user, correctness, security, performance, and maintenance
+   value with implementation cost, regression risk, and ongoing ownership.
+   Do not claim a performance benefit without relevant measurement.
+5. Recommend exactly one disposition: implement, defer, close as completed,
+   close as not planned, or request more information.
+
+Report the recommendation first, followed by current reality and history, the
+confirmed finding, value versus cost, verification and evidence gaps, and the
+next authorized action. Keep tracker changes as drafts unless the required
+external-write authority is explicit.
+
+When later implementation or repository history disproves a recommendation,
+use the learning-capture process to improve this gate only if the correction is
+evidence-backed and likely to recur.
+
 ## Step 2 — Apply the canonical labels
 
 The organization label set in `lib/labels.yml` is the source of truth. Apply at least one work-type label and one area label when the area is known.
@@ -183,6 +208,7 @@ Do not handle exploit details publicly.
 - `.github/AGENT_MEMORY.md`
 - `PATTERNS.md`
 - `decisions/`
+- `runbooks/learning-capture.md`
 - `runbooks/labels.md`
 - `runbooks/project-tracker.md`
 - `runbooks/sub-issues.md`
