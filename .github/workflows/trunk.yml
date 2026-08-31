@@ -183,7 +183,7 @@ jobs:
           trunk-path: ${{ inputs['trunk-path'] != '' && inputs['trunk-path'] || inputs.trunk_path }}
 
       - name: Set up Trunk dependencies
-        if: ${{ inputs['setup-deps'] && hashFiles('.trunk/setup-ci/action.yaml') != '' }}
+        if: ${{ inputs['setup-deps'] && hashFiles('.trunk/setup-ci/action.yaml', '.trunk/setup-ci/action.yml') != '' }}
         uses: ./.trunk/setup-ci
 
       - name: Run post-init commands
