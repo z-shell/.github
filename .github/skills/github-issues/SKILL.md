@@ -56,6 +56,31 @@ only for capabilities the installed high-level command does not expose.
    rendered line breaks.
 6. Report the resulting URL.
 
+## Pull-request issue links
+
+Closing keywords create a Development link only when the pull request targets
+the repository's default branch. If repository policy requires a non-default
+base, preserve that base and create a manual closing reference after explicit
+authority. Do not retarget the pull request merely to activate the keyword. A
+manual link does not change GitHub's default-branch requirement for closing the
+issue.
+
+Prefer a discovered high-level capability. If none exists, confirm the current
+GraphQL schema exposes `addCloseIssueReferences` with `issueId` and
+`pullRequestIds`, then use the issue and pull-request node IDs:
+
+```sh
+gh api graphql \
+  -f query='mutation($issueId: ID!, $pullRequestIds: [ID!]!) { addCloseIssueReferences(input: {issueId: $issueId, pullRequestIds: $pullRequestIds}) { issue { number } } }' \
+  -f issueId='ISSUE_NODE_ID' \
+  -F 'pullRequestIds[]=PR_NODE_ID'
+```
+
+Keep the complete `pullRequestIds[]=...` field quoted in Zsh so `NOMATCH` does
+not reject it before `gh` runs. Read both `closedByPullRequestsReferences` on
+the issue and `closingIssuesReferences` on the pull request back after the
+mutation.
+
 Never expose tokens, use destructive issue operations without exact authority,
 or treat tool availability as permission.
 
