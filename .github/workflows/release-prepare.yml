@@ -1,11 +1,12 @@
 ---
 name: Release Prepare
 
-# Prepares — but never publishes — a release for class-2 repositories
-# (decisions/0007-release-publication-flow.md). On every push to the default
-# branch it computes the next semantic version from Conventional Commits since
-# the last tag, drafts a changelog with GitHub Models (falling back to a
-# grouped commit list), and opens or updates a single release-proposal issue.
+# Prepares, but never publishes, a release for class-2 repositories and the
+# named Zi exception (decisions/0007-release-publication-flow.md). On every
+# push to the default branch it computes the next semantic version from
+# Conventional Commits since the last tag, drafts a changelog with GitHub
+# Models (falling back to a grouped commit list), and opens or updates a single
+# release-proposal issue.
 # The maintainer-pushed annotated tag remains the only publication act.
 
 on:
@@ -35,6 +36,11 @@ on:
         required: false
         type: string
         default: "release-proposal"
+      signed_tag:
+        description: Emit a signed annotated tag command in the proposal.
+        required: false
+        type: boolean
+        default: false
     outputs:
       version:
         description: >
@@ -235,11 +241,18 @@ jobs:
           PREVIOUS_TAG: ${{ steps.semver.outputs.previous-tag }}
           TAG_PREFIX: ${{ inputs.tag-prefix || 'v' }}
           PROPOSAL_LABEL: ${{ inputs.proposal-label || 'release-proposal' }}
+          SIGNED_TAG: ${{ inputs.signed_tag }}
           AI_RESPONSE_FILE: ${{ steps.ai.outputs.response-file }}
         run: |
           set -euo pipefail
           dir="${RUNNER_TEMP}/release-prepare"
           tag="${TAG_PREFIX}${VERSION}"
+          tag_flag="-a"
+          tag_kind="annotated"
+          if [ "$SIGNED_TAG" = "true" ]; then
+            tag_flag="-s"
+            tag_kind="signed annotated"
+          fi
 
           changelog="${dir}/fallback.md"
           if [ -n "${AI_RESPONSE_FILE}" ] && [ -s "${AI_RESPONSE_FILE}" ]; then
@@ -265,12 +278,12 @@ jobs:
             echo
             echo "## To publish"
             echo
-            echo "Per [ADR 0007](https://github.com/z-shell/.github/blob/main/decisions/0007-release-publication-flow.md) the annotated tag is the publication boundary — review, adjust the version if needed, then:"
+            echo "Per [ADR 0007](https://github.com/z-shell/.github/blob/main/decisions/0007-release-publication-flow.md) the ${tag_kind} tag is the publication boundary. Review and adjust the version if needed, then:"
             echo
             echo '```sh'
             echo "git switch ${GITHUB_REF_NAME} && git pull --ff-only"
             echo "# bump any in-repo version metadata first, if this repository has it"
-            echo "git tag -a ${tag} -m ${tag}"
+            echo "git tag ${tag_flag} ${tag} -m ${tag}"
             echo "git push origin ${tag}"
             echo '```'
             echo

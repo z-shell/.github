@@ -37,7 +37,8 @@ formalizes.
    only from those tags.
 3. **Git-consumed source** (`zi`, most plugins/annexes): Conventional Commits for
    clean history; CI is validation-only; **no release automation** unless the
-   repo later gains a separate packaged artifact.
+   repo later gains a separate packaged artifact or this ADR names an explicit
+   milestone-release exception.
 4. **Meta/infrastructure** (`.github`): Conventional Commits; no release
    automation.
 
@@ -70,9 +71,28 @@ Per-repo application:
 - **packaged `zsh`** — deferred: confirm what it publishes (npm package vs.
   metadata) before wiring a release, since the artifact determines the steps.
   (`zsh#8`.)
-- **`zi`** — class 3, git-consumed; **no release automation added**. Its
-  `next` to stable `main` promotion (`zi#346`) is governed by ADR-0019, while
-  this ADR adds no tag-driven release workflow to `zi`.
+- **`zi`**: class 3, git-consumed, with approval-gated milestone automation. Its
+  `next` to stable `main` promotion is governed by ADR-0019. The named
+  milestone-release exception below applies without changing `main` as the
+  stable Git-consumption boundary.
+
+### Zi milestone-release exception
+
+Zi may automate release preparation and publication under this contract:
+
+- a successful promotion to `main` may compute the next semantic version and
+  draft release notes, but preparation never creates or pushes a tag;
+- a maintainer authorizes publication by pushing an annotated, signed
+  `vX.Y.Z` tag to the exact verified `main` commit;
+- the tag-triggered workflow verifies the signature, exact target, and
+  successful required workflows on that commit before publishing the GitHub
+  release; and
+- Zi does not adopt `release-please` or a stored version file. Runtime version
+  reporting continues to derive from Git metadata.
+
+The signed tag is the human approval boundary. Automation after that boundary
+may be idempotent, but it must fail closed when the tag or validation evidence
+does not match the contract.
 
 ## Consequences
 
@@ -81,8 +101,9 @@ Per-repo application:
 - `zsh-lint` gains a notes-only tag-driven `release.yml`.
 - `release-please` is not adopted org-wide; it remains available to revisit per
   repo if a maintainer wants automated changelog/version PRs.
-- Class-3 repos (incl. `zi`) keep validation-only CI; tagging there is a manual,
-  policy-governed act, not automation.
+- Class-3 repositories remain validation-only by default. Zi is the named
+  exception: release preparation and publication may be automated, while tag
+  creation remains a manual, policy-governed act.
 
 ## Alternatives considered
 
@@ -92,6 +113,9 @@ Per-repo application:
   decision. Can be piloted per repo later without contradicting this ADR.
 - **One release model for all repos.** Rejected: continuously-deployed and
   git-consumed repos do not benefit from tag-driven release artifacts.
+- **Create a Zi tag on every promotion.** Rejected: not every promotion needs a
+  milestone release, and an automatically created tag would remove the exact
+  human publication approval boundary.
 - **Defer the ADR, keep guidance informal.** Rejected: the runbook explicitly
   waited on this decision; leaving it open invites drift.
 
@@ -101,6 +125,9 @@ Per-repo application:
 - `z-shell/zunit` `.github/workflows/release.yml` — reference tag-driven flow.
 - `decisions/0003-conventional-commits.md` — history format this builds on.
 - Tracker: `zsh-lint#21`, `zsh#8`, `zi#346`.
+- [Issue #583](https://github.com/z-shell/.github/issues/583) and
+  [zi#468](https://github.com/z-shell/zi/issues/468): approved Zi
+  milestone-release automation.
 - [Issue #497](https://github.com/z-shell/.github/issues/497) and
   [z-shell/zpmod#70](https://github.com/z-shell/zpmod/issues/70): accepted
   `zpmod` classification and owning repository remediation.
