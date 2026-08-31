@@ -1990,7 +1990,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "1a958a39d678afef3c4a42fa8163a131d8799e7adbc457403147c31eeff0ec19",
+            "905120edbdec5284d5da310be9552fd861028d0dbb541894e7333dec9eec39f3",
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
