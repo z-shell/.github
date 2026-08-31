@@ -72,9 +72,12 @@ rollout status per repository is tracked in issue #454, not restated here.
    part of the security surface governed by
    `decisions/0010-security-incident-response.md`.
 3. **Git-consumed source** (`zi`, most plugins/annexes) — **validation-only**: the
-   baseline checks above, plus ZUnit where the plugin ships tests. No release
-   automation and no coverage gate; these repos are consumed from source and the
-   bar is "does not break on load."
+   baseline checks above, plus ZUnit where the plugin ships tests. No coverage
+   gate; these repos are consumed from source and the bar is "does not break on
+   load." Release automation is absent by default. ADR-0007's named Zi
+   milestone exception additionally requires a signed tag targeting the exact
+   current `main` commit and successful required `main` workflows before the
+   GitHub release is published.
 4. **Meta/infrastructure** (`.github`) — baseline plus workflow/markdown linting.
 
 ### Coverage
@@ -100,9 +103,8 @@ that a ruleset enforces it.
 - A reviewer can determine the target CI bar from the repository's class
   instead of inferring policy from each workflow.
 - New repositories have an explicit target CI scope for their class.
-- "Validation-only for git-consumed repositories" becomes an explicit rule,
-  discouraging release machinery in class-3 repositories (consistent with
-  ADR-0007).
+- "Validation-only for git-consumed repositories" remains the default rule,
+  while ADR-0007 owns Zi's narrow approval-gated milestone exception.
 - The testing instruction distinguishes the organization target from verified
   repository-local enforcement so agents do not infer live gates from policy
   prose or workflow-file presence.

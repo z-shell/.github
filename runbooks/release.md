@@ -56,6 +56,9 @@ Policy:
 - use Conventional Commits for clean history and cross-repo reasoning
 - keep CI focused on validation
 - do **not** add release automation unless the repository later gains a separate packaged artifact or a clear tag-driven release workflow with maintainer buy-in
+- for Zi only, follow ADR-0007's named milestone exception: prepare
+  automatically, authorize with a maintainer-pushed signed tag, then publish
+  only after exact-ref validation
 
 ### 4. Meta and infrastructure repositories
 
@@ -99,11 +102,12 @@ ancestry-preserving promotion needs no reconciliation. A `zi` hotfix merged
 directly to `main` is synchronized into `next` through the reviewed merge
 procedure in the branch-protection runbook.
 
-## Release preparation automation (class 2)
+## Release preparation automation (class 2 and Zi)
 
 The reusable workflow
 [`release-prepare.yml`](../.github/workflows/release-prepare.yml) automates the
 _preparation_ half of the class-2 flow without moving the publication boundary.
+Zi may also call it under ADR-0007's named milestone exception.
 On every push to the default branch it:
 
 1. computes the next semantic version from Conventional Commits since the last
@@ -116,7 +120,11 @@ On every push to the default branch it:
 
 The maintainer-pushed annotated tag remains the only publication act, and the
 repository's tag-driven `release.yml` (zunit pattern) still does the
-publishing, so ADR 0007 is unchanged.
+publishing, so the class-2 publication boundary is unchanged.
+
+For Zi, set `signed_tag: true`. Its maintainer-pushed annotated, signed tag is
+the publication authorization, and the tag workflow must validate the exact
+tag target and required `main` workflows before creating the release.
 
 Caller snippet for a class-2 repository:
 
@@ -142,13 +150,23 @@ jobs:
     uses: z-shell/.github/.github/workflows/release-prepare.yml@main
 ```
 
+Zi adds the signed-tag input:
+
+```yaml
+jobs:
+  propose:
+    uses: z-shell/.github/.github/workflows/release-prepare.yml@main
+    with:
+      signed_tag: true
+```
+
 Notes:
 
 - Callers own `concurrency`; the reusable workflow does not set it.
 - `models: read` enables the GitHub Models changelog draft; without it the
   workflow still opens the proposal with the fallback commit list.
-- Do **not** add this to class-1, class-3, or class-4 repositories — they have
-  no tag boundary to prepare for.
+- Do **not** add this to class-1, class-4, or another class-3 repository. Zi is
+  the only named class-3 exception.
 
 ## Release-automation decision checklist
 
