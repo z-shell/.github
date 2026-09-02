@@ -876,6 +876,18 @@
       "canonical_for": ["chroma-command-knowledge"]
     },
     {
+      "id": "decision-0022",
+      "path": "decisions/0022-issue-traceability-on-pull-requests.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "branch-protection"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-index",
       "path": "decisions/README.md",
       "kind": "runbook",
