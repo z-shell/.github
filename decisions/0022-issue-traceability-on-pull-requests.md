@@ -1,8 +1,8 @@
 # 22. Enforce Issue Traceability on the Pull Request, Not the Branch Name
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-02
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -115,9 +115,9 @@ control active, which is the state this record exists to end.
 4. Relax `Validate Branch Name` to the shape check above, in this repository
    and in `z-shell/zi`, which carries the same job with its patterns inlined.
 5. Add a pointer in ADR-0019's Decision section recording that its
-   branch-naming clause is amended here. This step belongs to the
-   implementation, not to this draft: ADR-0019 is unamended until a maintainer
-   accepts this record.
+   branch-naming clause is amended here. This lands with the implementation
+   rather than with the record itself, so the pointer and the enforcement it
+   describes arrive together.
 6. Update `AGENTS.md` where it describes issue-linked branch naming.
 
 ## Consequences

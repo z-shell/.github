@@ -32,4 +32,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0019](0019-trunk-on-main-default.md)                   | Trunk-on-Main Default with a Zi Integration Exception               | ACCEPTED | 2026-08-28 | ss-o     |
 | [0020](0020-adopt-zsh-plugin-standard-2.md)             | Adopt Zsh Plugin Standard 2 as a Clean Portable Contract            | ACCEPTED | 2026-08-28 | ss-o     |
 | [0021](0021-derive-chroma-knowledge-at-runtime.md)      | Derive Chroma Command Knowledge at Runtime                          | ACCEPTED | 2026-08-29 | ss-o     |
-| [0022](0022-issue-traceability-on-pull-requests.md)     | Enforce Issue Traceability on the Pull Request, Not the Branch Name | PROPOSED | 2026-09-02 | TBD      |
+| [0022](0022-issue-traceability-on-pull-requests.md)     | Enforce Issue Traceability on the Pull Request, Not the Branch Name | ACCEPTED | 2026-09-02 | ss-o     |
