@@ -146,7 +146,13 @@ jobs:
 
           # As above: an empty pattern would match every branch name and turn
           # this job into a silent pass.
-          : "${BRANCH_PATTERN:=^(feature|bug|hotfix)-[1-9][0-9]*(-[a-z0-9]+)*$}"
+          # decisions/0022: a shape check, not an identifier check.
+          # Traceability moved to Validate Issue Link. Either
+          # <type>-<id> with an optional slug, which stays the
+          # recommended form, or <type>/<slug> over the
+          # decisions/0003 Conventional Commits types plus
+          # feature, bug and hotfix.
+          : "${BRANCH_PATTERN:=^((feature|bug|hotfix)-[1-9][0-9]*(-[a-z0-9]+)*|(feat|fix|perf|refactor|docs|test|build|ci|style|chore|revert|feature|bug|hotfix)/[a-z0-9]+(-[a-z0-9]+)*)$}"
 
           if echo "$BRANCH" | grep -qE "$AUTOMATION_BRANCH_PATTERN" || \
              { [ "$REPOSITORY" = "z-shell/zi" ] && [ "$BRANCH" = "next" ]; }; then

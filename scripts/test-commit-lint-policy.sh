@@ -154,9 +154,18 @@ check_branch_cases() {
   assert_branch codex/learning-capture-publication allow
   assert_branch next allow
 
+  # decisions/0022 relaxed this to a shape check, so a Conventional Commits
+  # type prefix now passes without an identifier.
+  assert_branch fix/labeler-audit-reject-malformed allow
+  assert_branch docs/adr-0022-rollout allow
+  assert_branch chore/tidy-workflows allow
+  assert_branch feature/no-identifier allow
+
+  # 'code' is not in the decisions/0003 type set, so it is still rejected.
   assert_branch code/promotion-precondition-ancestry reject
-  assert_branch fix/labeler-audit-reject-malformed reject
   assert_branch ss-o-govern-plugin-standard reject
+  assert_branch fix/Bad-Caps reject
+  assert_branch fix/ reject
   assert_branch feature-0 reject
   assert_branch feature- reject
   assert_branch feature-505- reject
