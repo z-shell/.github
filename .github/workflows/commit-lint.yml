@@ -35,9 +35,13 @@ on:
         type: string
       branch-pattern:
         description: >
-          grep -E pattern a PR head branch must match. dependabot/* and
-          renovate/* are always allowed. next is allowed only for z-shell/zi.
-          Falls back to ^(feature|bug|hotfix)-[1-9][0-9]*$ in the job step.
+          grep -E pattern a PR head branch must match. Agent- and
+          bot-generated prefixes (dependabot/, renovate/, copilot/, codex/) are
+          always allowed, because the pull-request author does not choose those
+          names. next is allowed only for z-shell/zi. Falls back to
+          ^(feature|bug|hotfix)-[1-9][0-9]*(-[a-z0-9]+)*$ in the job step, which
+          keeps the issue id mandatory and permits a descriptive slug after it
+          (decisions/0019).
         required: false
         type: string
 
@@ -131,9 +135,9 @@ jobs:
 
           # As above: an empty pattern would match every branch name and turn
           # this job into a silent pass.
-          : "${BRANCH_PATTERN:=^(feature|bug|hotfix)-[1-9][0-9]*$}"
+          : "${BRANCH_PATTERN:=^(feature|bug|hotfix)-[1-9][0-9]*(-[a-z0-9]+)*$}"
 
-          if echo "$BRANCH" | grep -qE '^(dependabot|renovate)/' || \
+          if echo "$BRANCH" | grep -qE '^(dependabot|renovate|copilot|codex)/' || \
              { [ "$REPOSITORY" = "z-shell/zi" ] && [ "$BRANCH" = "next" ]; }; then
             echo "✅ OK"
             exit 0
