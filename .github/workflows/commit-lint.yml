@@ -8,8 +8,18 @@ name: Commit Lint
 # allowed, only a bot/agent identity is banned (AGENTS.md) -- Conventional
 # Commits (decisions/0003), and issue-linked topic-branch naming
 # (decisions/0019).
+#
+# This workflow triggers directly on pull_request and is also callable by other
+# repositories. It was previously reached only through a thin `lint-commits.yml`
+# caller whose workflow-level `permissions: {}` capped the nested jobs at no
+# permissions, so every run ended in startup_failure and the policy was never
+# evaluated (z-shell/.github#575). The self-triggering + `workflow_call` shape
+# matches the other reusable suites in this repository.
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [main]
   workflow_call:
     inputs:
       disallowed-trailer-pattern:
@@ -17,28 +27,31 @@ on:
           Case-insensitive grep -E pattern for a banned commit trailer. A
           Co-authored-by trailer crediting a real human is allowed; only a
           bot/AI-agent/automation identity is disallowed (AGENTS.md), so the
-          default matches known bot/agent trailer shapes rather than every
-          Co-authored-by line. Extend as new agent identities show up.
+          fallback matches known bot/agent trailer shapes rather than every
+          Co-authored-by line. Extend as new agent identities show up. The
+          fallback lives in the job step, because workflow_call input defaults
+          do not apply to a pull_request run.
         required: false
         type: string
-        default: '^[[:space:]]*Co-authored-by:.*(\[bot\]|noreply@anthropic\.com|noreply@openai\.com|noreply@x\.ai|codex@openai\.com|copilot@github\.com|claude@anthropic\.com)'
       branch-pattern:
         description: >
           grep -E pattern a PR head branch must match. dependabot/* and
           renovate/* are always allowed. next is allowed only for z-shell/zi.
+          Falls back to ^(feature|bug|hotfix)-[1-9][0-9]*$ in the job step.
         required: false
         type: string
-        default: "^(feature|bug|hotfix)-[1-9][0-9]*$"
 
-permissions: {}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   commit-message:
     name: Validate Commits
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -52,6 +65,10 @@ jobs:
           DISALLOWED_TRAILER_PATTERN: ${{ inputs.disallowed-trailer-pattern }}
         run: |
           set -euo pipefail
+
+          # workflow_call input defaults are not applied on a pull_request run,
+          # so an unset or empty pattern would otherwise match every line.
+          : "${DISALLOWED_TRAILER_PATTERN:=^[[:space:]]*Co-authored-by:.*(\[bot\]|noreply@anthropic\.com|noreply@openai\.com|noreply@x\.ai|codex@openai\.com|copilot@github\.com|claude@anthropic\.com)}"
 
           CONVENTIONAL_PATTERN='^(feat|fix|perf|refactor|docs|test|build|ci|style|chore|revert)(\([^)]+\))?!?: .{1,72}$'
 
@@ -110,6 +127,12 @@ jobs:
           BRANCH_PATTERN: ${{ inputs.branch-pattern }}
           REPOSITORY: ${{ github.repository }}
         run: |
+          set -euo pipefail
+
+          # As above: an empty pattern would match every branch name and turn
+          # this job into a silent pass.
+          : "${BRANCH_PATTERN:=^(feature|bug|hotfix)-[1-9][0-9]*$}"
+
           if echo "$BRANCH" | grep -qE '^(dependabot|renovate)/' || \
              { [ "$REPOSITORY" = "z-shell/zi" ] && [ "$BRANCH" = "next" ]; }; then
             echo "✅ OK"
