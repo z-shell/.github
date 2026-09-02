@@ -1979,7 +1979,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             },
             "parsed_rules": validator._markdown_rules(instruction),
         }
-        self.assertEqual(len(snapshot["rule_blocks"]), 65)
+        self.assertEqual(len(snapshot["rule_blocks"]), 66)
         digest = hashlib.sha256(
             json.dumps(
                 snapshot,
@@ -1991,7 +1991,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "d841ec864632352bc399bb035780e6805200425a4f14b0b700d3e7a9e8f7c59e",
+            "c2faea55b03018e947b6e1b5fef023c4d50a9474cfc9f4c4f372f68cabf6ba58",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "

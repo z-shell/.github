@@ -144,6 +144,7 @@ NORMATIVE_RULE_IDS = (
     "zsh/completion/preserve-trust-boundaries",
     "zsh/test/isolate-environment",
     "zsh/test/declare-negative-fixtures",
+    "zsh/test/cover-removed-behavior",
     "zsh/test/match-production-profile",
     "zsh/options/canonical-spelling",
     "zsh/options/declare-correctness-state",

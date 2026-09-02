@@ -315,6 +315,31 @@ and remember that a system `zshenv` may still execute.
 Mark intentionally invalid, legacy, or lint-negative fixtures in repository
 metadata instead of excluding an entire test directory.
 
+### `zsh/test/cover-removed-behavior`
+
+- Level: `required`
+- Profiles: `test-fixture`
+- Minimum Zsh: `null`
+- Basis: `organization-policy`
+- Evidence: `manual-index`
+- Enforcement: `human-review`
+
+When a change removes code on the grounds that it is unnecessary, a test
+offered as evidence for that removal must exercise the behaviour the removed
+code provided. Observe it failing with the code removed and passing with it
+present. A test that passes in both states supports nothing and must not be
+cited as though it does.
+
+Run the candidate test against the unmodified source before removing anything.
+If it passes there, it is not evidence, and either the test or the premise of
+the removal is wrong.
+
+This applies with particular force where a line looks inert: a declaration that
+appears redundant, an assignment whose value seems unused, a mutation that
+resembles a leak. Such a line is exactly the kind that gets removed on
+inspection, and exactly the kind whose loss a nearby test will not notice
+because the test covers the path the line does not serve.
+
 ### `zsh/test/match-production-profile`
 
 - Level: `required`
