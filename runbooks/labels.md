@@ -82,6 +82,15 @@ label is `meta:initiative`; follow `runbooks/sub-issues.md` before applying it.
 
 - `meta:initiative`
 - `meta:org-tracked`
+- `meta:no-issue`
+
+`meta:no-issue` is the traceability exemption defined by
+`decisions/0022-issue-traceability-on-pull-requests.md`. Apply it only to a
+pull request that genuinely has no owning work item, such as gitlink and
+submodule reconciliation or a routine dependency update. ADR-0022 makes
+applying it a maintainer decision: an agent may propose it and must not apply
+it on its own authority. Every other pull request closes or references an
+issue instead.
 
 ## Retire old labels
 
