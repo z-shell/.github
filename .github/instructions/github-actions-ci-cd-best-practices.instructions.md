@@ -71,7 +71,9 @@ permissions:
 
 ## 4. Reusable Workflows (`workflow_call`)
 
-- Explicitly declare `type`, `required`, and `default` for every input in `workflow_call`.
+- Explicitly declare `type` and `required` for every input in `workflow_call`.
+- Declare `default` only for optional inputs. A `required: true` input must not carry one, because the caller always supplies the value and the default is unreachable.
+- When a workflow is **also** triggered directly (`push`, `pull_request`, `schedule`), put the operative fallback in the job step, for example `: "${VAR:=...}"`. The `inputs` context holds "the inputs of a reusable or manually triggered workflow", so on a direct trigger it is empty and `workflow_call` defaults are never applied. A default declared on the input is then dead text on the path the workflow actually takes, and an empty pattern reaching `grep -E` matches every line.
 - Reference called workflows using pinned immutable refs.
 - Expose job `outputs` cleanly for downstream dependent jobs (`needs:`).
 
