@@ -140,3 +140,33 @@ Pattern:
 - Do not store AI boilerplate (agents, instructions, `.cursorrules`) in standard
   plugins. If a skill applies to more than one plugin, it belongs in the public
   `z-shell/.github` repository.
+
+## Self-triggering reusable workflows
+
+Observed in:
+
+- `z-shell/.github:.github/workflows/labels-sync-test.yml`
+- `z-shell/.github:.github/workflows/repo-settings-audit-test.yml`
+- `z-shell/.github:.github/workflows/labeler-config-audit-test.yml`
+- `z-shell/zi:.github/workflows/commit-lint.yml`
+
+Pattern:
+
+- Give a shared workflow its own `push`/`pull_request` trigger alongside
+  `workflow_call`, instead of adding a thin caller workflow whose only job is
+  `uses: ./.github/workflows/<name>.yml`.
+- A called workflow's jobs cannot hold more permission than the caller job. A
+  caller with workflow-level `permissions: {}` therefore rejects a callee job
+  that requests `contents: read`, and the run ends in `startup_failure` with no
+  check runs and no logs to read. `actionlint` does not detect this, so the
+  failure is invisible until someone inspects run conclusions
+  (`z-shell/.github#575`: 20 of 20 runs failed at startup and the commit policy
+  was never evaluated).
+- `workflow_call` input defaults do not apply to a `push` or `pull_request`
+  run, where the `inputs` context is empty. Put the fallback in the step
+  (`: "${VAR:=default}"`) rather than in `on.workflow_call.inputs.*.default`,
+  or an empty pattern silently matches everything.
+
+Self-triggering also produces flatter check-context names (`Validate Commits`
+rather than `commit-lint / Validate Commits`), which is what
+`required_status_checks` has to register.
