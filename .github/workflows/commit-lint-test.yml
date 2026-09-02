@@ -1,0 +1,42 @@
+---
+name: Commit Lint Policy Tests
+
+# Covers the patterns and constructs inside commit-lint.yml. The suite reads
+# that workflow and asserts against what it finds, so it runs whenever either
+# file changes. See z-shell/.github#592.
+
+on:
+  push:
+    paths:
+      - ".github/workflows/commit-lint.yml"
+      - ".github/workflows/commit-lint-test.yml"
+      - "scripts/test-commit-lint-policy.sh"
+  pull_request:
+    paths:
+      - ".github/workflows/commit-lint.yml"
+      - ".github/workflows/commit-lint-test.yml"
+      - "scripts/test-commit-lint-policy.sh"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commit-lint-policy-test:
+    name: Commit Lint Policy Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check shell syntax
+        run: bash -n scripts/test-commit-lint-policy.sh
+
+      - name: Test commit-lint policy patterns
+        run: bash scripts/test-commit-lint-policy.sh
