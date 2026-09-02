@@ -311,6 +311,15 @@
       "enforcement": ["classifier"]
     },
     {
+      "id": "zsh/test/cover-removed-behavior",
+      "level": "required",
+      "profiles": ["test-fixture"],
+      "minimum_zsh": null,
+      "basis": "organization-policy",
+      "evidence": ["manual-index"],
+      "enforcement": ["human-review"]
+    },
+    {
       "id": "zsh/test/match-production-profile",
       "level": "required",
       "profiles": ["test-fixture"],
