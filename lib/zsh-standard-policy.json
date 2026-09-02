@@ -428,6 +428,21 @@
       "enforcement": ["lint", "human-review"]
     },
     {
+      "id": "zsh/parameters/capture-before-localizing",
+      "level": "required",
+      "profiles": [
+        "standalone-executable",
+        "startup-file",
+        "sourced-library",
+        "autoload-function",
+        "test-fixture"
+      ],
+      "minimum_zsh": null,
+      "basis": "language-semantics",
+      "evidence": ["parameters", "functions"],
+      "enforcement": ["lint", "human-review"]
+    },
+    {
       "id": "zsh/parameters/account-dynamic-scope",
       "level": "review",
       "profiles": [
