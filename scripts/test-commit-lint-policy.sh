@@ -29,9 +29,18 @@ fail() {
 
 # Pull the single capture of an anchored extraction, failing loudly when the
 # workflow no longer has the shape this file assumes.
+#
+# Prettier owns YAML formatting here and rewrites scalar quoting at will, so
+# every extraction strips one matching pair of surrounding quotes rather than
+# depending on which style it last chose. Patterns inside a run: block scalar
+# are untouched by prettier, but the same handling costs nothing.
 extract() {
   local label=$1 regex=$2 value
   value=$(sed -nE "s/$regex/\1/p" "$WORKFLOW")
+  case $value in
+    \'*\') value=${value#\'}; value=${value%\'} ;;
+    '"'*'"') value=${value#'"'}; value=${value%'"'} ;;
+  esac
   if [ -z "$value" ]; then
     printf 'FAIL: could not extract %s from %s\n' "$label" "$WORKFLOW" >&2
     printf '      the workflow changed shape; re-point this test\n' >&2
@@ -49,11 +58,11 @@ TRAILER_PATTERN=$(extract "trailer pattern" \
 BRANCH_PATTERN=$(extract "branch pattern" \
   '^ *: "\$\{BRANCH_PATTERN:=(.*)\}"$')
 CONVENTIONAL_PATTERN=$(extract "conventional pattern" \
-  "^ *CONVENTIONAL_PATTERN='(.*)'$")
+  "^ *CONVENTIONAL_PATTERN=(.*)$")
 PREFIX_PATTERN=$(extract "automation prefixes" \
-  "^ *AUTOMATION_BRANCH_PATTERN: '(.*)'$")
+  "^ *AUTOMATION_BRANCH_PATTERN: (.*)$")
 ISSUE_REFERENCE_PATTERN=$(extract "issue reference pattern" \
-  "^ *ISSUE_REFERENCE_PATTERN='(.*)'$")
+  "^ *ISSUE_REFERENCE_PATTERN=(.*)$")
 EXEMPT_LABEL=$(extract "exemption label" \
   '^ *EXEMPT_LABEL: (.*)$')
 
