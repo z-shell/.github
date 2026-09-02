@@ -29,9 +29,18 @@ fail() {
 
 # Pull the single capture of an anchored extraction, failing loudly when the
 # workflow no longer has the shape this file assumes.
+#
+# Prettier owns YAML formatting here and rewrites scalar quoting at will, so
+# every extraction strips one matching pair of surrounding quotes rather than
+# depending on which style it last chose. Patterns inside a run: block scalar
+# are untouched by prettier, but the same handling costs nothing.
 extract() {
   local label=$1 regex=$2 value
   value=$(sed -nE "s/$regex/\1/p" "$WORKFLOW")
+  case $value in
+    \'*\') value=${value#\'}; value=${value%\'} ;;
+    '"'*'"') value=${value#'"'}; value=${value%'"'} ;;
+  esac
   if [ -z "$value" ]; then
     printf 'FAIL: could not extract %s from %s\n' "$label" "$WORKFLOW" >&2
     printf '      the workflow changed shape; re-point this test\n' >&2
@@ -49,9 +58,13 @@ TRAILER_PATTERN=$(extract "trailer pattern" \
 BRANCH_PATTERN=$(extract "branch pattern" \
   '^ *: "\$\{BRANCH_PATTERN:=(.*)\}"$')
 CONVENTIONAL_PATTERN=$(extract "conventional pattern" \
-  "^ *CONVENTIONAL_PATTERN='(.*)'$")
-PREFIX_PATTERN=$(extract "allowed prefixes" \
-  "^ *if echo \"\\\$BRANCH\" \| grep -qE '(.*)' \|\| \\\\$")
+  "^ *CONVENTIONAL_PATTERN=(.*)$")
+PREFIX_PATTERN=$(extract "automation prefixes" \
+  "^ *AUTOMATION_BRANCH_PATTERN: (.*)$")
+ISSUE_REFERENCE_PATTERN=$(extract "issue reference pattern" \
+  "^ *ISSUE_REFERENCE_PATTERN=(.*)$")
+EXEMPT_LABEL=$(extract "exemption label" \
+  '^ *EXEMPT_LABEL: (.*)$')
 
 # --- guards on the constructs themselves ---------------------------------
 
@@ -84,6 +97,23 @@ check_no_input_defaults() {
   checks=$((checks + 1))
   if sed -n '/workflow_call:/,/^concurrency:/p' "$WORKFLOW" | grep -q '^ *default:'; then
     fail "workflow_call input carries a default that a pull_request run ignores (#586)"
+  fi
+}
+
+# decisions/0022: the exemption label the workflow honours has to be a label
+# the organization actually publishes, or applying it is impossible.
+check_exempt_label_is_canonical() {
+  checks=$((checks + 1))
+  grep -q "^  - name: $EXEMPT_LABEL\$" "$ROOT/lib/labels.yml" ||
+    fail "exemption label '$EXEMPT_LABEL' is not declared in lib/labels.yml (ADR-0022)"
+}
+
+# Both jobs must read one definition of the automation prefixes. A second
+# inlined copy is how the two silently diverge.
+check_prefixes_not_duplicated() {
+  checks=$((checks + 1))
+  if grep -qE "grep -qE '\\^\\(dependabot" "$WORKFLOW"; then
+    fail "automation prefixes are inlined as well as defined in env; the two copies will drift"
   fi
 }
 
@@ -162,6 +192,23 @@ check_conventional_cases() {
   assert_match subject "$p" "fix: $(printf 'x%.0s' $(seq 1 73))" no-match
 }
 
+check_issue_reference_cases() {
+  local p=$ISSUE_REFERENCE_PATTERN
+  assert_match "issue ref" "$p" 'Closes #595' match
+  assert_match "issue ref" "$p" 'Refs #12, and see #34' match
+  assert_match "issue ref" "$p" 'Fixes https://github.com/z-shell/zi/issues/486' match
+  assert_match "issue ref" "$p" 'follows z-shell/.github#590 for context' match
+  assert_match "issue ref" "$p" 'see z-shell/zi#487' match
+
+  # A body with no work item at all is the case ADR-0022 exists to catch: 10
+  # of the last 60 merged pull requests looked like this.
+  assert_match "issue ref" "$p" 'Tidies up the release script.' no-match
+  assert_match "issue ref" "$p" '' no-match
+  # A bare hash with no number, or an anchor-looking token, is not a reference.
+  assert_match "issue ref" "$p" 'see section #overview' no-match
+  assert_match "issue ref" "$p" 'issue #0 does not exist' no-match
+}
+
 # The failure mode behind #586: an empty pattern matches every line. If a
 # regression ever lets an empty value reach grep, these prove it is caught.
 check_empty_pattern_is_never_harmless() {
@@ -175,9 +222,12 @@ check_empty_pattern_is_never_harmless() {
 check_no_grep_q_on_trailer
 check_fallbacks_present
 check_no_input_defaults
+check_exempt_label_is_canonical
+check_prefixes_not_duplicated
 check_branch_cases
 check_trailer_cases
 check_conventional_cases
+check_issue_reference_cases
 check_empty_pattern_is_never_harmless
 
 if [ "$failures" -gt 0 ]; then
