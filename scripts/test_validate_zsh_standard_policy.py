@@ -1991,6 +1991,14 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         self.assertEqual(
             digest,
             "607f548eb63159678258e5caec4ae63ced8592906d2cb542f57b9ac1239a945b",
+            msg=(
+                "The frozen golden covers the parsed output of every path in "
+                f"{paths}. Editing any of them changes this digest, which is "
+                "the test working as intended. Review the diff to confirm the "
+                "content change is what you meant, then replace the expected "
+                "digest above with the one reported as actual and commit both "
+                "together. See z-shell/.github#588."
+            ),
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
