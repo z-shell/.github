@@ -40,6 +40,11 @@ The decision was re-evaluated in
 
 Use trunk-based development on `main` as the organization default:
 
+> **Amended by `decisions/0022-issue-traceability-on-pull-requests.md`.**
+> The issue identifier below is no longer mandatory. Traceability is
+> enforced on the pull request instead, and the branch check verifies a
+> type shape. The identifier form remains valid and recommended.
+
 - branch short-lived `feature-<id>`, `bug-<id>`, `hotfix-<id>`, and
   dependency-update branches from current `main`;
 - open pull requests into `main`;
