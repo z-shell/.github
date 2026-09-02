@@ -210,6 +210,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "zsh/options/constrain-multios",
             "zsh/parameters/declare-scope",
             "zsh/parameters/avoid-special-name-collisions",
+            "zsh/parameters/capture-before-localizing",
             "zsh/parameters/account-dynamic-scope",
             "zsh/arrays/declare-kind",
             "zsh/arrays/native-indexing",
@@ -250,7 +251,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             [rule["id"] for rule in matching_rules],
             expected_rule_ids,
         )
-        self.assertEqual(len(matching_rules), 49)
+        self.assertEqual(len(matching_rules), 50)
         for rule in matching_rules:
             with self.subTest(rule_id=rule["id"]):
                 if rule["id"] == "zsh/completion/preserve-trust-boundaries":
@@ -1978,7 +1979,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             },
             "parsed_rules": validator._markdown_rules(instruction),
         }
-        self.assertEqual(len(snapshot["rule_blocks"]), 64)
+        self.assertEqual(len(snapshot["rule_blocks"]), 65)
         digest = hashlib.sha256(
             json.dumps(
                 snapshot,
@@ -1990,7 +1991,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "607f548eb63159678258e5caec4ae63ced8592906d2cb542f57b9ac1239a945b",
+            "d841ec864632352bc399bb035780e6805200425a4f14b0b700d3e7a9e8f7c59e",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "

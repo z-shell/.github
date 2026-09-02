@@ -439,6 +439,44 @@ example, `status` is read-only, and `path` is tied to `PATH`; assignment can
 fail or change command lookup. Use purpose-specific names such as
 `command_status` and `candidate_paths`.
 
+### `zsh/parameters/capture-before-localizing`
+
+- Level: `required`
+- Profiles: `standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`
+- Minimum Zsh: `null`
+- Basis: `language-semantics`
+- Evidence: `parameters`, `functions`
+- Enforcement: `lint`, `human-review`
+
+When a function localizes a parameter and the intended new value derives from
+the caller's value, capture that value before the localizing declaration. A
+localizing declaration starts the parameter empty, so an assignment that reads
+the same name on its right-hand side truncates itself instead of extending.
+
+This matters most for tied pairs such as `fpath`/`FPATH`, `path`/`PATH`,
+`cdpath`/`CDPATH`, `manpath`/`MANPATH`, and `module_path`/`MODULE_PATH`.
+Assigning the scalar localizes the array as well, already populated, which
+makes a following array declaration look redundant when it is not: a second
+`local` on a parameter already local to the same scope is not a reset, so the
+earlier value survives. Removing the scalar as dead silently empties the array.
+
+```zsh
+# Wrong: $fpath is already empty when the assignment reads it.
+local +h -a fpath
+fpath=( $PLUGIN_DIR $fpath )
+
+# Right: capture first, then localize.
+local -a caller_fpath
+caller_fpath=( $fpath )
+local +h -a fpath
+fpath=( $PLUGIN_DIR $caller_fpath )
+```
+
+Do not rely on a tied scalar assignment to carry the caller's value across a
+later declaration, and do not rely on a second `local` to reset a parameter
+already local to the scope. Capture explicitly, so that neither line can be
+read as inert and deleted.
+
 ### `zsh/parameters/account-dynamic-scope`
 
 - Level: `review`
