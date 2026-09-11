@@ -23,7 +23,56 @@ and otherwise consult official documentation or search the local repository.
   and any Linear mirror are views, not independent authorities. Record
   tool-derived findings in the owning GitHub record, not only in local memory.
 
-## Context7 (no auth)
+## Copilot hosted review
+
+Check the current [GitHub MCP configuration documentation](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/configure-mcp-servers)
+before configuring a repository. These hosted constraints do not describe every
+interactive MCP client:
+
+| Capability            | Hosted requirement                                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------------------------- |
+| Configuration         | Repository Settings > Copilot > MCP servers, shared with cloud agent                                     |
+| Defaults              | GitHub and Playwright servers are enabled by default; verify the repository's actual state               |
+| Protocol              | Tools only; resources and prompts are unsupported                                                        |
+| Remote authentication | Remote OAuth servers are unsupported                                                                     |
+| Review tools          | `tools/list` must return `annotations.readOnlyHint: true`; missing or false annotations exclude the tool |
+| Credentials           | Reference Agents secrets or variables prefixed `COPILOT_MCP_`; never commit values                       |
+
+Use explicit read-tool allowlists and credentials restricted to the required
+read access. An annotation is not an access-control boundary. Configured tools
+can run without per-call approval; inspect the shared cloud-agent exposure too.
+Configuration and credential changes require separate maintainer authorization.
+A committed configuration draft does not prove that hosted settings are active.
+
+Select the smallest useful profile from the repository's actual components:
+
+- **`github`:** baseline for linked issue acceptance criteria, relevant PRs and
+  CI evidence. Read canonical organization policy and wiki contracts through
+  existing accessible sources. Do not broaden repository access implicitly.
+- **`github-docs`:** the `github` baseline plus documentation lookup for
+  framework, API, or platform changes that need it, such as wiki Docusaurus or
+  Cloudflare changes.
+  Prefer official version-matched documentation; Context7 or Cloudflare's
+  documentation server is optional. Check actual tools and annotations before
+  selecting either. Operational Cloudflare access is outside this profile.
+- **Linear:** optional addition only when a linked requirement is unavailable
+  in GitHub. Evaluate a restricted read-only API-key configuration if supported
+  by the current server; interactive OAuth availability does not prove hosted
+  compatibility. Do not mirror all tracker context into every review.
+
+Playwright is relevant to browser behavior and previews only when suitable
+tools are available to that review. Neither browser checks nor a third-party
+documentation service is required for repositories that do not need them.
+See [the health evidence procedure](../../runbooks/org-review.md#mcp-review-context)
+for configuration, discovery, and invocation verification.
+
+## Interactive runtime integrations
+
+The following integrations describe interactive clients with the stated
+capabilities. Discover the actual transport, authentication, and tools; do not
+copy OAuth configurations into hosted review settings.
+
+### Context7
 
 - **Availability:** optional; use only when present.
 - **Purpose:** current docs and code examples for libraries and frameworks
@@ -33,7 +82,7 @@ and otherwise consult official documentation or search the local repository.
 - **When NOT to use:** business-logic debugging, refactoring, or general
   programming concepts.
 
-## Cloudflare (OAuth)
+### Cloudflare (OAuth)
 
 - **Availability:** optional; use only when present.
 - **Purpose:** Pages, Workers, R2, and observability for the wiki, which
@@ -44,7 +93,7 @@ and otherwise consult official documentation or search the local repository.
   confirmation.
 - **Auth required:** yes (OAuth).
 
-## Greptile (OAuth)
+### Greptile (OAuth)
 
 - **Availability:** optional; use only when present.
 - **Purpose:** semantic code search across multiple repositories.

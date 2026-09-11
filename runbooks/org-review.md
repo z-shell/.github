@@ -90,6 +90,46 @@ local changes and resolve differences before replacing an installed copy.
 Policy and deterministic health tooling own this gate even when optional
 skills are not selected by the runtime.
 
+### MCP review context
+
+During health evaluation, record whether the repository selects the `github`
+baseline, `github-docs`, or no MCP profile, and why that choice fits its actual
+components. Optional services are not a health prerequisite. Follow
+[integration guidance](../.github/instructions/mcp-plugins.instructions.md#copilot-hosted-review)
+for hosted compatibility and tool selection. Keep these evidence dimensions
+separate:
+
+- **Configured:** identify the assessed repository revision, profile, runtime,
+  observation time, and source of the active hosted setting evidence. Record
+  server identities, selected tools, authentication mode and access boundaries
+  without credential values. A local declaration or a documented default alone
+  leaves actual hosted configuration unverified.
+- **Discovered:** cite startup or `tools/list` evidence for that configuration,
+  including the tools' read-only annotations. A configured server may fail to
+  start, authenticate, or expose tools eligible for review.
+- **Invoked:** cite an authorized review session or comment attribution showing
+  the server and tool used, reviewed head revision, and observed time. A passing
+  review or successful startup alone does not establish invocation or relevance.
+
+Bind observations to the exact configuration revision or a digest of its
+sanitized snapshot, plus the reviewed commit where applicable. Refresh evidence
+after configuration, server version, access, or relevant repository changes;
+an earlier successful call cannot verify the changed setup. Record unavailable
+settings, logs, annotations, or calls as unverified, and preserve conflicting
+evidence rather than inferring a pass from a local file.
+
+Report this separately from skill readiness. Absence of optional MCP services
+does not fail repository health. A selected profile whose required context is
+unavailable has an explicit context gap, not a verified tailored review.
+Keep administrative settings and private session evidence in the private
+handoff; publish only authorized, public-safe conclusions.
+
+Pilot the GitHub profile in the canonical owner and a standard plugin, then
+documentation lookup in the wiki. Verify useful context retrieval on a
+representative authorized review before wider configuration. A health
+evaluation does not authorize settings changes, credentials, server installs,
+or new hosted reviews.
+
 ### Install or update after authorization
 
 The canonical source is this repository's
