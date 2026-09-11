@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,6 +14,86 @@ import project_reconcile
 
 
 class ProjectReconcileTest(unittest.TestCase):
+    def test_cli_failure_replaces_stale_output_without_source_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            directory = Path(temporary_directory)
+            source = self.write_ndjson(
+                directory,
+                "issues.ndjson",
+                [
+                    {
+                        "node_id": "node",
+                        "updated_at": "private-timestamp-sentinel",
+                    }
+                ],
+            )
+            items = self.write_ndjson(directory, "items.ndjson", [])
+            output = directory / "report.json"
+            output.write_text("stale-source-sentinel")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(Path(project_reconcile.__file__)),
+                    "--open-issues",
+                    str(source),
+                    "--project-items",
+                    str(items),
+                    "--output",
+                    str(output),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertNotEqual(0, result.returncode)
+            self.assertNotIn(
+                "sentinel", output.read_text() + result.stdout + result.stderr
+            )
+            self.assertEqual("error", json.loads(output.read_text())["status"])
+
+    def test_cli_exports_only_counts_not_source_records(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            directory = Path(temporary_directory)
+            issue = {
+                "url": "https://github.com/example/restricted/issues/1",
+                "node_id": "restricted-node-sentinel",
+                "title": "restricted-title-sentinel",
+                "updated_at": "2026-08-01T00:00:00Z",
+                "labels": ["restricted-label-sentinel"],
+            }
+            source = self.write_ndjson(directory, "issues.ndjson", [issue])
+            items = self.write_ndjson(directory, "items.ndjson", [])
+            output = directory / "report.json"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(Path(project_reconcile.__file__)),
+                    "--open-issues",
+                    str(source),
+                    "--project-items",
+                    str(items),
+                    "--output",
+                    str(output),
+                    "--now",
+                    "2026-08-21T00:00:00Z",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            exported = output.read_text()
+            for value in [
+                issue["url"],
+                issue["node_id"],
+                issue["title"],
+                issue["labels"][0],
+            ]:
+                self.assertNotIn(value, exported + result.stdout + result.stderr)
+            summary = json.loads(exported)
+            self.assertEqual(1, summary["missing_open_issue_count"])
+            self.assertEqual(1, summary["stale_open_issue_count"])
+
     def write_ndjson(
         self, directory: Path, name: str, records: list[dict[str, object]]
     ) -> Path:

@@ -28,99 +28,28 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Reconcile organization issues
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
           APPLY: ${{ github.event_name == 'schedule' || inputs.apply || false }}
           ORGANIZATION: z-shell
           PROJECT_NUMBER: "28"
+          REPORT_PATH: ${{ runner.temp }}/project-reconcile-summary.json
         run: |
           set -euo pipefail
-
-          if [[ -z "${GH_TOKEN}" ]]; then
-            echo 'PROJECT_TOKEN is not configured; refusing to run without a project-scoped credential.' >&2
-            exit 1
+          args=()
+          if [[ "${APPLY}" == 'true' ]]; then
+            args+=(--apply)
           fi
-
-          project_id="$(gh api graphql -f query='
-            query($org: String!, $number: Int!) {
-              organization(login: $org) {
-                projectV2(number: $number) { id }
-              }
-            }' -f org="${ORGANIZATION}" -F number="${PROJECT_NUMBER}" --jq '.data.organization.projectV2.id')"
-
-          gh api --paginate \
-            -H 'Accept: application/vnd.github+json' \
-            "/search/issues?q=org%3A${ORGANIZATION}%20is%3Aissue%20is%3Aopen&per_page=100" \
-            --jq '.items[] | {url: .html_url, node_id: .node_id, title: .title, repository: .repository_url, author: .user.login, author_type: .user.type, updated_at: .updated_at, labels: [.labels[].name]}' \
-            > open-issues.ndjson
-
-          : > project-items.ndjson
-          cursor=''
-          while :; do
-            response="$(gh api graphql -f query='
-              query($project: ID!, $cursor: String) {
-                node(id: $project) {
-                  ... on ProjectV2 {
-                    items(first: 100, after: $cursor) {
-                      pageInfo { hasNextPage endCursor }
-                      nodes {
-                        id
-                        content {
-                          ... on Issue { url id title repository { nameWithOwner } }
-                          ... on PullRequest { url id title repository { nameWithOwner } }
-                        }
-                      }
-                    }
-                  }
-                }
-              }' -f project="${project_id}" -f cursor="${cursor}")"
-            jq -c '.data.node.items.nodes[] | select(.content != null) | {item_id: .id, url: .content.url, node_id: .content.id, title: .content.title, repository: .content.repository.nameWithOwner}' <<<"${response}" >> project-items.ndjson
-            if [[ "$(jq -r '.data.node.items.pageInfo.hasNextPage' <<<"${response}")" != 'true' ]]; then
-              break
-            fi
-            cursor="$(jq -r '.data.node.items.pageInfo.endCursor' <<<"${response}")"
-          done
-
-          python3 scripts/project_reconcile.py \
-            --open-issues open-issues.ndjson \
-            --project-items project-items.ndjson \
-            --output project-reconcile-report.json \
-            --stale-after-days 5
-
-          if [[ "${APPLY}" != 'true' ]]; then
-            echo 'Dry run only; no project mutations requested.'
-            exit 0
-          fi
-
-          while IFS= read -r issue; do
-            node_id="$(jq -r '.node_id' <<<"${issue}")"
-            gh api graphql -f query='
-              mutation($project: ID!, $content: ID!) {
-                addProjectV2ItemById(input: {projectId: $project, contentId: $content}) {
-                  item { id }
-                }
-              }' -f project="${project_id}" -f content="${node_id}" >/dev/null
-          done < <(jq -c '.missing_open_issues[]' project-reconcile-report.json)
-
-          while IFS= read -r item; do
-            item_id="$(jq -r '.item_id' <<<"${item}")"
-            gh api graphql -f query='
-              mutation($project: ID!, $item: ID!) {
-                deleteProjectV2Item(input: {projectId: $project, itemId: $item}) {
-                  deletedItemId
-                }
-              }' -f project="${project_id}" -f item="${item_id}" >/dev/null
-          done < <(jq -c '.excluded_project_items[]' project-reconcile-report.json)
-
-          echo 'Project membership reconciliation applied.'
+          python3 scripts/project_reconcile_live.py \
+            --organization "${ORGANIZATION}" \
+            --project-number "${PROJECT_NUMBER}" \
+            --output "${REPORT_PATH}" --require-token "${args[@]}"
 
       - name: Upload reconciliation report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: project-reconcile-report
-          path: |
-            open-issues.ndjson
-            project-items.ndjson
-            project-reconcile-report.json
+          path: ${{ runner.temp }}/project-reconcile-summary.json
           if-no-files-found: warn

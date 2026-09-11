@@ -1,0 +1,32 @@
+name: Project Reconcile Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/project-reconcile*.yml"
+      - "scripts/project_reconcile*.py"
+      - "scripts/test_project_reconcile*.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/project-reconcile*.yml"
+      - "scripts/project_reconcile*.py"
+      - "scripts/test_project_reconcile*.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test Project Reconciliation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Run synthetic reconciliation regressions
+        run: python3 -m unittest discover -s scripts -p 'test_project_reconcile*.py' -v

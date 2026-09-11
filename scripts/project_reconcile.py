@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -57,11 +58,25 @@ def build_report(
     now: str,
     stale_after_days: int,
 ) -> dict[str, Any]:
+    return build_report_from_records(
+        read_ndjson(open_issues_path),
+        read_ndjson(project_items_path),
+        now=now,
+        stale_after_days=stale_after_days,
+    )
+
+
+def build_report_from_records(
+    open_issues: list[dict[str, Any]],
+    project_items: list[dict[str, Any]],
+    *,
+    now: str,
+    stale_after_days: int,
+) -> dict[str, Any]:
+    """Keep detailed reconciliation records in memory for authorized operations."""
     if stale_after_days < 1:
         raise ValueError("stale_after_days must be at least one")
 
-    open_issues = read_ndjson(open_issues_path)
-    project_items = read_ndjson(project_items_path)
     project_items_by_node_id: dict[str, list[dict[str, Any]]] = {}
     for item in project_items:
         node_id = item.get("node_id")
@@ -110,7 +125,7 @@ def build_report(
     }
 
 
-def main() -> None:
+def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--open-issues", type=Path, required=True)
     parser.add_argument("--project-items", type=Path, required=True)
@@ -119,28 +134,48 @@ def main() -> None:
     parser.add_argument("--stale-after-days", type=int, default=5)
     arguments = parser.parse_args()
 
-    report = build_report(
-        arguments.open_issues,
-        arguments.project_items,
-        now=arguments.now,
-        stale_after_days=arguments.stale_after_days,
-    )
-    arguments.output.write_text(json.dumps(report, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                "open_issue_count": report["open_issue_count"],
-                "tracked_open_issue_count": report["tracked_open_issue_count"],
-                "project_content_count": report["project_content_count"],
-                "excluded_open_issue_count": len(report["excluded_open_issues"]),
-                "excluded_project_item_count": len(report["excluded_project_items"]),
-                "missing_open_issue_count": len(report["missing_open_issues"]),
-                "stale_open_issue_count": len(report["stale_open_issues"]),
-            },
-            indent=2,
+    try:
+        arguments.output.parent.mkdir(parents=True, exist_ok=True)
+        arguments.output.write_text(
+            json.dumps(
+                {
+                    "schema": "z-shell/project-reconcile-summary/v1",
+                    "status": "error",
+                }
+            )
+            + "\n"
         )
-    )
+        report = build_report(
+            arguments.open_issues,
+            arguments.project_items,
+            now=arguments.now,
+            stale_after_days=arguments.stale_after_days,
+        )
+        summary = json.dumps(public_summary(report) | {"status": "ok"}, indent=2)
+        arguments.output.write_text(summary + "\n")
+        print(summary)
+        return 0
+    except Exception:
+        print(
+            "Project reconciliation failed; source diagnostics withheld.",
+            file=sys.stderr,
+        )
+        return 1
+
+
+def public_summary(report: dict[str, Any]) -> dict[str, Any]:
+    """Publish only fixed keys and integer counts, never source metadata."""
+    return {
+        "schema": "z-shell/project-reconcile-summary/v1",
+        "open_issue_count": int(report["open_issue_count"]),
+        "tracked_open_issue_count": int(report["tracked_open_issue_count"]),
+        "project_content_count": int(report["project_content_count"]),
+        "excluded_open_issue_count": len(report["excluded_open_issues"]),
+        "excluded_project_item_count": len(report["excluded_project_items"]),
+        "missing_open_issue_count": len(report["missing_open_issues"]),
+        "stale_open_issue_count": len(report["stale_open_issues"]),
+    }
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

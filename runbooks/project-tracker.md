@@ -16,8 +16,9 @@ organization-infrastructure work; it is not the source of truth.
 
 ## Inclusion policy
 
-The organization-wide reconciler tracks actionable open organization issues so
-that work cannot disappear between repositories. It excludes Renovate
+The organization-wide reconciler tracks actionable open issues in public
+organization repositories. Private work remains in access-controlled records;
+it must not be ingested or exported by this public automation. It excludes Renovate
 Dependency Dashboard issues, which remain available in their owning
 repositories as automation control surfaces. Project views separate workstreams:
 
@@ -54,12 +55,44 @@ only one auto-add workflow. Keep it narrow while the central reconciler is
 introduced.
 
 The scheduled reconciler uses a project-scoped credential supplied as
-`PROJECT_TOKEN` to add every missing actionable open organization issue to
+`PROJECT_TOKEN` to add every missing actionable open public organization issue to
 Project 28. It also removes only exact Renovate Dependency Dashboard matches,
 identified by bot type, bot login, and title. It is otherwise additive and
-idempotent, emits a drift report, and never overwrites human-set field values.
+idempotent, emits a counts-only drift summary, and never overwrites human-set field values.
 Manual dispatch remains read-only unless a maintainer sets `apply=true` after
 reviewing the report.
+
+`scripts/project_reconcile_live.py` collects API responses in memory, verifies
+source repository visibility and organization ownership, and rechecks each
+mutation target before applying it. Private and foreign-owner sources are
+omitted. Redacted and draft Project items are counted but never mutated.
+Unknown repository visibility, incomplete pagination, or transport errors fail
+closed. GraphQL search inventories above 1,000 issues fail rather than silently
+truncate; move to per-repository enumeration before exceeding that limit.
+
+Only `project-reconcile-summary.json` is uploaded. Its schema is
+`z-shell/project-reconcile-summary/v1`: fixed status text and aggregate counts,
+with no source IDs, titles, URLs, labels, authors, raw API inputs, or diagnostic
+payloads. Failures produce a sanitized error summary and a nonzero exit status.
+The standalone NDJSON report CLI also exports only this summary. Detailed
+records remain in memory for reconciliation; use authorized GitHub inspection
+for per-item follow-up, never public workflow logs or artifacts. Counts are a
+pre-apply snapshot; successful apply additionally reports verified mutation
+counts. Failure may follow partial application, so inspect live membership
+before retrying.
+
+The credential-free `project-reconcile-test.yml` workflow runs synthetic
+privacy and membership regressions on pull requests and changes to `main`.
+Local verification uses:
+
+```sh
+python3 -m unittest discover -s scripts -p 'test_project_reconcile*.py' -v
+python3 scripts/project_reconcile_live.py --output /tmp/project-reconcile-summary.json
+```
+
+The live command above is read-only. `--apply` requires separate maintainer
+approval; CI uses `--require-token` to refuse fallback credentials when its
+project-scoped token is unavailable.
 
 The target implementation is an organization-owned GitHub App with Project
 read/write permission, installed on all repositories, receiving only the
@@ -74,7 +107,7 @@ is managed. Every substantive task must have an owning issue, visible Project
 Record a next action or blocker when work starts, becomes blocked, is ready for
 review, or is handed off. Assignment alone is not active management.
 
-The reconciliation artifact lists `stale_open_issues`: open issues without an
+The reconciliation summary counts stale open public issues: issues without an
 update for five days. Items labeled `status:blocked` are excluded so that the
 blocked workflow remains explicit. This is a review queue only. It must never
 automatically comment, label, close, or otherwise mutate an issue.
@@ -89,14 +122,16 @@ the agreed retention period.
 ## Verification
 
 Run the workflow manually without `apply=true` and inspect its artifact before
-changing reconciliation behavior. The report must identify:
+changing reconciliation behavior. The summary reports counts for:
 
 - open organization issues missing from Project 28
-- project items whose source issue or pull request is no longer visible
-- unclassified workstream records
+- omitted private, foreign-owner, draft, or unavailable Project records
 - excluded Renovate Dependency Dashboard records and any matching Project items
-- project items with conflicting or missing relationship data
 - open issues that have been stale for five days, excluding `status:blocked`
+
+Unclassified workstreams and conflicting or missing relationships require
+separate authorized Project inspection; the scheduled summary does not assess
+them. Do not treat a complete membership count as full portfolio readiness.
 
 Any project membership, field, label, issue, repository, organization setting,
 or workflow-setting mutation outside the scheduled additive reconciliation still
