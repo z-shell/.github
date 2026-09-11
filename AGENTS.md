@@ -121,6 +121,15 @@ drafts only.
 For coordinated outcomes, parent issues, sub-issues, and issue dependencies,
 follow `runbooks/sub-issues.md`.
 
+Every repository-health evaluation, including quick checks and bootstrap,
+must assess `.github/skills/code-review/SKILL.md` for presence, validity,
+source currency, local drift, and suitability for the repository. Follow
+`runbooks/org-review.md`; report unassessed or unavailable evidence explicitly.
+Missing or unsuitable guidance prevents a clean review-readiness result.
+Assessments remain read-only unless remediation is explicitly authorized.
+Skill invocation is separate runtime evidence. This mandatory health rule
+applies even when a runtime does not discover or use skills.
+
 ## Security
 
 - Never print, commit, or hand off secrets, tokens, or personal data.

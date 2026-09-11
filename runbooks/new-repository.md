@@ -5,7 +5,8 @@ unreviewed files from an existing project.
 
 **Hard rule:** keep organization-wide instructions, workflows, and issue
 metadata centralized. Add child-repository files only when the repository needs
-project-specific behavior.
+project-specific behavior or the maintained review-skill delivery described
+below.
 
 ## Step 1 — Classify and record the repository
 
@@ -32,6 +33,7 @@ README.md
 .editorconfig
 .gitignore
 .github/
+  skills/code-review/SKILL.md
   workflows/
 ```
 
@@ -64,6 +66,14 @@ serve the plugin.
 Do not copy generic `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/agents/`, or
 `.github/instructions/` files into child repositories. Link to the organization
 guidance when a short project-specific `AGENTS.md` is genuinely required.
+
+Install the centrally owned `code-review` skill using the approved published
+source revision and explicit `.github/skills` destination in
+[`runbooks/org-review.md`](org-review.md#install-or-update-after-authorization).
+This maintained delivery copy is the exception to generic skill duplication.
+Use existing local instructions and validation commands to establish that its
+guidance suits the repository's actual components; add focused local guidance
+only for a demonstrated gap.
 
 Use organization issue and pull-request templates by default. Add a child
 template only when the repository has a specific intake field that the shared
@@ -168,8 +178,11 @@ Before opening the bootstrap pull request:
    state, and post-load user changes.
 5. Confirm action and reusable-workflow references are immutable SHAs from
    published releases where a versioned organization tool is required.
-6. Confirm no generic AI orchestration files, secrets, local paths, or generated
-   output were added.
+6. Confirm no unrelated generic AI orchestration files, secrets, local paths,
+   or generated output were added. Complete the
+   [review-readiness checks](org-review.md#repository-health-review-readiness),
+   including skill provenance and repository suitability; report runtime
+   invocation separately from static readiness.
 7. Link the tracker issue and leave an `Agent handoff` comment for deferred
    template or release work.
 
