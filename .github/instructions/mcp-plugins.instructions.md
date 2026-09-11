@@ -49,14 +49,15 @@ Select the smallest useful profile from the repository's actual components:
 - **`github`:** baseline for linked issue acceptance criteria, relevant PRs and
   CI evidence. Read canonical organization policy and wiki contracts through
   existing accessible sources. Do not broaden repository access implicitly.
-- **`github-docs`:** add documentation lookup only for framework, API, or
-  platform changes that need it, such as wiki Docusaurus or Cloudflare changes.
+- **`github-docs`:** the `github` baseline plus documentation lookup for
+  framework, API, or platform changes that need it, such as wiki Docusaurus or
+  Cloudflare changes.
   Prefer official version-matched documentation; Context7 or Cloudflare's
   documentation server is optional. Check actual tools and annotations before
   selecting either. Operational Cloudflare access is outside this profile.
 - **Linear:** optional addition only when a linked requirement is unavailable
   in GitHub. Evaluate a restricted read-only API-key configuration if supported
-  by the current server; interactive OAuth availability proves no hosted
+  by the current server; interactive OAuth availability does not prove hosted
   compatibility. Do not mirror all tracker context into every review.
 
 Playwright is relevant to browser behavior and previews only when suitable
