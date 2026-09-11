@@ -309,6 +309,7 @@
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": [
         "code-review",
+        "review-readiness",
         "organization-review",
         "project-health",
         "repository-health",
@@ -532,6 +533,7 @@
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": [
         "organization-review",
+        "review-readiness",
         "project-health",
         "repository-health",
         "repository-health-audit",

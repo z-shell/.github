@@ -30,8 +30,8 @@ An inventory or review draft is evidence, not a replacement for those owners.
 
 Whenever recurring work evaluates repository health, include the mandatory
 [review-readiness checks](org-review.md#repository-health-review-readiness),
-including quick evaluations. Record missing or unsuitable review skills as
-remediation findings under the existing owner. The evaluation does not
+including quick evaluations. Record every failed or unverified readiness
+dimension as a remediation finding under the existing owner. The evaluation does not
 authorize installing skills, changing repositories, or triggering hosted
 reviews; apply those changes only within separately authorized scope.
 

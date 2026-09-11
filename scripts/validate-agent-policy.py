@@ -87,6 +87,7 @@ BASE_INVENTORY = {
     ".github/AGENT_MEMORY.md": "runbook",
     ".github/README.md": "runbook",
     ".github/copilot-instructions.md": "adapter",
+    ".github/skills/code-review/SKILL.md": "skill",
 }
 # Generated outputs that live inside a scanned inventory directory but are not
 # records of that directory's kind. The inventory scan discovers them when they
@@ -1077,7 +1078,9 @@ def _parse_apply_to_scalar(value: str) -> str | None:
     return None
 
 
-def _frontmatter_scalar_values(text: str, field: str) -> list[str]:
+def _frontmatter_scalar_values(
+    text: str, field: str, *, allow_plain: bool = False
+) -> list[str]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
         return []
@@ -1097,13 +1100,75 @@ def _frontmatter_scalar_values(text: str, field: str) -> list[str]:
         match = re.match(rf"^{re.escape(field)}\s*:\s*(.*?)\s*$", line)
         if match is None:
             continue
-        parsed = _parse_apply_to_scalar(match.group(1))
+        value = match.group(1)
+        parsed = _parse_apply_to_scalar(value)
+        if (
+            allow_plain
+            and re.fullmatch(r"[A-Za-z0-9][^\r\n\t]*", value)
+            and ": " not in value
+            and not value.endswith(":")
+            and " #" not in value
+        ):
+            parsed = value
         values.append(parsed or "")
     return values
 
 
 def _frontmatter_apply_to(text: str) -> list[str]:
     return _frontmatter_scalar_values(text, "applyTo")
+
+
+def validate_review_skill(root: Path, _manifest: dict[str, object]) -> list[str]:
+    """Validate the canonical single-file skill, not runtime use or suitability."""
+    relative_path = ".github/skills/code-review/SKILL.md"
+    path = _resolve_declared_path(root, relative_path)
+    if path is None or not path.is_file():
+        return []  # Manifest validation reports unsafe or missing paths.
+    text, errors = _read_utf8(path, relative_path)
+    if text is None:
+        return errors
+    sections = re.fullmatch(r"---\n((?:[^\n]*\n)*?)---\n([\s\S]*)", text)
+    if sections is None or any(
+        line.strip() and re.fullmatch(r"(?:name|description): .+", line) is None
+        for line in sections[1].splitlines()
+    ):
+        return [
+            error(
+                relative_path,
+                "invalid canonical skill frontmatter",
+                "use only name and description scalar fields between complete --- lines",
+            )
+        ]
+    names = _frontmatter_scalar_values(text, "name", allow_plain=True)
+    descriptions = _frontmatter_scalar_values(text, "description", allow_plain=True)
+    if names != ["code-review"]:
+        errors.append(
+            error(
+                relative_path,
+                "skill name must be exactly code-review",
+                "set one name scalar to code-review",
+            )
+        )
+    if (
+        len(descriptions) != 1
+        or re.search(r"\breview\b", descriptions[0], re.I) is None
+    ):
+        errors.append(
+            error(
+                relative_path,
+                "skill description must identify review tasks",
+                "set one non-empty review-focused description scalar",
+            )
+        )
+    if not sections[2].strip():
+        errors.append(
+            error(
+                relative_path,
+                "skill body is empty",
+                "restore the repository-aware read-only review procedure",
+            )
+        )
+    return errors
 
 
 def validate_scoped_instructions(root: Path, manifest: dict[str, object]) -> list[str]:
@@ -1362,6 +1427,7 @@ def validate(root: Path) -> list[str]:
         validate_public_references,
         validate_public_policy_size,
         validate_scoped_instructions,
+        validate_review_skill,
         validate_adapters,
         validate_runtime_guidance_layout,
     ):
