@@ -15,6 +15,11 @@ from pathlib import Path
 SCRIPT_PATH = Path(__file__).with_name("validate-agent-policy.py")
 PUBLIC_ROOT = SCRIPT_PATH.parents[1]
 PUBLIC_POLICY_BYTE_LIMIT = 32_768
+REVIEW_SKILL_PATH = ".github/skills/code-review/SKILL.md"
+REVIEW_SKILL_TEXT = (
+    "---\nname: code-review\ndescription: Review changes using repository contracts.\n"
+    "---\n\nInspect the diff and report findings without editing files.\n"
+)
 REQUIRED_IMPACT_QUESTIONS = (
     "Is this shared policy, scoped guidance, runtime-only behavior, or enforcement?",
     "Which runtimes and repository contexts must receive it?",
@@ -120,6 +125,18 @@ BASE_MANIFEST = {
             "review_owner": "z-shell maintainers",
             "canonical_for": [],
         },
+        {
+            "id": "skill-code-review",
+            "path": REVIEW_SKILL_PATH,
+            "kind": "skill",
+            "authority": "advisory",
+            "consumers": ["copilot"],
+            "tasks": ["code-review", "review-readiness"],
+            "file_patterns": ["**"],
+            "required": False,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
     ],
 }
 
@@ -145,6 +162,7 @@ def make_repository(root: Path) -> dict[str, object]:
     write_file(root, ".github/AGENT_MEMORY.md", "# Agent handoffs\n")
     write_file(root, ".github/README.md", "# Public agent catalog\n")
     write_file(root, ".github/copilot-instructions.md", "@../AGENTS.md\n")
+    write_file(root, REVIEW_SKILL_PATH, REVIEW_SKILL_TEXT)
     write_file(root, ".claude/CLAUDE.md", "@../AGENTS.md\n")
     write_file(
         root,
@@ -196,6 +214,76 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
     def test_valid_repository_has_no_errors(self) -> None:
         self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_corrupt_canonical_review_skill(self) -> None:
+        cases = (
+            "not frontmatter\n",
+            REVIEW_SKILL_TEXT.replace("name: code-review\n", ""),
+            REVIEW_SKILL_TEXT.replace("name: code-review", "name: other"),
+            REVIEW_SKILL_TEXT.replace(
+                "name: code-review", "name: code-review\nname: code-review"
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: [Review]",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: Review:",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.\n", ""
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: Review changes.\ndescription: Review again.",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: 'Review",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: Unrelated work",
+            ),
+            REVIEW_SKILL_TEXT.replace("contracts.\n---", "contracts.---"),
+            REVIEW_SKILL_TEXT.replace("name: code-review", "\tname: code-review"),
+            REVIEW_SKILL_TEXT.split("\n\n", 1)[0] + "\n\n",
+        )
+        for text in cases:
+            with self.subTest(text=text):
+                write_file(self.root, REVIEW_SKILL_PATH, text)
+                self.assert_error_contains(
+                    validator.validate(self.root), REVIEW_SKILL_PATH
+                )
+
+    def test_accepts_quoted_review_skill_fields(self) -> None:
+        write_file(
+            self.root,
+            REVIEW_SKILL_PATH,
+            REVIEW_SKILL_TEXT.replace(
+                "name: code-review", "name: 'code-review'"
+            ).replace(
+                "description: Review changes using repository contracts.",
+                'description: "Review changes using repository contracts."',
+            ),
+        )
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_review_skill_cannot_be_deleted_with_its_manifest_entry(self) -> None:
+        (self.root / REVIEW_SKILL_PATH).unlink()
+        self.assert_error_contains(
+            validator.validate(self.root), REVIEW_SKILL_PATH, "regular file"
+        )
+        self.manifest["surfaces"] = [
+            item
+            for item in self.manifest["surfaces"]
+            if item["path"] != REVIEW_SKILL_PATH
+        ]
+        write_manifest(self.root, self.manifest)
+        self.assert_error_contains(
+            validator.validate(self.root), REVIEW_SKILL_PATH, "missing from manifest"
+        )
 
     def test_rejects_invalid_json(self) -> None:
         write_file(self.root, ".github/instruction-surfaces.json", "{not json\n")
@@ -1304,6 +1392,10 @@ class AgentPolicyValidatorTests(unittest.TestCase):
                     with tempfile.TemporaryDirectory() as outside_directory:
                         link_path = root / relative_directory
                         link_path.parent.mkdir(parents=True, exist_ok=True)
+                        if relative_directory == ".github/skills":
+                            (root / REVIEW_SKILL_PATH).unlink()
+                            (root / REVIEW_SKILL_PATH).parent.rmdir()
+                            link_path.rmdir()
                         link_path.symlink_to(
                             Path(outside_directory),
                             target_is_directory=True,
@@ -1599,6 +1691,50 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_review_readiness_remains_required_without_skill_invocation(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        runbook = surfaces["runbook-org-review"]
+        skill = surfaces["skill-code-review"]
+        health_tasks = {
+            "review-readiness",
+            "organization-review",
+            "project-health",
+            "repository-health",
+            "repository-health-audit",
+            "repository-health-check",
+        }
+        self.assertTrue(runbook["required"])
+        self.assertEqual(runbook["path"], "runbooks/org-review.md")
+        self.assertEqual(runbook["authority"], "canonical-detail")
+        self.assertIn("review-readiness", runbook["canonical_for"])
+        self.assertTrue(
+            (health_tasks | {"repository-bootstrap"}).issubset(runbook["tasks"])
+        )
+        self.assertEqual(skill["path"], REVIEW_SKILL_PATH)
+        self.assertEqual(skill["authority"], "advisory")
+        self.assertFalse(skill["required"])
+        self.assertEqual(skill["canonical_for"], [])
+        self.assertTrue((health_tasks | {"code-review"}).issubset(skill["tasks"]))
+        for item in (runbook, skill):
+            self.assertEqual(item["file_patterns"], ["**"])
+            self.assertTrue(
+                {"codex", "claude-code", "copilot", "gemini-cli", "human"}.issubset(
+                    item["consumers"]
+                )
+            )
+        policy = " ".join((PUBLIC_ROOT / "AGENTS.md").read_text().split())
+        self.assertIn(
+            "Every repository-health evaluation, including quick checks and bootstrap, must assess",
+            policy,
+        )
+        self.assertIn(f"`{REVIEW_SKILL_PATH}`", policy)
+        self.assertIn(
+            "applies even when a runtime does not discover or use skills", policy
+        )
+
     def test_public_manifest_routes_zsh_scripting_standard(self) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()

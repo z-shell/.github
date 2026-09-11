@@ -135,11 +135,21 @@ Observed in:
 
 Pattern:
 
-- Place general-purpose engineering personas, global skills, and cross-repository instructions exclusively in the public `z-shell/.github` repository.
+- Maintain general-purpose engineering personas, global skills, and
+  cross-repository instructions canonically in the public `z-shell/.github`
+  repository.
 - Place domain-specific agents or instructions (e.g., Docusaurus documentation writers) directly in the repository where that specialized context applies (e.g., `wiki/`).
 - Do not store AI boilerplate (agents, instructions, `.cursorrules`) in standard
   plugins. If a skill applies to more than one plugin, it belongs in the public
   `z-shell/.github` repository.
+
+Policy exception: repository-local `.github/skills/code-review/` delivery
+copies are required for review readiness, including in standard plugins. Keep
+the shared skill centrally owned and install from an approved source revision
+with provenance metadata. Put repository-specific contracts in existing local
+guidance; do not fork shared review policy to customize a delivery copy. Follow
+[`runbooks/org-review.md`](runbooks/org-review.md#repository-health-review-readiness)
+for delivery, drift checks, and review-only authorization boundaries.
 
 ## Self-triggering reusable workflows
 

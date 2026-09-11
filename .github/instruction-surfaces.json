@@ -302,6 +302,26 @@
       "canonical_for": []
     },
     {
+      "id": "skill-code-review",
+      "path": ".github/skills/code-review/SKILL.md",
+      "kind": "skill",
+      "authority": "advisory",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": [
+        "code-review",
+        "review-readiness",
+        "organization-review",
+        "project-health",
+        "repository-health",
+        "repository-health-audit",
+        "repository-health-check"
+      ],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "skill-create-readme",
       "path": ".github/skills/create-readme/SKILL.md",
       "kind": "skill",
@@ -513,15 +533,17 @@
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": [
         "organization-review",
+        "review-readiness",
         "project-health",
         "repository-health",
         "repository-health-audit",
-        "repository-health-check"
+        "repository-health-check",
+        "repository-bootstrap"
       ],
       "file_patterns": ["**"],
       "required": true,
       "review_owner": "z-shell maintainers",
-      "canonical_for": ["organization-review"]
+      "canonical_for": ["organization-review", "review-readiness"]
     },
     {
       "id": "runbook-project-tracker",
