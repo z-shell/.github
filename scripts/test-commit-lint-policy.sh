@@ -100,15 +100,6 @@ check_no_input_defaults() {
   fi
 }
 
-# Empty bookkeeping commits can be created by automation progress updates. They
-# carry no file change, so the subject lint should skip them rather than fail a
-# pull request whose substantive commits are already conventional.
-check_empty_commits_are_skipped() {
-  checks=$((checks + 1))
-  grep -q 'git diff-tree --quiet --no-commit-id -r "\$sha"' "$WORKFLOW" ||
-    fail "empty commits are not skipped before subject lint"
-}
-
 # decisions/0022: the exemption label the workflow honours has to be a label
 # the organization actually publishes, or applying it is impossible.
 check_exempt_label_is_canonical() {
@@ -240,7 +231,6 @@ check_empty_pattern_is_never_harmless() {
 check_no_grep_q_on_trailer
 check_fallbacks_present
 check_no_input_defaults
-check_empty_commits_are_skipped
 check_exempt_label_is_canonical
 check_prefixes_not_duplicated
 check_branch_cases

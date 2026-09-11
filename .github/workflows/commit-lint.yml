@@ -99,11 +99,6 @@ jobs:
             parent_count=$(git cat-file -p "$sha" | grep -c '^parent' || true)
             [ "$parent_count" -gt 1 ] && continue
 
-            if git diff-tree --quiet --no-commit-id -r "$sha"; then
-              echo "Skipping empty commit (${sha:0:7})"
-              continue
-            fi
-
             subject=$(git show -s --format='%s' "$sha")
             checked=$((checked + 1))
 
