@@ -1,2 +1,3 @@
 .lycheecache
 build/
+__pycache__/
