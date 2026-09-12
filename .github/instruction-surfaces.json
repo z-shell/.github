@@ -247,7 +247,7 @@
       "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": ["code-review", "readme-authoring", "zsh-plugin-scaffolding"],
       "file_patterns": [
-        "**/*.plugin.zsh,**/init.zsh,templates/readme/zsh-plugin.md,.github/skills/new-zsh-plugin/**,.github/agents/zsh-plugin-standard-reviewer.agent.md"
+        "**/*.plugin.zsh,**/init.zsh,templates/readme/zsh-plugin.md,.github/skills/zsh-plugin/**,.github/agents/zsh-plugin-standard-reviewer.agent.md"
       ],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -370,8 +370,8 @@
       "canonical_for": []
     },
     {
-      "id": "skill-new-zsh-plugin",
-      "path": ".github/skills/new-zsh-plugin/SKILL.md",
+      "id": "skill-zsh-plugin",
+      "path": ".github/skills/zsh-plugin/SKILL.md",
       "kind": "skill",
       "authority": "advisory",
       "consumers": ["copilot"],

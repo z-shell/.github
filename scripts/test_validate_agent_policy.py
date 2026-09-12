@@ -1911,7 +1911,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 "file_patterns": [
                     "**/*.plugin.zsh,**/init.zsh,"
                     "templates/readme/zsh-plugin.md,"
-                    ".github/skills/new-zsh-plugin/**,"
+                    ".github/skills/zsh-plugin/**,"
                     ".github/agents/zsh-plugin-standard-reviewer.agent.md"
                 ],
                 "required": True,

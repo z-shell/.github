@@ -1,5 +1,5 @@
 ---
-name: new-zsh-plugin
+name: zsh-plugin
 description: Use when a user asks to create a new Zsh plugin, start a plugin from scratch, or add a plugin skeleton.
 disable-model-invocation: true
 ---
