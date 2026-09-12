@@ -1,6 +1,6 @@
 ---
 description: "Route generic review and README tasks on plugin-shaped files to the canonical Zsh plugin guidance"
-applyTo: "**/*.plugin.zsh,**/init.zsh,templates/readme/zsh-plugin.md,.github/skills/new-zsh-plugin/**,.github/agents/zsh-plugin-standard-reviewer.agent.md"
+applyTo: "**/*.plugin.zsh,**/init.zsh,templates/readme/zsh-plugin.md,.github/skills/zsh-plugin/**,.github/agents/zsh-plugin-standard-reviewer.agent.md"
 ---
 
 # Zsh Plugin Standard Task Aliases

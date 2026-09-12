@@ -23,14 +23,14 @@ SHELL_DISPATCHER_SHA256 = (
 VALIDATOR_PATH = "scripts/validate-zsh-standard-policy.py"
 ADVISORY_CONSUMER_PATHS = (
     ".github/agents/zsh-plugin-standard-reviewer.agent.md",
-    ".github/skills/new-zsh-plugin/SKILL.md",
+    ".github/skills/zsh-plugin/SKILL.md",
     ".github/skills/zunit-test/SKILL.md",
 )
 REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
     "PATTERNS.md",
     ".github/README.md",
 )
-PLUGIN_TEMPLATE_PATH = ".github/skills/new-zsh-plugin/templates/plugin.plugin.zsh"
+PLUGIN_TEMPLATE_PATH = ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
 RETIRED_PATTERN_SECTIONS = {
     "Plugin entry-point skeleton": {
         "evidence": (
