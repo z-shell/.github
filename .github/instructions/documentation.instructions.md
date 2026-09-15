@@ -62,6 +62,14 @@ Summarize only repository-specific behavior. Official Zsh documentation remains
 authoritative for shell semantics, and manager-specific profiles must be
 identified as optional integrations rather than portable requirements.
 
+## Line wrapping
+
+Write prose one paragraph per line, and one list item per line. Do not hard-wrap at a column width.
+
+GitHub renders repository `.md` files with soft breaks, so wrapping changes nothing on the page there; it only makes a one-word edit reflow every following line of the paragraph, and reviews and blame then show whole-paragraph churn. Issue bodies, pull-request bodies, comments, release notes, discussions, and the `markdown` blocks inside issue forms render every newline as a line break, so wrapped text there is a visible defect. One rule for both targets is simpler than remembering which renderer applies.
+
+Do not reflow a pre-existing wrapped paragraph unless you are already editing it. Reflowing a whole repository is mechanical cleanup and lands as its own pull request, together with a `.prettierrc` that sets `"proseWrap": "never"` so Trunk's prettier keeps it that way. New repositories start with that file (`runbooks/new-repository.md`).
+
 ## LLM/agent files
 
 Keep shared organization guidance in z-shell/.github. Keep child-repository AGENTS.md or .github/instructions files only for concise repository-specific behavior, and link to public canonical guidance rather than duplicating it.
