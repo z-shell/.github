@@ -114,7 +114,7 @@ labels:
     description: Indicates this issue has cross-repository tracking implications (synced to Linear).
   - name: meta:no-issue
     color: "5319e7"
-    description: Pull request with no owning issue by design, such as gitlink reconciliation or a routine dependency update (ADR-0022).
+    description: "No owning issue by design: gitlink reconciliation, routine dependency update, or similar (ADR-0022)"
 
   # External automation labels retained for compatibility.
   # These are not part of the triage taxonomy but appear in z-shell/.github

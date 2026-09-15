@@ -16,6 +16,9 @@ require "yaml"
 
 ROOT = File.expand_path("..", __dir__)
 DEFAULT_LABELS_FILE = File.join(ROOT, "lib", "labels.yml")
+# GitHub rejects label descriptions longer than this with a 422, which would
+# surface only once the sync reaches the first repository.
+MAX_DESCRIPTION_LENGTH = 100
 
 # Temporary pilot allowlist. Keep this intentionally tiny until #411 has one
 # reviewed create/update-only pilot result. Use --allow-non-pilot-repo only
@@ -320,6 +323,12 @@ def canonical_label_map(labels_file)
   label_names = labels.map { |label| label.fetch("name") }
   duplicate_names = label_names.select { |name| label_names.count(name) > 1 }.uniq
   raise "duplicate canonical labels: #{duplicate_names.join(', ')}" unless duplicate_names.empty?
+
+  too_long = labels.select { |label| (label["description"] || "").length > MAX_DESCRIPTION_LENGTH }
+  unless too_long.empty?
+    names = too_long.map { |label| "#{label.fetch('name')} (#{label['description'].length})" }
+    raise "label descriptions exceed #{MAX_DESCRIPTION_LENGTH} characters: #{names.join(', ')}"
+  end
 
   [
     labels.to_h do |label|

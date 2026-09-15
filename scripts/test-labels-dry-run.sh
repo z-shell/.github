@@ -56,6 +56,16 @@ assert_exit 2 "$SCRIPT" --all-repos --apply
 assert_exit 2 "$SCRIPT" --all-repos --apply --confirm-apply
 assert_exit 2 "$SCRIPT" --repo z-shell/zi --apply --confirm-apply
 
+# A description over GitHub's 100-character limit must fail before any repo call.
+TOO_LONG="$TEST_TMP/too-long.yml"
+{
+  printf 'labels:\n  - name: type:bug\n    color: ff0000\n    description: "'
+  printf 'x%.0s' $(seq 1 101)
+  printf '"\n'
+} >"$TOO_LONG"
+assert_exit 1 "$SCRIPT" --labels-file "$TOO_LONG" --repo z-shell/.github
+grep -q 'exceed 100 characters: type:bug (101)' "$ERR" || fail "expected description length error"
+
 # Backward-compatible dry-run entrypoint should keep working.
 assert_json_field apply-preview "$COMPAT_SCRIPT" --repo z-shell/.github --apply --json
 
