@@ -62,6 +62,14 @@ and tested, not a dependency to wait on.
    `docs/project/parser-gap-workflow.md`, without waiting for or conditioning
    on an upstream response. Gaps without corpus evidence are tracked and
    prioritized by evidence, not by upstream status.
+   A construct that parses successfully with the wrong shape is a gap of the
+   same class and must not reach analysis silently: the front end rejects it
+   with a positioned parse error until it is supported (the reserved-word
+   guard for `repeat` and `foreach` in
+   [zsh-lint#217](https://github.com/z-shell/zsh-lint/pull/217)), or carries
+   it as typed `parse.File` metadata. Neither requires a fork; a fork is
+   needed only when a correct typed tree is required and metadata cannot
+   carry it (point 4).
 2. **Track upstream; filing is optional.** Where an upstream issue already
    exists, link it as a reference. Filing new upstream issues is at the
    maintainers' discretion and is never a prerequisite for local work.
@@ -70,7 +78,12 @@ and tested, not a dependency to wait on.
    release closes a tracked gap. A bump is a parser behavior change: it lands
    with tree-shape assertions for every corpus fixture the release affects,
    and the survey corpus runs before and after. A fixture that stops erroring
-   must fail on tree shape rather than pass vacuously.
+   must fail on tree shape rather than pass vacuously. The assertions are
+   adoption gates: a bump whose affected assertion fails does not merge until
+   the front end fails closed on that construct or produces the correct tree.
+   v3.14.1 is the reference case: it fixes #209 and turns `foreach ... end`
+   into a successful three-command misparse, so it ships only with the guard
+   from point 1.
 4. **Fork the parser on a trigger, not in advance.** Maintain a fork of the
    `syntax` package (class L3, upstream license retained) only when one of
    these holds:
@@ -88,8 +101,12 @@ and tested, not a dependency to wait on.
 
 ## Consequences
 
-- Contributors no longer read "upstream-first" and stall. The workflow
-  document states the local-first rule and links this record.
+- Contributors no longer read "upstream-first" and stall once the companion
+  change [zsh-lint#219](https://github.com/z-shell/zsh-lint/pull/219) lands:
+  it states the local-first rule in the workflow document, links this record,
+  and marks the upstream-first wording in the 2026-06-12 records as
+  superseded. Until it merges, those records still say upstream-first and
+  this record governs.
 - Adapter growth continues in the short term. The trigger in point 4 bounds
   it: the first construct that an adapter cannot express correctly moves the
   work to a fork instead of a wider adapter.
