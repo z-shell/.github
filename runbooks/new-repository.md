@@ -32,10 +32,13 @@ LICENSE
 README.md
 .editorconfig
 .gitignore
+.prettierrc
 .github/
   skills/code-review/SKILL.md
   workflows/
 ```
+
+`.prettierrc` contains `{ "proseWrap": "never" }` so Trunk's prettier keeps Markdown prose one paragraph per line from the first commit; the rule and its rendering rationale are in `.github/instructions/documentation.instructions.md`.
 
 Select the license deliberately and record the choice on the owning issue from
 Step 1. Do not leave it to whatever the repository template happens to create;
