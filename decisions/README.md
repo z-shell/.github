@@ -33,4 +33,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0020](0020-adopt-zsh-plugin-standard-2.md)             | Adopt Zsh Plugin Standard 2 as a Clean Portable Contract                   | ACCEPTED | 2026-08-28 | ss-o     |
 | [0021](0021-derive-chroma-knowledge-at-runtime.md)      | Derive Chroma Command Knowledge at Runtime                                 | ACCEPTED | 2026-08-29 | ss-o     |
 | [0022](0022-issue-traceability-on-pull-requests.md)     | Enforce Issue Traceability on the Pull Request, Not the Branch Name        | ACCEPTED | 2026-09-02 | ss-o     |
-| [0023](0023-zsh-lint-parser-front-end-strategy.md)      | zsh-lint Tracks Upstream, Fixes Locally, and Forks the Parser on a Trigger | PROPOSED | 2026-09-15 | TBD      |
+| [0023](0023-zsh-lint-parser-front-end-strategy.md)      | zsh-lint Tracks Upstream, Fixes Locally, and Forks the Parser on a Trigger | ACCEPTED | 2026-09-15 | ss-o     |

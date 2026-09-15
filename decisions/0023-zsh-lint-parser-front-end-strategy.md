@@ -1,8 +1,8 @@
 # 23. zsh-lint Tracks Upstream, Fixes Locally, and Forks the Parser on a Trigger
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-15
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
