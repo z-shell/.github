@@ -126,21 +126,22 @@ module RepoSettingsAudit
       linear_history
       signed_commits
       copilot_code_review
+      review_thread_resolution
     ].freeze
 
     TABLE = {
       1 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
-             "copilot_code_review" => "R" },
+             "copilot_code_review" => "R", "review_thread_resolution" => "R" },
       2 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
-             "copilot_code_review" => "R" },
+             "copilot_code_review" => "R", "review_thread_resolution" => "R" },
       3 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "R", "linear_history" => "S", "signed_commits" => "S",
-             "copilot_code_review" => "S" },
+             "copilot_code_review" => "S", "review_thread_resolution" => "R" },
       4 => { "default_branch_main" => "R", "pr_required" => "R", "deletion_blocked" => "R", "force_push_blocked" => "R",
              "required_status_checks" => "S", "linear_history" => "S", "signed_commits" => "S",
-             "copilot_code_review" => "R" }
+             "copilot_code_review" => "R", "review_thread_resolution" => "R" }
     }.freeze
 
     def self.disposition(klass, setting, overrides: {})
@@ -258,12 +259,19 @@ module RepoSettingsAudit
           next unless setting
 
           settings[setting] = true
+          settings["review_thread_resolution"] = true if review_thread_resolution?(rule)
         end
 
         checks = rulesets_status_checks(ruleset)
         settings["required_status_checks"] = true unless checks.empty?
       end
       settings
+    end
+
+    # review_thread_resolution is a parameter of the pull_request rule, not a
+    # rule type of its own, so RULE_TYPE_TO_SETTING cannot carry it.
+    def self.review_thread_resolution?(rule)
+      rule["type"] == "pull_request" && rule.dig("parameters", "required_review_thread_resolution") == true
     end
 
     def self.rulesets_status_checks(ruleset)
@@ -282,13 +290,15 @@ module RepoSettingsAudit
         "linear_history" => !!protection.dig("required_linear_history", "enabled"),
         "signed_commits" => !!protection.dig("required_signatures", "enabled"),
         "pr_required" => !protection["required_pull_request_reviews"].nil?,
-        "required_status_checks" => !Array(protection.dig("required_status_checks", "contexts")).empty?
+        "required_status_checks" => !Array(protection.dig("required_status_checks", "contexts")).empty?,
+        "review_thread_resolution" => !!protection.dig("required_conversation_resolution", "enabled")
         # copilot_code_review is deliberately absent: classic protection has no
         # way to express it, so it must never contribute a true value for it.
       }
     end
 
-    private_class_method :applies?, :ref_matches?, :live_from_rulesets, :rulesets_status_checks, :live_from_classic
+    private_class_method :applies?, :ref_matches?, :live_from_rulesets, :review_thread_resolution?, :rulesets_status_checks,
+                         :live_from_classic
   end
 
   # Fetches one repository's live rulesets and classic protection, extracts
