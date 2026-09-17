@@ -89,6 +89,7 @@ recommended for this class.
 | Linear history                                               | S       | S       | S       | S       |
 | Signed commits                                               | S       | S       | S       | S       |
 | Copilot code review                                          | R       | R       | S       | R       |
+| Review thread resolution before merge                        | R       | R       | R       | R       |
 | Squash merge default message: title only, no body            | R       | R       | R       | R       |
 
 Rationale for the differences:
@@ -108,6 +109,18 @@ Rationale for the differences:
   audit applies that named override from `lib/repository-classes.yml`.
 - **Copilot code review** is required wherever a change reaches users or other
   repositories without a second human necessarily reading it.
+- **Review thread resolution before merge** (`required_review_thread_resolution`
+  on the pull-request rule) is required in every class, added 2026-09-17 by
+  [z-shell/.github#625](https://github.com/z-shell/.github/issues/625). Review
+  runs without a second human in most repositories, so the only evidence that a
+  review was read is the state of its threads. Over the 62 most recent merged
+  pull requests in five repositories, 25 Copilot threads on 11 pull requests
+  were still unresolved at merge, and 17 merged under 15 minutes after
+  creation. The rule makes the `AGENTS.md` done gate a control the merge
+  button applies rather than text an agent chooses to follow: a thread is
+  resolved by a fix or by a reply saying why not, never by clicking through.
+  Class 3 keeps Copilot review at S; where it is off, the rule costs nothing
+  and still governs human threads.
 - **Squash merge default message** is required uniformly, unlike the other
   rows, because it isn't a class-scaled risk: it is a plain repository API
   setting (`squash_merge_commit_title`/`squash_merge_commit_message`), not a
@@ -260,3 +273,5 @@ With that row excluded, nothing the audit applies is irreversible.
   unenforced-control pattern this ADR generalizes from CI to repository settings.
 - [Issue #473](https://github.com/z-shell/.github/issues/473) — the class-1
   linear-history divergence this ADR's baseline table now excludes.
+- [Issue #625](https://github.com/z-shell/.github/issues/625): the review-thread
+  resolution row and the measurement behind it.

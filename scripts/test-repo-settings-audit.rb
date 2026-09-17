@@ -62,6 +62,7 @@ class RepoSettingsAuditTest
     assert_equal("S", RepoSettingsAudit::Baseline.disposition(2, "linear_history"))
     assert_equal("R", RepoSettingsAudit::Baseline.disposition(4, "copilot_code_review"))
     assert_equal("S", RepoSettingsAudit::Baseline.disposition(3, "copilot_code_review"))
+    (1..4).each { |klass| assert_equal("R", RepoSettingsAudit::Baseline.disposition(klass, "review_thread_resolution")) }
   end
 
   def test_baseline_applies_a_named_repository_override
@@ -159,13 +160,14 @@ class RepoSettingsAuditTest
         "required_status_checks" => false,
         "linear_history" => false,
         "signed_commits" => false,
-        "copilot_code_review" => false
+        "copilot_code_review" => false,
+        "review_thread_resolution" => false
       },
       has_ci: true
     )
 
     assert_equal(RepoSettingsAudit::Baseline::SETTINGS.length, result.fetch("settings").length)
-    assert_equal({ "pass" => 3, "warn" => 3, "fail" => 2, "na" => 0 }, result.fetch("summary"))
+    assert_equal({ "pass" => 3, "warn" => 3, "fail" => 3, "na" => 0 }, result.fetch("summary"))
   end
 
   def test_evaluator_reports_default_branch_drift_as_required
@@ -184,7 +186,7 @@ class RepoSettingsAuditTest
       { "type" => "deletion" },
       { "type" => "non_fast_forward" },
       { "type" => "required_signatures" },
-      { "type" => "pull_request" },
+      { "type" => "pull_request", "parameters" => { "required_review_thread_resolution" => true } },
       { "type" => "copilot_code_review" },
       { "type" => "required_status_checks",
         "parameters" => { "required_status_checks" => [{ "context" => "ci" }] } }
@@ -206,6 +208,7 @@ class RepoSettingsAuditTest
     assert(live.fetch("signed_commits"))
     assert(live.fetch("pr_required"))
     assert(live.fetch("copilot_code_review"))
+    assert(live.fetch("review_thread_resolution"))
     assert(live.fetch("required_status_checks"))
     refute(live.fetch("linear_history"), "linear_history rule was never included")
     refute(extracted.fetch("flags").fetch("dual_protection_systems"))
@@ -253,6 +256,7 @@ class RepoSettingsAuditTest
     "required_signatures" => { "enabled" => true },
     "required_pull_request_reviews" => { "required_approving_review_count" => 0 },
     "required_status_checks" => { "contexts" => ["ci"] },
+    "required_conversation_resolution" => { "enabled" => true },
     "enforce_admins" => { "enabled" => true }
   }.freeze
 
@@ -268,6 +272,7 @@ class RepoSettingsAuditTest
     assert(live.fetch("signed_commits"))
     assert(live.fetch("pr_required"))
     assert(live.fetch("required_status_checks"))
+    assert(live.fetch("review_thread_resolution"))
     refute(live.fetch("copilot_code_review"), "classic protection cannot express Copilot code review")
     assert(extracted.fetch("flags").fetch("enforce_admins"))
   end
@@ -304,7 +309,8 @@ class RepoSettingsAuditTest
         "conditions" => { "ref_name" => { "include" => ["~DEFAULT_BRANCH"], "exclude" => [] } },
         "rules" => [
           { "type" => "deletion" }, { "type" => "non_fast_forward" }, { "type" => "required_signatures" },
-          { "type" => "pull_request" }, { "type" => "copilot_code_review" },
+          { "type" => "pull_request", "parameters" => { "required_review_thread_resolution" => true } },
+          { "type" => "copilot_code_review" },
           { "type" => "required_status_checks", "parameters" => { "required_status_checks" => [{ "context" => "ci" }] } }
         ]
       },

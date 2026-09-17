@@ -34,6 +34,7 @@ A `404` from the second request means classic protection is absent.
 
 - block deletion and force pushes;
 - require pull requests and the applicable status checks;
+- require review thread resolution (`required_review_thread_resolution`);
 - require code-owner review when the repository can satisfy it;
 - require the main-branch source guard described below;
 - restrict the pull-request rule to merge commits; and
@@ -42,7 +43,8 @@ A `404` from the second request means classic protection is absent.
 `next`:
 
 - block deletion and force pushes;
-- require pull requests and the applicable status checks; and
+- require pull requests and the applicable status checks;
+- require review thread resolution (`required_review_thread_resolution`); and
 - require signed commits when the repository's class baseline recommends it;
   and
 - **do not require linear history**, because hotfix synchronization preserves
