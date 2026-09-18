@@ -37,6 +37,10 @@ type Root struct {
 	fd     int
 	closed bool
 
+	// replaceMu serializes AtomicReplace calls on this root, so the identity
+	// check after promotion can only ever see a foreign entry, never the
+	// staging file of a concurrent call through the same root.
+	replaceMu sync.Mutex
 	// temporaries names staging files so a failed AtomicReplace can clean up.
 	temporaries atomic.Uint64
 }
@@ -182,7 +186,9 @@ func (r *Root) OpenDir(rel string) (*os.File, error) {
 // written) is verified immediately before the rename and the promoted
 // destination is verified immediately after it. A mismatch is reported as a
 // containment failure and the foreign entry is unlinked; the method never
-// returns success for a promotion it did not write.
+// returns success for a promotion it did not write. Calls through the same
+// root are serialized, so two replacements of one destination cannot
+// interleave and mistake each other for that foreign entry.
 func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error {
 	if src == nil {
 		return unsafePath("path", errors.New("source reader is required"))
@@ -190,6 +196,11 @@ func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error 
 	if err := validateRelative(rel); err != nil {
 		return err
 	}
+	if r == nil {
+		return unsafePath("root", errors.New("root is nil"))
+	}
+	r.replaceMu.Lock()
+	defer r.replaceMu.Unlock()
 
 	parent, name, err := r.openParent(rel)
 	if err != nil {

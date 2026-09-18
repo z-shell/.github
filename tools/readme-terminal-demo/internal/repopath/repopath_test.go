@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -146,7 +147,8 @@ func TestOpenReadAcceptsDirectory(t *testing.T) {
 // instead of hanging the suite.
 func TestOpenReadRejectsFIFO(t *testing.T) {
 	root, dir := newRoot(t)
-	if err := unix.Mkfifo(filepath.Join(dir, "pipe.yml"), 0o644); err != nil {
+	fifo := filepath.Join(dir, "pipe.yml")
+	if err := unix.Mkfifo(fifo, 0o644); err != nil {
 		t.Fatalf("mkfifo: %v", err)
 	}
 
@@ -163,6 +165,13 @@ func TestOpenReadRejectsFIFO(t *testing.T) {
 	case err := <-done:
 		assertUnsafePath(t, err, "pipe.yml")
 	case <-time.After(5 * time.Second):
+		// A blocked open holds the root's read lock, and the cleanup Close
+		// would wait on it forever. Supplying the writer end releases the
+		// reader so the regression fails instead of hanging the suite.
+		if writer, err := unix.Open(fifo, unix.O_WRONLY|unix.O_NONBLOCK|unix.O_CLOEXEC, 0); err == nil {
+			<-done
+			_ = unix.Close(writer)
+		}
 		t.Fatal("OpenRead blocked on a FIFO instead of rejecting it")
 	}
 }
@@ -548,6 +557,43 @@ func TestCloseRacesOpenWithoutDescriptorReuse(t *testing.T) {
 		_ = root.Close()
 		wg.Wait()
 	}
+}
+
+// TestAtomicReplaceSerializesConcurrentCalls proves two replacements of one
+// destination through the same root cannot interleave: every call succeeds
+// and the destination ends as one of the written contents, never absent.
+func TestAtomicReplaceSerializesConcurrentCalls(t *testing.T) {
+	root, dir := newRoot(t)
+	const workers = 8
+	var wg sync.WaitGroup
+	errs := make(chan error, workers)
+	start := make(chan struct{})
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			<-start
+			content := strings.Repeat(strconv.Itoa(i), 4) + "\n"
+			errs <- root.AtomicReplace("manifest.yml", strings.NewReader(content), 0o644)
+		}(i)
+	}
+	close(start)
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		if err != nil {
+			t.Errorf("concurrent AtomicReplace failed: %v", err)
+		}
+	}
+
+	data, err := os.ReadFile(filepath.Join(dir, "manifest.yml"))
+	if err != nil {
+		t.Fatalf("destination missing after concurrent replacement: %v", err)
+	}
+	if len(data) != 5 || data[0] != data[1] || data[1] != data[2] || data[2] != data[3] || data[4] != '\n' {
+		t.Errorf("destination is not one complete write: %q", data)
+	}
+	assertNoStagingEntries(t, dir)
 }
 
 func TestAtomicReplaceRejectsUnsafePaths(t *testing.T) {
