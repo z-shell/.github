@@ -1,14 +1,15 @@
 # Zsh Plugin README Template
 
-Use this template for a new Z-Shell Zsh plugin repository and for a substantial README refactor. A focused correction does not need it.
+Use this template for a maintained Z-Shell repository README and for a substantial README refactor. Plugins use it directly; annexes, tools, and modules adapt the same structure through the `create-readme` archetype guidance. A focused correction does not need it.
 
 ## How to use it
 
-1. Copy everything between `<!-- TEMPLATE START -->` and `<!-- TEMPLATE END -->` into the repository `README.md`.
-2. Replace every `<angle-bracket>` placeholder with repository-specific content.
-3. Delete every `<!-- ... -->` comment. Comments are guidance for the author, never README content.
-4. Drop a section marked optional when it would not help a user understand or operate the plugin. A required section may be short, but it stays.
-5. Work through the [maintainer checklist](#maintainer-checklist) before publishing.
+1. Copy everything between `<!-- TEMPLATE START -->` and `<!-- TEMPLATE END -->` into exactly one repository README: `docs/README.md` when `docs/` exists, otherwise `.github/README.md` when `.github/` exists, and otherwise `README.md` at the repository root.
+2. Replace every `<angle-bracket>` placeholder with repository-specific content, including path placeholders such as `<license-path>`.
+3. Update relative links for the chosen README location, such as `../LICENSE` from `docs/` or `.github/`.
+4. Delete every `<!-- ... -->` comment. Comments are guidance for the author, never README content.
+5. Drop a section marked optional when it would not help a user understand or operate the repository. A required section may be short, but it stays.
+6. Work through the [maintainer checklist](#maintainer-checklist) before publishing.
 
 ## Section map
 
@@ -34,12 +35,14 @@ Sections run from what an evaluator needs first to what a contributor returns to
 
 - The header is a centered HTML block: logo, title, one-sentence tagline, and a badge row of maintained signals only.
 - Secondary plugin managers live in `<details>` blocks so Zi stays the visible path.
-- GitHub alerts carry operational notes: `[!NOTE]` for compatibility floors and optional dependencies, `[!TIP]` for optional optimizations, `[!IMPORTANT]` for mandatory prerequisites and breaking configuration changes, `[!WARNING]` for terminal constraints and known conflicts. Use at most one per section.
+- GitHub alerts carry operational notes: `[!NOTE]` for compatibility floors and optional dependencies, `[!TIP]` for optional optimizations, `[!IMPORTANT]` for mandatory prerequisites and breaking configuration changes, `[!WARNING]` for terminal constraints and known conflicts. Use at most one per section, keep the marker and body on separate quoted lines, and rely on Prettier's default Markdown `preserve` behavior so formatting does not collapse the alert into plain blockquote text.
 - Reference data (styles, aliases, commands) goes in a table with explicit column alignment, surrounded by blank lines.
 - Code blocks carry a language tag (`zsh`, `bash`, `console`).
 - Prose is one paragraph per line with no hard wrapping.
 
 <!-- TEMPLATE START -->
+
+<!-- Put this content in exactly one repository README: `docs/README.md` when `docs/` exists, otherwise `.github/README.md` when `.github/` exists, and otherwise `README.md` at the repository root. Keep a single repository README and adjust relative links such as `<license-path>` for the chosen location, for example `../LICENSE` from `docs/` or `.github/`. -->
 
 <div align="center">
   <a href="https://github.com/z-shell/<repository>">
@@ -60,7 +63,7 @@ Sections run from what an evaluator needs first to what a contributor returns to
         alt="CI status"
       />
     </a>
-    <a href="LICENSE">
+    <a href="<license-path>">
       <img
         src="https://img.shields.io/github/license/z-shell/<repository>"
         alt="License"
@@ -184,7 +187,7 @@ From the repository root:
 
 ## Contributing and license
 
-Contributions follow the [Z-Shell organization guidance](https://github.com/z-shell/.github). This project is distributed under the terms in [LICENSE](LICENSE).
+Contributions follow the [Z-Shell organization guidance](https://github.com/z-shell/.github). This project is distributed under the terms in [LICENSE](<license-path>).
 
 ---
 

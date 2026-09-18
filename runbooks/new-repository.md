@@ -25,20 +25,20 @@ that tool's own instructions; it is not a public bootstrap dependency.
 
 ## Step 2 — Create the common repository envelope
 
+Every repository starts with exactly one repository README, placed at `docs/README.md` when `docs/` exists, otherwise at `.github/README.md` when `.github/` exists, and otherwise at `README.md` in the repository root. Update relative links for the selected location, such as `../LICENSE` from `docs/` or `.github/`.
+
 Every repository starts with:
 
 ```text
 LICENSE
-README.md
 .editorconfig
 .gitignore
-.prettierrc
 .github/
   skills/code-review/SKILL.md
   workflows/
 ```
 
-`.prettierrc` contains `{ "proseWrap": "never" }` so Trunk's prettier keeps Markdown prose one paragraph per line from the first commit; the rule and its rendering rationale are in `.github/instructions/documentation.instructions.md`.
+Leave Markdown wrapping at Prettier's default `preserve` behavior unless a separately documented repository need requires something else. That default keeps one-paragraph-per-line prose as written and preserves the multi-line GitHub alert blocks used in the README template.
 
 Select the license deliberately and record the choice on the owning issue from
 Step 1. Do not leave it to whatever the repository template happens to create;
@@ -58,13 +58,7 @@ For organization-authored code, note that the choice is effectively permanent,
 since a license grant already published cannot be revoked and a later change
 reaches only future releases.
 
-For a Zsh plugin,
-start from [`templates/readme/zsh-plugin.md`](../templates/readme/zsh-plugin.md).
-The initial README must state the purpose, features, install path, supported
-shell/runtime, public configuration, lifecycle behavior, verification command,
-release model, and wiki link. Preserve the template's accessible visual
-hierarchy, but replace its placeholders and omit optional sections that do not
-serve the plugin.
+For a maintained plugin, annex, tool, or module README, start from [`templates/readme/zsh-plugin.md`](../templates/readme/zsh-plugin.md) and place it at the selected README location above. The initial README must state the purpose, features, install path, supported shell/runtime, public configuration, lifecycle behavior, verification command, release model, and wiki link. Preserve the template's accessible visual hierarchy, replace its placeholders, adapt plugin-specific sections to the repository archetype, and omit optional sections that do not serve the repository.
 
 Do not copy generic `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/agents/`, or
 `.github/instructions/` files into child repositories. Link to the organization
