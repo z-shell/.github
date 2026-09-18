@@ -1,8 +1,8 @@
 # 24. Benchmarks Are Observed, Not Gated, With Flag Thresholds and Committed Per-Release Results
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-18
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
