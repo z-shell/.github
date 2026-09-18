@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
+
+	"golang.org/x/sys/unix"
 
 	"github.com/z-shell/.github/tools/readme-terminal-demo/internal/failure"
 	"github.com/z-shell/.github/tools/readme-terminal-demo/internal/manifest"
@@ -91,6 +95,16 @@ func TestOpenReadAcceptsOrdinaryFile(t *testing.T) {
 	if string(data) != "version: 1\n" {
 		t.Errorf("contents = %q, want %q", data, "version: 1\n")
 	}
+
+	// The FIFO guard opens non-blocking; the descriptor handed out must not
+	// keep that flag, or ordinary reads would change behaviour.
+	status, err := unix.FcntlInt(file.Fd(), unix.F_GETFL, 0)
+	if err != nil {
+		t.Fatalf("F_GETFL: %v", err)
+	}
+	if status&unix.O_NONBLOCK != 0 {
+		t.Error("returned descriptor still has O_NONBLOCK set")
+	}
 }
 
 func TestOpenReadAcceptsNestedFile(t *testing.T) {
@@ -122,6 +136,50 @@ func TestOpenReadAcceptsDirectory(t *testing.T) {
 	if !info.IsDir() {
 		t.Error("expected the opened directory to report IsDir")
 	}
+}
+
+// TestOpenReadRejectsFIFO proves a repository-controlled FIFO cannot stall the
+// renderer: a blocking read-only open of a FIFO waits for a writer that never
+// arrives, so the open must be non-blocking and the descriptor type inspected
+// before the file is handed out. The test is bounded so a regression fails
+// instead of hanging the suite.
+func TestOpenReadRejectsFIFO(t *testing.T) {
+	root, dir := newRoot(t)
+	if err := unix.Mkfifo(filepath.Join(dir, "pipe.yml"), 0o644); err != nil {
+		t.Fatalf("mkfifo: %v", err)
+	}
+
+	done := make(chan error, 1)
+	go func() {
+		file, err := root.OpenRead("pipe.yml")
+		if err == nil {
+			_ = file.Close()
+		}
+		done <- err
+	}()
+
+	select {
+	case err := <-done:
+		assertUnsafePath(t, err, "pipe.yml")
+	case <-time.After(5 * time.Second):
+		t.Fatal("OpenRead blocked on a FIFO instead of rejecting it")
+	}
+}
+
+// TestOpenReadRejectsSocket covers the other non-regular type a local checkout
+// can contain; opening a socket path fails in the kernel, but the rejection
+// must still surface as the sanitized containment class.
+func TestOpenReadRejectsSocket(t *testing.T) {
+	root, dir := newRoot(t)
+	socket := filepath.Join(dir, "sock")
+	listener, err := net.Listen("unix", socket)
+	if err != nil {
+		t.Skipf("unix socket unavailable: %v", err)
+	}
+	defer listener.Close()
+
+	_, err = root.OpenRead("sock")
+	assertUnsafePath(t, err, "sock")
 }
 
 func TestOpenDirRejectsRegularFile(t *testing.T) {

@@ -75,6 +75,11 @@ func (r *Root) Close() error {
 }
 
 // openAt performs the kernel-enforced resolution shared by every accessor.
+//
+// The open is non-blocking so a repository-controlled FIFO cannot stall the
+// renderer waiting for a writer, and the opened descriptor is inspected before
+// it is handed out: only a regular file or a directory is accepted. The flag is
+// cleared again afterwards so the returned descriptor reads normally.
 func (r *Root) openAt(rel string, flags uint64) (int, error) {
 	if r == nil {
 		return -1, unsafePath("root", errors.New("root is nil"))
@@ -87,12 +92,33 @@ func (r *Root) openAt(rel string, flags uint64) (int, error) {
 	}
 
 	how := unix.OpenHow{
-		Flags:   flags | unix.O_CLOEXEC | unix.O_NOFOLLOW,
+		Flags:   flags | unix.O_CLOEXEC | unix.O_NOFOLLOW | unix.O_NONBLOCK,
 		Resolve: resolveFlags,
 	}
 	fd, err := unix.Openat2(r.FD, rel, &how)
 	if err != nil {
 		return -1, unsafePath("path", fmt.Errorf("resolve path: %w", err))
+	}
+
+	var stat unix.Stat_t
+	if err := unix.Fstat(fd, &stat); err != nil {
+		_ = unix.Close(fd)
+		return -1, unsafePath("path", fmt.Errorf("inspect path: %w", err))
+	}
+	switch stat.Mode & unix.S_IFMT {
+	case unix.S_IFREG, unix.S_IFDIR:
+	default:
+		_ = unix.Close(fd)
+		return -1, unsafePath("path", errors.New("path is not a regular file or directory"))
+	}
+
+	status, err := unix.FcntlInt(uintptr(fd), unix.F_GETFL, 0)
+	if err == nil {
+		_, err = unix.FcntlInt(uintptr(fd), unix.F_SETFL, status&^unix.O_NONBLOCK)
+	}
+	if err != nil {
+		_ = unix.Close(fd)
+		return -1, unsafePath("path", fmt.Errorf("restore blocking mode: %w", err))
 	}
 	return fd, nil
 }
@@ -121,9 +147,10 @@ func (r *Root) OpenDir(rel string) (*os.File, error) {
 // AtomicReplace writes src to rel through a staging file inside the same
 // directory, then renames it into place.
 //
-// The staging file is created with O_EXCL beneath the contained parent, so a
-// pre-planted symlink at the destination cannot redirect the write: the rename
-// replaces the symlink itself rather than following it.
+// A destination that already exists as anything but a regular file, including
+// a pre-planted symlink, is rejected before any staging file is created; it is
+// never followed and never replaced. The staging file itself is created with
+// O_EXCL beneath the contained parent, so nothing can redirect the write.
 func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error {
 	if src == nil {
 		return unsafePath("path", errors.New("source reader is required"))
