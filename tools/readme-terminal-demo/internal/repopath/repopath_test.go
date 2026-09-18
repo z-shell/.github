@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -440,6 +441,112 @@ func TestAtomicReplaceRejectsSymlinkDestination(t *testing.T) {
 	}
 	if string(data) != "original\n" {
 		t.Errorf("symlink target was modified: %q", data)
+	}
+}
+
+// swapStagingForSymlink replaces the staging entry, after it was created and
+// written, with a symlink to outside so a promotion of that name would escape.
+func swapStagingForSymlink(t *testing.T, outside string) func(parent int, staging string) {
+	t.Helper()
+	return func(parent int, staging string) {
+		if err := unix.Unlinkat(parent, staging, 0); err != nil {
+			t.Fatalf("unlink staging: %v", err)
+		}
+		if err := unix.Symlinkat(outside, parent, staging); err != nil {
+			t.Fatalf("plant symlink at staging name: %v", err)
+		}
+	}
+}
+
+// TestAtomicReplaceDetectsStagingSwapBeforePromotion proves that a staging
+// entry swapped after the write is caught before the rename: the destination
+// keeps its original content and the foreign entry is removed.
+func TestAtomicReplaceDetectsStagingSwapBeforePromotion(t *testing.T) {
+	root, dir := newRoot(t)
+	outside := filepath.Join(t.TempDir(), "target.txt")
+	mustWrite(t, outside, "original\n")
+
+	testBeforeStagingCheck = swapStagingForSymlink(t, outside)
+	t.Cleanup(func() { testBeforeStagingCheck = nil })
+
+	err := root.AtomicReplace("manifest.yml", strings.NewReader("hijacked\n"), 0o644)
+	assertUnsafePath(t, err, outside)
+
+	if data, _ := os.ReadFile(filepath.Join(dir, "manifest.yml")); string(data) != "version: 1\n" {
+		t.Errorf("destination changed: %q", data)
+	}
+	if data, _ := os.ReadFile(outside); string(data) != "original\n" {
+		t.Errorf("symlink target changed: %q", data)
+	}
+	assertNoStagingEntries(t, dir)
+}
+
+// TestAtomicReplaceDetectsStagingSwapAfterPromotion narrows the window to the
+// instant before the rename: the swapped entry is promoted by the kernel, then
+// detected by the post-promotion identity check and unlinked, and the call
+// reports a containment failure instead of success.
+func TestAtomicReplaceDetectsStagingSwapAfterPromotion(t *testing.T) {
+	root, dir := newRoot(t)
+	outside := filepath.Join(t.TempDir(), "target.txt")
+	mustWrite(t, outside, "original\n")
+
+	testBeforePromote = swapStagingForSymlink(t, outside)
+	t.Cleanup(func() { testBeforePromote = nil })
+
+	err := root.AtomicReplace("manifest.yml", strings.NewReader("hijacked\n"), 0o644)
+	assertUnsafePath(t, err, outside)
+
+	if _, statErr := os.Lstat(filepath.Join(dir, "manifest.yml")); !errors.Is(statErr, os.ErrNotExist) {
+		t.Errorf("foreign entry survived at the destination: %v", statErr)
+	}
+	if data, _ := os.ReadFile(outside); string(data) != "original\n" {
+		t.Errorf("symlink target changed: %q", data)
+	}
+	assertNoStagingEntries(t, dir)
+}
+
+func assertNoStagingEntries(t *testing.T, dir string) {
+	t.Helper()
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		t.Fatalf("read dir: %v", err)
+	}
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), ".readme-terminal-demo.") {
+			t.Errorf("staging entry %q was left behind", entry.Name())
+		}
+	}
+}
+
+// TestCloseRacesOpenWithoutDescriptorReuse hammers Close against concurrent
+// opens. Every open must either return a descriptor that still points inside
+// the root or the sanitized closed-root failure; run with -race to also prove
+// the descriptor is never read unsynchronized.
+func TestCloseRacesOpenWithoutDescriptorReuse(t *testing.T) {
+	for round := 0; round < 50; round++ {
+		root, _ := newRoot(t)
+		var wg sync.WaitGroup
+		start := make(chan struct{})
+		for i := 0; i < 8; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				<-start
+				file, err := root.OpenRead("manifest.yml")
+				if err != nil {
+					assertUnsafePath(t, err, "manifest.yml")
+					return
+				}
+				data, readErr := io.ReadAll(file)
+				_ = file.Close()
+				if readErr != nil || string(data) != "version: 1\n" {
+					t.Errorf("open after close returned wrong content: %q, %v", data, readErr)
+				}
+			}()
+		}
+		close(start)
+		_ = root.Close()
+		wg.Wait()
 	}
 }
 

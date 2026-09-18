@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"os"
 	"strconv"
+	"sync"
 	"sync/atomic"
 
 	"golang.org/x/sys/unix"
@@ -26,14 +27,27 @@ const resolveFlags = unix.RESOLVE_BENEATH | unix.RESOLVE_NO_SYMLINKS | unix.RESO
 
 // Root is an open repository root that constrains every relative open beneath
 // itself.
+//
+// The root descriptor is private and every child acquisition holds the read
+// side of mu while it uses that descriptor, so Close cannot release it, and
+// the kernel cannot reuse its number, between the closed check and the
+// openat2 or dup that depends on it.
 type Root struct {
-	Path string
-	FD   int
+	mu     sync.RWMutex
+	fd     int
+	closed bool
 
-	closed atomic.Bool
 	// temporaries names staging files so a failed AtomicReplace can clean up.
 	temporaries atomic.Uint64
 }
+
+// testBeforeStagingCheck and testBeforePromote are test-only seams that let a
+// test interleave a hostile directory change at the two points AtomicReplace
+// verifies the staging entry. Production code never sets them.
+var (
+	testBeforeStagingCheck func(parent int, staging string)
+	testBeforePromote      func(parent int, staging string)
+)
 
 // OpenRoot opens path as a containment root. The root itself is trusted input
 // supplied by the renderer, not by the repository under test.
@@ -57,18 +71,25 @@ func OpenRoot(path string) (*Root, error) {
 		return nil, unsafePath("root", errors.New("root is not a directory"))
 	}
 
-	return &Root{Path: path, FD: fd}, nil
+	return &Root{fd: fd}, nil
 }
 
-// Close releases the root descriptor. It is safe to call more than once.
+// Close releases the root descriptor. It is safe to call more than once, and
+// it waits for every in-flight child acquisition before the descriptor goes
+// away.
 func (r *Root) Close() error {
 	if r == nil {
 		return nil
 	}
-	if !r.closed.CompareAndSwap(false, true) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.closed {
 		return nil
 	}
-	if err := unix.Close(r.FD); err != nil {
+	r.closed = true
+	fd := r.fd
+	r.fd = -1
+	if err := unix.Close(fd); err != nil {
 		return unsafePath("root", fmt.Errorf("close root: %w", err))
 	}
 	return nil
@@ -84,9 +105,6 @@ func (r *Root) openAt(rel string, flags uint64) (int, error) {
 	if r == nil {
 		return -1, unsafePath("root", errors.New("root is nil"))
 	}
-	if r.closed.Load() {
-		return -1, unsafePath("root", errors.New("root is closed"))
-	}
 	if err := validateRelative(rel); err != nil {
 		return -1, err
 	}
@@ -95,7 +113,13 @@ func (r *Root) openAt(rel string, flags uint64) (int, error) {
 		Flags:   flags | unix.O_CLOEXEC | unix.O_NOFOLLOW | unix.O_NONBLOCK,
 		Resolve: resolveFlags,
 	}
-	fd, err := unix.Openat2(r.FD, rel, &how)
+	r.mu.RLock()
+	if r.closed {
+		r.mu.RUnlock()
+		return -1, unsafePath("root", errors.New("root is closed"))
+	}
+	fd, err := unix.Openat2(r.fd, rel, &how)
+	r.mu.RUnlock()
 	if err != nil {
 		return -1, unsafePath("path", fmt.Errorf("resolve path: %w", err))
 	}
@@ -151,6 +175,14 @@ func (r *Root) OpenDir(rel string) (*os.File, error) {
 // a pre-planted symlink, is rejected before any staging file is created; it is
 // never followed and never replaced. The staging file itself is created with
 // O_EXCL beneath the contained parent, so nothing can redirect the write.
+//
+// O_EXCL protects creation only. A writer to the same directory could still
+// swap the staging name for another entry between creation and promotion, so
+// the staging entry's identity (device and inode of the descriptor that was
+// written) is verified immediately before the rename and the promoted
+// destination is verified immediately after it. A mismatch is reported as a
+// containment failure and the foreign entry is unlinked; the method never
+// returns success for a promotion it did not write.
 func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error {
 	if src == nil {
 		return unsafePath("path", errors.New("source reader is required"))
@@ -193,6 +225,13 @@ func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error 
 		_ = unix.Unlinkat(parent, staging, 0)
 	}
 
+	var written unix.Stat_t
+	if err := unix.Fstat(stagingFD, &written); err != nil {
+		_ = unix.Close(stagingFD)
+		cleanup()
+		return unsafePath("path", fmt.Errorf("inspect staging file: %w", err))
+	}
+
 	file := os.NewFile(uintptr(stagingFD), staging)
 	if _, err := io.Copy(file, src); err != nil {
 		_ = file.Close()
@@ -215,9 +254,39 @@ func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error 
 		return unsafePath("path", fmt.Errorf("close staging file: %w", err))
 	}
 
+	if testBeforeStagingCheck != nil {
+		testBeforeStagingCheck(parent, staging)
+	}
+	if err := verifyIdentity(parent, staging, &written); err != nil {
+		cleanup()
+		return unsafePath("path", fmt.Errorf("staging entry: %w", err))
+	}
+	if testBeforePromote != nil {
+		testBeforePromote(parent, staging)
+	}
 	if err := unix.Renameat(parent, staging, parent, name); err != nil {
 		cleanup()
 		return unsafePath("path", fmt.Errorf("promote staging file: %w", err))
+	}
+	if err := verifyIdentity(parent, name, &written); err != nil {
+		// The promoted entry is not the file this call wrote. Remove it so a
+		// foreign entry never survives at the destination under a success or
+		// failure return.
+		_ = unix.Unlinkat(parent, name, 0)
+		return unsafePath("path", fmt.Errorf("promoted entry: %w", err))
+	}
+	return nil
+}
+
+// verifyIdentity proves that name inside parent, resolved without following a
+// final symlink, is exactly the file described by want.
+func verifyIdentity(parent int, name string, want *unix.Stat_t) error {
+	var got unix.Stat_t
+	if err := unix.Fstatat(parent, name, &got, unix.AT_SYMLINK_NOFOLLOW); err != nil {
+		return fmt.Errorf("inspect: %w", err)
+	}
+	if got.Dev != want.Dev || got.Ino != want.Ino {
+		return errors.New("entry was replaced")
 	}
 	return nil
 }
@@ -228,9 +297,6 @@ func (r *Root) AtomicReplace(rel string, src io.Reader, mode fs.FileMode) error 
 func (r *Root) openParent(rel string) (int, string, error) {
 	if r == nil {
 		return -1, "", unsafePath("root", errors.New("root is nil"))
-	}
-	if r.closed.Load() {
-		return -1, "", unsafePath("root", errors.New("root is closed"))
 	}
 
 	name := rel
@@ -244,7 +310,13 @@ func (r *Root) openParent(rel string) (int, string, error) {
 	}
 
 	if parentRel == "" {
-		fd, err := unix.Dup(r.FD)
+		r.mu.RLock()
+		if r.closed {
+			r.mu.RUnlock()
+			return -1, "", unsafePath("root", errors.New("root is closed"))
+		}
+		fd, err := unix.FcntlInt(uintptr(r.fd), unix.F_DUPFD_CLOEXEC, 0)
+		r.mu.RUnlock()
 		if err != nil {
 			return -1, "", unsafePath("root", fmt.Errorf("duplicate root: %w", err))
 		}
