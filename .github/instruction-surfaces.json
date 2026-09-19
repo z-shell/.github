@@ -322,6 +322,18 @@
       "canonical_for": []
     },
     {
+      "id": "skill-zi-install",
+      "path": ".github/skills/zi-install/SKILL.md",
+      "kind": "skill",
+      "authority": "advisory",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["zi-installation", "zi-setup"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "skill-create-readme",
       "path": ".github/skills/create-readme/SKILL.md",
       "kind": "skill",
