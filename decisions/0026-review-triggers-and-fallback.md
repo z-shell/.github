@@ -1,8 +1,8 @@
 # 26. Pull Request Reviews Are Requested Once, Not Billed Per Push, With a Documented Fallback
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-19
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
