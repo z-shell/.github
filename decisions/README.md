@@ -37,3 +37,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0024](0024-benchmarks-observed-not-gated.md)           | Benchmarks Are Observed, Not Gated, With Flag Thresholds and Committed Per-Release Results    | ACCEPTED | 2026-09-18 | ss-o     |
 | [0025](0025-guided-setup-planner-first.md)              | Zi Guided Setup Is a Planner First, With the Interface and Its Language Deferred to a Trigger | ACCEPTED | 2026-09-18 | ss-o     |
 | [0026](0026-review-triggers-and-fallback.md)            | Pull Request Reviews Are Requested Once, Not Billed Per Push, With a Documented Fallback      | ACCEPTED | 2026-09-19 | ss-o     |
+| [0027](0027-canonical-repository-readme.md)             | Adopt One Canonical Repository README Location and Shared Structure                           | PROPOSED | 2026-09-19 | TBD      |
