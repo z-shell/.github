@@ -26,7 +26,8 @@ For each `.github/workflows/*.yml` in scope, report PASS / FAIL with file:line a
 8. **Reusable workflows** (`workflow_call`) — all inputs declare `type`, `required`, `default`; called workflows pinned to a ref.
 
 9. **Organization-retired patterns**: flag new uses of `actions/labeler`,
-   `sync-labels.yml`, `pr-labels.yml`, `stale.yml`, `lock.yml`, `rebase.yml`, or
+   `sync-labels.yml`, `pr-labels.yml`, `assign.yml` or any per-repository
+   `actions/add-to-project`, `stale.yml`, `lock.yml`, `rebase.yml`, or
    SHA-free `uses:`. Existing uses need an owning migration plan.
 
 ## How to work

@@ -40,6 +40,8 @@ README.md
 
 `.prettierrc` contains `{ "proseWrap": "never" }` so Trunk's prettier keeps Markdown prose one paragraph per line from the first commit; the rule and its rendering rationale are in `.github/instructions/documentation.instructions.md`.
 
+`.gitignore` excludes `.trunk/out` and `.trunk/logs`, and neither symlink is ever committed: Trunk's post-checkout hook re-points both at its per-clone cache, so a tracked one keeps every worktree of the repository permanently dirty (z-shell/z-a-eval#7 and z-shell/z-a-default-ice#9 each had to remove one).
+
 Select the license deliberately and record the choice on the owning issue from
 Step 1. Do not leave it to whatever the repository template happens to create;
 that is how the organization accumulated six differing licenses against an
