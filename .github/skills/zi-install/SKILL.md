@@ -23,6 +23,7 @@ Prefer Loader for a new setup. Use `-i skip` when the user manages their dotfile
 - `.zshrc` lives in `${ZDOTDIR:-$HOME}`; report that path before running. `ZDOTDIR` and `ZI_HOME`, when set, must be absolute: the installer changes directory before it reads them, so a relative value targets the wrong place. Stop and ask the user if either is relative.
 - The installer honours `XDG_CONFIG_HOME` and `XDG_DATA_HOME` only when they are absolute; a relative value falls back to `~/.config` and `~/.local/share`. Say which directories will be used.
 - An existing installation is detected by the installer (`~/.zi` or `$XDG_DATA_HOME/zi`, or an explicit `ZI_HOME`). Do not move or delete it.
+- An explicit `ZI_HOME` or `ZI_BIN_DIR_NAME` is supported only with `-i skip`. The Loader block does not carry them, so with `-a loader` the first shell start would clone a second Zi at the default location (z-shell/src#217). If the user has either set and wants Loader, stop and explain that.
 - `zsh`, `git`, and `curl` or `wget` must be present; the installer refuses without `git`.
 
 ## Run the installer
