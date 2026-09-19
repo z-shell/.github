@@ -110,7 +110,7 @@ Creating or updating issues, comments, pull requests, or tracker records require
 - For documentation-only edits, at minimum make sure links, paths, and examples are internally consistent.
 - If work is unfinished, blocked, or likely to be resumed later, leave an `Agent handoff` comment using `.github/AGENT_MEMORY.md`.
 - Convert deferred follow-up work into issues instead of leaving it only in local notes.
-- A pull request is done only after every configured review has posted (Copilot where enabled) and every review thread has been acted on: a fix, or a reply saying why not. No thread stays unresolved. Check with the GraphQL `reviewThreads` connection; `gh pr view` has no thread field.
+- A pull request is done only after every configured review has posted (Copilot where enabled, requested once the head is ready; the fallback in `decisions/0026-review-triggers-and-fallback.md` when the request is not registered) and every review thread has been acted on: a fix, or a reply saying why not. No thread stays unresolved. Check with the GraphQL `reviewThreads` connection; `gh pr view` has no thread field.
 - The ruleset enforces that gate (`required_review_thread_resolution`, ADR-0013). Outside a documented bypass case, a merge the ruleset would block is not done.
 
 ## Triage and recurring operations
