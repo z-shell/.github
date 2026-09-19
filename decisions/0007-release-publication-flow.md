@@ -4,7 +4,7 @@
 - **Date:** 2026-05-26
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** `decisions/0027-zi-promotion-is-release-authorization.md` (Zi milestone exception only)
 
 ## Context
 
@@ -78,21 +78,7 @@ Per-repo application:
 
 ### Zi milestone-release exception
 
-Zi may automate release preparation and publication under this contract:
-
-- a successful promotion to `main` may compute the next semantic version and
-  draft release notes, but preparation never creates or pushes a tag;
-- a maintainer authorizes publication by pushing an annotated, signed
-  `vX.Y.Z` tag to the exact verified `main` commit;
-- the tag-triggered workflow verifies the signature, exact target, and
-  successful required workflows on that commit before publishing the GitHub
-  release; and
-- Zi does not adopt `release-please` or a stored version file. Runtime version
-  reporting continues to derive from Git metadata.
-
-The signed tag is the human approval boundary. Automation after that boundary
-may be idempotent, but it must fail closed when the tag or validation evidence
-does not match the contract.
+ADR-0027 supersedes this exception. A reviewed `next` to `main` promotion is now Zi's human publication boundary when the promoted range contains releasable commits. Zi displays the version and release-note plan before merge, then creates the annotated tag and GitHub release only after every required workflow succeeds on the exact merge SHA. The maintainer-signed tag path remains available for recovery.
 
 ## Consequences
 
@@ -102,8 +88,7 @@ does not match the contract.
 - `release-please` is not adopted org-wide; it remains available to revisit per
   repo if a maintainer wants automated changelog/version PRs.
 - Class-3 repositories remain validation-only by default. Zi is the named
-  exception: release preparation and publication may be automated, while tag
-  creation remains a manual, policy-governed act.
+  exception governed by ADR-0027.
 
 ## Alternatives considered
 
@@ -113,9 +98,9 @@ does not match the contract.
   decision. Can be piloted per repo later without contradicting this ADR.
 - **One release model for all repos.** Rejected: continuously-deployed and
   git-consumed repos do not benefit from tag-driven release artifacts.
-- **Create a Zi tag on every promotion.** Rejected: not every promotion needs a
-  milestone release, and an automatically created tag would remove the exact
-  human publication approval boundary.
+- **Create a Zi tag without a pre-merge plan or exact-SHA validation.** Rejected:
+  automation must identify releasable commits before merge and must fail closed
+  until every required workflow succeeds on the exact promotion merge SHA.
 - **Defer the ADR, keep guidance informal.** Rejected: the runbook explicitly
   waited on this decision; leaving it open invites drift.
 
@@ -127,7 +112,9 @@ does not match the contract.
 - Tracker: `zsh-lint#21`, `zsh#8`, `zi#346`.
 - [Issue #583](https://github.com/z-shell/.github/issues/583) and
   [zi#468](https://github.com/z-shell/zi/issues/468): approved Zi
-  milestone-release automation.
+  milestone-release automation, superseded for the normal path by ADR-0027.
+- [ADR-0027](0027-zi-promotion-is-release-authorization.md): Zi promotion as
+  release authorization.
 - [Issue #497](https://github.com/z-shell/.github/issues/497) and
   [z-shell/zpmod#70](https://github.com/z-shell/zpmod/issues/70): accepted
   `zpmod` classification and owning repository remediation.

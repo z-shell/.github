@@ -970,6 +970,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0027",
+      "path": "decisions/0027-zi-promotion-is-release-authorization.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "release"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-index",
       "path": "decisions/README.md",
       "kind": "runbook",
