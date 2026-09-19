@@ -1945,6 +1945,35 @@ class PublicRepositoryTests(unittest.TestCase):
         for question in REQUIRED_IMPACT_QUESTIONS:
             self.assertIn(question, runbook)
 
+    def test_public_repository_aligns_readme_template_scope_and_location(self) -> None:
+        documentation = (
+            PUBLIC_ROOT / ".github/instructions/documentation.instructions.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("default `preserve` behavior", documentation)
+
+        skill = (PUBLIC_ROOT / ".github/skills/create-readme/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Place exactly one repository README", skill)
+        self.assertIn(
+            "**Zi Annexes (`z-a-*`):** Keep Zi as the installation path",
+            skill,
+        )
+        self.assertIn("**Compiled Modules:**", skill)
+
+        runbook = (PUBLIC_ROOT / "runbooks/new-repository.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Every repository starts with exactly one repository README", runbook)
+        self.assertNotIn(".prettierrc", runbook)
+
+        template = (PUBLIC_ROOT / "templates/readme/zsh-plugin.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("`docs/README.md`", template)
+        self.assertIn("`<license-path>`", template)
+        self.assertIn("default Markdown `preserve` behavior", template)
+
     def test_public_repository_requires_manifest_routing_for_all_runtimes(self) -> None:
         policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
         required_fragments = (

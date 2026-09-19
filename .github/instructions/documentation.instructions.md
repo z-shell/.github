@@ -43,32 +43,13 @@ Maintainer/operational guides are **not** end-user docs — do not place them un
 - Never commit secret values or stale secret-key names in docs; reference the
   current canonical names only.
 
-## Zsh plugin READMEs
-
-Use [`templates/readme/zsh-plugin.md`](../../templates/readme/zsh-plugin.md)
-when creating a Zsh plugin repository or substantially restructuring its
-README. Focused corrections do not require an unrelated full rewrite.
-
-The template standardizes required information and visual hierarchy, not
-identical prose or artwork. Zi remains the first installation path. Include a
-screenshot or short demo only when it materially explains behavior, and keep
-long-form ecosystem guidance in the wiki.
-
-The
-[Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
-is the canonical public plugin-authoring standard and should be linked from
-plugin documentation where authoring or lifecycle behavior is discussed.
-Summarize only repository-specific behavior. Official Zsh documentation remains
-authoritative for shell semantics, and manager-specific profiles must be
-identified as optional integrations rather than portable requirements.
-
 ## Line wrapping
 
 Write prose one paragraph per line, and one list item per line. Do not hard-wrap at a column width.
 
 GitHub renders repository `.md` files with soft breaks, so wrapping changes nothing on the page there; it only makes a one-word edit reflow every following line of the paragraph, and reviews and blame then show whole-paragraph churn. Issue bodies, pull-request bodies, comments, release notes, discussions, and the `markdown` blocks inside issue forms render every newline as a line break, so wrapped text there is a visible defect. One rule for both targets is simpler than remembering which renderer applies.
 
-Do not reflow a pre-existing wrapped paragraph unless you are already editing it. Reflowing a whole repository is mechanical cleanup and lands as its own pull request, together with a `.prettierrc` that sets `"proseWrap": "never"` so Trunk's prettier keeps it that way. New repositories start with that file (`runbooks/new-repository.md`).
+Do not reflow a pre-existing wrapped paragraph unless you are already editing it. Reflowing a whole repository is mechanical cleanup and lands as its own pull request. When a repository uses Prettier for Markdown, leave wrapping at the default `preserve` behavior unless a separately documented need requires otherwise; that keeps one-paragraph-per-line prose as written and does not collapse multi-line GitHub alert blocks in README templates.
 
 ## LLM/agent files
 
