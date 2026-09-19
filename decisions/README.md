@@ -36,3 +36,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0023](0023-zsh-lint-parser-front-end-strategy.md)      | zsh-lint Tracks Upstream, Fixes Locally, and Forks the Parser on a Trigger                    | ACCEPTED | 2026-09-15 | ss-o     |
 | [0024](0024-benchmarks-observed-not-gated.md)           | Benchmarks Are Observed, Not Gated, With Flag Thresholds and Committed Per-Release Results    | ACCEPTED | 2026-09-18 | ss-o     |
 | [0025](0025-guided-setup-planner-first.md)              | Zi Guided Setup Is a Planner First, With the Interface and Its Language Deferred to a Trigger | ACCEPTED | 2026-09-18 | ss-o     |
+| [0026](0026-review-triggers-and-fallback.md)            | Pull Request Reviews Are Requested Once, Not Billed Per Push, With a Documented Fallback      | PROPOSED | 2026-09-19 | TBD      |
