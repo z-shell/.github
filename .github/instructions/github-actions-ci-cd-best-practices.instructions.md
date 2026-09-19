@@ -87,6 +87,7 @@ new uses; migrate existing uses through their owning rollout and runbook.
 
 - `actions/labeler` (label management is handled centrally via `runbooks/labels.md`)
 - `sync-labels.yml`, `pr-labels.yml`
+- `assign.yml` and any per-repository `actions/add-to-project` workflow (Project 28 membership is reconciled centrally; see `runbooks/project-tracker.md`)
 - `stale.yml`, `lock.yml`, `rebase.yml`
 - Unpinned or tag-referenced third-party actions
 
