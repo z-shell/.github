@@ -43,16 +43,6 @@ Maintainer/operational guides are **not** end-user docs — do not place them un
 - Never commit secret values or stale secret-key names in docs; reference the
   current canonical names only.
 
-## Repository READMEs
-
-Use [`templates/readme/zsh-plugin.md`](../../templates/readme/zsh-plugin.md) when creating or substantially restructuring any maintained repository README, including plugins, annexes, tools, and modules. Focused corrections do not require an unrelated full rewrite.
-
-The template standardizes required information and visual hierarchy, not identical prose or artwork. The `create-readme` skill's archetypes own the repository-class adaptations, including annex, tool, and module changes to plugin-shaped sections. Zi remains the first visible installation path where it is a supported user path. Include a screenshot or short demo only when it materially explains behavior, and keep long-form ecosystem guidance in the wiki.
-
-Place exactly one maintained repository README at `docs/README.md` when `docs/` exists, otherwise at `.github/README.md` when `.github/` exists, and otherwise at `README.md` in the repository root. Do not keep a second repository README at another level. Update relative links for the selected location, such as `../LICENSE` from `docs/` or `.github/`.
-
-The [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard) is the canonical public plugin-authoring standard and should be linked from plugin and annex documentation where authoring or lifecycle behavior is discussed. Summarize only repository-specific behavior. Official Zsh documentation remains authoritative for shell semantics, and manager-specific profiles must be identified as optional integrations rather than portable requirements.
-
 ## Line wrapping
 
 Write prose one paragraph per line, and one list item per line. Do not hard-wrap at a column width.

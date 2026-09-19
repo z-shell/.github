@@ -1949,10 +1949,6 @@ class PublicRepositoryTests(unittest.TestCase):
         documentation = (
             PUBLIC_ROOT / ".github/instructions/documentation.instructions.md"
         ).read_text(encoding="utf-8")
-        self.assertIn("## Repository READMEs", documentation)
-        self.assertIn("docs/README.md", documentation)
-        self.assertIn(".github/README.md", documentation)
-        self.assertIn("Do not keep a second repository README", documentation)
         self.assertIn("default `preserve` behavior", documentation)
 
         skill = (PUBLIC_ROOT / ".github/skills/create-readme/SKILL.md").read_text(
