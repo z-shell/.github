@@ -1945,6 +1945,66 @@ class PublicRepositoryTests(unittest.TestCase):
         for question in REQUIRED_IMPACT_QUESTIONS:
             self.assertIn(question, runbook)
 
+    def test_public_repository_aligns_readme_template_scope_and_location(self) -> None:
+        documentation = (
+            PUBLIC_ROOT / ".github/instructions/documentation.instructions.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("default `preserve` behavior", documentation)
+        self.assertIn("## Repository READMEs", documentation)
+        self.assertIn(
+            "Every maintained repository has exactly one repository landing README",
+            documentation,
+        )
+        self.assertIn(
+            "[`templates/readme/zsh-plugin.md`](../../templates/readme/zsh-plugin.md)",
+            documentation,
+        )
+        self.assertIn("**Compiled modules:**", documentation)
+        self.assertIn("when the repository is not Zsh-facing", documentation)
+
+        skill = (PUBLIC_ROOT / ".github/skills/create-readme/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Place exactly one repository README", skill)
+        self.assertIn(
+            "**Zi Annexes (`z-a-*`):** Keep Zi as the installation path",
+            skill,
+        )
+        self.assertIn("**Compiled Modules:**", skill)
+        self.assertIn(
+            "Add Zsh Plugin Standard v2 compliance only for plugin-shaped repositories",
+            skill,
+        )
+        self.assertIn(
+            "Use official Zsh manual sections for Zsh-facing repositories", skill
+        )
+
+        runbook = (PUBLIC_ROOT / "runbooks/new-repository.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "Every repository starts with exactly one repository README", runbook
+        )
+        self.assertNotIn(".prettierrc", runbook)
+
+        template = (PUBLIC_ROOT / "templates/readme/zsh-plugin.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("`docs/README.md`", template)
+        self.assertEqual(template.count('href="<license-path>"'), 2)
+        self.assertNotIn("](<license-path>)", template)
+        self.assertIn('src="<logo-path-or-url>"', template)
+        self.assertIn("default Markdown `preserve` behavior", template)
+        self.assertIn("Plugin-shaped repositories only, installation paths", template)
+        self.assertIn("Zsh plugins only, Plugin Standard", template)
+        self.assertIn("Zi annexes only", template)
+        self.assertIn("> [!IMPORTANT]\n> <Removed setting>", template)
+        self.assertNotIn("> [!IMPORTANT] <Removed setting>", template)
+
+        lychee = (PUBLIC_ROOT / ".github/lychee.toml").read_text(encoding="utf-8")
+        self.assertIn("%3Clicense-path%3E", lychee)
+        self.assertIn("%3Clogo-path-or-url%3E", lychee)
+
     def test_public_repository_requires_manifest_routing_for_all_runtimes(self) -> None:
         policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
         required_fragments = (

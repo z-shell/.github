@@ -92,7 +92,7 @@ exclude = [
   '/daweedkob',
   '/tondrejk',
   'github\.com/z-shell/%3Crepository%3E',
-  'templates/readme/(?:LICENSE|repository-owned-asset-path)$',
+  'templates/readme/(?:LICENSE|repository-owned-asset-path|%3Clicense-path%3E|%3Clogo-path-or-url%3E)$',
 ]
 
 # Exclude these filesystem paths from getting checked.

@@ -56,7 +56,7 @@ Policy:
 - use Conventional Commits for clean history and cross-repo reasoning
 - keep CI focused on validation
 - do **not** add release automation unless the repository later gains a separate packaged artifact or a clear tag-driven release workflow with maintainer buy-in
-- for Zi only, follow ADR-0027: review the release plan on the promotion pull
+- for Zi only, follow ADR-0028: review the release plan on the promotion pull
   request, treat merge as publication authorization, and publish only after
   exact-SHA validation; retain signed manual tags for recovery
 
@@ -158,7 +158,7 @@ Zi does not call the post-merge proposal workflow. Its repository-owned release-
 
 Merging that reviewed promotion is the human publication authorization. A privileged workflow then waits for the complete required-workflow allowlist to succeed on the exact merge SHA, verifies the merge identity and current `main`, and creates the annotated tag and idempotent GitHub release. It performs those two writes in one workflow because events created with `GITHUB_TOKEN` do not normally trigger another workflow.
 
-A promotion with no releasable Conventional Commits is a successful no-op. The signed manual-tag verifier remains available for recovery. Tag rules prevent deletion, update, and unauthorized creation of `v*` refs. See [ADR-0027](../decisions/0027-zi-promotion-is-release-authorization.md).
+A promotion with no releasable Conventional Commits is a successful no-op. The signed manual-tag verifier remains available for recovery. Tag rules prevent deletion, update, and unauthorized creation of `v*` refs. See [ADR-0028](../decisions/0028-zi-promotion-is-release-authorization.md).
 
 ## Release-automation decision checklist
 

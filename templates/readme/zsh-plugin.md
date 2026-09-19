@@ -1,14 +1,15 @@
-# Zsh Plugin README Template
+# Z-Shell Repository README Template
 
-Use this template for a new Z-Shell Zsh plugin repository and for a substantial README refactor. A focused correction does not need it.
+Use this template for a maintained Z-Shell repository README and for a substantial README refactor. Plugins use the body directly; annexes, tools, and modules keep the common information order while adapting plugin-specific headings, examples, links, and checklist items through the `create-readme` archetype guidance. A focused correction does not need it.
 
 ## How to use it
 
-1. Copy everything between `<!-- TEMPLATE START -->` and `<!-- TEMPLATE END -->` into the repository `README.md`.
-2. Replace every `<angle-bracket>` placeholder with repository-specific content.
-3. Delete every `<!-- ... -->` comment. Comments are guidance for the author, never README content.
-4. Drop a section marked optional when it would not help a user understand or operate the plugin. A required section may be short, but it stays.
-5. Work through the [maintainer checklist](#maintainer-checklist) before publishing.
+1. Copy everything between `<!-- TEMPLATE START -->` and `<!-- TEMPLATE END -->` into exactly one repository README: `docs/README.md` when `docs/` exists, otherwise `.github/README.md` when `.github/` exists, and otherwise `README.md` at the repository root.
+2. Replace every `<angle-bracket>` placeholder with repository-specific content, including path placeholders such as `<license-path>`.
+3. Update relative links for the chosen README location, such as `../LICENSE` from `docs/` or `.github/`.
+4. Delete every `<!-- ... -->` comment. Comments are guidance for the author, never README content.
+5. Drop a section marked optional when it would not help a user understand or operate the repository. Keep every required information category, but rename and adapt plugin-specific headings for the repository archetype.
+6. Work through the [maintainer checklist](#maintainer-checklist) before publishing.
 
 ## Section map
 
@@ -20,11 +21,11 @@ Sections run from what an evaluator needs first to what a contributor returns to
 | Features                   | Required | Why would I want it                                     |
 | Demo                       | Optional | What does it look like                                  |
 | Requirements               | Required | Can I run it                                            |
-| Installation               | Required | How do I get it, with Zi first                          |
-| Usage                      | Required | What do I do after it loads                             |
+| Installation               | Required | How do I get it                                         |
+| Usage                      | Required | What do I do after installation                         |
 | Configuration              | Required | How do I change its behavior                            |
-| Lifecycle and side effects | Required | What does it touch in my shell, and how do I remove it  |
-| Portable shell contract    | Required | Which names, files, and directories the plugin owns     |
+| Lifecycle and side effects | Required | What state or resources does it own                     |
+| Public contract            | Required | Which names, interfaces, files, and directories it owns |
 | Verification               | Required | How do I check a checkout                               |
 | Documentation and support  | Required | Where do I read more and report problems                |
 | Release model              | Required | How does it ship                                        |
@@ -33,26 +34,29 @@ Sections run from what an evaluator needs first to what a contributor returns to
 ## Styling conventions
 
 - The header is a centered HTML block: logo, title, one-sentence tagline, and a badge row of maintained signals only.
-- Secondary plugin managers live in `<details>` blocks so Zi stays the visible path.
-- GitHub alerts carry operational notes: `[!NOTE]` for compatibility floors and optional dependencies, `[!TIP]` for optional optimizations, `[!IMPORTANT]` for mandatory prerequisites and breaking configuration changes, `[!WARNING]` for terminal constraints and known conflicts. Use at most one per section.
+- For plugin-shaped repositories, secondary plugin managers live in `<details>` blocks so Zi stays the visible path.
+- GitHub alerts carry operational notes: `[!NOTE]` for compatibility floors and optional dependencies, `[!TIP]` for optional optimizations, `[!IMPORTANT]` for mandatory prerequisites and breaking configuration changes, `[!WARNING]` for terminal constraints and known conflicts. Use at most one per section, keep the marker and body on separate quoted lines, and rely on Prettier's default Markdown `preserve` behavior so formatting does not collapse the alert into plain blockquote text.
 - Reference data (styles, aliases, commands) goes in a table with explicit column alignment, surrounded by blank lines.
 - Code blocks carry a language tag (`zsh`, `bash`, `console`).
 - Prose is one paragraph per line with no hard wrapping.
 
 <!-- TEMPLATE START -->
 
+<!-- Put this content in exactly one repository README: `docs/README.md` when `docs/` exists, otherwise `.github/README.md` when `.github/` exists, and otherwise `README.md` at the repository root. Keep a single repository README and adjust relative links such as `<license-path>` for the chosen location, for example `../LICENSE` from `docs/` or `.github/`. -->
+<!-- The body below is the Zsh-plugin baseline. Annexes, tools, and modules keep the section order but replace plugin-only requirements, commands, links, and public-contract fields with the applicable create-readme archetype guidance. -->
+
 <div align="center">
   <a href="https://github.com/z-shell/<repository>">
     <img
-      src="https://raw.githubusercontent.com/z-shell/zi/main/docs/images/logo.svg"
-      alt="<Plugin name> logo"
+      src="<logo-path-or-url>"
+      alt="<Project name> logo"
       width="72"
       height="72"
     />
   </a>
 
-  <h1>&lt;Plugin name&gt;</h1>
-  <p>&lt;One sentence describing the observable value of the plugin.&gt;</p>
+  <h1>&lt;Project name&gt;</h1>
+  <p>&lt;One sentence describing the observable value of the project.&gt;</p>
   <p>
     <a href="https://github.com/z-shell/<repository>/actions/workflows/<validation-workflow>.yml">
       <img
@@ -60,7 +64,7 @@ Sections run from what an evaluator needs first to what a contributor returns to
         alt="CI status"
       />
     </a>
-    <a href="LICENSE">
+    <a href="<license-path>">
       <img
         src="https://img.shields.io/github/license/z-shell/<repository>"
         alt="License"
@@ -85,11 +89,13 @@ Sections run from what an evaluator needs first to what a contributor returns to
 
 ## Requirements
 
-- Zsh <supported version or "a currently supported Zsh release">
+- <Runtime and supported version>
 - `<required-command>` available on `PATH`
 - <Platform or terminal constraint, if any>
 
 ## Installation
+
+<!-- Plugin-shaped baseline: annexes keep Zi only; tools and modules replace this section with their archetype-specific installation or deployment path. -->
 
 ### Zi
 
@@ -172,6 +178,8 @@ From the repository root:
 
 ## Documentation and support
 
+<!-- Keep only links that apply to the archetype. Zsh, Plugin Standard, and Zi links are not required for non-Zsh-facing repositories. -->
+
 - [Z-Shell wiki](https://wiki.zshell.dev/)
 - [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
 - [Zsh documentation](https://zsh.sourceforge.io/Doc/)
@@ -184,7 +192,7 @@ From the repository root:
 
 ## Contributing and license
 
-Contributions follow the [Z-Shell organization guidance](https://github.com/z-shell/.github). This project is distributed under the terms in [LICENSE](LICENSE).
+Contributions follow the [Z-Shell organization guidance](https://github.com/z-shell/.github). This project is distributed under the terms in <a href="<license-path>">LICENSE</a>.
 
 ---
 
@@ -200,23 +208,29 @@ Accuracy:
 
 - [ ] The purpose and feature claims match current implementation behavior.
 - [ ] Public settings, aliases, functions, hooks, and defaults are complete.
-- [ ] Load failures, partial cleanup, and ownership-aware unload behavior are documented.
+- [ ] For plugin-shaped repositories, load failures, partial cleanup, and ownership-aware unload behavior are documented.
 - [ ] The verification command runs from a clean checkout.
 
-Installation paths:
+Plugin-shaped repositories only, installation paths:
 
-- [ ] Zi is the first installation path.
-- [ ] Other manager examples are intentionally supported or verified.
+- [ ] Zi is the first installation path for plugins and the installation path for annexes.
+- [ ] Other manager examples appear only when the repository intentionally supports or verifies them.
 - [ ] Manager-specific profiles are distinguished from portable requirements.
 - [ ] No competitor comparison creates an avoidable drift obligation.
 
-Plugin Standard:
+Zsh plugins only, Plugin Standard:
 
 - [ ] One portable ASCII identifier owns every persistent shell-visible name.
 - [ ] Ordinary public configuration uses one namespaced `zstyle` context.
 - [ ] Portable code neither requires nor mutates a shared plugin registry.
 - [ ] Plugin-owned state is namespaced, option changes are scoped, and unload reverses every owned side effect.
 - [ ] Plugin load performs no network activity.
+
+Zi annexes only:
+
+- [ ] Registered ice modifiers and annex hooks match the implementation.
+- [ ] Annex-owned state and unload behavior are documented.
+- [ ] Portable claims are limited to manager-independent behavior.
 
 Presentation:
 

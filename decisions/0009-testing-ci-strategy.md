@@ -74,7 +74,7 @@ rollout status per repository is tracked in issue #454, not restated here.
 3. **Git-consumed source** (`zi`, most plugins/annexes) — **validation-only**: the
    baseline checks above, plus ZUnit where the plugin ships tests. No coverage
    gate; these repos are consumed from source and the bar is "does not break on
-   load." Release automation is absent by default. ADR-0027's named Zi
+   load." Release automation is absent by default. ADR-0028's named Zi
    milestone exception requires a reviewed promotion plan and successful
    required workflows on the exact promotion merge SHA before the automatic
    tag and GitHub release are published. A manually pushed recovery tag keeps
@@ -105,7 +105,7 @@ that a ruleset enforces it.
   instead of inferring policy from each workflow.
 - New repositories have an explicit target CI scope for their class.
 - "Validation-only for git-consumed repositories" remains the default rule,
-  while ADR-0027 owns Zi's narrow approval-gated milestone exception.
+  while ADR-0028 owns Zi's narrow approval-gated milestone exception.
 - The testing instruction distinguishes the organization target from verified
   repository-local enforcement so agents do not infer live gates from policy
   prose or workflow-file presence.
@@ -124,7 +124,7 @@ that a ruleset enforces it.
 ## References
 
 - `decisions/0007-release-publication-flow.md` — repository classes.
-- `decisions/0027-zi-promotion-is-release-authorization.md` - Zi milestone
+- `decisions/0028-zi-promotion-is-release-authorization.md` - Zi milestone
   publication boundary.
 - `decisions/0019-trunk-on-main-default.md` - branch model and named exception.
 - `decisions/0005-workflow-naming-conventions.md` — workflow naming baseline.

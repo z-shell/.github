@@ -4,7 +4,7 @@
 - **Date:** 2026-05-26
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** `decisions/0027-zi-promotion-is-release-authorization.md` (Zi milestone exception only)
+- **Superseded by:** `decisions/0028-zi-promotion-is-release-authorization.md` (Zi milestone exception only)
 
 ## Context
 
@@ -78,7 +78,7 @@ Per-repo application:
 
 ### Zi milestone-release exception
 
-ADR-0027 supersedes this exception. A reviewed `next` to `main` promotion is now Zi's human publication boundary when the promoted range contains releasable commits. Zi displays the version and release-note plan before merge, then creates the annotated tag and GitHub release only after every required workflow succeeds on the exact merge SHA. The maintainer-signed tag path remains available for recovery.
+ADR-0028 supersedes this exception. A reviewed `next` to `main` promotion is now Zi's human publication boundary when the promoted range contains releasable commits. Zi displays the version and release-note plan before merge, then creates the annotated tag and GitHub release only after every required workflow succeeds on the exact merge SHA. The maintainer-signed tag path remains available for recovery.
 
 ## Consequences
 
@@ -88,7 +88,7 @@ ADR-0027 supersedes this exception. A reviewed `next` to `main` promotion is now
 - `release-please` is not adopted org-wide; it remains available to revisit per
   repo if a maintainer wants automated changelog/version PRs.
 - Class-3 repositories remain validation-only by default. Zi is the named
-  exception governed by ADR-0027.
+  exception governed by ADR-0028.
 
 ## Alternatives considered
 
@@ -112,8 +112,8 @@ ADR-0027 supersedes this exception. A reviewed `next` to `main` promotion is now
 - Tracker: `zsh-lint#21`, `zsh#8`, `zi#346`.
 - [Issue #583](https://github.com/z-shell/.github/issues/583) and
   [zi#468](https://github.com/z-shell/zi/issues/468): approved Zi
-  milestone-release automation, superseded for the normal path by ADR-0027.
-- [ADR-0027](0027-zi-promotion-is-release-authorization.md): Zi promotion as
+  milestone-release automation, superseded for the normal path by ADR-0028.
+- [ADR-0028](0028-zi-promotion-is-release-authorization.md): Zi promotion as
   release authorization.
 - [Issue #497](https://github.com/z-shell/.github/issues/497) and
   [z-shell/zpmod#70](https://github.com/z-shell/zpmod/issues/70): accepted

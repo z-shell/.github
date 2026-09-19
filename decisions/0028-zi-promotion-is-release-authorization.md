@@ -1,4 +1,4 @@
-# 27. Zi Promotion Is Release Authorization
+# 28. Zi Promotion Is Release Authorization
 
 - **Status:** ACCEPTED
 - **Date:** 2026-09-20
