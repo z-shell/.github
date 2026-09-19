@@ -1959,6 +1959,7 @@ class PublicRepositoryTests(unittest.TestCase):
             "**Zi Annexes (`z-a-*`):** Keep Zi as the installation path",
             skill,
         )
+        self.assertIn("**Compiled Modules:**", skill)
 
         runbook = (PUBLIC_ROOT / "runbooks/new-repository.md").read_text(
             encoding="utf-8"
