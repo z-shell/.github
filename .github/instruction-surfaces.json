@@ -958,6 +958,20 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0025-planner-implementation",
+      "path": "decisions/0025-guided-setup-planner-first.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["implementation"],
+      "file_patterns": [
+        "public/sh/install.sh,public/sh/setup.sh,public/setup/**,tests/installers.sh"
+      ],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-0026",
       "path": "decisions/0026-review-triggers-and-fallback.md",
       "kind": "decision",
