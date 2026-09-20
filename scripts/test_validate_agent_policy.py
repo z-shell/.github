@@ -530,15 +530,45 @@ class AgentPolicyValidatorTests(unittest.TestCase):
 
         self.assert_error_contains(errors, "organization-policy", "duplicate")
 
-    def test_rejects_duplicate_paths(self) -> None:
-        self.manifest["surfaces"].append(
-            make_surface("duplicate-agent-policy", "AGENTS.md")
-        )
+    def test_rejects_duplicate_route_selectors(self) -> None:
+        route = copy.deepcopy(self.manifest["surfaces"][0])
+        route["id"] = "duplicate-agent-policy"
+        route["canonical_for"] = []
+        self.manifest["surfaces"].append(route)
         write_manifest(self.root, self.manifest)
 
         errors = validator.validate(self.root)
 
-        self.assert_error_contains(errors, "AGENTS.md", "duplicate")
+        self.assert_error_contains(errors, "AGENTS.md", "duplicate route selectors")
+
+    def test_allows_distinct_routes_to_the_same_path(self) -> None:
+        route = copy.deepcopy(self.manifest["surfaces"][0])
+        route["id"] = "agent-policy-implementation"
+        route["tasks"] = ["implementation"]
+        route["file_patterns"] = ["public/sh/setup.sh"]
+        route["canonical_for"] = []
+        self.manifest["surfaces"].append(route)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assertEqual(errors, [])
+
+    def test_rejects_conflicting_metadata_for_shared_path(self) -> None:
+        route = make_surface(
+            "agent-policy-implementation",
+            "AGENTS.md",
+            kind="decision",
+            tasks=["implementation"],
+            file_patterns=["public/sh/setup.sh"],
+        )
+        route["canonical_for"] = []
+        self.manifest["surfaces"].append(route)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "AGENTS.md", "shared-file field 'kind'")
 
     def test_rejects_duplicate_canonical_owner(self) -> None:
         self.manifest["surfaces"][1]["canonical_for"].append("organization-policy")
@@ -2092,6 +2122,32 @@ class PublicRepositoryTests(unittest.TestCase):
             ],
         )
         self.assertEqual(surfaces["zsh-standard-policy"]["tasks"], ["zsh-standard"])
+
+    def test_public_manifest_routes_guided_setup_decisions_to_implementation(
+        self,
+    ) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        architecture = surfaces["decision-0029"]
+        planner = surfaces["decision-0025-planner-implementation"]
+        topology = surfaces["decision-0029-planner-implementation"]
+
+        self.assertEqual(architecture["tasks"], ["architecture-decision"])
+        self.assertEqual(architecture["file_patterns"], ["**"])
+        self.assertNotEqual(planner["path"], architecture["path"])
+        self.assertEqual(topology["path"], architecture["path"])
+        for implementation in (planner, topology):
+            self.assertEqual(implementation["tasks"], ["implementation"])
+            self.assertEqual(
+                implementation["file_patterns"],
+                [
+                    "public/sh/install.sh,public/sh/setup.sh,public/setup/**,"
+                    "tests/installers.sh"
+                ],
+            )
+            self.assertTrue(implementation["required"])
 
     def test_public_repository_declares_learning_capture_surfaces(self) -> None:
         manifest = json.loads(

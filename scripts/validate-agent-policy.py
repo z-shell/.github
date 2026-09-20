@@ -502,7 +502,10 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
         surfaces_value = []
 
     seen_ids: dict[str, int] = {}
-    seen_paths: dict[Path, str] = {}
+    seen_paths: dict[Path, tuple[str, dict[str, object]]] = {}
+    seen_routes: dict[
+        tuple[Path, tuple[str, ...], tuple[str, ...], tuple[str, ...]], str
+    ] = {}
     seen_canonical_domains: dict[str, str] = {}
     declared_inventory: set[str] = set()
 
@@ -741,16 +744,44 @@ def validate_manifest(root: Path, manifest: dict[str, object]) -> list[str]:
                     f"set kind to {expected_kind!r} for surface {name!r}",
                 )
             )
-        if resolved in seen_paths:
-            errors.append(
-                error(
-                    relative_path,
-                    f"duplicate declared path also used by {seen_paths[resolved]!r}",
-                    f"give every surface in {MANIFEST_PATH} a unique path",
-                )
-            )
+        prior_path = seen_paths.get(resolved)
+        if prior_path is None:
+            seen_paths[resolved] = (name, surface)
         else:
-            seen_paths[resolved] = name
+            prior_name, prior_surface = prior_path
+            for field in ("kind", "authority", "review_owner"):
+                if surface.get(field) != prior_surface.get(field):
+                    errors.append(
+                        error(
+                            relative_path,
+                            f"route {name!r} conflicts with {prior_name!r} on "
+                            f"shared-file field {field!r}",
+                            f"use the same {field} for every route to {relative_path}",
+                        )
+                    )
+
+        if all(
+            _string_list(surface.get(field))
+            for field in ("consumers", "tasks", "file_patterns")
+        ):
+            route_key = (
+                resolved,
+                tuple(sorted(cast(list[str], surface["consumers"]))),
+                tuple(sorted(cast(list[str], surface["tasks"]))),
+                tuple(sorted(cast(list[str], surface["file_patterns"]))),
+            )
+            prior_route = seen_routes.get(route_key)
+            if prior_route is not None:
+                errors.append(
+                    error(
+                        relative_path,
+                        f"duplicate route selectors also used by {prior_route!r}",
+                        "change the consumers, tasks, or file_patterns so each "
+                        "route selects a distinct context",
+                    )
+                )
+            else:
+                seen_routes[route_key] = name
 
         try:
             is_regular_file = resolved.is_file()
