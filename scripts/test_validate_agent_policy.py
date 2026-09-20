@@ -2123,26 +2123,31 @@ class PublicRepositoryTests(unittest.TestCase):
         )
         self.assertEqual(surfaces["zsh-standard-policy"]["tasks"], ["zsh-standard"])
 
-    def test_public_manifest_routes_adr_0025_to_planner_implementation(self) -> None:
+    def test_public_manifest_routes_guided_setup_decisions_to_implementation(
+        self,
+    ) -> None:
         manifest = json.loads(
             (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
         )
         surfaces = {item["id"]: item for item in manifest["surfaces"]}
-        architecture = surfaces["decision-0025"]
-        implementation = surfaces["decision-0025-planner-implementation"]
+        architecture = surfaces["decision-0029"]
+        planner = surfaces["decision-0025-planner-implementation"]
+        topology = surfaces["decision-0029-planner-implementation"]
 
         self.assertEqual(architecture["tasks"], ["architecture-decision"])
         self.assertEqual(architecture["file_patterns"], ["**"])
-        self.assertEqual(implementation["path"], architecture["path"])
-        self.assertEqual(implementation["tasks"], ["implementation"])
-        self.assertEqual(
-            implementation["file_patterns"],
-            [
-                "public/sh/install.sh,public/sh/setup.sh,public/setup/**,"
-                "tests/installers.sh"
-            ],
-        )
-        self.assertTrue(implementation["required"])
+        self.assertNotEqual(planner["path"], architecture["path"])
+        self.assertEqual(topology["path"], architecture["path"])
+        for implementation in (planner, topology):
+            self.assertEqual(implementation["tasks"], ["implementation"])
+            self.assertEqual(
+                implementation["file_patterns"],
+                [
+                    "public/sh/install.sh,public/sh/setup.sh,public/setup/**,"
+                    "tests/installers.sh"
+                ],
+            )
+            self.assertTrue(implementation["required"])
 
     def test_public_repository_declares_learning_capture_surfaces(self) -> None:
         manifest = json.loads(

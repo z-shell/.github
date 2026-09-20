@@ -1008,6 +1008,32 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0029",
+      "path": "decisions/0029-guided-setup-configuration-topology-and-entrypoint.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
+      "id": "decision-0029-planner-implementation",
+      "path": "decisions/0029-guided-setup-configuration-topology-and-entrypoint.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["implementation"],
+      "file_patterns": [
+        "public/sh/install.sh,public/sh/setup.sh,public/setup/**,tests/installers.sh"
+      ],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-index",
       "path": "decisions/README.md",
       "kind": "runbook",

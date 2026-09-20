@@ -4,7 +4,7 @@
 - **Date:** 2026-09-18
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** `decisions/0029-guided-setup-configuration-topology-and-entrypoint.md` for the configuration topology and startup integration details
 
 ## Context
 
