@@ -1050,6 +1050,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0030",
+      "path": "decisions/0030-zsh-lint-parser-fork-trigger-fired.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-index",
       "path": "decisions/README.md",
       "kind": "runbook",
