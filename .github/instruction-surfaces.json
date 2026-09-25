@@ -422,7 +422,7 @@
       "path": ".github/skills/zsh-manual-research/SKILL.md",
       "kind": "skill",
       "authority": "advisory",
-      "consumers": ["copilot"],
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
       "tasks": [
         "zsh-semantics-research",
         "zsh-lint-parser-gap",

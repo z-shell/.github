@@ -6,15 +6,16 @@ description: Use when a task depends on what Zsh itself does, such as investigat
 # Research Zsh behavior from primary sources
 
 The released official Zsh manual is the semantic authority
-(`zsh/authority/released-manual` in
-`.github/instructions/zsh-scripting.instructions.md`), and released `zsh` is
-the syntax authority (`zsh/validation/native-authority`). This skill says how
+(`zsh/authority/released-manual` in the
+[Zsh scripting standard](https://github.com/z-shell/.github/blob/main/.github/instructions/zsh-scripting.instructions.md)),
+and released `zsh` is the syntax authority (`zsh/validation/native-authority`). This skill says how
 to reach both and how to record what you found. It adds no rules of its own.
 
 ## Find the baseline
 
-1. Read the reviewed release in `lib/zsh-standard-policy.json`
-   (`stable_release.version`) and the owning repository's compatibility floor.
+1. Read the reviewed release, `stable_release.version` in the
+   [standard policy record](https://github.com/z-shell/.github/blob/main/lib/zsh-standard-policy.json), and the owning
+   repository's compatibility floor.
 2. Run `zsh --version` for the binary you will use as the oracle. If it
    differs from the reviewed release, say so wherever you cite it.
 
@@ -38,15 +39,16 @@ to reach both and how to record what you found. It adds no rules of its own.
    directory.
 4. **Zsh source at the release tag** (`Src/parse.c`, `Src/lex.c`,
    `Src/subst.c`, `Doc/Zsh/*.yo`), only when the manual is silent and a
-   grammar question needs it. Use the tag matching the reviewed release
-   (`zsh-5.9.2` in `https://git.code.sf.net/p/zsh/code`). A vendored or
-   development snapshot is not the release.
+   grammar question needs it. Use the tag for the reviewed release,
+   `zsh-<stable_release.version>` in `https://git.code.sf.net/p/zsh/code`
+   (`zsh-5.9.2` today). A vendored or development snapshot is not the release.
 5. **The zsh-workers archive and `NEWS`/release notes**, for why behavior
    changed and in which release.
 
 These do not ground a Zsh claim: memory of the manual, the Bash manual,
-POSIX (except where the Zsh manual defers to it), ShellCheck, what `mvdan/sh`
-or another parser accepts, blog posts, and answers on Q&A sites. They may
+POSIX (except where the Zsh manual defers to it), ShellCheck
+(`zsh/validation/no-shellcheck`), what `mvdan/sh` or another parser accepts
+(`zsh/validation/parser-gap`), blog posts, and answers on Q&A sites. They may
 suggest where to look.
 
 ## When sources disagree
@@ -66,15 +68,17 @@ Every conclusion names its manual section as a link,
 page name when that helps a reader offline, for example
 `zshmisc(1), Complex Commands`.
 
-In zsh-lint, the citation is checked:
+In z-shell/zsh-lint:
 
-- A rule's doc comment links the manual or Plugin Standard section in its Why
-  text (`docs/project/rule-policy.md`, "Manual grounding").
-- A parser issue body links the section that defines the construct, and every
-  new `gap-`, `ok-` or `invalid-` fixture carries a `# Manual: <url>` line
-  (`docs/project/parser-gap-workflow.md`, "Classify" and "Promote to
-  fixture"). `internal/manualcite` fails on a missing citation or a page the
-  released manual does not have.
+- A parser issue body links the section that defines the construct
+  (`docs/project/parser-gap-workflow.md`, "Classify"). This is a workflow
+  requirement; nothing checks it.
+- A rule's doc comment links the manual or Plugin Standard section
+  (`docs/project/rule-policy.md`, "Manual grounding"), and every new `gap-`,
+  `ok-` or `invalid-` fixture carries a `# Manual: <url>` line
+  (`parser-gap-workflow.md`, "Promote to fixture"). `internal/manualcite`
+  checks both and fails on a missing citation or a page the released manual
+  does not have.
 
 For Plugin Standard questions, the canonical source is the
 [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard);
