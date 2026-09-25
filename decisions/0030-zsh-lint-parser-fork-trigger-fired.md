@@ -1,8 +1,8 @@
 # 30. The zsh-lint Parser-Fork Trigger Has Fired: Fork the Syntax Package and Migrate Adapters by Family
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-25
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
