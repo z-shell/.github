@@ -418,6 +418,22 @@
       "canonical_for": []
     },
     {
+      "id": "skill-zsh-manual-research",
+      "path": ".github/skills/zsh-manual-research/SKILL.md",
+      "kind": "skill",
+      "authority": "advisory",
+      "consumers": ["copilot"],
+      "tasks": [
+        "zsh-semantics-research",
+        "zsh-lint-parser-gap",
+        "zsh-lint-rule-proposal"
+      ],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "runbook-adr",
       "path": "runbooks/adr.md",
       "kind": "runbook",
