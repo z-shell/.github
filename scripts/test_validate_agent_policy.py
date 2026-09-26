@@ -215,6 +215,92 @@ class AgentPolicyValidatorTests(unittest.TestCase):
     def test_valid_repository_has_no_errors(self) -> None:
         self.assertEqual(validator.validate(self.root), [])
 
+    def _install_org_routing(self, downstream: object) -> None:
+        write_file(
+            self.root,
+            validator.ORG_ROUTING_SCRIPT,
+            (PUBLIC_ROOT / validator.ORG_ROUTING_SCRIPT).read_text(encoding="utf-8"),
+        )
+        self.manifest["surfaces"].append(
+            make_surface(
+                "org-routing-generator",
+                validator.ORG_ROUTING_SCRIPT,
+                kind="enforcement",
+                authority="canonical-detail",
+                consumers=["ci", "human"],
+                tasks=["validation"],
+            )
+        )
+        self.manifest["surfaces"].append(
+            make_surface(
+                "skill-code-review",
+                REVIEW_SKILL_PATH,
+                kind="skill",
+                tasks=["code-review"],
+                required=False,
+            )
+        )
+        if downstream is not None:
+            self.manifest["downstream"] = downstream
+        write_manifest(self.root, self.manifest)
+        write_file(
+            self.root,
+            "lib/approved-skills.json",
+            json.dumps(
+                {
+                    "version": 1,
+                    "source": "z-shell/.github",
+                    "skills": {
+                        "code-review": {
+                            "path": ".github/skills/code-review",
+                            "revision": "a" * 40,
+                            "digest": "b" * 64,
+                            "files": ["SKILL.md"],
+                        }
+                    },
+                }
+            )
+            + "\n",
+        )
+
+    def test_downstream_inventory_is_validated_once_the_generator_exists(self) -> None:
+        self.manifest["surfaces"] = [
+            surface
+            for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(
+            [{"repository": "z-shell/zi", "vendored_skills": ["code-review"]}]
+        )
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_generator_without_downstream_inventory_is_rejected(self) -> None:
+        self.manifest["surfaces"] = [
+            surface
+            for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(None)
+        self.assert_error_contains(
+            validator.validate(self.root), "downstream inventory is missing"
+        )
+
+    def test_invalid_downstream_inventory_is_rejected(self) -> None:
+        self.manifest["surfaces"] = [
+            surface
+            for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(
+            [
+                {"repository": "z-shell/zi", "vendored_skills": ["unapproved"]},
+                {"repository": "z-shell/.github"},
+            ]
+        )
+        errors = validator.validate(self.root)
+        self.assert_error_contains(errors, "unapproved", "no approved revision")
+        self.assert_error_contains(errors, "canonical repository is not downstream")
+
     def test_rejects_corrupt_canonical_review_skill(self) -> None:
         cases = (
             "not frontmatter\n",

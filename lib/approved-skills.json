@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "z-shell/.github",
+  "skills": {
+    "code-review": {
+      "path": ".github/skills/code-review",
+      "revision": "e1f8f6c1c9dd61e87f2e5f44ef6285992b8b892d",
+      "digest": "1bd83aa417ab0aaf7ad3e26d6027435b4938cfc1dfda933aa5c702c829f37b02",
+      "files": ["SKILL.md"]
+    },
+    "zi-install": {
+      "path": ".github/skills/zi-install",
+      "revision": "1bfbf33a545c4d521b60d535559005f0953b4af4",
+      "digest": "ec10708bab341727abccd89e58b39e72d5f832decf7274161fa63a1f3a4ceffe",
+      "files": ["SKILL.md"]
+    }
+  }
+}

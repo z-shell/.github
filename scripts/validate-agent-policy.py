@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -105,9 +106,18 @@ ENFORCEMENT_INVENTORY = {
     ".github/workflows/agent-instructions.yml": "enforcement",
     "scripts/validate-agent-policy.py": "enforcement",
     "scripts/decision-records.py": "enforcement",
+    "scripts/org-routing.py": "enforcement",
+    ".github/workflows/org-routing.yml": "enforcement",
 }
 PUBLIC_SCAN_EXEMPTIONS = {"scripts/validate-agent-policy.py"}
-ALLOWED_MANIFEST_FIELDS = {"version", "repository", "canonical_policy", "surfaces"}
+ALLOWED_MANIFEST_FIELDS = {
+    "version",
+    "repository",
+    "canonical_policy",
+    "surfaces",
+    "downstream",
+}
+ORG_ROUTING_SCRIPT = "scripts/org-routing.py"
 ALLOWED_SURFACE_FIELDS = set(REQUIRED_SURFACE_FIELDS)
 ALLOWED_EXCLUDE_AGENTS = {"cloud-agent", "code-review"}
 
@@ -1461,9 +1471,71 @@ def validate(root: Path) -> list[str]:
         validate_review_skill,
         validate_adapters,
         validate_runtime_guidance_layout,
+        validate_downstream_routing,
     ):
         errors.extend(validator(root, manifest))
     return sorted(set(errors))
+
+
+def _load_org_routing(root: Path) -> object | None:
+    script = root / ORG_ROUTING_SCRIPT
+    try:
+        mode = script.lstat().st_mode
+    except OSError:
+        return None
+    if not stat.S_ISREG(mode):
+        return None
+    spec = importlib.util.spec_from_file_location("org_routing", script)
+    if spec is None or spec.loader is None:
+        return None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def validate_downstream_routing(root: Path, manifest: dict[str, object]) -> list[str]:
+    """Validate the downstream inventory with the generator's own schema check.
+
+    ADR-0031 keeps one inventory and one generator; the validator reuses the
+    generator's validation so the two cannot disagree about the schema. Like
+    the rest of the enforcement inventory, the check applies once the
+    generator is present in the repository.
+    """
+    if not os.path.lexists(root / ORG_ROUTING_SCRIPT):
+        return []
+    if not isinstance(manifest, dict) or "downstream" not in manifest:
+        return [
+            error(
+                MANIFEST_PATH,
+                "downstream inventory is missing",
+                "declare every consuming repository under downstream (decisions/0031)",
+            )
+        ]
+    routing = _load_org_routing(root)
+    if routing is None:
+        return [
+            error(
+                ORG_ROUTING_SCRIPT,
+                "routing generator is missing or not a regular file",
+                f"restore {ORG_ROUTING_SCRIPT}",
+            )
+        ]
+    approved_path = root / routing.APPROVED_PATH  # type: ignore[attr-defined]
+    try:
+        approved = routing.load_json(approved_path)  # type: ignore[attr-defined]
+    except (OSError, UnicodeError, ValueError) as exc:
+        return [
+            error(
+                routing.APPROVED_PATH,  # type: ignore[attr-defined]
+                f"cannot read approved skill revisions: {exc}",
+                "restore a valid JSON file",
+            )
+        ]
+    return list(routing.validate_downstream(manifest["downstream"])) + list(  # type: ignore[attr-defined]
+        routing.validate_approved(  # type: ignore[attr-defined]
+            approved, root, manifest["downstream"], manifest.get("surfaces")
+        )
+    )
 
 
 def main() -> int:
