@@ -1062,6 +1062,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0031",
+      "path": "decisions/0031-per-repository-instruction-routing-delivery.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "instruction-change"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-index",
       "path": "decisions/README.md",
       "kind": "runbook",
