@@ -34,6 +34,52 @@ A repository's `AGENTS.md` may declare automation-only diff classes that need no
 6. Batch the thread fixes and push them once before the next Copilot request; that is one round. After the second round in which Copilot raises only implementation-level or wording findings, the maintainer decides whether to defer the rest to an issue instead of requesting a third review.
 7. Any push after a fallback review, a rebase included, voids it ([z-shell/.github#664](https://github.com/z-shell/.github/issues/664)). Post a new fallback review on the new head before merging.
 
+### Write a readable fallback review
+
+Keep the exact ADR-0026 opening marker appropriate to the actual request history. Use a short linked commit label elsewhere instead of repeating full hashes. Scale the presentation to the diff: a small fix may need only labeled bullets; a substantive review may benefit from headings and a collapsible evidence section. The example below is a starting point, not a fixed checklist or a substitute for executing the review.
+
+- **Findings first:** state actionable findings by severity, with the exact location, trigger, consequence and remedy. Post inline threads as section 3 requires. When there are no actionable findings, say so directly.
+- **Visible decisions and limits:** keep merge blockers, unresolved decisions, self-review status and material verification gaps outside collapsed sections. A short `NOTE` alert can make the self-review limit visible without implying merge approval.
+- **Evidence by area:** give each relevant checklist area a verdict and concrete evidence. Use short labeled bullets or paragraphs for explanations; reserve tables for compact comparisons. Do not repair prose-heavy tables with forced line breaks or `<br>` tags.
+- **Verification status:** distinguish passed, failed, skipped and unavailable checks. Explain meaningful skips and link source, commit and CI evidence. A passing test suite alone does not prove compatibility, authority or delivery.
+- **Optional detail:** use one clearly labeled `<details>` section for lengthy supporting evidence, commands or logs when useful. Keep its conclusions visible. Use fenced code with a language tag for reproducible snippets; choose Markdown features for their purpose rather than decoration.
+- **Follow-up:** separate deferred work from current findings and identify its existing issue or proposed owner. Do not imply approval to create or implement further work.
+
+Use one paragraph or list item per source line, with blank lines around headings, lists and Markdown inside `<details>`, following the [documentation instructions](../.github/instructions/documentation.instructions.md#line-wrapping). GitHub documents [collapsed sections](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-collapsed-sections) and [alerts](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#alerts).
+
+Before posting or updating, check the exact text with GitHub's Markdown renderer and inspect the target review at desktop and narrow widths when available. If rendering cannot be inspected, report that limitation. Send multiline text by file, then verify the stored body and reviewed commit. Reformat an existing review in place only when its evidence, verdict and reviewed HEAD remain unchanged; preserve historical correction comments and request-history records. A new source HEAD requires a newly executed and posted review under ADR-0026, not an edit that carries old evidence forward.
+
+Example for a maintainer-elected fallback without a Copilot request: replace every bracketed placeholder, and use the other opening marker from section 3 when a real request did not register.
+
+```markdown
+Fallback review under ADR-0026: maintainer elected, no Copilot request on [full reviewed SHA]
+
+### Findings
+
+[Findings ordered by severity, or "No actionable findings."]
+
+**Scope:** [Latest commit and complete diff reviewed, with an issue or diff link.]
+
+> [!NOTE]
+> This is a maintainer-elected self-review, not an independent review or approval to merge.
+
+### Validation
+
+- **Passed:** [Checks and evidence links.]
+- **Skipped or unavailable:** [Checks, reasons and their effect on confidence.]
+
+<details>
+<summary>Checklist verdicts and supporting evidence</summary>
+
+- **[Relevant area]: [verdict].** [Concrete evidence. Repeat only for relevant areas.]
+
+</details>
+
+### Limits and follow-up
+
+[Material coverage limits, blockers or decisions, and separately recorded follow-up work.]
+```
+
 ### Diagnose an unregistered request
 
 - Record the request time, repository, base branch, head SHA, request path/reviewer identifier, response and new timeline events. Check for a Copilot review or run as well; another reviewer's event is not confirmation.
