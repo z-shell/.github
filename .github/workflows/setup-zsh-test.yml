@@ -63,4 +63,13 @@ jobs:
           if [[ $EXPECTED_VERSION != latest ]]; then
             [[ $(zsh -f -c 'printf "%s" "$ZSH_VERSION"') == "$EXPECTED_VERSION" ]]
           fi
-          zsh -f -c 'zmodload zsh/system; autoload -Uz compinit; compinit -D'
+          zsh -f -c '
+            if [[ $1 == latest ]]; then
+              # Check the installed package tree, not runner vendor completions.
+              fpath=(/usr/share/zsh/functions/**/*(N/))
+              _compdir=
+            fi
+            zmodload zsh/system
+            autoload -Uz compinit
+            compinit -D
+          ' zsh "$EXPECTED_VERSION"
