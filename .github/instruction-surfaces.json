@@ -627,6 +627,18 @@
       "canonical_for": ["worktree-management-procedure"]
     },
     {
+      "id": "runbook-zsh-lint-ci",
+      "path": "runbooks/zsh-lint-ci.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["zsh-lint-integration"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["zsh-lint-integration"]
+    },
+    {
       "id": "runbook-pull-requests",
       "path": "runbooks/pull-requests.md",
       "kind": "runbook",
@@ -1070,6 +1082,18 @@
       "tasks": ["architecture-decision", "instruction-change"],
       "file_patterns": ["**"],
       "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
+      "id": "decision-0033",
+      "path": "decisions/0033-shared-zsh-quality-boundaries.md",
+      "kind": "decision",
+      "authority": "advisory",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "zsh-lint-integration"],
+      "file_patterns": ["**"],
+      "required": false,
       "review_owner": "z-shell maintainers",
       "canonical_for": []
     },
