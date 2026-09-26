@@ -117,8 +117,11 @@ Composite actions currently available to all repositories via `z-shell/.github/a
 
 ```yaml
 steps:
-  - uses: z-shell/.github/actions/setup-zsh@main
+  # After checking out this repository; external callers use a full SHA pin.
+  - uses: ./actions/setup-zsh
 ```
+
+For the version contract and exact Linux installs, see the [`setup-zsh` action documentation](../actions/setup-zsh/README.md).
 
 ## Workflow Templates
 
