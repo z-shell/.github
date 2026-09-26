@@ -1991,7 +1991,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "42253682933ea0388c34d24dcfd3a4b3a7cc88553b03b1ac9b4fd62f4b643e57",
+            "a72489d8a0d5fcf6e405fdc067e94c185530637d2954d263becdfb24c2a2adbb",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "

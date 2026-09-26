@@ -38,8 +38,8 @@ permissions:
 
 ### Action Pinning
 
-- **Immutable Commit SHAs**: Every external action `uses:` reference MUST be pinned to a full 40-character commit SHA.
-- **Version Comments**: Append a human-readable version comment after the SHA for auditability.
+- **Immutable Commit SHAs**: Every remote action and reusable workflow `uses:` reference, including organization references, MUST be pinned to a full 40-character commit SHA.
+- **Version Comments**: Append the associated release version after the SHA for auditability (e.g., `# v4.3.1`). For organization reusable workflows from `z-shell/.github/.github/workflows/` without an adopted workflow release, retain the established interim `# main` comment. The comment identifies the source branch; the full SHA selects the code.
 - **Prohibited**: Never use mutable tags (e.g., `@v4`, `@main`, `@latest`).
 
 ```yaml
@@ -49,6 +49,14 @@ permissions:
 # Forbidden
 - uses: actions/checkout@v4
 ```
+
+### Interim pinact exception for organization reusable workflows
+
+pinact 4.1.1 rejects the interim `# main` comment on a SHA pin because it requires a version comment. Reuse [the shared pinact template](../../templates/pinact/.pinact.yaml), observed in [zunit#27](https://github.com/z-shell/zunit/pull/27) and [zpmod#114](https://github.com/z-shell/zpmod/pull/114). Copy it to the caller repository's `.pinact.yaml` only when no pinact configuration exists. Otherwise merge the `ignore_actions` entry into the existing configuration, preserving its settings and avoiding a second competing config file. The template retains configuration version 3; it does not install or enable pinact.
+
+The exception matches only `z-shell/.github/.github/workflows/` references with a full lowercase 40-hex SHA. Mutable refs, other organization actions and third-party actions remain subject to pinact's checks. pinact skips all validation and updates for matching entries, not just the comment check: the regex restricts the ref's shape but does not verify the commit exists, belongs to the repository, or has been reviewed. Continue to verify the selected workflow and commit through the repository's checks and PR review. Do not broaden the exception or use a branch or tag as the actual ref.
+
+This is an interim compatibility measure for [#663](https://github.com/z-shell/.github/issues/663). Once [#543](https://github.com/z-shell/.github/issues/543) establishes the applicable immutable workflow releases and a caller adopts them, use the associated workflow release comment and remove its unused exception. Downstream adoption and release changes require their own reviewed rollout. See [pinact 4.1.1 configuration](https://github.com/suzuki-shunsuke/pinact/blob/v4.1.1/docs/config.md#ignore_actions) for exception semantics.
 
 ### Permissions (Least Privilege)
 
@@ -99,5 +107,6 @@ new uses; migrate existing uses through their owning rollout and runbook.
 - [ ] Workflow `name:` and Job `name:` contain NO emojis.
 - [ ] Top-level `permissions:` is declared with minimum necessary scope.
 - [ ] `concurrency:` block is present with `cancel-in-progress` set appropriately.
-- [ ] All external actions are pinned to 40-character commit SHAs with `# vX.Y.Z` comments.
+- [ ] All remote actions and reusable workflows are pinned to 40-character commit SHAs with associated release comments, or the documented interim `# main` comment for organization reusable workflows.
+- [ ] Any interim pinact exception uses the shared template's exact repository/workflow and full-SHA match; the selected workflow and commit are verified separately.
 - [ ] Actionlint and YAML syntax checks pass.
