@@ -627,6 +627,18 @@
       "canonical_for": ["worktree-management-procedure"]
     },
     {
+      "id": "runbook-benchmark-report",
+      "path": "runbooks/benchmark-report.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["benchmark-report-integration"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["benchmark-report-integration"]
+    },
+    {
       "id": "runbook-zsh-lint-ci",
       "path": "runbooks/zsh-lint-ci.md",
       "kind": "runbook",
