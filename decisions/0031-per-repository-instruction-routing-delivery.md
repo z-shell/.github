@@ -1,8 +1,8 @@
 # 31. Deliver Instruction Routing Into Every Repository and Verify Vendored Skill Pins Mechanically
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-26
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -29,23 +29,23 @@ The `Required instruction routing` section, the text that sends a runtime to
 `.github/instruction-surfaces.json`, exists only in this repository's
 `AGENTS.md`. A survey of the fifteen organization repositories found:
 
-| Repository                     | `AGENTS.md` lines | Names the routing manifest |
-| ------------------------------ | ----------------- | -------------------------- |
-| `z-shell/.github`              | 187               | yes                        |
-| `z-shell/wiki`                 | 106               | no                         |
-| `z-shell/F-Sy-H`               | 102               | no                         |
-| `z-shell/zsh-eza`              | 91                | no                         |
-| `z-shell/zsh-lint`             | 79                | no                         |
-| `z-shell/zpmod`                | 54                | no                         |
-| `z-shell/z-a-meta-plugins`     | 50                | no                         |
-| `z-shell/zi`                   | 43                | no                         |
-| `z-shell/src`                  | 31                | no                         |
-| `z-shell/zsh-fancy-completions`| 26                | no                         |
-| `z-shell/zd`                   | 13                | no                         |
-| `z-shell/zsh`                  | 12                | no                         |
-| `z-shell/zunit`                | 7                 | no                         |
-| `z-shell/z-a-default-ice`      | absent            | no                         |
-| `z-shell/z-a-eval`             | absent            | no                         |
+| Repository                      | `AGENTS.md` lines | Names the routing manifest |
+| ------------------------------- | ----------------- | -------------------------- |
+| `z-shell/.github`               | 187               | yes                        |
+| `z-shell/wiki`                  | 106               | no                         |
+| `z-shell/F-Sy-H`                | 102               | no                         |
+| `z-shell/zsh-eza`               | 91                | no                         |
+| `z-shell/zsh-lint`              | 79                | no                         |
+| `z-shell/zpmod`                 | 54                | no                         |
+| `z-shell/z-a-meta-plugins`      | 50                | no                         |
+| `z-shell/zi`                    | 43                | no                         |
+| `z-shell/src`                   | 31                | no                         |
+| `z-shell/zsh-fancy-completions` | 26                | no                         |
+| `z-shell/zd`                    | 13                | no                         |
+| `z-shell/zsh`                   | 12                | no                         |
+| `z-shell/zunit`                 | 7                 | no                         |
+| `z-shell/z-a-default-ice`       | absent            | no                         |
+| `z-shell/z-a-eval`              | absent            | no                         |
 
 Most of these files link to organization policy in prose, between one and eight
 mentions each. A prose link is not a routing directive: it tells a reader where
@@ -152,6 +152,29 @@ text.
 
 Material changes under this decision follow the impact review in
 `runbooks/instruction-update.md`.
+
+### Implementation
+
+- `.github/instruction-surfaces.json` gains a top-level `downstream` list, one
+  entry per consuming repository, sorted by repository. Each entry declares
+  that repository's own routable surfaces (Copilot adapter, scoped
+  instructions, agents, prompts, and local skills) with their tasks and file
+  patterns, plus the organization skills it vendors. An adapter that is a
+  symbolic link to the repository's `AGENTS.md` is an alias, not a surface.
+- `lib/approved-skills.json` records, per vendored organization skill, the
+  approved commit, the file list, and a SHA-256 digest of the skill with the
+  installer's `metadata` block excluded. Frontmatter keys are compared in
+  sorted order, so installer key order and indentation are not drift.
+- `scripts/org-routing.py` is the only generator and verifier. `apply` writes
+  the block into one checkout, `check` verifies one checkout, `validate`
+  checks the inventory, and `verify-approved` confirms each approved digest
+  against the recorded commit in this repository's history.
+- `.github/workflows/org-routing.yml` is the reusable workflow. It checks the
+  caller against the inventory at the called workflow's own commit, so a
+  caller's pin selects the inventory it is held to. In this repository it runs
+  the generator's tests and `verify-approved` instead.
+- `scripts/validate-agent-policy.py` validates the `downstream` section with the
+  generator's own schema check, so the two cannot disagree.
 
 ## Consequences
 

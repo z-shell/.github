@@ -83,7 +83,15 @@ answers is not an impact review.
 
 - [ ] Update the repository's `AGENTS.md`, any required runtime adapter, and any
       scoped `.github/instructions/*.instructions.md` that describes the changed
-      area.
+      area. Edit only outside the `org-routing` markers; the block between them
+      is generated (decisions/0031).
+- [ ] Adding, removing, or renaming a routable surface (Copilot adapter, scoped
+      instructions, agent, prompt, or local skill) or vendoring an
+      organization skill is a `downstream` change in this repository's
+      `.github/instruction-surfaces.json`. Land it here first, then regenerate
+      the repository's block with
+      `python3 scripts/org-routing.py apply --repository z-shell/<name> --root <checkout>`
+      and verify with `check`.
 - [ ] Prefer linking to canonical organization or wiki guidance over duplicating
       it.
 
@@ -100,6 +108,9 @@ Run from the root of a standalone `z-shell/.github` clone:
 ```bash
 python3 scripts/validate-agent-policy.py
 python3 -m unittest scripts/test_validate_agent_policy.py -v
+python3 scripts/org-routing.py validate
+python3 scripts/org-routing.py verify-approved
+python3 -m unittest scripts/test_org_routing.py -v
 ```
 
 ### Private-meta-workspace commands

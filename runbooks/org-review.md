@@ -77,6 +77,16 @@ classes, and these results for each repository:
   attribution when available; otherwise report invocation as unverified.
   A successful review without attribution does not establish skill use.
 
+The approved canonical revision is the one recorded for the skill in
+`lib/approved-skills.json`. For a repository declared in the `downstream`
+section of `.github/instruction-surfaces.json`, the provenance, currency, and
+local-drift dimensions are deterministic: run
+`python3 scripts/org-routing.py check --repository z-shell/<name> --root <checkout>`
+from a `z-shell/.github` clone, or read the repository's `Org Routing` check
+(decisions/0031). A pinned revision other than the approved one is stale even
+when the content is identical. Presence, suitability, and runtime evidence
+still need the assessment above.
+
 Report each failed dimension as missing, invalid, stale, modified, unsuitable,
 or unverified with evidence and a concrete remedy. Missing, invalid, stale,
 modified, or unsuitable guidance prevents a clean review-readiness result.
@@ -156,12 +166,19 @@ claiming a remote installation. See the
 [GitHub CLI installation manual](https://cli.github.com/manual/gh_skill_install).
 
 For updates, compare the recorded source revision and actual installed files
-against the currently approved canonical revision explicitly. `gh skill update
+against the currently approved canonical revision explicitly;
+`scripts/org-routing.py check` does this for declared repositories. `gh skill update
 --dry-run` skips pinned skills, so its output cannot establish currency. Once
 the differences and update scope are approved, reinstall at the new approved
 commit and verify the resulting content and metadata. An unchanged repeated
 installation should leave no diff. See the
 [GitHub CLI update manual](https://cli.github.com/manual/gh_skill_update).
+
+Advancing the approved revision is a reviewed change to
+`lib/approved-skills.json` in this repository: set the new commit, run
+`python3 scripts/org-routing.py verify-approved` to confirm the digest and
+file list, and merge it before any downstream repository re-pins. Each
+downstream re-pin is then a separately authorized change in that repository.
 
 Pilot changes in the canonical owner, a standard plugin, and a documentation
 repository before wider delivery. Exercise representative review requests
