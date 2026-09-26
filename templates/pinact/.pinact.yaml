@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/pinact/refs/heads/main/json-schema/pinact.json
+# Usage and limits: https://github.com/z-shell/.github/blob/main/.github/instructions/github-actions-ci-cd-best-practices.instructions.md#interim-pinact-exception-for-organization-reusable-workflows
+version: 3
+ignore_actions:
+  # Interim # main comments on SHA-pinned organization reusable workflows.
+  # pinact skips validation and updates for these entries, including provenance.
+  # The ref regex checks SHA shape only; verify the workflow and commit separately.
+  # Merge into an existing config; keep unrelated settings and checks enabled.
+  - name: z-shell/\.github/\.github/workflows/.*
+    ref: "[0-9a-f]{40}"
