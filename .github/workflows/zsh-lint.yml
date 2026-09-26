@@ -39,6 +39,8 @@ jobs:
     name: Zsh Lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Analyzer code never needs access to shared Actions caches.
+    cache-mode: none
     permissions:
       contents: read
     steps:
