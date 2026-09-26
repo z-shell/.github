@@ -216,6 +216,44 @@ class BenchmarkTests(unittest.TestCase):
             )
             self.assertIn("No timings accepted", (root / "out/summary.md").read_text())
 
+    def test_malformed_raw_control_retains_failure_evidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "report.json").write_text(json.dumps(fixture()))
+            for value in (None, [], True, "invalid", 42):
+                with self.subTest(value=value):
+                    raw = json.dumps(value)
+                    (root / "control.json").write_text(raw)
+                    result = subprocess.run(
+                        [
+                            sys.executable,
+                            str(Path(validator.__file__).resolve()),
+                            "--root",
+                            str(root),
+                            "--report",
+                            "report.json",
+                            "--control-report",
+                            "control.json",
+                            "--output",
+                            str(root / "out"),
+                        ],
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )  # nosec B603
+                    self.assertEqual(result.returncode, 1)
+                    self.assertNotIn("Traceback", result.stderr)
+                    self.assertEqual((root / "out/control.json").read_text(), raw)
+                    self.assertEqual(
+                        json.loads((root / "out/validation.json").read_text())[
+                            "status"
+                        ],
+                        "failed",
+                    )
+                    self.assertIn(
+                        "No timings accepted", (root / "out/summary.md").read_text()
+                    )
+
     def test_zero_baseline_and_exact_threshold(self):
         row = fixture()["cases"]["fixture"]
         for variant in row["results"].values():

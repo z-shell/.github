@@ -67,12 +67,14 @@ def read_report(root, name, output):
     require(current.stat().st_size <= MAX_BYTES, "report exceeds 16 MiB")
     raw = current.read_bytes()
     output.write_bytes(raw)
-    return json.loads(
+    report = json.loads(
         raw,
         object_pairs_hook=unique_object,
         parse_float=finite_float,
         parse_constant=invalid_constant,
     )
+    require(isinstance(report, dict), "report must be a JSON object")
+    return report
 
 
 def identity(value):
@@ -221,7 +223,8 @@ def validate_report(report, control_report=None):
     )
     if control_report is not None:
         require(
-            type(control_report.get("schema_version")) is int
+            isinstance(control_report, dict)
+            and type(control_report.get("schema_version")) is int
             and control_report["schema_version"] == 1
             and control_report.get("status", "complete") == "complete",
             "invalid raw control report schema or status",
