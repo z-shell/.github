@@ -651,6 +651,18 @@
       "canonical_for": ["worktree-management-procedure"]
     },
     {
+      "id": "runbook-pull-requests",
+      "path": "runbooks/pull-requests.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["pull-request", "code-review", "github-operations"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["pull-request-lifecycle"]
+    },
+    {
       "id": "runbook-triage",
       "path": "runbooks/triage.md",
       "kind": "runbook",
