@@ -1,0 +1,75 @@
+---
+name: Setup Zsh Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "actions/setup-zsh/**"
+      - "scripts/test_setup_zsh.py"
+      - ".github/workflows/setup-zsh-test.yml"
+  pull_request:
+    paths:
+      - "actions/setup-zsh/**"
+      - "scripts/test_setup_zsh.py"
+      - ".github/workflows/setup-zsh-test.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Installer Regressions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check Bash syntax
+        run: bash -n actions/setup-zsh/install.sh
+      - name: Test installer behavior
+        run: python3 -m unittest scripts/test_setup_zsh.py -v
+
+  smoke:
+    name: Zsh ${{ matrix.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [latest, "5.9", "5.9.2"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Zsh
+        uses: ./actions/setup-zsh
+        with:
+          version: ${{ matrix.version }}
+      - name: Verify selected shell and modules
+        shell: bash
+        env:
+          EXPECTED_VERSION: ${{ matrix.version }}
+        run: |
+          command -v zsh
+          zsh --version
+          if [[ $EXPECTED_VERSION != latest ]]; then
+            [[ $(zsh -f -c 'printf "%s" "$ZSH_VERSION"') == "$EXPECTED_VERSION" ]]
+          fi
+          zsh -f -c '
+            if [[ $1 == latest ]]; then
+              # Check the installed package tree, not runner vendor completions.
+              fpath=(/usr/share/zsh/functions/**/*(N/))
+              _compdir=
+            fi
+            zmodload zsh/system
+            autoload -Uz compinit
+            compinit -D
+          ' zsh "$EXPECTED_VERSION"
