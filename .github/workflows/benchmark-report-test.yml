@@ -1,0 +1,59 @@
+name: Benchmark Report Tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/benchmark_report.py
+      - scripts/test_benchmark_report.py
+      - actions/benchmark-report/**
+      - .github/workflows/benchmark-report-test.yml
+  pull_request:
+    paths:
+      - scripts/benchmark_report.py
+      - scripts/test_benchmark_report.py
+      - actions/benchmark-report/**
+      - .github/workflows/benchmark-report-test.yml
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contract:
+    name: Benchmark Report Contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test validation and prepare smoke reports
+        run: |
+          python3 -m unittest scripts/test_benchmark_report.py -v
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.test_benchmark_report import fixture
+          Path('slowdown.json').write_text(json.dumps(fixture(slow=True)))
+          report = fixture()
+          report['candidate']['environment']['runner_image'] = 'incompatible-image'
+          Path('invalid.json').write_text(json.dumps(report))
+          PY
+      - name: Verify slowdown is nonfatal
+        uses: ./actions/benchmark-report
+        with:
+          report: slowdown.json
+          artifact-name: benchmark-slowdown-smoke
+      - name: Exercise rejection of incompatible evidence
+        id: reject
+        continue-on-error: true
+        uses: ./actions/benchmark-report
+        with:
+          report: invalid.json
+          artifact-name: benchmark-invalid-smoke
+      - name: Assert incompatible evidence failed
+        if: always()
+        env:
+          REJECTION_OUTCOME: ${{ steps.reject.outcome }}
+        run: test "$REJECTION_OUTCOME" = failure

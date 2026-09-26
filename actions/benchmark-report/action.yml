@@ -1,0 +1,46 @@
+name: Benchmark Report
+description: Validate ADR-0024 evidence, publish a job summary and retain reports.
+inputs:
+  report:
+    description: Repository-relative path to a version 1 comparison report.
+    required: true
+  control-report:
+    description: Raw control report when the comparison omits control_identity.
+    required: false
+    default: ""
+  artifact-name:
+    description: Unique artifact name for this invocation.
+    required: false
+    default: benchmark-evidence
+outputs:
+  evidence-directory:
+    description: Directory containing raw reports, validation status and summary.
+    value: ${{ steps.prepare.outputs.directory }}
+runs:
+  using: composite
+  steps:
+    - name: Prepare evidence directory
+      id: prepare
+      shell: bash
+      run: |
+        directory=$(mktemp -d "$RUNNER_TEMP/benchmark-evidence.XXXXXX")
+        printf 'directory=%s\n' "$directory" >> "$GITHUB_OUTPUT"
+    - name: Validate and present benchmark evidence
+      shell: bash
+      env:
+        ACTION_DIRECTORY: ${{ github.action_path }}
+        REPORT_PATH: ${{ inputs.report }}
+        CONTROL_REPORT_PATH: ${{ inputs.control-report }}
+        EVIDENCE_DIRECTORY: ${{ steps.prepare.outputs.directory }}
+      run: |
+        python3 "$ACTION_DIRECTORY/../../scripts/benchmark_report.py" \
+          --root "$GITHUB_WORKSPACE" --report "$REPORT_PATH" \
+          --control-report "$CONTROL_REPORT_PATH" --output "$EVIDENCE_DIRECTORY"
+    - name: Preserve benchmark evidence
+      if: always() && steps.prepare.outputs.directory != ''
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.prepare.outputs.directory }}/
+        retention-days: 14
+        if-no-files-found: error

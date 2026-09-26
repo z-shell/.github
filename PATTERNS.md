@@ -180,3 +180,16 @@ Pattern:
 Self-triggering also produces flatter check-context names (`Validate Commits`
 rather than `commit-lint / Validate Commits`), which is what
 `required_status_checks` has to register.
+
+## Benchmark comparison report, schema version 1
+
+Observed in:
+
+- `z-shell/zi:benchmarks/compare.zsh` (Zi PR #556)
+- `z-shell/z-a-meta-plugins:benchmarks/run.py` (annex PR #104)
+
+[ADR-0024](decisions/0024-benchmarks-observed-not-gated.md) owns the contract. Reports carry `schema_version: 1`, baseline/candidate source, environment and workload identities, derived `comparable`, and per-case rows containing either variant failures or variant statistics, median/p95 deltas and a review flag. Statistics retain median, p95, minimum, count and raw samples. `control` uses the same row shape for baseline versus its second A/A measurement; `flagged` and `failed` index affected cases, including control failures in `failed`.
+
+The annex lifts each metric to a separate case, such as `loader.repeat_ms`. Producer-specific metadata and unsupported-case extensions are not a replacement for this shared comparison shape. The [shared validator](runbooks/benchmark-report.md) independently checks report consistency and requires explicit control provenance, supplied separately for Zi's current format. This admission records the common schema, not universal consumer qualification or performance gating.
+
+Workloads stay repository-owned. Timing flags are nonblocking, functional failures invalidate evidence, and the A/A column makes runner noise visible. Per-release publication uses `benchmarks/results/<tag>-<os>-<arch>/`, originating in `z-shell/zpmod`; automation retains artifacts and summaries, while a maintainer commits release results under ADR-0024.
