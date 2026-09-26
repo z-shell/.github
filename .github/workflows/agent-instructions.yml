@@ -22,6 +22,9 @@ on:
       - "decisions/**"
       - "runbooks/**"
       - "lib/zsh-standard-policy.json"
+      - "lib/approved-skills.json"
+      - "scripts/org-routing.py"
+      - "scripts/test_org_routing.py"
       - "scripts/validate-agent-policy.py"
       - "scripts/test_validate_agent_policy.py"
       - "scripts/validate-zsh-standard-policy.py"
@@ -51,6 +54,9 @@ on:
       - "decisions/**"
       - "runbooks/**"
       - "lib/zsh-standard-policy.json"
+      - "lib/approved-skills.json"
+      - "scripts/org-routing.py"
+      - "scripts/test_org_routing.py"
       - "scripts/validate-agent-policy.py"
       - "scripts/test_validate_agent_policy.py"
       - "scripts/validate-zsh-standard-policy.py"
@@ -83,6 +89,9 @@ jobs:
 
       - name: Run agent policy unit tests
         run: python3 -m unittest scripts/test_validate_agent_policy.py -v
+
+      - name: Run routing generator unit tests
+        run: python3 -m unittest scripts/test_org_routing.py -v
 
       - name: Run decision record unit tests
         run: python3 -m unittest scripts/test_decision_records.py -v

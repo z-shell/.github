@@ -1062,6 +1062,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0031",
+      "path": "decisions/0031-per-repository-instruction-routing-delivery.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["architecture-decision", "instruction-change"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "decision-index",
       "path": "decisions/README.md",
       "kind": "runbook",
@@ -1136,6 +1148,278 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["public-policy-ci"]
+    },
+    {
+      "id": "org-routing-generator",
+      "path": "scripts/org-routing.py",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["ci", "human"],
+      "tasks": ["instruction-change", "validation"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["downstream-routing-generation"]
+    },
+    {
+      "id": "org-routing-workflow",
+      "path": ".github/workflows/org-routing.yml",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["ci"],
+      "tasks": ["instruction-change", "github-actions"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["downstream-routing-ci"]
+    },
+    {
+      "id": "approved-skill-revisions",
+      "path": "lib/approved-skills.json",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": [
+        "codex",
+        "claude-code",
+        "copilot",
+        "gemini-cli",
+        "human",
+        "ci"
+      ],
+      "tasks": [
+        "instruction-change",
+        "organization-review",
+        "review-readiness"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["approved-skill-revisions"]
+    }
+  ],
+  "downstream": [
+    {
+      "repository": "z-shell/F-Sy-H",
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/src",
+      "vendored_skills": ["code-review", "zi-install"]
+    },
+    {
+      "repository": "z-shell/wiki",
+      "surfaces": [
+        {
+          "path": ".github/agents/docusaurus-writer.agent.md",
+          "tasks": ["documentation"],
+          "file_patterns": ["{docs,community,ecosystem}/**/*.mdx"]
+        },
+        {
+          "path": ".github/agents/localization-maintainer.agent.md",
+          "tasks": ["documentation", "localization"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/instructions/agent-docusaurus-writer.instructions.md",
+          "tasks": ["documentation"],
+          "file_patterns": ["{docs,community,ecosystem}/**/*.mdx"]
+        },
+        {
+          "path": ".github/instructions/docs-authoring.instructions.md",
+          "tasks": ["documentation"],
+          "file_patterns": ["{docs,community,ecosystem}/**/*.mdx"]
+        },
+        {
+          "path": ".github/instructions/docusaurus-api.instructions.md",
+          "tasks": ["documentation", "implementation"],
+          "file_patterns": [
+            "src/**/*.{ts,tsx}",
+            "{docs,community,ecosystem}/**/*.mdx"
+          ]
+        },
+        {
+          "path": ".github/instructions/docusaurus-config.instructions.md",
+          "tasks": ["implementation"],
+          "file_patterns": ["docusaurus.config.ts"]
+        },
+        {
+          "path": ".github/instructions/frontend-components.instructions.md",
+          "tasks": ["implementation"],
+          "file_patterns": ["src/**/*.{ts,tsx}"]
+        },
+        {
+          "path": ".github/instructions/skill-codebase-health.instructions.md",
+          "tasks": ["implementation", "project-health"],
+          "file_patterns": ["src/**/*.{ts,tsx}"]
+        },
+        {
+          "path": ".github/instructions/skill-docs-readiness.instructions.md",
+          "tasks": ["documentation", "review-readiness"],
+          "file_patterns": ["{docs,community,ecosystem}/**/*.mdx"]
+        },
+        {
+          "path": ".github/instructions/skill-ui-design.instructions.md",
+          "tasks": ["implementation"],
+          "file_patterns": ["src/**/*.{css,module.css}"]
+        },
+        {
+          "path": ".github/prompts/add-doc-section.prompt.md",
+          "tasks": ["documentation"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/prompts/audit-consistency.prompt.md",
+          "tasks": ["project-health"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/prompts/project-health.prompt.md",
+          "tasks": ["project-health"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/prompts/review-pr.prompt.md",
+          "tasks": ["code-review"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/acquire-codebase-knowledge/SKILL.md",
+          "tasks": ["onboarding"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/codebase-health-audit/SKILL.md",
+          "tasks": ["project-health"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/context-map/SKILL.md",
+          "tasks": ["context-engineering", "implementation"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/conventional-commit/SKILL.md",
+          "tasks": ["commit"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/create-llms/SKILL.md",
+          "tasks": ["documentation"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/docs-release-readiness/SKILL.md",
+          "tasks": ["documentation", "release", "review-readiness"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/documentation-writer/SKILL.md",
+          "tasks": ["documentation"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/editorconfig/SKILL.md",
+          "tasks": ["repository-bootstrap"],
+          "file_patterns": ["**"]
+        },
+        {
+          "path": ".github/skills/ui-design/SKILL.md",
+          "tasks": ["implementation"],
+          "file_patterns": ["src/**/*.{css,module.css}", "src/**/*.tsx"]
+        },
+        {
+          "path": ".github/skills/what-context-needed/SKILL.md",
+          "tasks": ["context-engineering"],
+          "file_patterns": ["**"]
+        }
+      ],
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/z-a-default-ice"
+    },
+    {
+      "repository": "z-shell/z-a-eval"
+    },
+    {
+      "repository": "z-shell/z-a-meta-plugins",
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zd"
+    },
+    {
+      "repository": "z-shell/zi",
+      "surfaces": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "tasks": ["all"],
+          "file_patterns": ["**"]
+        }
+      ],
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zi-setup",
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zpmod",
+      "surfaces": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "tasks": ["all"],
+          "file_patterns": ["**"]
+        }
+      ],
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zsh",
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zsh-eza",
+      "surfaces": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "tasks": ["all"],
+          "file_patterns": ["**"]
+        }
+      ],
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zsh-fancy-completions",
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zsh-lint",
+      "surfaces": [
+        {
+          "path": ".github/instructions/go-ast-linting.instructions.md",
+          "tasks": ["implementation", "zsh-lint-rule-proposal"],
+          "file_patterns": ["internal/analyzer/**", "internal/rules/**"]
+        },
+        {
+          "path": ".github/instructions/parser-front-end.instructions.md",
+          "tasks": ["implementation", "zsh-lint-parser-gap"],
+          "file_patterns": [
+            "internal/parse/**",
+            "internal/survey/**",
+            "cmd/zsh-lint-survey/**"
+          ]
+        },
+        {
+          "path": ".github/skills/parser-gap-fix/SKILL.md",
+          "tasks": ["zsh-lint-parser-gap"],
+          "file_patterns": ["internal/parse/**"]
+        }
+      ],
+      "vendored_skills": ["code-review"]
+    },
+    {
+      "repository": "z-shell/zunit"
     }
   ]
 }

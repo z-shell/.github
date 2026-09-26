@@ -1,0 +1,124 @@
+name: Org Routing
+
+# Decision 0031: every organization repository carries a generated routing
+# preamble in AGENTS.md and vendors organization skills only at an approved
+# revision. Repositories call this workflow; it checks the caller's checkout
+# against the canonical inventory at the called workflow's own commit, and
+# reports drift without writing anything.
+#
+# Caller:
+#
+#   jobs:
+#     org-routing:
+#       uses: z-shell/.github/.github/workflows/org-routing.yml@<sha> # main
+#       permissions:
+#         contents: read
+#
+# Do not set a workflow-level `concurrency:` in the caller: this workflow sets
+# its own group, and a matching caller group deadlocks the called run.
+
+on:
+  workflow_call:
+  pull_request:
+    paths:
+      - ".github/instruction-surfaces.json"
+      - ".github/skills/**"
+      - ".github/workflows/org-routing.yml"
+      - "lib/approved-skills.json"
+      - "scripts/org-routing.py"
+      - "scripts/test_org_routing.py"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/instruction-surfaces.json"
+      - ".github/skills/**"
+      - ".github/workflows/org-routing.yml"
+      - "lib/approved-skills.json"
+      - "scripts/org-routing.py"
+      - "scripts/test_org_routing.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-org-routing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Org Routing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # GitHub exposes the called workflow identity through job.workflow_*.
+      # Serialize the context because actionlint does not model those
+      # properties yet, then validate the values. There is no fallback: a
+      # caller's own checkout must never supply the tooling that checks it.
+      # The run is a self-test when the workflow runs from the repository it
+      # lives in (this repository or a fork of it), not a caller check.
+      - name: Resolve called workflow source
+        id: workflow-source
+        shell: bash
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: |
+          repository=$(jq -r '.workflow_repository // empty' <<<"$JOB_CONTEXT")
+          sha=$(jq -r '.workflow_sha // empty' <<<"$JOB_CONTEXT")
+          [[ $repository =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ $sha =~ ^[0-9a-f]{40}$ ]]
+          self=false
+          if [[ ${repository,,} == "${GITHUB_REPOSITORY,,}" ]]; then
+            self=true
+          fi
+          printf 'repository=%s\n' "$repository" >>"$GITHUB_OUTPUT"
+          printf 'sha=%s\n' "$sha" >>"$GITHUB_OUTPUT"
+          printf 'self=%s\n' "$self" >>"$GITHUB_OUTPUT"
+
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: ${{ steps.workflow-source.outputs.self == 'true' && '0' || '1' }}
+          persist-credentials: false
+
+      - name: Check out routing tooling
+        if: ${{ steps.workflow-source.outputs.self != 'true' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ steps.workflow-source.outputs.repository }}
+          ref: ${{ steps.workflow-source.outputs.sha }}
+          path: .z-shell-org-routing
+          persist-credentials: false
+          sparse-checkout: |
+            .github/instruction-surfaces.json
+            .github/skills
+            lib/approved-skills.json
+            scripts/org-routing.py
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.10"
+
+      - name: Test routing generator
+        if: ${{ steps.workflow-source.outputs.self == 'true' }}
+        run: python3 -m unittest scripts/test_org_routing.py -v
+
+      - name: Validate inventory and approved revisions
+        if: ${{ steps.workflow-source.outputs.self == 'true' }}
+        run: |
+          python3 scripts/org-routing.py validate
+          python3 scripts/org-routing.py verify-approved
+
+      - name: Check caller routing and vendored skills
+        if: ${{ steps.workflow-source.outputs.self != 'true' }}
+        shell: bash
+        env:
+          CALLER: ${{ github.repository }}
+        run: |
+          tooling="$RUNNER_TEMP/z-shell-org-routing"
+          mv -- .z-shell-org-routing "$tooling"
+          python3 "$tooling/scripts/org-routing.py" --org-root "$tooling" \
+            check --repository "$CALLER" --root "$GITHUB_WORKSPACE"
