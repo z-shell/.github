@@ -25,7 +25,7 @@ For example, after checking out this repository:
   run: zsh --version
 ```
 
-Request an exact version in native-oracle jobs. Compatibility jobs choose their own versions; this action does not impose an organization-wide minimum. Existing SHA-pinned callers must update their action reference before receiving this behavior. The reusable `zsh-ci.yml` action reference also requires a separately reviewed pin update.
+Request an exact version in native-oracle jobs. Compatibility jobs choose their own versions; this action does not impose an organization-wide minimum. Existing SHA-pinned callers must update their action reference before receiving this behavior. The reusable `zsh-ci.yml` workflow forwards its `zsh-version` input to this action; existing workflow callers must update their workflow SHA pin to receive exact installs.
 
 ## Source pins and verification
 

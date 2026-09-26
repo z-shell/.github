@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       zsh-version:
-        description: Zsh version to install ("latest" or a semver string).
+        description: Zsh version to install (latest package, or exact Linux 5.9 or 5.9.2).
         required: false
         type: string
         default: latest
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Set up Zsh
-        uses: z-shell/.github/actions/setup-zsh@1f17c09554fe87ebe1ed35b14cd95a4ad18cf95e # main
+        uses: z-shell/.github/actions/setup-zsh@6c7972d4f682c29cdd0e86df2cffce6aa5d23c89 # main
         with:
           version: ${{ inputs.zsh-version }}
 
