@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import stat
 import subprocess  # nosec B404 - fixed git invocation in verify-approved only
@@ -117,19 +118,34 @@ def _safe_relative(path: object) -> bool:
     )
 
 
+_NAME = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 SURFACE_PATTERNS = (
     ("adapter", re.compile(r"^\.github/copilot-instructions\.md$")),
-    ("scoped-guidance", re.compile(r"^\.github/instructions/[^/]+\.instructions\.md$")),
-    ("agent", re.compile(r"^\.github/agents/[^/]+\.agent\.md$")),
-    ("prompt", re.compile(r"^\.github/prompts/[^/]+\.prompt\.md$")),
+    (
+        "scoped-guidance",
+        re.compile(rf"^\.github/instructions/(?:{_NAME}/)*{_NAME}\.instructions\.md$"),
+    ),
+    ("agent", re.compile(rf"^\.github/agents/{_NAME}\.agent\.md$")),
+    ("prompt", re.compile(rf"^\.github/prompts/{_NAME}\.prompt\.md$")),
     ("skill", re.compile(r"^\.github/skills/[a-z0-9][a-z0-9-]*/SKILL\.md$")),
 )
 DISCOVERY_GLOBS = (
     ".github/copilot-instructions.md",
-    ".github/instructions/*.instructions.md",
+    ".github/instructions/**/*.instructions.md",
     ".github/agents/*.agent.md",
     ".github/prompts/*.prompt.md",
     ".github/skills/*/SKILL.md",
+)
+# Runtime instruction carriers that a downstream repository cannot declare:
+# guidance belongs in AGENTS.md or a declared surface (decisions/0014, 0031).
+UNSUPPORTED_CARRIER_GLOBS = (
+    "**/AGENTS.md",
+    "**/CLAUDE.md",
+    "**/GEMINI.md",
+    ".claude/**/*",
+    ".cursorrules",
+    ".cursor/**/*",
+    ".github/chatmodes/**/*",
 )
 
 
@@ -545,7 +561,13 @@ def render(entry: dict, org: Org) -> str:
 
 
 def splice(text: str | None, block: str, repository: str) -> str:
-    """Return AGENTS.md text with the generated block inserted or replaced."""
+    """Return AGENTS.md text with the generated block at its required place.
+
+    The block begins the file, after an optional first ``# `` title line
+    (decision 0031, point 1). An existing block is removed and reinserted
+    there, so a block moved later in the file, or wrapped in a fence, is
+    regenerated in place and fails ``check``.
+    """
     if text is None:
         name = repository.split("/", 1)[1]
         return (
@@ -569,12 +591,13 @@ def splice(text: str | None, block: str, repository: str) -> str:
         stop = text.index(END_MARKER) + len(END_MARKER)
         if text[stop : stop + 1] == "\n":
             stop += 1
-        return text[:start] + block + text[stop:]
-    first, newline, rest = text.partition("\n")
+        text = text[:start] + text[stop:]
+    first, _newline, rest = text.partition("\n")
     if first.startswith("# "):
         body = rest.lstrip("\n")
         return f"{first}\n\n{block}" + (f"\n{body}" if body else "")
-    return block + ("\n" + text if text else "")
+    body = text.lstrip("\n")
+    return block + ("\n" + body if body else "")
 
 
 # --------------------------------------------------------------------------
@@ -582,12 +605,17 @@ def splice(text: str | None, block: str, repository: str) -> str:
 # --------------------------------------------------------------------------
 
 
-def parse_skill(text: str) -> tuple[dict[str, str], dict[str, str], str]:
+def parse_skill(
+    text: str, strict_metadata: bool = False
+) -> tuple[dict[str, str], dict[str, str], str]:
     """Split SKILL.md into scalar frontmatter, installer metadata and body.
 
     Top-level keys must be scalars, except ``metadata``, whose direct children
-    are read as scalars; values nested deeper than those children are ignored.
-    Other nested top-level values are kept verbatim as part of their key.
+    are read as scalars. Other nested top-level values are kept verbatim as
+    part of their key. With ``strict_metadata`` (a vendored organization
+    skill, whose digest excludes metadata), only the installer's keys are
+    accepted and nothing may nest below them, so no content can hide there;
+    otherwise deeper values are ignored.
     """
     match = re.fullmatch(r"---\n((?:[^\n]*\n)*?)---\n([\s\S]*)", text)
     if match is None:
@@ -610,13 +638,20 @@ def parse_skill(text: str) -> tuple[dict[str, str], dict[str, str], str]:
             if child_indent is None:
                 child_indent = indent
             if indent > child_indent:
+                if strict_metadata:
+                    raise ValueError(f"nested installer metadata {line.strip()!r}")
                 continue
             if indent < child_indent:
                 raise ValueError(f"inconsistent metadata indentation {line!r}")
             key, sep, value = line.strip().partition(":")
             if not sep:
                 raise ValueError(f"invalid metadata line {line!r}")
-            metadata[key.strip()] = value.strip()
+            key = key.strip()
+            if strict_metadata and key not in METADATA_KEYS:
+                raise ValueError(f"unexpected installer metadata key {key!r}")
+            if key in metadata:
+                raise ValueError(f"duplicate installer metadata key {key!r}")
+            metadata[key] = value.strip()
             continue
         key, sep, value = line.partition(":")
         if not sep:
@@ -635,14 +670,14 @@ def parse_skill(text: str) -> tuple[dict[str, str], dict[str, str], str]:
     return scalars, metadata, match[2]
 
 
-def skill_digest(text: str) -> str:
+def skill_digest(text: str, strict_metadata: bool = False) -> str:
     """Digest of a skill with the installer's metadata block excluded.
 
     Frontmatter keys are sorted and blank lines between the frontmatter and the
     body are dropped, so an installer's key order or a formatter's spacing does
     not count as drift. Every other byte of the body is significant.
     """
-    scalars, _metadata, body = parse_skill(text)
+    scalars, _metadata, body = parse_skill(text, strict_metadata)
     normalized = (
         "".join(f"{key}: {scalars[key]}\n" for key in sorted(scalars))
         + "---\n"
@@ -667,12 +702,25 @@ def _read_regular(root: Path, relative: str) -> str | None:
     return path.read_text(encoding="utf-8")
 
 
-def _regular_files(directory: Path) -> list[str]:
-    return sorted(
-        str(path.relative_to(directory).as_posix())
-        for path in directory.rglob("*")
-        if path.is_file() and not path.is_symlink()
-    )
+def _skill_entries(directory: Path) -> list[str]:
+    """Every non-directory entry below a skill directory, symlinks included.
+
+    Symbolic links are listed with a ``@`` suffix, so a link can never match an
+    approved file name and always fails the file comparison.
+    """
+    entries: list[str] = []
+    for current, directories, files in os.walk(directory, followlinks=False):
+        base = Path(current)
+        for name in list(directories):
+            if (base / name).is_symlink():
+                directories.remove(name)
+                files.append(name)
+        for name in files:
+            path = base / name
+            relative = path.relative_to(directory).as_posix()
+            mode = path.lstat().st_mode
+            entries.append(relative if stat.S_ISREG(mode) else relative + "@")
+    return sorted(entries)
 
 
 def _is_agents_alias(root: Path, path: Path) -> bool:
@@ -680,17 +728,41 @@ def _is_agents_alias(root: Path, path: Path) -> bool:
     return path.is_symlink() and path.resolve() == (root / AGENTS_PATH).resolve()
 
 
-def _discovered_surfaces(root: Path) -> list[str]:
-    """Routable surfaces present in a checkout, minus aliases of AGENTS.md."""
+def _display(path: str) -> str:
+    """Render a checkout path so it cannot inject a workflow command."""
+    return path if path.isprintable() else repr(path)
+
+
+def _discovered_surfaces(root: Path) -> tuple[list[str], list[str]]:
+    """Return (routable surfaces, unroutable instruction files) in a checkout.
+
+    Aliases of AGENTS.md are neither. A file that a discovery glob or a
+    runtime carrier glob finds but no surface pattern accepts is unroutable:
+    a runtime may still load it, so it cannot pass silently.
+    """
     found: set[str] = set()
+    unroutable: set[str] = set()
     for pattern in DISCOVERY_GLOBS:
         for path in root.glob(pattern):
+            if path.is_dir() or _is_agents_alias(root, path):
+                continue
             relative = path.relative_to(root).as_posix()
-            if _surface_path_kind(relative) is not None and not _is_agents_alias(
-                root, path
-            ):
+            if _surface_path_kind(relative) is not None:
                 found.add(relative)
-    return sorted(found)
+            else:
+                unroutable.add(relative)
+    for pattern in UNSUPPORTED_CARRIER_GLOBS:
+        for path in root.glob(pattern):
+            relative = path.relative_to(root).as_posix()
+            if (
+                path.is_dir()
+                or relative == AGENTS_PATH
+                or relative.startswith(".git/")
+                or _is_agents_alias(root, path)
+            ):
+                continue
+            unroutable.add(relative)
+    return sorted(found), sorted(unroutable)
 
 
 def check(root: Path, repository: str, org: Org) -> list[str]:
@@ -735,7 +807,17 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
                     f"restore it or remove it from the {CANONICAL_REPOSITORY} manifest",
                 )
             )
-    for relative in _discovered_surfaces(root):
+    surfaces, unroutable = _discovered_surfaces(root)
+    for relative in unroutable:
+        errors.append(
+            error(
+                _display(relative),
+                "instruction file is not a routable surface",
+                "move its guidance into AGENTS.md or a declared surface "
+                "(decisions/0031); runtimes may load it unrouted",
+            )
+        )
+    for relative in surfaces:
         if relative in declared or relative in vendored_paths:
             continue
         text = _read_regular(root, relative)
@@ -757,7 +839,7 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
         else:
             errors.append(
                 error(
-                    relative,
+                    _display(relative),
                     "instruction surface is not declared downstream",
                     fix_manifest,
                 )
@@ -778,8 +860,8 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
     if text is None:
         return [error(relative, "vendored skill is missing", reinstall)]
     try:
-        _scalars, metadata, _body = parse_skill(text)
-        digest = skill_digest(text)
+        _scalars, metadata, _body = parse_skill(text, strict_metadata=True)
+        digest = skill_digest(text, strict_metadata=True)
     except ValueError as exc:
         return [error(relative, f"invalid skill frontmatter: {exc}", reinstall)]
     errors: list[str] = []
@@ -795,6 +877,14 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
             )
         )
     pinned = metadata.get("github-pinned")
+    if metadata.get("github-ref", pinned) != pinned:
+        errors.append(
+            error(
+                relative,
+                "installer metadata github-ref differs from github-pinned",
+                reinstall,
+            )
+        )
     if pinned != revision:
         errors.append(
             error(
@@ -809,7 +899,7 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
                 relative, "content differs from the approved canonical skill", reinstall
             )
         )
-    files = _regular_files(root / record["path"])
+    files = _skill_entries(root / record["path"])
     if files != record["files"]:
         errors.append(
             error(
@@ -868,6 +958,27 @@ def verify_approved(org_root: Path, approved: dict) -> list[str]:
                 )
             )
             continue
+        reachable = subprocess.run(  # nosec B603 B607 - fixed git arguments
+            [
+                "git",
+                "-C",
+                str(org_root),
+                "merge-base",
+                "--is-ancestor",
+                revision,
+                "HEAD",
+            ],
+            check=False,
+            capture_output=True,
+        )
+        if reachable.returncode != 0:
+            errors.append(
+                error(
+                    APPROVED_PATH,
+                    f"skill {name} revision {revision} is not an ancestor of HEAD",
+                    "approve a commit already on the default branch",
+                )
+            )
         if skill_digest(text) != record["digest"]:
             errors.append(
                 error(

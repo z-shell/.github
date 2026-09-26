@@ -169,12 +169,28 @@ Material changes under this decision follow the impact review in
   the block into one checkout, `check` verifies one checkout, `validate`
   checks the inventory, and `verify-approved` confirms each approved digest
   against the recorded commit in this repository's history.
+  - `check` also fails on any other instruction carrier that a runtime may load
+    unrouted: nested or runtime-specific instruction files such as `CLAUDE.md`,
+    `.claude/`, or `.cursor/`, or a surface whose name no pattern accepts.
+  - It also fails on a vendored skill containing a symbolic link or installer
+    metadata beyond the installer's own keys, and on a block that is not at the
+    top of `AGENTS.md`.
+  - `verify-approved` also requires the approved commit to be reachable from
+    `HEAD`.
 - `.github/workflows/org-routing.yml` is the reusable workflow. It checks the
   caller against the inventory at the called workflow's own commit, so a
   caller's pin selects the inventory it is held to. In this repository it runs
   the generator's tests and `verify-approved` instead.
 - `scripts/validate-agent-policy.py` validates the `downstream` section with the
   generator's own schema check, so the two cannot disagree.
+
+The survey figures in Context are as drafted. The inventory taken for this
+implementation on 2026-09-26 differs, and the inventory is authoritative. It
+includes `z-shell/zi-setup`, which the survey table omits. It records eleven
+vendored `code-review` copies: eight pinned at `23fb0c86`, one at `ce74af22`,
+and two at the approved revision `e1f8f6c1`. All eleven have content identical
+to the approved revision. One copy of `zi-install` is vendored, and its content
+has drifted.
 
 ## Consequences
 
