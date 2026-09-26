@@ -346,30 +346,6 @@
       "canonical_for": []
     },
     {
-      "id": "skill-gh-cli",
-      "path": ".github/skills/gh-cli/SKILL.md",
-      "kind": "skill",
-      "authority": "advisory",
-      "consumers": ["copilot"],
-      "tasks": ["github-operations"],
-      "file_patterns": ["**"],
-      "required": false,
-      "review_owner": "z-shell maintainers",
-      "canonical_for": []
-    },
-    {
-      "id": "skill-git-commit",
-      "path": ".github/skills/git-commit/SKILL.md",
-      "kind": "skill",
-      "authority": "advisory",
-      "consumers": ["copilot"],
-      "tasks": ["commit"],
-      "file_patterns": ["**"],
-      "required": false,
-      "review_owner": "z-shell maintainers",
-      "canonical_for": []
-    },
-    {
       "id": "skill-github-issues",
       "path": ".github/skills/github-issues/SKILL.md",
       "kind": "skill",
