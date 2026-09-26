@@ -14,7 +14,6 @@ on:
       - scripts/test_zsh_lint_ci.py
       - scripts/fixtures/zsh-lint/**
       - .github/workflows/zsh-lint*.yml
-  workflow_dispatch: {}
 
 permissions:
   contents: read
