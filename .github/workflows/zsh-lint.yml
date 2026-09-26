@@ -13,6 +13,23 @@ on:
         required: true
         type: string
 
+      config:
+        description: Optional repository-relative project configuration; empty uses discovery.
+        required: false
+        type: string
+        default: ""
+      mode:
+        description: Strict fails on findings; observe tolerates semantic findings only.
+        required: false
+        type: string
+        default: strict
+
+      artifact-name:
+        description: Artifact name; use a unique value for each invocation in one run.
+        required: false
+        type: string
+        default: zsh-lint-report
+
 permissions: {}
 
 # The calling workflow owns concurrency. Reusing its group here deadlocks
@@ -21,9 +38,37 @@ jobs:
   zsh-lint:
     name: Zsh Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
+      - name: Validate inputs and resolve workflow source
+        id: source
+        shell: bash
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          ANALYZER_REF: ${{ inputs.zsh-lint-ref }}
+          LINT_MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          [[ $ANALYZER_REF =~ ^[0-9a-f]{40}$ ]]
+          [[ $LINT_MODE == strict || $LINT_MODE == observe ]]
+          repository=$(jq -r '.workflow_repository // empty' <<<"$JOB_CONTEXT")
+          sha=$(jq -r '.workflow_sha // empty' <<<"$JOB_CONTEXT")
+          [[ $repository =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ $sha =~ ^[0-9a-f]{40}$ ]]
+          printf 'repository=%s\nsha=%s\n' "$repository" "$sha" >>"$GITHUB_OUTPUT"
+
+      - name: Check out workflow tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ steps.source.outputs.repository }}
+          ref: ${{ steps.source.outputs.sha }}
+          path: workflow-tooling
+          persist-credentials: false
+          sparse-checkout: scripts/zsh_lint_ci.py
+          sparse-checkout-cone-mode: false
+
       - name: Check out calling repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -44,39 +89,30 @@ jobs:
           # The calling repository need not be Go-based. zsh-lint is checked
           # out separately, so dependency-cache discovery here is irrelevant.
           cache: false
-          go-version: "1.25"
+          go-version-file: zsh-lint/go.mod
 
       - name: Build zsh-lint
         working-directory: zsh-lint
         run: go build -o "$RUNNER_TEMP/zsh-lint" ./cmd/zsh-lint
 
-      - name: Run strict Zsh lint
-        working-directory: target
-        shell: bash
+      - name: Run Zsh lint
         env:
           ZSH_LINT_PATHS: ${{ inputs.paths }}
+          ZSH_LINT_CONFIG: ${{ inputs.config }}
+          ZSH_LINT_MODE: ${{ inputs.mode }}
           ZSH_LINT_REF: ${{ inputs.zsh-lint-ref }}
+          ZSH_LINT_WORKFLOW_SHA: ${{ steps.source.outputs.sha }}
         run: |
-          set -euo pipefail
-          if [[ ! "$ZSH_LINT_REF" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::zsh-lint-ref must be a full 40-character lowercase commit SHA"
-            exit 1
-          fi
-          mapfile -t targets < <(printf '%s\n' "$ZSH_LINT_PATHS" | sed '/^[[:space:]]*$/d')
-          if [[ ${#targets[@]} -eq 0 ]]; then
-            echo "::error::paths must list at least one file or directory"
-            exit 1
-          fi
-          for target in "${targets[@]}"; do
-            if [[ ! -e "$target" ]]; then
-              echo "::error file=$target::configured zsh-lint target does not exist"
-              exit 1
-            fi
-          done
-          find -- "${targets[@]}" -type f -print0 | sort -z > "$RUNNER_TEMP/zsh-lint-files"
-          mapfile -d '' files < "$RUNNER_TEMP/zsh-lint-files"
-          if [[ ${#files[@]} -eq 0 ]]; then
-            echo "::error::configured zsh-lint targets contain no files"
-            exit 1
-          fi
-          "$RUNNER_TEMP/zsh-lint" "${files[@]}"
+          python3 workflow-tooling/scripts/zsh_lint_ci.py \
+            --root target --analyzer "$RUNNER_TEMP/zsh-lint" \
+            --output "$RUNNER_TEMP/zsh-lint-report" \
+            --config "$ZSH_LINT_CONFIG" --mode "$ZSH_LINT_MODE"
+
+      - name: Preserve lint evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ runner.temp }}/zsh-lint-report/
+          retention-days: 14
+          if-no-files-found: warn

@@ -43,3 +43,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0030](0030-zsh-lint-parser-fork-trigger-fired.md)                   | The zsh-lint Parser-Fork Trigger Has Fired: Fork the Syntax Package and Migrate Adapters by Family | ACCEPTED | 2026-09-25 | ss-o     |
 | [0031](0031-per-repository-instruction-routing-delivery.md)          | Deliver Instruction Routing Into Every Repository and Verify Vendored Skill Pins Mechanically      | ACCEPTED | 2026-09-26 | ss-o     |
 | [0032](0032-organization-procedures-live-once-as-public-runbooks.md) | Organization Procedures Live Once, as Public Runbooks That Thin Skills Route To                    | ACCEPTED | 2026-09-26 | ss-o     |
+| [0033](0033-shared-zsh-quality-boundaries.md)                        | Shared Zsh Quality Integrations Keep Analysis and Workloads Repository-Owned                       | PROPOSED | 2026-09-26 | TBD      |
