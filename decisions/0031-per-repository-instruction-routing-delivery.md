@@ -62,8 +62,10 @@ being the variable.
 ### A vendored skill has no currency check
 
 Twelve repositories vendor `.github/skills/code-review/SKILL.md` through
-`gh skill install --pin`, which is what hosted Copilot review requires. Hashing
-each copy with its injected frontmatter `metadata:` block removed shows all
+`gh skill install --pin`, which is what hosted Copilot review requires.
+Thirteen copies of the file exist in total: this repository's canonical file,
+which is the source, and twelve vendored downstream copies. Hashing each
+vendored copy with its injected frontmatter `metadata:` block removed shows all
 twelve bodies are byte-identical to each other and differ from this
 repository's canonical copy only by that metadata. The pins, however, disagree:
 ten repositories pin one commit and two pin another, and neither is the current
@@ -90,7 +92,11 @@ text.
    Each repository's `AGENTS.md` begins with a delimited, generated block that
    names this repository as the canonical policy owner, states the routing
    obligation in the same terms as the organization baseline, and enumerates
-   that repository's own declared surfaces. It is bounded by
+   that repository's own declared surfaces. Downstream surfaces are declared in
+   this repository's `.github/instruction-surfaces.json`, keyed by repository;
+   no other repository gains a manifest of its own. This keeps one inventory,
+   which is what makes the manifest usable for detecting duplicate and
+   contradictory routes under ADR-0014 point 5. The block is bounded by
    `<!-- BEGIN org-routing -->` and `<!-- END org-routing -->` markers, matching
    the delimited-composite convention ADR-0014 point 4 established.
 
@@ -124,10 +130,13 @@ text.
    manual assessment into a deterministic result.
 
 6. **The approved canonical skill revision is declared, not inferred.** This
-   repository records the revision downstream repositories are expected to pin.
-   Advancing it is a reviewed change here, and downstream re-pinning follows the
-   existing authorized-installation procedure in `runbooks/org-review.md`.
-   Nothing in this decision authorizes automated commits to another repository.
+   repository records the revision downstream repositories are expected to pin,
+   in `lib/repository-classes.yml` or a sibling machine-readable file under
+   `lib/`, following the precedent that file already sets for per-repository
+   facts consumed by tooling. Advancing it is a reviewed change here, and
+   downstream re-pinning follows the existing authorized-installation procedure
+   in `runbooks/org-review.md`. Nothing in this decision authorizes automated
+   commits to another repository.
 
 7. **The check reports, it does not self-heal.** A drift failure names the
    file, the expected content or revision, and the command that fixes it.
@@ -162,6 +171,9 @@ Material changes under this decision follow the impact review in
 
 - Fifteen repositories gain a required check, and a canonical routing change
   now produces a visible follow-up in each of them.
+- Declaring downstream surfaces in this repository's manifest extends its
+  schema and grows one file with every repository, which `validate-agent-policy.py`
+  must be taught to accept and check.
 - The reusable workflow becomes a cross-repository dependency: a defect in it
   can block unrelated pull requests until it is fixed here.
 - Advancing the approved skill revision becomes an explicit reviewed step
