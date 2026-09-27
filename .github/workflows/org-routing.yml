@@ -27,6 +27,8 @@ on:
       - "lib/approved-skills.json"
       - "scripts/org-routing.py"
       - "scripts/test_org_routing.py"
+      - "scripts/org_policy_report.py"
+      - "scripts/test_org_policy_report.py"
   push:
     branches:
       - main
@@ -37,6 +39,8 @@ on:
       - "lib/approved-skills.json"
       - "scripts/org-routing.py"
       - "scripts/test_org_routing.py"
+      - "scripts/org_policy_report.py"
+      - "scripts/test_org_policy_report.py"
 
 permissions:
   contents: read
@@ -72,9 +76,8 @@ jobs:
           if [[ ${repository,,} == "${GITHUB_REPOSITORY,,}" ]]; then
             self=true
           fi
-          printf 'repository=%s\n' "$repository" >>"$GITHUB_OUTPUT"
-          printf 'sha=%s\n' "$sha" >>"$GITHUB_OUTPUT"
-          printf 'self=%s\n' "$self" >>"$GITHUB_OUTPUT"
+          printf 'repository=%s\nsha=%s\nself=%s\n' \
+            "$repository" "$sha" "$self" >>"$GITHUB_OUTPUT"
 
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -104,7 +107,7 @@ jobs:
 
       - name: Test routing generator
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
-        run: python3 -m unittest scripts/test_org_routing.py -v
+        run: python3 -m unittest scripts/test_org_routing.py scripts/test_org_policy_report.py -v
 
       - name: Validate inventory and approved revisions
         if: ${{ steps.workflow-source.outputs.self == 'true' }}

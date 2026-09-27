@@ -187,6 +187,18 @@ separate authorization; inspect attribution afterward rather than inferring
 use from skill presence. See
 [GitHub's review guidance](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review).
 
+## Read-only coverage report
+
+Run `python3 scripts/org_policy_report.py coverage --live` from a current, reviewed organization checkout. It uses read-only `gh api` calls, fully paginates the repository inventory, and observes declared active consumers at immutable default-branch commits. It reports generated routing-block currency, workflow caller references, approved skill pins and content, resource inventory, and effective ruleset-required check names. It performs no installation, dispatch, tracker write, repository edit or settings change. Keep output containing private repositories private.
+
+For an offline report, save the REST repository inventory as a JSON array (or the page arrays produced by `gh api --paginate --slurp`) and pass `coverage --inventory inventory.json`. An optional `--checkouts checkouts.json` maps full repository names to local checkout paths and runs the local routing verifier. Local validation and published observations remain separate. The report includes its canonical source revision and observation time; record the collection time of an offline inventory separately.
+
+Read findings and evidence gaps even when the command exits zero: zero means the report was produced, not that organization compliance passed. Archived repositories are listed as excluded; undeclared repositories, maintained forks and declared repositories missing from the inventory remain explicit coverage gaps. Only declared active consumers receive detailed file observations. A truncated tree or failed API request produces unavailable evidence, never a passing result. Inventory visibility depends on the caller's access.
+
+Caller references do not prove trigger eligibility or successful CI. Ruleset-required checks describe the observed default branch. Classic branch protection, bypass settings and other integration branches require separate checks; assess Zi's `next` separately. Runtime discovery, skill invocation and repository-specific semantic suitability remain unverified or unassessed until the earlier review-readiness procedure supplies evidence. For multi-file skills, use the full routing verifier to establish content integrity. Compare observed workflow pins with the intended approved tooling revision independently.
+
+Use this report as input to the existing weekly-review pilot (#412) and recurring-operations coordination (#485). A schedule is optional and needs its own authorization; evaluate the first three drafts before expanding cadence or scope. Deterministic PR checks remain the immediate change gate. New settings enforcement follows #478 after a caller has a verified successful run; #665 remains the adoption owner.
+
 ## Prompt template
 
 ```text

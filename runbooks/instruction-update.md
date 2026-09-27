@@ -131,6 +131,14 @@ python3 scripts/sync-agent-instructions.py --check
 python3 scripts/test-agent-instructions.py
 ```
 
+## Read-only change-impact report
+
+Before editing consumers, run `python3 scripts/org_policy_report.py impact --changed runbooks/triage.md` from the organization checkout. Repeat `--changed` for every added, modified, renamed or removed path, including both names of a rename. The JSON report uses the existing manifest and approved-skill inventory: shared policy selects all declared consumers for review, while approved skill changes select their declared vendors. Workflow, action and template changes explicitly require a caller inventory. Unmapped paths remain visible for manual review. This is a conservative review list, not a complete prose-reference graph or permission to edit consumers.
+
+The report does not advance approved revisions. Merge an approved-source change before downstream re-pinning; verify each caller against both its pinned tooling and the intended current baseline. A passing check at an older pin establishes compatibility with that pin, not currency with newer policy.
+
+`org-routing.py check` discovers tracked and non-ignored files when its target is a Git checkout. Tracked files remain checked even if an ignore rule matches them; required declared files and vendored resources are always checked. Ignored dependency files are outside this repository-content check. Exported trees without their own Git metadata retain filesystem discovery. This boundary does not establish that a runtime ignores ambient local guidance; runtime discovery remains a separate observation.
+
 ## Template prompt for agents
 
 ```text

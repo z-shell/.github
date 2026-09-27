@@ -1260,6 +1260,22 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": []
+    },
+    {
+      "id": "org-policy-report",
+      "path": "scripts/org_policy_report.py",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["agent", "human", "ci"],
+      "tasks": [
+        "instruction-change",
+        "organization-review",
+        "review-readiness"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["policy-coverage-and-impact-report"]
     }
   ],
   "downstream": [
@@ -1401,17 +1417,20 @@
       "vendored_skills": ["code-review"]
     },
     {
-      "repository": "z-shell/z-a-default-ice"
+      "repository": "z-shell/z-a-default-ice",
+      "vendored_skills": ["code-review"]
     },
     {
-      "repository": "z-shell/z-a-eval"
+      "repository": "z-shell/z-a-eval",
+      "vendored_skills": ["code-review"]
     },
     {
       "repository": "z-shell/z-a-meta-plugins",
       "vendored_skills": ["code-review"]
     },
     {
-      "repository": "z-shell/zd"
+      "repository": "z-shell/zd",
+      "vendored_skills": ["code-review"]
     },
     {
       "repository": "z-shell/zi",
@@ -1484,7 +1503,8 @@
       "vendored_skills": ["code-review"]
     },
     {
-      "repository": "z-shell/zunit"
+      "repository": "z-shell/zunit",
+      "vendored_skills": ["code-review"]
     }
   ]
 }

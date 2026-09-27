@@ -19,6 +19,7 @@ Commands:
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import hashlib
 import json
 import os
@@ -740,6 +741,42 @@ def _display(path: str) -> str:
     return path if path.isprintable() else repr(path)
 
 
+def _project_files(root: Path) -> list[Path] | None:
+    """Use Git's project boundary, including tracked ignored files and new files.
+
+    Exported trees have no Git inventory and retain filesystem discovery. Never
+    use an enclosing repository's index for an export or fixture nested in it.
+    """
+    if not (root / ".git").exists():
+        return None
+    result = subprocess.run(  # nosec B603 B607 - fixed read-only git command
+        [
+            "git",
+            "-C",
+            str(root),
+            "ls-files",
+            "-z",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+        ],
+        capture_output=True,
+        check=True,
+        timeout=30,
+    )
+    return [
+        root / os.fsdecode(name) for name in set(result.stdout.split(b"\0")) if name
+    ]
+
+
+def _matches_glob(relative: str, pattern: str) -> bool:
+    # fnmatch permits multiple path components; the surface schema below rejects
+    # unsupported nesting instead of silently accepting an unrouted carrier.
+    return fnmatch.fnmatchcase(relative, pattern) or fnmatch.fnmatchcase(
+        relative, pattern.replace("**/", "")
+    )
+
+
 def _discovered_surfaces(root: Path) -> tuple[list[str], list[str]]:
     """Return (routable surfaces, unroutable instruction files) in a checkout.
 
@@ -749,9 +786,24 @@ def _discovered_surfaces(root: Path) -> tuple[list[str], list[str]]:
     """
     found: set[str] = set()
     unroutable: set[str] = set()
+    project_files = _project_files(root)
+
+    def candidates(pattern: str):
+        if project_files is None:
+            return root.glob(pattern)
+        return (
+            path
+            for path in project_files
+            if _matches_glob(path.relative_to(root).as_posix(), pattern)
+        )
+
     for pattern in DISCOVERY_GLOBS:
-        for path in root.glob(pattern):
-            if path.is_dir() or _is_agents_alias(root, path):
+        for path in candidates(pattern):
+            if (
+                (not path.exists() and not path.is_symlink())
+                or path.is_dir()
+                or _is_agents_alias(root, path)
+            ):
                 continue
             relative = path.relative_to(root).as_posix()
             if _surface_path_kind(relative) is not None:
@@ -759,10 +811,11 @@ def _discovered_surfaces(root: Path) -> tuple[list[str], list[str]]:
             else:
                 unroutable.add(relative)
     for pattern in UNSUPPORTED_CARRIER_GLOBS:
-        for path in root.glob(pattern):
+        for path in candidates(pattern):
             relative = path.relative_to(root).as_posix()
             if (
                 path.is_dir()
+                or (not path.exists() and not path.is_symlink())
                 or relative == AGENTS_PATH
                 or relative.startswith(".git/")
                 or _is_agents_alias(root, path)
@@ -1067,7 +1120,7 @@ def main(argv: list[str] | None = None) -> int:
         for message in str(exc).splitlines():
             print(f"ERROR: {message}")
         return 1
-    except (OSError, UnicodeError, ValueError) as exc:
+    except (OSError, UnicodeError, ValueError, subprocess.SubprocessError) as exc:
         print(f"ERROR: {exc}")
         return 1
     for message in errors:
