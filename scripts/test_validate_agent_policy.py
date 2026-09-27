@@ -492,6 +492,32 @@ class AgentPolicyValidatorTests(unittest.TestCase):
             "repository must be exactly 'z-shell/.github'",
         )
 
+    def test_accepts_portable_agent_audience(self) -> None:
+        self.manifest["surfaces"][0]["consumers"] = ["agent", "human", "ci"]
+        write_manifest(self.root, self.manifest)
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_consumers_remain_required(self) -> None:
+        del self.manifest["surfaces"][0]["consumers"]
+        write_manifest(self.root, self.manifest)
+        self.assert_error_contains(validator.validate(self.root), "consumers")
+
+    def test_generic_audience_cannot_replace_adapter_runtime(self) -> None:
+        for adapter_id in ("copilot-adapter", "claude-adapter", "gemini-adapter"):
+            with self.subTest(adapter=adapter_id):
+                surface = next(
+                    item
+                    for item in self.manifest["surfaces"]
+                    if item["id"] == adapter_id
+                )
+                prior = surface["consumers"]
+                surface["consumers"] = ["agent"]
+                write_manifest(self.root, self.manifest)
+                self.assert_error_contains(
+                    validator.validate(self.root), adapter_id, "delivery contract"
+                )
+                surface["consumers"] = prior
+
     def test_rejects_unknown_enum_values(self) -> None:
         cases = (
             ("kind", "unknown-kind"),
@@ -1836,11 +1862,7 @@ class PublicRepositoryTests(unittest.TestCase):
         self.assertTrue((health_tasks | {"code-review"}).issubset(skill["tasks"]))
         for item in (runbook, skill):
             self.assertEqual(item["file_patterns"], ["**"])
-            self.assertTrue(
-                {"codex", "claude-code", "copilot", "gemini-cli", "human"}.issubset(
-                    item["consumers"]
-                )
-            )
+            self.assertTrue({"agent", "human"}.issubset(item["consumers"]))
         policy = " ".join((PUBLIC_ROOT / "AGENTS.md").read_text().split())
         self.assertIn(
             "Every repository-health evaluation, including quick checks and bootstrap, must assess",
@@ -1902,7 +1924,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 "path": "decisions/0015-zsh-scripting-standard.md",
                 "kind": "decision",
                 "authority": "canonical-detail",
-                "consumers": ["codex", "claude-code", "copilot", "human"],
+                "consumers": ["agent", "human"],
                 "tasks": ["architecture-decision", "zsh-standard"],
                 "file_patterns": ["**"],
                 "required": True,
@@ -1950,7 +1972,7 @@ class PublicRepositoryTests(unittest.TestCase):
                     "path": "runbooks/recurring-operations.md",
                     "kind": "runbook",
                     "authority": "canonical-detail",
-                    "consumers": ["codex", "claude-code", "copilot", "human"],
+                    "consumers": ["agent", "human"],
                     "tasks": [
                         "recurring-operations",
                         "scheduled-workflow-audit",
@@ -1981,13 +2003,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 "path": ".github/instructions/zsh-plugin-standard.instructions.md",
                 "kind": "scoped-guidance",
                 "authority": "canonical-detail",
-                "consumers": [
-                    "codex",
-                    "claude-code",
-                    "copilot",
-                    "gemini-cli",
-                    "human",
-                ],
+                "consumers": ["agent", "human"],
                 "tasks": [
                     "zsh-plugin-creation",
                     "zsh-plugin-review",
@@ -2012,13 +2028,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 ),
                 "kind": "scoped-guidance",
                 "authority": "canonical-detail",
-                "consumers": [
-                    "codex",
-                    "claude-code",
-                    "copilot",
-                    "gemini-cli",
-                    "human",
-                ],
+                "consumers": ["agent", "human"],
                 "tasks": [
                     "code-review",
                     "readme-authoring",
@@ -2248,13 +2258,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 "path": "runbooks/learning-capture.md",
                 "kind": "runbook",
                 "authority": "canonical-detail",
-                "consumers": [
-                    "codex",
-                    "claude-code",
-                    "copilot",
-                    "gemini-cli",
-                    "human",
-                ],
+                "consumers": ["agent", "human"],
                 "tasks": ["learning-capture", "completion-review"],
                 "file_patterns": ["**"],
                 "required": True,
@@ -2269,7 +2273,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 "path": ".github/skills/review-project-learning/SKILL.md",
                 "kind": "skill",
                 "authority": "advisory",
-                "consumers": ["copilot"],
+                "consumers": ["agent"],
                 "tasks": ["learning-capture", "completion-review"],
                 "file_patterns": ["**"],
                 "required": False,
@@ -2291,13 +2295,7 @@ class PublicRepositoryTests(unittest.TestCase):
                 "path": "runbooks/sub-issues.md",
                 "kind": "runbook",
                 "authority": "canonical-detail",
-                "consumers": [
-                    "codex",
-                    "claude-code",
-                    "copilot",
-                    "gemini-cli",
-                    "human",
-                ],
+                "consumers": ["agent", "human"],
                 "tasks": ["project-tracking", "sub-issue-management"],
                 "file_patterns": ["**"],
                 "required": True,

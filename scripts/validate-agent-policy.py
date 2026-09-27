@@ -26,6 +26,7 @@ ALLOWED_AUTHORITIES = {
     "advisory",
 }
 ALLOWED_CONSUMERS = {
+    "agent",
     "codex",
     "claude-code",
     "copilot",
