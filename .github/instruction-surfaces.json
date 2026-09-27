@@ -370,6 +370,18 @@
       "canonical_for": []
     },
     {
+      "id": "skill-project-tracker",
+      "path": ".github/skills/project-tracker/SKILL.md",
+      "kind": "skill",
+      "authority": "advisory",
+      "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+      "tasks": ["project-tracker"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "skill-zsh-plugin",
       "path": ".github/skills/zsh-plugin/SKILL.md",
       "kind": "skill",
