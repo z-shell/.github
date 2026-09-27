@@ -64,7 +64,7 @@ env:
 jobs:
   commit-message:
     name: Validate Commits
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -120,7 +120,7 @@ jobs:
 
   pr-title:
     name: Validate PR Title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions: {}
     steps:
       - name: 📋 Check PR title follows Conventional Commits
@@ -136,7 +136,7 @@ jobs:
 
   branch-naming:
     name: Validate Branch Name
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions: {}
     steps:
       - name: 🌿 Check branch naming convention
@@ -170,7 +170,7 @@ jobs:
 
   issue-link:
     name: Validate Issue Link
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions: {}
     steps:
       - name: 🔗 Check the pull request is traceable to an issue

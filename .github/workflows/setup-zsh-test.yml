@@ -30,7 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-26.04, macos-latest]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -48,14 +48,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-26.04, macos-latest]
         version: ["5.8.1", "5.9", "5.9.2"]
         patch: [none]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
             version: latest
             patch: none
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
             version: "5.9.2"
             patch: trap-bounds-a3547fd4
           - os: macos-latest

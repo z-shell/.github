@@ -21,7 +21,7 @@ concurrency:
 jobs:
   contract:
     name: Benchmark Report Contract
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - name: Check out repository
