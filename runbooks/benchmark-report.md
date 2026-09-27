@@ -35,3 +35,8 @@ Run `python3 -m unittest scripts/test_benchmark_report.py -v`. `Benchmark Report
 Current producer references are [Zi's comparison](https://github.com/z-shell/zi/blob/8448b4a2323099b3034db9b40b598eef702ae9b2/benchmarks/compare.zsh) and [the annex's runner](https://github.com/z-shell/z-a-meta-plugins/blob/f3f95b9ec33978b18813ed6b02285cc58548c339/benchmarks/run.py). Zi's comparison alone omits the control identity and does not compare runner-image/CPU fields; the raw control report and this validator close those evidence gaps without editing its workload runner.
 
 See [ADR-0024](../decisions/0024-benchmarks-observed-not-gated.md) for the schema and publication policy. Adoption and remaining qualifications are tracked in [#673](https://github.com/z-shell/.github/issues/673) and [#675](https://github.com/z-shell/.github/issues/675).
+
+Controlled container producers can use [run-zd](zd-validation.md). Pass its
+`evidence-directory` as the action's optional `root` and keep `report` relative
+to that directory. Existing callers default to `github.workspace`. Execution
+and report validation remain separate, and no timing gate is added.

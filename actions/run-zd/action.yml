@@ -1,0 +1,67 @@
+name: Run Zd
+description: Run a repository-owned command in a pinned controlled zd image.
+inputs:
+  zd-ref:
+    description: Full reviewed z-shell/zd commit containing scripts/zd.py.
+    required: true
+  image:
+    description: Qualified registry image digest, or a preloaded local image ID.
+    required: true
+  profile:
+    description: runtime or module-build.
+    required: true
+  command:
+    description: JSON array of command arguments, evaluated without a shell.
+    required: true
+  source:
+    description: Git checkout root containing the repository-owned workload.
+    default: ${{ github.workspace }}
+  fixtures:
+    description: JSON object mapping input names to prepared Git checkout roots.
+    default: "{}"
+  mode:
+    description: test or benchmark; benchmark forbids workload network access.
+    default: test
+  cpuset:
+    description: Optional CPU affinity list; does not reserve host CPUs.
+    default: ""
+  timeout:
+    description: Maximum workload seconds, excluding image and runner preparation.
+    default: "900"
+  pull:
+    description: Pull the immutable registry image before execution; false for preloaded images.
+    default: "true"
+  artifact-name:
+    description: Unique artifact name for this invocation.
+    default: zd-execution
+outputs:
+  evidence-directory:
+    description: Retained output directory containing execution identity and workload artifacts.
+    value: ${{ steps.run.outputs.directory }}
+runs:
+  using: composite
+  steps:
+    - name: Execute controlled repository command
+      id: run
+      shell: bash
+      env:
+        ACTION_DIRECTORY: ${{ github.action_path }}
+        ZD_REF: ${{ inputs.zd-ref }}
+        ZD_IMAGE: ${{ inputs.image }}
+        ZD_PROFILE: ${{ inputs.profile }}
+        ZD_COMMAND: ${{ inputs.command }}
+        ZD_SOURCE: ${{ inputs.source }}
+        ZD_FIXTURES: ${{ inputs.fixtures }}
+        ZD_MODE: ${{ inputs.mode }}
+        ZD_CPUSET: ${{ inputs.cpuset }}
+        ZD_TIMEOUT: ${{ inputs.timeout }}
+        ZD_PULL: ${{ inputs.pull }}
+      run: python3 "$ACTION_DIRECTORY/run.py"
+    - name: Preserve execution evidence
+      if: always() && steps.run.outputs.directory != ''
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.run.outputs.directory }}/
+        retention-days: 14
+        if-no-files-found: error
