@@ -133,9 +133,7 @@ Unclassified workstreams and conflicting or missing relationships require
 separate authorized Project inspection; the scheduled summary does not assess
 them. Do not treat a complete membership count as full portfolio readiness.
 
-Any project membership, field, label, issue, repository, organization setting,
-or workflow-setting mutation outside the scheduled additive reconciliation still
-requires explicit maintainer approval.
+Any project membership, field, label, issue, repository, organization setting, or workflow-setting mutation outside the scheduled additive reconciliation requires explicit maintainer authority. The [triage procedure](triage.md#authority-and-scope) defines how a bounded delivery approval can include routine membership and factual status updates. It does not authorize overwriting human fields, changing project configuration or operating beyond the named issue and its implementation PRs.
 
 ## See also
 
