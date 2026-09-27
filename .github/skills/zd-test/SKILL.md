@@ -7,7 +7,7 @@ description: Reproduce Linux Zsh failures, validate module ABI boundaries, or co
 
 Read the owning repository's checks and compatibility floor, then the organization [selection guidance](../../instructions/zd-validation.instructions.md). Keep the user's workload and target versions.
 
-Choose `runtime` for source tests or `module-build` for a compiled module. Obtain an already qualified immutable image and the corresponding pinned zd runner. Inspect the runner's `--help` and [controlled-execution contract](https://github.com/z-shell/zd/blob/main/docs/controlled-execution.md) when preparing a run. Do not infer installed tools from a legacy zd tag.
+Choose `runtime` for source tests or `module-build` for a compiled module. Obtain an already qualified immutable image and the corresponding pinned zd runner. Inspect the runner's `--help` and [controlled-execution contract](https://github.com/z-shell/zd/blob/f8d74a1c916d42c99fea2600adff3607f67ee4bc/docs/controlled-execution.md) when preparing a run. Do not infer installed tools from a legacy zd tag.
 
 Run the repository-owned entrypoint with a fresh output directory outside its Git source tree. Pass prepared Git fixtures as named inputs. Finish installation, cloning and image preparation before a benchmark; leave workload network access disabled. Declare required non-secret environment values explicitly. Preserve command argument boundaries instead of evaluating a command string.
 

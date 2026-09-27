@@ -4,7 +4,7 @@ zd owns the execution environment; repositories own their test commands and benc
 
 ## Prepare and qualify the environment
 
-Use zd's [controlled execution guide](https://github.com/z-shell/zd/blob/main/docs/controlled-execution.md). It defines `runtime` and `module-build`, release archive checksums, explicit runtime patches, image qualification and CLI behavior. Legacy zd images do not claim this profile contract. Build/pull a qualified image before execution. Record its immutable registry digest, actual Zsh release, patch identity, architecture and package manifest. Benchmark images must match the Docker host architecture; emulation is correctness evidence only.
+Use zd's [controlled execution guide](https://github.com/z-shell/zd/blob/f8d74a1c916d42c99fea2600adff3607f67ee4bc/docs/controlled-execution.md). It defines `runtime` and `module-build`, release archive checksums, explicit runtime patches, image qualification and CLI behavior. Legacy zd images do not claim this profile contract. Build/pull a qualified image before execution. Record its immutable registry digest, actual Zsh release, patch identity, architecture and package manifest. Benchmark images must match the Docker host architecture; emulation is correctness evidence only.
 
 Clone or prepare fixed dependency revisions outside the timed workload. Pass public Git fixture roots as named inputs, such as `zi`. zd snapshots Git-selected files into disposable writable state without Git metadata or ignored build caches, records original revisions and content hashes, and rejects input changes during execution. The source and fixture mounts are read-only. Commands receive a clean HOME, ZDOTDIR and explicit environment. Keep secrets out of arguments, fixtures and artifacts.
 

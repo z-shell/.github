@@ -1262,6 +1262,23 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0035",
+      "path": "decisions/0035-sole-maintainer-class-1-review-exception.md",
+      "kind": "decision",
+      "authority": "canonical-detail",
+      "consumers": ["agent", "human"],
+      "tasks": [
+        "architecture-decision",
+        "code-review",
+        "pull-request",
+        "github-operations"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["sole-maintainer-class-1-review-exception"]
+    },
+    {
       "id": "org-policy-report",
       "path": "scripts/org_policy_report.py",
       "kind": "enforcement",
