@@ -45,3 +45,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0032](0032-organization-procedures-live-once-as-public-runbooks.md) | Organization Procedures Live Once, as Public Runbooks That Thin Skills Route To                    | ACCEPTED | 2026-09-26 | ss-o     |
 | [0033](0033-shared-zsh-quality-boundaries.md)                        | Shared Zsh Quality Integrations Keep Analysis and Workloads Repository-Owned                       | PROPOSED | 2026-09-26 | TBD      |
 | [0034](0034-portable-consumer-audiences.md)                          | Use portable audiences for shared instruction surfaces                                             | ACCEPTED | 2026-09-27 | ss-o     |
+| [0035](0035-sole-maintainer-class-1-review-exception.md)             | Allow a bounded Class 1 review exception for a sole maintainer                                     | ACCEPTED | 2026-09-27 | ss-o     |

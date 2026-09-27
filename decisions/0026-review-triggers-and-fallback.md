@@ -20,7 +20,7 @@ The amendment proposed in [#664](https://github.com/z-shell/.github/issues/664) 
 
 1. **Reviews are requested, not triggered by pushes.** Every `copilot_code_review` rule sets `review_on_push: false` and `review_draft_pull_requests: false`. The rule's presence per class is unchanged from ADR-0013, and the settings audit continues to check presence only. Unless the maintainer elects the fallback below, a configured Copilot review is requested explicitly (`requested_reviewers` with `copilot-pull-request-reviewer[bot]`) when the pull request is ready: checks green, description complete, all local validation run. The request is confirmed by a new `review_requested` timeline event identifying Copilot, not assumed from the API status code or an unrelated reviewer event.
 2. **One request per review round, and the loop is capped.** Thread fixes are batched and pushed once before the next request. After the second round in which Copilot raises only implementation-level or wording findings, the maintainer decides whether to defer the remaining detail to an issue rather than request a third review.
-3. **Review of record and maintainer-elected fallback.** Every non-exempt pull request needs a posted review of record, whether or not Copilot review is configured for its base branch. In classes 2, 3 and 4 the maintainer may elect a fallback up front, when Copilot is not configured, or after a request fails to register. An agent never elects it on the maintainer's behalf. Class 1 waits for Copilot or a second human; fallback is unavailable.
+3. **Review of record and maintainer-elected fallback.** Every non-exempt pull request needs a posted review of record, whether or not Copilot review is configured for its base branch. In classes 2, 3 and 4 the maintainer may elect a fallback up front, when Copilot is not configured, or after a request fails to register. An agent never elects it on the maintainer's behalf. Class 1 normally waits for Copilot or a second human. [ADR-0035](0035-sole-maintainer-class-1-review-exception.md) defines the accepted bounded sole-maintainer exception.
 
    A fallback is executed under `.github/skills/code-review/SKILL.md` against `code-review-generic.instructions.md` on the current head and posted as a pull-request review, with inline threads for actionable findings. Record the reviewed head, relevant checklist verdicts and evidence, findings, and verification limits; a marker or test summary alone is not a review. Use the marker matching what occurred:
    - Maintainer election without a Copilot request: `Fallback review under ADR-0026: maintainer elected, no Copilot request on <sha>`.
@@ -36,11 +36,11 @@ The amendment proposed in [#664](https://github.com/z-shell/.github/issues/664) 
 
 - The allowance is spent on reviews of ready heads, so a day of ordinary work no longer ends with a pull request nobody can review.
 - The fallback is a named procedure with a marker line, so a merge without Copilot is visible in the record instead of being an undocumented bypass.
-- Class 1 keeps its independent second reader.
+- Class 1 normally keeps its independent second reader; ADR-0035 separately records the sole-maintainer exception and its added risk.
 
 ### Costs and risks
 
-- An agent reviewing its own change shares its blind spots. The fallback is a second pass under the written checklist, not an independent reviewer; that is why class 1 is excluded and why the marker line exists.
+- An agent reviewing its own change shares its blind spots. The fallback is a second pass under the written checklist, not an independent reviewer; that is why Class 1 normally requires Copilot or a second human and why the marker line exists. ADR-0035 describes the additional limits for a sole-maintainer exception.
 - Turning off `review_on_push` removes the review a maintainer never asked for. A pull request that is opened and merged without an explicit request has no review at all; the done gate in `AGENTS.md` still blocks that, and the thread-resolution rule cannot help when there are no threads. The weekly organization review lists merged pull requests without a review of record.
 - Seven rulesets change; the change is a parameter edit inside an existing rule and is applied through the ADR-0013 rollout ([z-shell/.github#478](https://github.com/z-shell/.github/issues/478)).
 
