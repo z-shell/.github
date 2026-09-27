@@ -1,0 +1,32 @@
+--- a/Src/builtin.c
++++ b/Src/builtin.c
+@@ -7428,6 +7428,14 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
+ 	return 1;
+     }
+ 
++    if (!*argv) {
++	if (idigit(*arg) || !strncmp(arg, "SIG", 3))
++	    zwarnnam(name, "undefined signal: %s", arg);
++	else
++	    zwarnnam(name, "signal expected");
++	return 1;
++    }
++
+     /* set traps */
+     for (; *argv; argv++) {
+ 	Eprog t;
+--- a/Src/jobs.c
++++ b/Src/jobs.c
+@@ -3054,7 +3054,11 @@ getsigidx(const char *s)
+ 
+     /* check for a signal specified by number */
+     x = atoi(s);
+-    if (idigit(*s) && x >= 0)
++    if (idigit(*s) && x >= 0 && (x < VSIGCOUNT
++#if defined(SIGRTMIN) && defined(SIGRTMAX)
++	|| (x >= SIGRTMIN && x <= SIGRTMAX)
++#endif
++	))
+ 	return SIGIDX(x);
+ 
+     /* search for signal by name */

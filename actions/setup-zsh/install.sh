@@ -3,6 +3,16 @@
 set -euo pipefail
 
 version=${ZSH_VERSION:-latest}
+patch_set=${ZSH_PATCH_SET:-none}
+action_dir=${SETUP_ZSH_ACTION_PATH:-$(cd -- "$(dirname -- "$0")" && pwd)}
+case ${patch_set}:${version} in
+none:*) ;;
+trap-bounds-a3547fd4:5.9.2) ;;
+*)
+  printf '%s\n' 'Unsupported Zsh patch-set/version combination.' >&2
+  exit 1
+  ;;
+esac
 case ${RUNNER_OS:?RUNNER_OS is required} in
 Linux | macOS | Windows) ;;
 *)
@@ -25,14 +35,18 @@ if [[ ${version} == latest ]]; then
   exit 0
 fi
 
-if [[ ${RUNNER_OS} != Linux ]]; then
-  printf '%s\n' 'Exact Zsh versions are supported only on Linux; use latest for package installs.' >&2
+if [[ ${RUNNER_OS} == Windows ]]; then
+  printf '%s\n' 'Exact Zsh versions are supported only on Linux and macOS; use latest for package installs.' >&2
   exit 1
 fi
 
 # Checked against the official release archives. Keep digests in source so a
 # changed download cannot silently change the shell used by native oracles.
 case ${version} in
+5.8.1)
+  url=https://www.zsh.org/pub/old/zsh-5.8.1.tar.xz
+  digest=b6973520bace600b4779200269b1e5d79e5f505ac4952058c11ad5bbf0dd9919
+  ;;
 5.9)
   url=https://www.zsh.org/pub/old/zsh-5.9.tar.xz
   digest=9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5
@@ -42,7 +56,7 @@ case ${version} in
   digest=36fa734374b44783582cec09bcd67822e2f992c779ec1624ab5596df078d2f81
   ;;
 *)
-  printf '%s\n' 'Unsupported Zsh version; supported values: latest, 5.9, 5.9.2.' >&2
+  printf '%s\n' 'Unsupported Zsh version; supported values: latest, 5.8.1, 5.9, 5.9.2.' >&2
   exit 1
   ;;
 esac
@@ -60,8 +74,21 @@ cleanup() {
 trap cleanup EXIT
 install_dir=$(mktemp -d "${RUNNER_TEMP}/setup-zsh-install.XXXXXX")
 
-sudo apt-get update
-sudo apt-get install -y build-essential libncurses-dev curl ca-certificates xz-utils
+cppflags=''
+ldflags=''
+patch_tool="patch"
+hash_tool=(sha256sum)
+if [[ ${RUNNER_OS} == Linux ]]; then
+  sudo apt-get update
+  sudo apt-get install -y build-essential libncurses-dev curl ca-certificates xz-utils patch python3
+else
+  brew install ncurses xz gpatch
+  ncurses_prefix=$(brew --prefix ncurses)
+  cppflags="-I${ncurses_prefix}/include"
+  ldflags="-L${ncurses_prefix}/lib"
+  patch_tool=gpatch
+  hash_tool=(shasum -a 256)
+fi
 download_release() {
   curl --fail --show-error --silent --location --proto '=https' --proto-redir '=https' \
     --retry 3 --output "${build_dir}/zsh.tar.xz" "$1"
@@ -73,13 +100,28 @@ download_release() {
 if ! download_release "${url}"; then
   download_release "https://www.zsh.org/pub/old/zsh-${version}.tar.xz"
 fi
-printf '%s  %s\n' "${digest}" "${build_dir}/zsh.tar.xz" | sha256sum --check --status
+printf '%s  %s\n' "${digest}" "${build_dir}/zsh.tar.xz" | "${hash_tool[@]}" --check --status
+patch_digest=''
+patch_commit=''
+if [[ ${patch_set} != none ]]; then
+  patch_digest=bcac19bbbb4506ae35eee6e7873c4308aba9b86e4e6d152101e3a4c4d5265255
+  patch_commit=a3547fd4c165bd6c0c9c9d2643bd61b593f7bbaf
+  printf '%s  %s\n' "${patch_digest}" "${action_dir}/${patch_set}.patch" | "${hash_tool[@]}" --check --status
+fi
 # Extract only after verifying the release bytes.
 tar -xJf "${build_dir}/zsh.tar.xz" -C "${build_dir}"
 (
   cd "${build_dir}/zsh-${version}"
-  ./configure --prefix="${install_dir}" --enable-multibyte --with-tcsetpgrp
+  if [[ ${patch_set} != none ]]; then
+    "${patch_tool}" --batch --forward --fuzz=0 -p1 --dry-run <"${action_dir}/${patch_set}.patch"
+    "${patch_tool}" --batch --forward --fuzz=0 -p1 <"${action_dir}/${patch_set}.patch"
+  fi
+  CC=cc CFLAGS=-O2 CPPFLAGS="${cppflags}" LDFLAGS="${ldflags}" ./configure --prefix="${install_dir}" --enable-multibyte --with-tcsetpgrp
   make -j2
+  if [[ ${patch_set} != none ]]; then
+    make TESTNUM=A05 check
+    make TESTNUM=B11 check
+  fi
   make install.bin install.modules install.fns
 )
 # The child Zsh, not Bash, expands its own version parameter.
@@ -90,5 +132,15 @@ if [[ ${actual_version} != "${version}" ]]; then
   exit 1
 fi
 "${install_dir}/bin/zsh" --version
+profile="${version}+${patch_set}"
+python3 "${action_dir}/provenance.py" "${install_dir}" "${version}" "${profile}" \
+  "${url}" "${digest}" "${patch_commit}" "${patch_digest}" "${cppflags}" "${ldflags}"
+if [[ -n ${GITHUB_OUTPUT-} ]]; then
+  {
+    printf 'executable=%s\n' "${install_dir}/bin/zsh"
+    printf 'profile=%s\n' "${profile}"
+    printf 'provenance=%s\n' "${install_dir}/provenance.json"
+  } >>"${GITHUB_OUTPUT}"
+fi
 printf '%s\n' "${install_dir}/bin" >>"${GITHUB_PATH}"
 installed=true

@@ -3,16 +3,35 @@ name: "Setup Zsh"
 description: "Setup Zsh for GitHub Actions"
 inputs:
   version:
-    description: "Package version (latest), or exact Linux source version (5.9, 5.9.2)"
+    description: "Package version (latest), or exact Linux/macOS source version (5.8.1, 5.9, 5.9.2)"
     required: false
     default: "latest"
+
+  patch-set:
+    description: "Reviewed patch profile: none or trap-bounds-a3547fd4 (5.9.2 only)"
+    required: false
+    default: "none"
+outputs:
+  executable:
+    description: "Absolute executable path for an exact source build"
+    value: ${{ steps.install.outputs.executable }}
+  profile:
+    description: "Exact source version and patch profile"
+    value: ${{ steps.install.outputs.profile }}
+  provenance:
+    description: "JSON provenance path for an exact source build"
+    value: ${{ steps.install.outputs.provenance }}
 
 runs:
   using: "composite"
   steps:
     - name: Set up Zsh
+      id: install
       shell: bash
       env:
+        ZSH_PATCH_SET: ${{ inputs.patch-set }}
+        SETUP_ZSH_ACTION_REF: ${{ github.action_ref }}
+        SETUP_ZSH_ACTION_REPOSITORY: ${{ github.action_repository }}
         ZSH_VERSION: ${{ inputs.version }}
         SETUP_ZSH_ACTION_PATH: ${{ github.action_path }}
       run: bash "$SETUP_ZSH_ACTION_PATH/install.sh"
