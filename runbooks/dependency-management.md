@@ -133,11 +133,7 @@ If both bots open routine updates:
    `.github/dependabot.yml`;
 4. close the duplicate pull request only after choosing the update to retain.
 
-Dependabot security update pull requests are expected and are not an overlap
-with Renovate's routine update ownership. In repositories with a persistent
-integration branch (`next`), Dependabot security updates target the default
-branch (`main`) natively and are accepted by the main source guard per
-`runbooks/branch-protection.md`.
+Dependabot security update pull requests are expected and are not an overlap with Renovate's routine update ownership. In repositories with a persistent integration branch (`next`), Dependabot security updates target the default branch (`main`) natively, and the main source guard must accept them as `runbooks/branch-protection.md` specifies. A guard that allows only `next` and `hotfix-*` rejects them until its workflow and tests implement that exception.
 
 ## Rollback
 

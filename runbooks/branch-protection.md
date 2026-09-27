@@ -62,22 +62,21 @@ must reject pull requests into `main` unless:
 
 1. `github.event.pull_request.head.repo.full_name == github.repository`; and
 2. one of the following conditions is met:
-   a. the head is exactly `next`, representing a reviewed promotion;
-   b. the head matches an explicitly reviewed `hotfix-*` branch; or
-   c. the head matches `dependabot/**` and `github.event.pull_request.user.login`
-      is `dependabot[bot]` or `app/dependabot`, representing an automated
-      Dependabot security update.
+   - the head is exactly `next`, representing a reviewed promotion;
+   - the head matches an explicitly reviewed `hotfix-*` branch; or
+   - the head matches `dependabot/**` and `github.event.pull_request.user.login` is `dependabot[bot]`, representing an automated Dependabot security update. That is the login in the event payload; `gh pr view --json author` reports the same account as `app/dependabot`, which the guard must not compare against.
 
 Checking repository identity first prevents a fork from reusing an allowed
 branch name.
 
-GitHub Dependabot version updates honor `target-branch: next`, but Dependabot
-security updates ignore that setting and always target the repository's
-default branch (`main`). Authenticating the same-repository head, the branch
-prefix, and the bot actor allows automated security updates through the
-guard while routine updates continue targeting `next`. The known limitation of
-this exception is that a routine Dependabot update manually retargeted to
-`main` by a maintainer would also satisfy these criteria.
+GitHub Dependabot version updates honor `target-branch: next`, but Dependabot security updates ignore that setting and always target the repository's default branch (`main`). Checking the same-repository head, the branch prefix, and the pull-request author lets automated security updates through the guard while routine updates continue targeting `next`.
+
+These signals identify who opened the pull request, not what it contains, so the exception has two known limitations:
+
+- a routine Dependabot update that a maintainer manually retargets to `main` also satisfies the criteria; and
+- anyone with write access can push their own commits onto an open `dependabot/**` branch. The pull-request author stays `dependabot[bot]`, so the guard still passes on the `synchronize` run and those commits can reach `main` without passing through `next`.
+
+The guard closes neither limitation. Where the `main` ruleset requires review, the reviewer must confirm that a `dependabot/**` pull request into `main` is a security update and that every commit on it was made by Dependabot. A repository that declares Dependabot bumps an automation-only class ([`pull-requests.md`](pull-requests.md), section 3) gets no review of record on those pull requests, so there both limitations are accepted without a compensating control.
 
 Run the guard on a real pull request before adding its context to
 `required_status_checks`, because GitHub only accepts observed check contexts.
