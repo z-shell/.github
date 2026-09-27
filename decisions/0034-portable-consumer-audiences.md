@@ -1,8 +1,8 @@
 # 34. Use portable audiences for shared instruction surfaces
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-09-27
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
