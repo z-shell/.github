@@ -99,7 +99,8 @@ be kept aligned when a repository's branch model changes.
   (consistent with ADR-0007).
 - This ADR sets the policy; `runbooks/branch-protection.md` covers the
   repository-settings and ruleset provisioning that enforces it (added after
-  an audit found `src` and `zsh-eza` both missing parts of it).
+  an audit found `src` and `zsh-eza` both missing parts of it), including the
+  exception allowing authenticated Dependabot security updates into `main`.
 
 ## Alternatives considered
 
