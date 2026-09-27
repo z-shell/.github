@@ -1276,6 +1276,61 @@
       "required": true,
       "review_owner": "z-shell maintainers",
       "canonical_for": ["policy-coverage-and-impact-report"]
+    },
+    {
+      "id": "instruction-zd-validation",
+      "path": ".github/instructions/zd-validation.instructions.md",
+      "kind": "scoped-guidance",
+      "authority": "canonical-detail",
+      "consumers": ["agent", "human"],
+      "tasks": [
+        "container-validation",
+        "benchmark",
+        "compatibility-validation",
+        "zd-integration",
+        "testing",
+        "ci",
+        "github-actions",
+        "workflow"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["controlled-validation-selection"]
+    },
+    {
+      "id": "skill-zd-test",
+      "path": ".github/skills/zd-test/SKILL.md",
+      "kind": "skill",
+      "authority": "advisory",
+      "consumers": ["agent", "human"],
+      "tasks": [
+        "container-validation",
+        "benchmark",
+        "compatibility-validation",
+        "zd-integration"
+      ],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
+      "id": "runbook-zd-validation",
+      "path": "runbooks/zd-validation.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["agent", "human"],
+      "tasks": [
+        "container-validation",
+        "benchmark",
+        "compatibility-validation",
+        "zd-integration"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["controlled-validation-integration"]
     }
   ],
   "downstream": [

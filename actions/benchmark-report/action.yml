@@ -1,6 +1,9 @@
 name: Benchmark Report
 description: Validate ADR-0024 evidence, publish a job summary and retain reports.
 inputs:
+  root:
+    description: Root containing the report, including a run-zd evidence directory.
+    default: ${{ github.workspace }}
   report:
     description: Repository-relative path to a version 1 comparison report.
     required: true
@@ -29,12 +32,13 @@ runs:
       shell: bash
       env:
         ACTION_DIRECTORY: ${{ github.action_path }}
+        REPORT_ROOT: ${{ inputs.root }}
         REPORT_PATH: ${{ inputs.report }}
         CONTROL_REPORT_PATH: ${{ inputs.control-report }}
         EVIDENCE_DIRECTORY: ${{ steps.prepare.outputs.directory }}
       run: |
         python3 "$ACTION_DIRECTORY/../../scripts/benchmark_report.py" \
-          --root "$GITHUB_WORKSPACE" --report "$REPORT_PATH" \
+          --root "$REPORT_ROOT" --report "$REPORT_PATH" \
           --control-report "$CONTROL_REPORT_PATH" --output "$EVIDENCE_DIRECTORY"
     - name: Preserve benchmark evidence
       if: always() && steps.prepare.outputs.directory != ''

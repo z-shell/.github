@@ -1,0 +1,92 @@
+name: Zd Action
+on:
+  pull_request:
+    paths:
+      - actions/run-zd/**
+      - scripts/test_run_zd.py
+      - .github/workflows/zd-action.yml
+  push:
+    branches: [main]
+    paths:
+      - actions/run-zd/**
+      - scripts/test_run_zd.py
+      - .github/workflows/zd-action.yml
+  workflow_dispatch:
+    inputs:
+      zd-ref:
+        description: Full reviewed zd commit containing the controlled runner.
+        required: true
+      image:
+        description: Qualified runtime image with immutable registry digest.
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    name: Adapter Contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Check adapter contracts
+        run: python3 -m unittest scripts/test_run_zd.py -v
+  qualify:
+    name: Execution (${{ matrix.name }})
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: success
+            command: '["python3", "-c", "import os; from pathlib import Path; assert not Path(\".git\").exists(); assert os.environ[\"HOME\"] == \"/work/home\""]'
+            timeout: "60"
+            expected: 0
+          - name: failure
+            command: '["python3", "-c", "raise SystemExit(23)"]'
+            timeout: "60"
+            expected: 23
+          - name: timeout
+            command: '["python3", "-c", "import time; time.sleep(60)"]'
+            timeout: "2"
+            expected: 124
+    steps:
+      - name: Check out source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Qualify the action
+        id: execution
+        continue-on-error: true
+        uses: ./actions/run-zd
+        with:
+          zd-ref: ${{ inputs.zd-ref }}
+          image: ${{ inputs.image }}
+          profile: runtime
+          command: ${{ matrix.command }}
+          timeout: ${{ matrix.timeout }}
+          artifact-name: zd-action-${{ matrix.name }}
+      - name: Verify observable result and container cleanup
+        if: always()
+        env:
+          EVIDENCE: ${{ steps.execution.outputs.evidence-directory }}
+          EXPECTED: ${{ matrix.expected }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          evidence = Path(os.environ['EVIDENCE'])
+          action = json.loads((evidence / 'action.json').read_text())
+          execution = json.loads((evidence / 'execution/execution.json').read_text())
+          assert action['exit_code'] == int(os.environ['EXPECTED'])
+          assert execution['exit_code'] == int(os.environ['EXPECTED'])
+          names = subprocess.check_output(['docker', 'ps', '-a', '--format', '{{.Names}}'], text=True).splitlines()
+          assert execution['container_name'] not in names
+          PY
