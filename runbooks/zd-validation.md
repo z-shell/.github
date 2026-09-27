@@ -18,7 +18,7 @@ Locally, invoke `python3 /path/to/zd/bin/zd run` with an immutable image, `--pro
 
 For an ADR-0024 producer, invoke `actions/benchmark-report` afterward with `root` equal to the run-zd `evidence-directory` output and `report` relative to that directory, for example `execution/comparison/comparison.json`. This root input preserves the default workspace-root behavior for existing callers. Keep report validation after a failed workload if diagnostic evidence is needed; an absent or incomplete comparison must fail validation. Both actions require only `contents: read`; neither comments on pull requests or publishes an image.
 
-Until the new source has a reviewed published SHA, pilot workflows use manual dispatch requiring full organization/zd commits and an image digest. They check out the selected organization tooling and use its local action path. Do not invent a pin for an uncommitted implementation. After publication, replace this bootstrap with a reviewed immutable action reference before enabling automatic PR runs. Image publication is a separate release operation.
+Pilot workflows pin already published organization and zd commits in source, check out that exact organization revision and use its local action path. Dispatch selects only a qualified immutable image digest; it cannot select executable shared revisions. A full-SHA format check alone does not establish that dispatched code is trusted. Draft prerequisite pins still need review of record before the pilot is used. Do not invent a pin for an uncommitted implementation. After prerequisite review and hosted qualification, use a reviewed immutable action reference before enabling automatic PR runs. Image publication is a separate release operation.
 
 ## Repository pilots
 
