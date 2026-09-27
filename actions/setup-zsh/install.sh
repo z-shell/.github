@@ -140,7 +140,7 @@ if [[ -n ${GITHUB_OUTPUT-} ]]; then
     printf 'executable=%s\n' "${install_dir}/bin/zsh"
     printf 'profile=%s\n' "${profile}"
     printf 'provenance=%s\n' "${install_dir}/provenance.json"
-  } >>"${GITHUB_OUTPUT}"
+  } >>"${GITHUB_OUTPUT}" || exit 1
 fi
 printf '%s\n' "${install_dir}/bin" >>"${GITHUB_PATH}"
 installed=true

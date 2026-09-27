@@ -63,6 +63,7 @@ class SetupZshTest(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.bin = self.root / "bin"
         self.bin.mkdir()
+        (self.bin / "bash").symlink_to("/bin/bash")
         self.runner_temp = self.root / "runner"
         self.runner_temp.mkdir()
         self.log = self.root / "commands.jsonl"
