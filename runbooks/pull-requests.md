@@ -4,7 +4,7 @@ Use this runbook for every pull request to a z-shell repository, whoever opens i
 
 ## 1. Before the branch
 
-- Read the owning issue and its acceptance criteria. The pull request is measured against them.
+- Read the owning issue and its acceptance criteria. The pull request is measured against them. Complete the [triage procedure](triage.md), including the bounded metadata authorization, before implementation; carry its label and Project 28 verification through opening, review handoff and post-merge.
 - Name the branch before creating it. The pattern is the `BRANCH_PATTERN` default in `.github/workflows/commit-lint.yml`:
   - `feature-<issue>`, `bug-<issue>` or `hotfix-<issue>`, optionally followed by a lowercase `-<slug>` (for example `bug-480` or `feature-668-pull-requests`);
   - or `<type>/<lowercase-slug>` with a slash after a Conventional Commits type, or `feature`, `bug` or `hotfix` (for example `docs/pull-requests-runbook`). `docs-488` matches neither and fails the required check.
