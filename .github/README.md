@@ -216,9 +216,4 @@ the required override.
 
 ## Controlled Linux validation
 
-Use the portable [`zd-test`](skills/zd-test/SKILL.md) skill for container-sensitive
-reproduction, explicit Zsh runtime checks and controlled benchmarks. The
-[selection guidance](instructions/zd-validation.instructions.md) explains when
-zd helps, and the [integration runbook](../runbooks/zd-validation.md) describes
-the `run-zd` composite action and repository-owned pilot commands. Native platform
-and terminal checks retain their own coverage.
+Use the portable [`zd-test`](skills/zd-test/SKILL.md) skill for container-sensitive reproduction, explicit Zsh runtime checks and controlled benchmarks. The [selection guidance](instructions/zd-validation.instructions.md) explains when zd helps, and the [integration runbook](../runbooks/zd-validation.md) describes the `run-zd` composite action and repository-owned pilot commands. Native platform and terminal checks retain their own coverage.

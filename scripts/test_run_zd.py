@@ -6,8 +6,8 @@ import json
 import os
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
-from unittest import mock
 
 spec = importlib.util.spec_from_file_location(
     "run_zd", Path(__file__).parents[1] / "actions/run-zd/run.py"
@@ -51,8 +51,8 @@ class AdapterTests(unittest.TestCase):
         env = self.environment()
         env["ZD_FIXTURES"] = json.dumps({"zi": "/fixture path"})
         config = adapter.configuration(env)
-        with mock.patch.object(
-            adapter.subprocess, "run", return_value=mock.Mock(returncode=23)
+        with unittest.mock.patch.object(
+            adapter.subprocess, "run", return_value=unittest.mock.Mock(returncode=23)
         ) as run:
             self.assertEqual(
                 adapter.execute(config, Path("runner.py"), Path("output")), 23
@@ -86,7 +86,7 @@ class AdapterTests(unittest.TestCase):
                 "GITHUB_OUTPUT": str(output),
                 "ZD_REF": "main",
             }
-            with mock.patch.dict(os.environ, env):
+            with unittest.mock.patch.dict(os.environ, env):
                 self.assertEqual(adapter.main(), 125)
             evidence = Path(output.read_text().strip().split("=", 1)[1])
             self.assertEqual(
