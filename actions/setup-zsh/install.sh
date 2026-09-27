@@ -74,6 +74,9 @@ cleanup() {
 trap cleanup EXIT
 install_dir=$(mktemp -d "${RUNNER_TEMP}/setup-zsh-install.XXXXXX")
 
+cflags=-O2
+dllflags=''
+configure_args=(--enable-multibyte --with-tcsetpgrp)
 cppflags=''
 ldflags=''
 patch_tool="patch"
@@ -87,6 +90,13 @@ else
   cppflags="-I${ncurses_prefix}/include"
   ldflags="-L${ncurses_prefix}/lib"
   patch_tool=gpatch
+  # Older release probes use implicit-int C89 definitions rejected by new Clang.
+  if [[ ${version} == 5.8.1 || ${version} == 5.9 ]]; then
+    cflags='-O2 -std=gnu89'
+  fi
+  # Match upstream's modern Darwin linker mode (383526da422c).
+  dllflags='-bundle -flat_namespace -undefined dynamic_lookup'
+  configure_args+=("DLLDFLAGS=${dllflags}")
   hash_tool=(shasum -a 256)
 fi
 download_release() {
@@ -116,7 +126,7 @@ tar -xJf "${build_dir}/zsh.tar.xz" -C "${build_dir}"
     "${patch_tool}" --batch --forward --fuzz=0 -p1 --dry-run <"${action_dir}/${patch_set}.patch"
     "${patch_tool}" --batch --forward --fuzz=0 -p1 <"${action_dir}/${patch_set}.patch"
   fi
-  CC=cc CFLAGS=-O2 CPPFLAGS="${cppflags}" LDFLAGS="${ldflags}" ./configure --prefix="${install_dir}" --enable-multibyte --with-tcsetpgrp
+  CC=cc CFLAGS="${cflags}" CPPFLAGS="${cppflags}" LDFLAGS="${ldflags}" ./configure --prefix="${install_dir}" "${configure_args[@]}"
   make -j2
   if [[ ${patch_set} != none ]]; then
     make TESTNUM=A05 check
@@ -132,9 +142,10 @@ if [[ ${actual_version} != "${version}" ]]; then
   exit 1
 fi
 "${install_dir}/bin/zsh" --version
+"${install_dir}/bin/zsh" -f -c 'zmodload zsh/system'
 profile="${version}+${patch_set}"
 python3 "${action_dir}/provenance.py" "${install_dir}" "${version}" "${profile}" \
-  "${url}" "${digest}" "${patch_commit}" "${patch_digest}" "${cppflags}" "${ldflags}"
+  "${url}" "${digest}" "${patch_commit}" "${patch_digest}" "${cppflags}" "${ldflags}" "${cflags}" "${dllflags}"
 if [[ -n ${GITHUB_OUTPUT-} ]]; then
   {
     printf 'executable=%s\n' "${install_dir}/bin/zsh"

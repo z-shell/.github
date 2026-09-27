@@ -221,6 +221,23 @@ class SetupZshTest(unittest.TestCase):
         self.assertNotIn("sudo", [c[0] for c in commands])
         self.assertIn("gpatch", [c[0] for c in commands])
 
+    def test_old_macos_profile_records_legacy_dialect_and_linker(self):
+        output = self.root / "outputs"
+        result = self.run_action(
+            "5.8.1",
+            MOCK_ACTUAL_VERSION="5.8.1",
+            RUNNER_OS="macOS",
+            GITHUB_OUTPUT=str(output),
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        values = dict(line.split("=", 1) for line in output.read_text().splitlines())
+        manifest = json.loads(Path(values["provenance"]).read_text())
+        self.assertEqual("-O2 -std=gnu89", manifest["build"]["cflags"])
+        self.assertEqual(
+            "-bundle -flat_namespace -undefined dynamic_lookup",
+            manifest["build"]["dlldflags"],
+        )
+
     def test_output_write_failure_cleans_install(self):
         result = self.run_action(GITHUB_OUTPUT=str(self.root))
         self.assertNotEqual(0, result.returncode)

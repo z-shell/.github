@@ -11,9 +11,19 @@ from pathlib import Path
 
 
 def main():
-    install, version, profile, url, digest, patch_commit, patch_digest, cpp, ld = (
-        sys.argv[1:]
-    )
+    (
+        install,
+        version,
+        profile,
+        url,
+        digest,
+        patch_commit,
+        patch_digest,
+        cpp,
+        ld,
+        cflags,
+        dllflags,
+    ) = sys.argv[1:]
     root = Path(__file__).resolve().parent
     source_hashes = {
         name: hashlib.sha256((root / name).read_bytes()).hexdigest()
@@ -36,7 +46,13 @@ def main():
         "os": os.environ["RUNNER_OS"],
         "architecture": platform.machine(),
         "compiler": compiler,
-        "build": {"cc": "cc", "cflags": "-O2", "cppflags": cpp, "ldflags": ld},
+        "build": {
+            "cc": "cc",
+            "cflags": cflags,
+            "cppflags": cpp,
+            "ldflags": ld,
+            "dlldflags": dllflags,
+        },
         "configure": ["--enable-multibyte", "--with-tcsetpgrp"],
         "executable_sha256": hashlib.sha256(
             (Path(install) / "bin/zsh").read_bytes()

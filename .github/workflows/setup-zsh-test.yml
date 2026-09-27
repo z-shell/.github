@@ -95,7 +95,7 @@ jobs:
               fpath=( "${2:h:h}/share/zsh/$ZSH_VERSION/functions" )
             fi
             _compdir=
-            zmodload zsh/system
+            zmodload zsh/system || exit 1
             autoload -Uz compinit
             compinit -D
           ' zsh "$EXPECTED_VERSION" "$SOURCE_EXECUTABLE"
