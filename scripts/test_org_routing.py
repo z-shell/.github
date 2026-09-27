@@ -432,6 +432,34 @@ class CheckTests(unittest.TestCase):
             )
         )
 
+    def test_git_inventory_excludes_dependencies_but_keeps_project_guidance(
+        self,
+    ) -> None:
+        git(self.root, "init", "-q")
+        (self.root / ".gitignore").write_text("node_modules/\nignored/\n")
+        dependency = self.root / "node_modules/package/CLAUDE.md"
+        dependency.parent.mkdir(parents=True)
+        dependency.write_text("Dependency guidance\n")
+        self.assertEqual(self.check(), [])
+        tracked = self.root / "ignored/AGENTS.md"
+        tracked.parent.mkdir()
+        tracked.write_text("Tracked project guidance\n")
+        git(self.root, "add", "-f", "ignored/AGENTS.md")
+        self.assertTrue(any("ignored/AGENTS.md" in e for e in self.check()))
+        new = self.root / "docs/CLAUDE.md"
+        new.parent.mkdir()
+        new.write_text("New project guidance\n")
+        self.assertTrue(any("docs/CLAUDE.md" in e for e in self.check()))
+        tracked.unlink()
+        new.unlink()
+        self.assertEqual(self.check(), [])
+
+    def test_ignored_declared_surface_is_still_required(self) -> None:
+        git(self.root, "init", "-q")
+        (self.root / ".gitignore").write_text(".github/instructions/\n")
+        (self.root / ".github/instructions/go.instructions.md").unlink()
+        self.assertTrue(any("declared surface is missing" in e for e in self.check()))
+
     def test_control_characters_in_paths_are_escaped(self) -> None:
         path = self.root / ".github/prompts/a\n::error title=x::y.prompt.md"
         path.parent.mkdir(parents=True, exist_ok=True)

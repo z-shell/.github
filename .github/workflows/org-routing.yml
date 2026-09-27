@@ -27,6 +27,8 @@ on:
       - "lib/approved-skills.json"
       - "scripts/org-routing.py"
       - "scripts/test_org_routing.py"
+      - "scripts/org_policy_report.py"
+      - "scripts/test_org_policy_report.py"
   push:
     branches:
       - main
@@ -37,6 +39,8 @@ on:
       - "lib/approved-skills.json"
       - "scripts/org-routing.py"
       - "scripts/test_org_routing.py"
+      - "scripts/org_policy_report.py"
+      - "scripts/test_org_policy_report.py"
 
 permissions:
   contents: read
@@ -104,7 +108,7 @@ jobs:
 
       - name: Test routing generator
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
-        run: python3 -m unittest scripts/test_org_routing.py -v
+        run: python3 -m unittest scripts/test_org_routing.py scripts/test_org_policy_report.py -v
 
       - name: Validate inventory and approved revisions
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
