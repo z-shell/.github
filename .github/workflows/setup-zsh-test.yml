@@ -7,11 +7,13 @@ on:
     paths:
       - "actions/setup-zsh/**"
       - "scripts/test_setup_zsh.py"
+      - "scripts/verify_zsh_signals.py"
       - ".github/workflows/setup-zsh-test.yml"
   pull_request:
     paths:
       - "actions/setup-zsh/**"
       - "scripts/test_setup_zsh.py"
+      - "scripts/verify_zsh_signals.py"
       - ".github/workflows/setup-zsh-test.yml"
   workflow_dispatch: {}
 
@@ -25,7 +27,10 @@ concurrency:
 jobs:
   regression:
     name: Installer Regressions
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -37,39 +42,72 @@ jobs:
         run: python3 -m unittest scripts/test_setup_zsh.py -v
 
   smoke:
-    name: Zsh ${{ matrix.version }}
-    runs-on: ubuntu-latest
+    name: Zsh ${{ matrix.os }} ${{ matrix.version }} ${{ matrix.patch }}
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        version: [latest, "5.9", "5.9.2"]
+        os: [ubuntu-latest, macos-latest]
+        version: ["5.8.1", "5.9", "5.9.2"]
+        patch: [none]
+        include:
+          - os: ubuntu-latest
+            version: latest
+            patch: none
+          - os: ubuntu-latest
+            version: "5.9.2"
+            patch: trap-bounds-a3547fd4
+          - os: macos-latest
+            version: "5.9.2"
+            patch: trap-bounds-a3547fd4
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install Zsh
+        id: runtime
         uses: ./actions/setup-zsh
         with:
           version: ${{ matrix.version }}
+          patch-set: ${{ matrix.patch }}
       - name: Verify selected shell and modules
+        timeout-minutes: 2
         shell: bash
         env:
           EXPECTED_VERSION: ${{ matrix.version }}
+          SOURCE_EXECUTABLE: ${{ steps.runtime.outputs.executable }}
         run: |
           command -v zsh
           zsh --version
           if [[ $EXPECTED_VERSION != latest ]]; then
             [[ $(zsh -f -c 'printf "%s" "$ZSH_VERSION"') == "$EXPECTED_VERSION" ]]
           fi
-          zsh -f -c '
+          test_home=$(mktemp -d "$RUNNER_TEMP/setup-zsh-smoke.XXXXXX")
+          HOME="$test_home" ZDOTDIR="$test_home" zsh -f -c '
+            emulate -R zsh
             if [[ $1 == latest ]]; then
               # Check the installed package tree, not runner vendor completions.
               fpath=(/usr/share/zsh/functions/**/*(N/))
-              _compdir=
+            else
+              # Only the functions installed alongside the selected binary.
+              fpath=( "${2:h:h}/share/zsh/$ZSH_VERSION/functions" )
             fi
-            zmodload zsh/system
+            _compdir=
+            zmodload zsh/system || exit 1
             autoload -Uz compinit
             compinit -D
-          ' zsh "$EXPECTED_VERSION"
+          ' zsh "$EXPECTED_VERSION" "$SOURCE_EXECUTABLE"
+      - name: Verify explicit patch profile
+        if: matrix.patch != 'none'
+        env:
+          ZSH_EXECUTABLE: ${{ steps.runtime.outputs.executable }}
+        run: python3 scripts/verify_zsh_signals.py
+      - name: Retain source runtime provenance
+        if: matrix.version != 'latest'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: runtime-${{ matrix.os }}-${{ matrix.version }}-${{ matrix.patch }}
+          path: ${{ steps.runtime.outputs.provenance }}
+          if-no-files-found: error

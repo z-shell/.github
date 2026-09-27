@@ -30,10 +30,13 @@ if name == "curl":
     if os.environ.get("MOVED_RELEASE") and "/old/" not in args[-1]:
         sys.exit(22)
     Path(args[args.index("--output") + 1]).write_bytes(b"release fixture")
-elif name == "sha256sum":
+elif name in ("sha256sum", "shasum"):
     if os.environ.get("BAD_CHECKSUM"):
         sys.exit(1)
-    assert "zsh.tar.xz" in sys.stdin.read()
+    value = sys.stdin.read()
+    if os.environ.get("BAD_PATCH") and ".patch" in value:
+        sys.exit(1)
+    assert "zsh.tar.xz" in value or ".patch" in value
 elif name == "tar":
     source = Path(args[args.index("-C") + 1]) / ("zsh-" + os.environ["ZSH_VERSION"])
     source.mkdir()
@@ -46,6 +49,8 @@ elif name == "make" and "install.bin" in args:
     shell = prefix / "bin/zsh"
     shell.write_text("#!/bin/sh\nprintf '%s' \"$MOCK_ACTUAL_VERSION\"\n")
     shell.chmod(0o700)
+elif name == "brew" and "--prefix" in args:
+    print("/fixture/ncurses")
 elif name == "zsh":
     print("zsh package fixture")
 """
@@ -58,6 +63,7 @@ class SetupZshTest(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.bin = self.root / "bin"
         self.bin.mkdir()
+        (self.bin / "bash").symlink_to("/bin/bash")
         self.runner_temp = self.root / "runner"
         self.runner_temp.mkdir()
         self.log = self.root / "commands.jsonl"
@@ -68,6 +74,9 @@ class SetupZshTest(unittest.TestCase):
             "choco",
             "curl",
             "sha256sum",
+            "shasum",
+            "patch",
+            "gpatch",
             "tar",
             "make",
             "zsh",
@@ -129,7 +138,7 @@ class SetupZshTest(unittest.TestCase):
         self.assertEqual(["sudo", "sudo", "zsh"], [c[0] for c in self.commands()])
 
     def test_exact_versions_install_without_replacing_system_shell(self):
-        for version in ("5.9", "5.9.2"):
+        for version in ("5.8.1", "5.9", "5.9.2"):
             with self.subTest(version=version):
                 result = self.run_action(version, MOCK_ACTUAL_VERSION=version)
                 self.assertEqual(0, result.returncode, result.stderr)
@@ -144,7 +153,7 @@ class SetupZshTest(unittest.TestCase):
                     ["make", "install.bin", "install.modules", "install.fns"], commands
                 )
                 self.assertFalse(any(c[0] == "sudo" and "make" in c for c in commands))
-        self.assertEqual(2, len(self.path_file.read_text().splitlines()))
+        self.assertEqual(3, len(self.path_file.read_text().splitlines()))
 
     def test_unsupported_versions_and_injection_fail_before_commands(self):
         for version in ("5.8", "main", "../5.9", "5.9\n5.9.2", "$(touch injected)"):
@@ -157,13 +166,82 @@ class SetupZshTest(unittest.TestCase):
                 self.assert_not_exposed()
 
     def test_exact_versions_on_other_platforms_fail_before_commands(self):
-        for platform in ("macOS", "Windows"):
+        for platform in ("Windows",):
             with self.subTest(platform=platform):
                 result = self.run_action(RUNNER_OS=platform)
                 self.assertNotEqual(0, result.returncode)
                 self.assertIn("only on Linux", result.stderr)
                 self.assertEqual([], self.commands())
                 self.assert_not_exposed()
+
+    def test_patch_profile_and_provenance(self):
+        output = self.root / "outputs"
+        result = self.run_action(
+            ZSH_PATCH_SET="trap-bounds-a3547fd4", GITHUB_OUTPUT=str(output)
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        values = dict(line.split("=", 1) for line in output.read_text().splitlines())
+        self.assertEqual("5.9.2+trap-bounds-a3547fd4", values["profile"])
+        provenance = json.loads(Path(values["provenance"]).read_text())
+        self.assertEqual(
+            "a3547fd4c165bd6c0c9c9d2643bd61b593f7bbaf", provenance["patch"]["commit"]
+        )
+        commands = self.commands()
+        self.assertIn(["make", "TESTNUM=A05", "check"], commands)
+        self.assertIn(["make", "TESTNUM=B11", "check"], commands)
+        self.assertEqual(2, sum(c[0] == "patch" for c in commands))
+
+    def test_invalid_patch_combinations_fail_before_commands(self):
+        for version, patch in (
+            ("latest", "trap-bounds-a3547fd4"),
+            ("5.8.1", "trap-bounds-a3547fd4"),
+            ("5.9.2", "unknown"),
+        ):
+            with self.subTest(version=version, patch=patch):
+                self.assertNotEqual(
+                    0, self.run_action(version, ZSH_PATCH_SET=patch).returncode
+                )
+                self.assertEqual([], self.commands())
+                self.assert_not_exposed()
+
+    def test_patch_integrity_and_application_failures_clean_install(self):
+        for env in ({"BAD_PATCH": "1"}, {"FAIL_TOOL": "patch"}):
+            with self.subTest(env=env):
+                result = self.run_action(ZSH_PATCH_SET="trap-bounds-a3547fd4", **env)
+                self.assertNotEqual(0, result.returncode)
+                self.assert_not_exposed()
+
+    def test_macos_exact_build_uses_native_dependencies(self):
+        result = self.run_action(
+            RUNNER_OS="macOS", ZSH_PATCH_SET="trap-bounds-a3547fd4"
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        commands = self.commands()
+        self.assertIn(["brew", "install", "ncurses", "xz", "gpatch"], commands)
+        self.assertNotIn("sudo", [c[0] for c in commands])
+        self.assertIn("gpatch", [c[0] for c in commands])
+
+    def test_old_macos_profile_records_legacy_dialect_and_linker(self):
+        output = self.root / "outputs"
+        result = self.run_action(
+            "5.8.1",
+            MOCK_ACTUAL_VERSION="5.8.1",
+            RUNNER_OS="macOS",
+            GITHUB_OUTPUT=str(output),
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        values = dict(line.split("=", 1) for line in output.read_text().splitlines())
+        manifest = json.loads(Path(values["provenance"]).read_text())
+        self.assertEqual("-O2 -std=gnu89", manifest["build"]["cflags"])
+        self.assertEqual(
+            "-bundle -flat_namespace -undefined dynamic_lookup",
+            manifest["build"]["dlldflags"],
+        )
+
+    def test_output_write_failure_cleans_install(self):
+        result = self.run_action(GITHUB_OUTPUT=str(self.root))
+        self.assertNotEqual(0, result.returncode)
+        self.assert_not_exposed()
 
     def test_unknown_platform_fails_before_commands(self):
         result = self.run_action("latest", RUNNER_OS="Other")
