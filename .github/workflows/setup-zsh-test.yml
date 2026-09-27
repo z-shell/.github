@@ -73,25 +73,32 @@ jobs:
           version: ${{ matrix.version }}
           patch-set: ${{ matrix.patch }}
       - name: Verify selected shell and modules
+        timeout-minutes: 2
         shell: bash
         env:
           EXPECTED_VERSION: ${{ matrix.version }}
+          SOURCE_EXECUTABLE: ${{ steps.runtime.outputs.executable }}
         run: |
           command -v zsh
           zsh --version
           if [[ $EXPECTED_VERSION != latest ]]; then
             [[ $(zsh -f -c 'printf "%s" "$ZSH_VERSION"') == "$EXPECTED_VERSION" ]]
           fi
-          zsh -f -c '
+          test_home=$(mktemp -d "$RUNNER_TEMP/setup-zsh-smoke.XXXXXX")
+          HOME="$test_home" ZDOTDIR="$test_home" zsh -f -c '
+            emulate -R zsh
             if [[ $1 == latest ]]; then
               # Check the installed package tree, not runner vendor completions.
               fpath=(/usr/share/zsh/functions/**/*(N/))
-              _compdir=
+            else
+              # Only the functions installed alongside the selected binary.
+              fpath=( "${2:h:h}/share/zsh/$ZSH_VERSION/functions" )
             fi
+            _compdir=
             zmodload zsh/system
             autoload -Uz compinit
             compinit -D
-          ' zsh "$EXPECTED_VERSION"
+          ' zsh "$EXPECTED_VERSION" "$SOURCE_EXECUTABLE"
       - name: Verify explicit patch profile
         if: matrix.patch != 'none'
         env:
