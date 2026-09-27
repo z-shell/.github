@@ -67,6 +67,10 @@ Do not add an org-wide coverage number.
 - Assert the documented load allowlist, harmless repeated source, cleanup after
   partial failure, hostile caller options, non-interactive behavior, and exact
   unload restoration.
+- In a separate clean-shell case, load, unload, and load again. Assert that the
+  second load restores the first load's declared surface and that restored
+  handlers, hooks, widgets, or other resources perform their intended behavior.
+  Resource presence or a successful return status alone is insufficient.
 - Use ownership-aware cleanup assertions: restore the pre-load value only when
   the user did not change the installed value, otherwise preserve the user's
   newer state.

@@ -43,7 +43,10 @@ for maintained z-shell plugins and new plugin scaffolds.
    user-invoked `bin/` roles. Optional directories are omitted when unused.
 7. Static analysis verifies structure and namespace rules. A clean-process
    runtime suite separately proves the declared load surface, repeated source,
-   partial failure, hostile caller state, and exact unload behavior.
+   partial failure, hostile caller state, and exact unload behavior. A separate
+   clean-shell case loads, unloads, and loads again, proving that the second load
+   restores the first load's declared surface and observable resource behavior.
+   Resource presence or a successful return status alone is insufficient.
 8. New scaffolds conform immediately. Maintained plugins migrate through
    owning issues. Refactored plugins do not retain legacy aliases, duplicate
    configuration variables, shared-registry writes, or alternate declaration
