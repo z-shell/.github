@@ -90,14 +90,16 @@ else
   cppflags="-I${ncurses_prefix}/include"
   ldflags="-L${ncurses_prefix}/lib"
   patch_tool=gpatch
-  # Older release probes use implicit-int C89 definitions rejected by new Clang.
-  if [[ ${version} == 5.8.1 || ${version} == 5.9 ]]; then
-    cflags='-O2 -std=gnu89'
-  fi
   # Match upstream's modern Darwin linker mode (383526da422c).
   dllflags='-bundle -flat_namespace -undefined dynamic_lookup'
   configure_args+=("DLLDFLAGS=${dllflags}")
   hash_tool=(shasum -a 256)
+fi
+# Older release configure probes use C89 constructs that new compilers reject:
+# implicit int under Clang, and GCC 14+ incompatible-pointer-types, which makes
+# the termcap boolcodes probe fail so termcap.c redefines the ncurses symbol.
+if [[ ${version} == 5.8.1 || ${version} == 5.9 ]]; then
+  cflags='-O2 -std=gnu89'
 fi
 download_release() {
   curl --fail --show-error --silent --location --proto '=https' --proto-redir '=https' \
