@@ -90,7 +90,8 @@ For `zi`:
 - `main` must not require linear history;
 - `delete_branch_on_merge` remains disabled so GitHub does not remove `next`;
 - the `main` ruleset or required CI must reject ordinary topic branches while
-  allowing `next` and an explicitly reviewed `hotfix-*` branch; and
+  allowing `next`, an explicitly reviewed `hotfix-*` branch, and authenticated
+  Dependabot security updates (`dependabot/**`); and
 - a successful promotion needs no routine back-merge because the merge commit
   makes the promoted `next` commit an ancestor of `main`.
 

@@ -32,7 +32,11 @@ Adopt a hybrid model with non-overlapping ownership:
 1. **GitHub Dependabot owns security:**
    - dependency graph;
    - Dependabot alerts;
-   - Dependabot security update pull requests.
+   - Dependabot security update pull requests. In persistent-integration
+     repositories, Dependabot security updates target `main` natively and are
+     authenticated through the main source guard by repository identity,
+     branch prefix, and bot actor (reconciling ADR-0008, ADR-0019, and
+     `runbooks/branch-protection.md`).
 2. **Renovate owns routine version updates:**
    - GitHub Actions;
    - package-manager dependencies and lock files;

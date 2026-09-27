@@ -61,11 +61,25 @@ Rulesets cannot restrict a pull request by head branch. A required workflow
 must reject pull requests into `main` unless:
 
 1. `github.event.pull_request.head.repo.full_name == github.repository`; and
-2. the head is exactly `next`, or matches an explicitly reviewed `hotfix-*`
-   branch.
+2. one of the following conditions is met:
+   a. the head is exactly `next`, representing a reviewed promotion;
+   b. the head matches an explicitly reviewed `hotfix-*` branch; or
+   c. the head matches `dependabot/**` and `github.event.pull_request.user.login`
+      is `dependabot[bot]` or `app/dependabot`, representing an automated
+      Dependabot security update.
 
 Checking repository identity first prevents a fork from reusing an allowed
-branch name. Run the guard on a real pull request before adding its context to
+branch name.
+
+GitHub Dependabot version updates honor `target-branch: next`, but Dependabot
+security updates ignore that setting and always target the repository's
+default branch (`main`). Authenticating the same-repository head, the branch
+prefix, and the bot actor allows automated security updates through the
+guard while routine updates continue targeting `next`. The known limitation of
+this exception is that a routine Dependabot update manually retargeted to
+`main` by a maintainer would also satisfy these criteria.
+
+Run the guard on a real pull request before adding its context to
 `required_status_checks`, because GitHub only accepts observed check contexts.
 
 ## Promotion procedure
