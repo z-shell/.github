@@ -16,6 +16,14 @@ Run this before opening a PR that:
 Skip it for pure bug fixes or content edits that do not change any documented
 convention.
 
+## Consumer audiences
+
+Keep `consumers` required. Use `agent` for portable guidance intended for any coding agent, `human` for people, and `ci` for automated checks. Shared policy, runbooks and portable skills normally use `["agent", "human"]`; include `ci` only when applicable. This avoids enumerating every current or future runtime on shared surfaces.
+
+Keep concrete runtime consumers on adapters and guidance whose mechanics are runtime-specific. Existing runtime identifiers remain valid for compatibility; do not rename a Gemini adapter to Antigravity without verifying its actual file and loading contract. Audience declarations describe intended applicability, not successful discovery, installation or invocation. Verify delivery separately for each runtime under ADR-0014 and ADR-0032.
+
+`consumers` does not replace task and path selectors or authorize actions. The downstream routing generator continues to select declared surfaces by tasks, file patterns and approved vendored skills. Do not broaden a targeted surface to `agent` solely to make an inventory look complete.
+
 ## Required impact review
 
 For every material instruction change, answer these questions in the issue or

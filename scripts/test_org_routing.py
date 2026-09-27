@@ -233,7 +233,8 @@ class SkillDigestTests(unittest.TestCase):
 class RenderAndSpliceTests(unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
-        self.org = OrgFixture(Path(self.directory.name)).load()
+        self.fixture = OrgFixture(Path(self.directory.name))
+        self.org = self.fixture.load()
         self.entry = routing.downstream_entry(self.org.downstream, "z-shell/tool")
 
     def tearDown(self) -> None:
@@ -249,6 +250,18 @@ class RenderAndSpliceTests(unittest.TestCase):
         )
         self.assertIn("tasks `code-review`, `review-readiness`", block)
         self.assertNotIn("\u2014", block)
+
+    def test_portable_audience_does_not_change_downstream_routing(self) -> None:
+        before = routing.render(self.entry, self.org)
+        surface = self.fixture.manifest["surfaces"][0]
+        surface["consumers"] = ["codex", "claude-code", "human"]
+        self.fixture.write()
+        explicit = routing.render(self.entry, self.fixture.load())
+        surface["consumers"] = ["agent", "human"]
+        self.fixture.write()
+        portable = routing.render(self.entry, self.fixture.load())
+        self.assertEqual(before, explicit)
+        self.assertEqual(explicit, portable)
 
     def test_splice_preserves_repository_content(self) -> None:
         block = routing.render(self.entry, self.org)
