@@ -238,6 +238,26 @@ class SetupZshTest(unittest.TestCase):
             manifest["build"]["dlldflags"],
         )
 
+    def test_old_linux_profiles_record_legacy_dialect_only(self):
+        # GCC 14+ rejects the old boolcodes configure probe outside C89 mode.
+        for version, cflags in (
+            ("5.8.1", "-O2 -std=gnu89"),
+            ("5.9", "-O2 -std=gnu89"),
+            ("5.9.2", "-O2"),
+        ):
+            with self.subTest(version=version):
+                output = self.root / f"outputs-{version}"
+                result = self.run_action(
+                    version, MOCK_ACTUAL_VERSION=version, GITHUB_OUTPUT=str(output)
+                )
+                self.assertEqual(0, result.returncode, result.stderr)
+                values = dict(
+                    line.split("=", 1) for line in output.read_text().splitlines()
+                )
+                manifest = json.loads(Path(values["provenance"]).read_text())
+                self.assertEqual(cflags, manifest["build"]["cflags"])
+                self.assertEqual("", manifest["build"]["dlldflags"])
+
     def test_output_write_failure_cleans_install(self):
         result = self.run_action(GITHUB_OUTPUT=str(self.root))
         self.assertNotEqual(0, result.returncode)
