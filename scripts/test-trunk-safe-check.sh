@@ -166,23 +166,35 @@ for case_args in "check" "--exit 17" "--internal-failure --exit 23"; do
 done
 assert_runtime_clean
 
-# A signal runs the trap, and the trap runs again on exit: still exactly one
-# shutdown, made while the runtime directory exists.
-rm -f "$INVOCATIONS"
-TMPDIR=$TEST_TMP/runtime "$SCRIPT" --trunk-path "$FAKE_TRUNK" -- \
-  --sleep 3 >"$OUT" 2>"$ERR" &
-wrapper_pid=$!
-tries=0
-until [ -s "$INVOCATIONS" ] || [ "$tries" -ge 50 ]; do
-  sleep 0.1
-  tries=$((tries + 1))
+# A signal runs the cleanup once, before the runtime directory is removed, and
+# the wrapper exits with 128 plus the signal number instead of carrying on.
+for signal_case in "TERM 143" "INT 130" "HUP 129"; do
+  signal_name=${signal_case% *}
+  expected=${signal_case#* }
+  rm -f "$INVOCATIONS"
+  # A non-interactive shell starts `&` jobs with SIGINT ignored, and a script
+  # cannot trap a signal ignored on entry; restore the defaults so INT reaches
+  # the wrapper as it would from a terminal or CI cancellation.
+  TMPDIR=$TEST_TMP/runtime perl -e '$SIG{$_} = "DEFAULT" for qw(INT HUP TERM); exec @ARGV' \
+    "$SCRIPT" --trunk-path "$FAKE_TRUNK" -- --sleep 3 >"$OUT" 2>"$ERR" &
+  wrapper_pid=$!
+  tries=0
+  until [ -s "$INVOCATIONS" ] || [ "$tries" -ge 50 ]; do
+    sleep 0.1
+    tries=$((tries + 1))
+  done
+  kill -"$signal_name" "$wrapper_pid"
+  set +e
+  wait "$wrapper_pid"
+  status=$?
+  set -e
+  sleep 4
+  [ "$status" -eq "$expected" ] || fail "$signal_name: expected exit $expected, got $status"
+  assert_shutdown_after_run "$signal_name"
+  assert_not_contains "HOME_MISSING_AT_SHUTDOWN" "$INVOCATIONS"
+  assert_not_contains "No such file" "$ERR"
+  assert_runtime_clean
 done
-kill -TERM "$wrapper_pid"
-wait "$wrapper_pid" || true
-sleep 4
-assert_shutdown_after_run "TERM"
-assert_not_contains "HOME_MISSING_AT_SHUTDOWN" "$INVOCATIONS"
-assert_runtime_clean
 
 # A failing shutdown changes neither the exit status nor the output.
 touch "$TEST_TMP/fail-shutdown"
