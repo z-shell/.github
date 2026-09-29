@@ -23,7 +23,7 @@ For each `.github/workflows/*.yml` in scope, report PASS / FAIL with file:line a
 
 7. **Concurrency** — push/PR-triggered workflows must declare a `concurrency:` block with `cancel-in-progress: true` (use `false` only for release/deploy).
 
-8. **Reusable workflows** (`workflow_call`) — all inputs declare `type`, `required`, `default`; called workflows pinned to a ref.
+8. **Reusable workflows** (`workflow_call`): every input declares `type` and `required`; `default` only on optional inputs, never on a required one; a workflow also triggered directly (`push`, `pull_request`, `schedule`) puts the operative fallback in the job step, because `workflow_call` defaults do not apply there; called workflows pinned to an immutable ref. See section 4 of `.github/instructions/github-actions-ci-cd-best-practices.instructions.md`.
 
 9. **Organization-retired patterns**: flag new uses of `actions/labeler`,
    `sync-labels.yml`, `pr-labels.yml`, `assign.yml` or any per-repository
