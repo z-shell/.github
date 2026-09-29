@@ -58,6 +58,13 @@ runtime_dir=$(mktemp -d "$runtime_parent/z-shell-trunk.XXXXXX")
 # Invoked through the signal and exit trap below.
 # shellcheck disable=SC2329
 cleanup() {
+  # `trunk check` leaves a daemon and its crash handler running. Stop them with
+  # the same isolated environment while the runtime directory still exists. A
+  # signal runs this trap and exit runs it again, so shut down only once.
+  if [ -n "${trunk_ran-}" ]; then
+    trunk_ran=
+    run_trunk daemon shutdown >/dev/null 2>&1 || true
+  fi
   rm -rf -- "$runtime_dir"
 }
 trap cleanup EXIT HUP INT TERM
@@ -74,22 +81,27 @@ stderr_file=$runtime_dir/stderr
 ci_value=
 [ -z "${CI-}" ] || ci_value=true
 
+run_trunk() {
+  env -i \
+    CI="$ci_value" \
+    HOME="$runtime_dir/home" \
+    LANG=C \
+    LC_ALL=C \
+    NO_COLOR=1 \
+    PATH="${PATH:-/usr/bin:/bin}" \
+    TERM=dumb \
+    TMPDIR="$runtime_dir/tmp" \
+    TRUNK_CACHE="$runtime_dir/cache" \
+    TRUNK_LAUNCHER_QUIET=false \
+    XDG_CACHE_HOME="$runtime_dir/cache" \
+    XDG_CONFIG_HOME="$runtime_dir/config" \
+    XDG_DATA_HOME="$runtime_dir/data" \
+    "$trunk_path" "$@"
+}
+
 set +e
-env -i \
-  CI="$ci_value" \
-  HOME="$runtime_dir/home" \
-  LANG=C \
-  LC_ALL=C \
-  NO_COLOR=1 \
-  PATH="${PATH:-/usr/bin:/bin}" \
-  TERM=dumb \
-  TMPDIR="$runtime_dir/tmp" \
-  TRUNK_CACHE="$runtime_dir/cache" \
-  TRUNK_LAUNCHER_QUIET=false \
-  XDG_CACHE_HOME="$runtime_dir/cache" \
-  XDG_CONFIG_HOME="$runtime_dir/config" \
-  XDG_DATA_HOME="$runtime_dir/data" \
-  "$trunk_path" "$@" >"$stdout_file" 2>"$stderr_file"
+trunk_ran=1
+run_trunk "$@" >"$stdout_file" 2>"$stderr_file"
 status=$?
 set -e
 
