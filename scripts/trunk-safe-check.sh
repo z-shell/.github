@@ -59,8 +59,10 @@ runtime_dir=$(mktemp -d "$runtime_parent/z-shell-trunk.XXXXXX")
 # shellcheck disable=SC2329
 cleanup() {
   # `trunk check` leaves a daemon and its crash handler running. Stop them with
-  # the same isolated environment while the runtime directory still exists.
+  # the same isolated environment while the runtime directory still exists. A
+  # signal runs this trap and exit runs it again, so shut down only once.
   if [ -n "${trunk_ran-}" ]; then
+    trunk_ran=
     run_trunk daemon shutdown >/dev/null 2>&1 || true
   fi
   rm -rf -- "$runtime_dir"

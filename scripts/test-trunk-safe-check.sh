@@ -77,6 +77,10 @@ while [ "$#" -gt 0 ]; do
       internal_failure=true
       shift
       ;;
+    --sleep)
+      sleep "$2"
+      shift 2
+      ;;
     *)
       [ -n "$capture_args" ] && printf '%s\n' "$1" >>"$capture_args"
       shift
@@ -160,6 +164,24 @@ for case_args in "check" "--exit 17" "--internal-failure --exit 23"; do
   set -e
   assert_shutdown_after_run "$case_args"
 done
+assert_runtime_clean
+
+# A signal runs the trap, and the trap runs again on exit: still exactly one
+# shutdown, made while the runtime directory exists.
+rm -f "$INVOCATIONS"
+TMPDIR=$TEST_TMP/runtime "$SCRIPT" --trunk-path "$FAKE_TRUNK" -- \
+  --sleep 3 >"$OUT" 2>"$ERR" &
+wrapper_pid=$!
+tries=0
+until [ -s "$INVOCATIONS" ] || [ "$tries" -ge 50 ]; do
+  sleep 0.1
+  tries=$((tries + 1))
+done
+kill -TERM "$wrapper_pid"
+wait "$wrapper_pid" || true
+sleep 4
+assert_shutdown_after_run "TERM"
+assert_not_contains "HOME_MISSING_AT_SHUTDOWN" "$INVOCATIONS"
 assert_runtime_clean
 
 # A failing shutdown changes neither the exit status nor the output.
