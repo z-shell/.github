@@ -67,7 +67,19 @@ cleanup() {
   fi
   rm -rf -- "$runtime_dir"
 }
-trap cleanup EXIT HUP INT TERM
+# Invoked through the signal traps below.
+# shellcheck disable=SC2329
+on_signal() {
+  # Clean up once and stop, so the script does not carry on without its
+  # runtime directory; exit with the conventional 128 + signal number.
+  trap - EXIT HUP INT TERM
+  cleanup
+  exit "$1"
+}
+trap cleanup EXIT
+trap 'on_signal 129' HUP
+trap 'on_signal 130' INT
+trap 'on_signal 143' TERM
 
 mkdir -p \
   "$runtime_dir/cache" \
