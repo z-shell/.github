@@ -43,8 +43,10 @@ only for a real commitment. Use native parent issues and sub-issues for
 coordinated outcomes, and native issue dependencies for blockers.
 
 Keep cross-repository parent issues in `z-shell/.github` and implementation
-issues in their owning repositories. Link implementation pull requests with a
-closing keyword. Apply `meta:initiative` only to qualifying parent issues and
+issues in their owning repositories. Link implementation pull requests to
+their issue as [`pull-requests.md`](pull-requests.md) describes: `Closes` only
+when the pull request meets every acceptance criterion, `Refs` otherwise.
+Apply `meta:initiative` only to qualifying parent issues and
 follow `runbooks/sub-issues.md` for ownership, status, and closing rules.
 
 ## Automation model
