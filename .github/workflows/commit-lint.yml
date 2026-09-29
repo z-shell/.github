@@ -6,8 +6,9 @@ name: Commit Lint
 # the AGENTS.md rules that were previously "author-enforced" only: the
 # disallowed bot/AI-agent Co-authored-by trailer -- a human co-author is
 # allowed, only a bot/agent identity is banned (AGENTS.md) -- Conventional
-# Commits (decisions/0003), and issue-linked topic-branch naming
-# (decisions/0019).
+# Commits (decisions/0003), and topic-branch naming against the documented
+# pattern (decisions/0019). Issue traceability is checked on the pull request,
+# not the branch name (decisions/0022).
 #
 # This workflow triggers directly on pull_request and is also callable by other
 # repositories. It was previously reached only through a thin `lint-commits.yml`
