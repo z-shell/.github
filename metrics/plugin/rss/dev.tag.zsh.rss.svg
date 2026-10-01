@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="120" class="">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="111" class="">
     <defs>
         <style/>
     </defs>
@@ -20,8 +20,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Never Name a zsh Loop Variable path: Three Deploy-Verification Traps That Looked Like Outages</div>
-                                <div class="date">14 Sept 2026</div>
+                                <div class="title">I Built a Pure-Zsh Prompt Engine That Renders in 0.6ms (Without Rust or C++)</div>
+                                <div class="date">30 Sept 2026</div>
                             </div>
                         </div>
                         <div class="field rss">
@@ -29,8 +29,8 @@
                                 <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 8a4 4 0 118 0 4 4 0 01-8 0z"/>
                             </svg>
                             <div class="infos">
-                                <div class="title">Tối ưu terminal cho developer xử lý dữ liệu và prompt SEO</div>
-                                <div class="date">13 Sept 2026</div>
+                                <div class="title">Ditch Oh-My-Zsh Bloat: How I Built zload for Sub-Millisecond Terminal Startup</div>
+                                <div class="date">29 Sept 2026</div>
                             </div>
                         </div>
                     </section>
