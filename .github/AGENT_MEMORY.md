@@ -79,3 +79,7 @@ Use this structure for issue and pull request comments:
 - Do not use a central append-only Markdown file for active progress; it will drift and conflict.
 - Keep durable documentation in the wiki and link to it from repository-local files when needed.
 - Keep the tracker issue body or PR thread concise, factual, and actionable.
+- Write handoffs and progress comments for the people who follow the project: what is true in the repository, how the change was verified, blockers in project terms, and the next actions.
+- Leave out the agent's own process: which model, runtime, or reviewer ran; session, task, or delegation identifiers; exit codes; accounts of runs started, stopped, or retried; private exchanges with the agent; and statements of what did not happen.
+- Do not post or edit a comment only to announce that an agent step started or stopped. Update a handoff when the project state changes.
+- Keep one handoff per unit of work, on the pull request when one exists, otherwise on the owning issue. Do not copy it to each linked issue.
