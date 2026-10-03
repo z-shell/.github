@@ -38,10 +38,7 @@ Adopt the following instruction architecture:
 2. Organization repository roots do not contain `CLAUDE.md` or `GEMINI.md`.
    Runtimes consume `AGENTS.md` directly or use a supported repository-local
    adapter outside the root when runtime mechanics require one.
-   Claude Code uses `.claude/CLAUDE.md` containing only an import of
-   `../AGENTS.md`. Gemini CLI uses `.gemini/settings.json` to set
-   `context.fileName` to `AGENTS.md`. Both adapters are manifest-declared and
-   contain no policy of their own.
+   Claude Code v2.1.277 and later reads `AGENTS.md` natively when no project or ancestor `CLAUDE.md` or `CLAUDE.local.md` takes precedence. The former `.claude/CLAUDE.md` import adapter is removed. User-level `~/.claude/CLAUDE.md` still loads separately. See the [Claude Code instruction rules](https://code.claude.com/docs/en/memory#agentsmd) for configuration and version limits. Gemini CLI uses `.gemini/settings.json` to set `context.fileName` to `AGENTS.md`; its manifest-declared adapter contains no policy of its own.
 3. The private maintainer workspace may use root-level `CLAUDE.md` and
    `GEMINI.md` vendor adapters as the sole exception to the root-file rule.
 4. Private delivery is generated as one composite containing the public
