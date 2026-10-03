@@ -39,10 +39,6 @@ ADAPTER_TEMPLATES = {
         ".github/copilot-instructions.md",
         b"@../AGENTS.md\n",
     ),
-    "claude-adapter": (
-        ".claude/CLAUDE.md",
-        b"@../AGENTS.md\n",
-    ),
     "gemini-adapter": (
         ".gemini/settings.json",
         b'{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n',
@@ -84,7 +80,6 @@ REQUIRED_SURFACE_FIELDS = (
 BASE_INVENTORY = {
     "AGENTS.md": "shared-policy",
     "PATTERNS.md": "shared-policy",
-    ".claude/CLAUDE.md": "adapter",
     ".gemini/settings.json": "adapter",
     ".github/AGENT_MEMORY.md": "runbook",
     ".github/README.md": "runbook",
@@ -1334,7 +1329,6 @@ def validate_adapters(root: Path, manifest: dict[str, object]) -> list[str]:
         )
     expected_consumers = {
         "copilot-adapter": ["copilot"],
-        "claude-adapter": ["claude-code"],
         "gemini-adapter": ["gemini-cli"],
     }
     for surface_id, (expected_path, expected_content) in ADAPTER_TEMPLATES.items():

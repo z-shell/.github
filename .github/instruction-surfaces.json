@@ -28,18 +28,6 @@
       "canonical_for": []
     },
     {
-      "id": "claude-adapter",
-      "path": ".claude/CLAUDE.md",
-      "kind": "adapter",
-      "authority": "adapter-only",
-      "consumers": ["claude-code"],
-      "tasks": ["all"],
-      "file_patterns": ["**"],
-      "required": true,
-      "review_owner": "z-shell maintainers",
-      "canonical_for": []
-    },
-    {
       "id": "gemini-adapter",
       "path": ".gemini/settings.json",
       "kind": "adapter",

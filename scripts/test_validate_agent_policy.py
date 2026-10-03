@@ -102,18 +102,6 @@ BASE_MANIFEST = {
             "canonical_for": [],
         },
         {
-            "id": "claude-adapter",
-            "path": ".claude/CLAUDE.md",
-            "kind": "adapter",
-            "authority": "adapter-only",
-            "consumers": ["claude-code"],
-            "tasks": ["all"],
-            "file_patterns": ["**"],
-            "required": True,
-            "review_owner": "z-shell maintainers",
-            "canonical_for": [],
-        },
-        {
             "id": "gemini-adapter",
             "path": ".gemini/settings.json",
             "kind": "adapter",
@@ -163,7 +151,6 @@ def make_repository(root: Path) -> dict[str, object]:
     write_file(root, ".github/README.md", "# Public agent catalog\n")
     write_file(root, ".github/copilot-instructions.md", "@../AGENTS.md\n")
     write_file(root, REVIEW_SKILL_PATH, REVIEW_SKILL_TEXT)
-    write_file(root, ".claude/CLAUDE.md", "@../AGENTS.md\n")
     write_file(
         root,
         ".gemini/settings.json",
@@ -503,7 +490,7 @@ class AgentPolicyValidatorTests(unittest.TestCase):
         self.assert_error_contains(validator.validate(self.root), "consumers")
 
     def test_generic_audience_cannot_replace_adapter_runtime(self) -> None:
-        for adapter_id in ("copilot-adapter", "claude-adapter", "gemini-adapter"):
+        for adapter_id in ("copilot-adapter", "gemini-adapter"):
             with self.subTest(adapter=adapter_id):
                 surface = next(
                     item
@@ -2428,10 +2415,10 @@ class PublicRepositoryTests(unittest.TestCase):
 
     def test_public_repository_uses_manifest_declared_runtime_adapters(self) -> None:
         self.assertFalse((PUBLIC_ROOT / "CLAUDE.md").exists())
+        self.assertFalse((PUBLIC_ROOT / ".claude/CLAUDE.md").exists())
         self.assertFalse((PUBLIC_ROOT / "GEMINI.md").exists())
         expected = {
             ".github/copilot-instructions.md": "@../AGENTS.md\n",
-            ".claude/CLAUDE.md": "@../AGENTS.md\n",
             ".gemini/settings.json": (
                 '{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n'
             ),
