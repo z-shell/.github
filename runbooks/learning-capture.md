@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/learning-capture.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook - Learning capture
 
 Use this workflow before claiming non-trivial project work complete. Its purpose
@@ -25,6 +29,8 @@ or project constraint.
 7. Does that surface already contain equivalent or contradictory guidance?
 
 ## Strong candidate signals
+
+When reviewing navigation or tool economy, inspect existing check commands, CI wiring and maintained pointers before proposing new ones. An unwired check or a missing source route can be the actual defect. Use [writing for agents](../knowledge/domains/agents/writing-for-agents.md) for an evidence-backed guidance correction; retain this runbook as the single learning-capture procedure. This selection adapts the relevant maintenance review in [retro](https://github.com/mattpocock/skills/tree/main/skills/engineering/retro).
 
 - an unexpected test, build, release, deployment, or tooling failure
 - a maintainer correction or a disproved assumption

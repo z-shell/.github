@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/charter.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Charter for the Z-Shell Organization
 
 This is the organizational charter for the Z-Shell Organization (the "Organization"). By adding their name to the [Steering Committee file](./STEERING_COMMITTEE.md), Steering Committee members agree as follows.

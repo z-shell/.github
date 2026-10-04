@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/security-incident-response.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Security Incident Response
 
 How to handle a security report from intake to post-incident review. This
@@ -78,7 +82,7 @@ Run Trunk through the repository wrapper so the linter process receives only a
 documented minimal environment and disposable runtime directories:
 
 ```sh
-scripts/trunk-safe-check.sh -- check --no-fix
+automation/ci/trunk-safe-check.sh -- check --no-fix
 ```
 
 The wrapper forwards only `CI`, `HOME`, `LANG`, `LC_ALL`, `NO_COLOR`, `PATH`,

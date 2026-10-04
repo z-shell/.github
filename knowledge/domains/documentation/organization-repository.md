@@ -1,0 +1,222 @@
+<div align="center">
+  <a href="https://github.com/z-shell">
+    <img src="https://raw.githubusercontent.com/z-shell/.github/main/profile/img/logo.svg" width="64" height="64" alt="Z-Shell" />
+  </a>
+  <h2>Z-Shell — Organization Configuration</h2>
+  <p>
+    Shared GitHub Actions, workflow templates, organization profile, and community assets.
+  </p>
+  <p>
+    <a href="https://github.com/z-shell/.github/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/License-GPL--3.0-23c88a?style=flat-square" alt="License" />
+    </a>
+  </p>
+</div>
+
+---
+
+## About the `.github` Repository
+
+The `.github` repository is a [special GitHub repository](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file) and the **organization-wide configuration hub**. GitHub inherits supported community health files and templates from here; reusable actions, workflow templates, Renovate policy, ADRs, and runbooks remain shared resources that repositories or maintainers reference explicitly.
+
+### What Makes It Special
+
+| Feature                            | How It Works                                                                                                                                                                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Organization Profile**           | `profile/README.md` is rendered on the [organization's GitHub page](https://github.com/z-shell) as the public-facing profile.                                                                                                             |
+| **Default Community Health Files** | Supported files such as `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` and `SECURITY.md` in `.github/` are used as fallbacks by repositories without their own versions. Other organization documents require explicit references or delivery. |
+| **Default Issue & PR Templates**   | Templates in `.github/ISSUE_TEMPLATE/` and discussion forms in `.github/DISCUSSION_TEMPLATE/` are inherited by repositories without their own templates.                                                                                  |
+| **Agent Memory Protocol**          | `.github/AGENT_MEMORY.md` defines the GitHub-native handoff workflow used to keep cross-LLM and cross-repository progress visible.                                                                                                        |
+| **Reusable Composite Actions**     | The `actions/` directory hosts [composite actions](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action) that any org repository can reference via `uses: z-shell/.github/actions/<name>@main`.                |
+| **Workflow Templates**             | The `workflow-templates/` directory provides [starter workflows](https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization) available in every org repository under **Actions > New workflow**. |
+| **Shared Dependency Config**       | `renovate-config.json` defines the shared [Renovate](https://docs.renovatebot.com/) preset for routine version updates; GitHub Dependabot retains alerts and security updates.                                                            |
+
+> **Note:** The `.github` repository must be **public** for default community health files to apply across the organization.
+
+---
+
+## Repository Structure
+
+| Path                                                                                               | Purpose                                                                                                               |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [`AGENTS.md`](../../../AGENTS.md)                                                                        | Canonical org-wide instructions for AI coding agents and maintainers                                                  |
+| [`PATTERNS.md`](../../../PATTERNS.md)                                                                    | Cross-repo implementation idioms grounded in real repositories                                                        |
+| [`knowledge/index.md`](../../index.md) | Domain navigation to maintained policy, procedures, skills and project contracts |
+| [`.github/instructions/zsh/scripting.instructions.md`](../../../.github/instructions/zsh/scripting.instructions.md) | Canonical detailed Zsh authoring, review, compatibility, and validation standard                                      |
+| [`knowledge/domains/zsh/data/zsh-standard-policy.json`](../../../knowledge/domains/zsh/data/zsh-standard-policy.json)                                  | Machine-readable Zsh stable-release, profile, rule, and source-class contract                                         |
+| [`decisions/`](../../../decisions/)                                                                      | Architectural decision records for non-obvious org-wide choices                                                       |
+| [`runbooks/`](../../../runbooks/)                                                                        | Repeatable operational workflows such as learning capture, org review, triage, ADR drafting, and release coordination |
+| [`profile/`](../../../profile/)                                                                          | Organization profile with the README and visual assets displayed on the [org page](https://github.com/z-shell)        |
+| [`actions/`](../../../actions/)                                                                          | Reusable composite GitHub Actions shared across all org repositories                                                  |
+| [`workflow-templates/`](../../../workflow-templates/)                                                    | Starter workflow templates available in the **Actions > New workflow** tab                                            |
+| [`renovate-config.json`](../../../renovate-config.json)                                                  | Shared Renovate preset for routine dependency version updates                                                         |
+
+## Instruction Architecture
+
+The organization uses a portable, manifest-backed instruction architecture:
+
+- [`AGENTS.md`](../../../AGENTS.md) is the standalone canonical organization policy.
+- [`instruction-surfaces.json`](../../../.github/instruction-surfaces.json) records instruction
+  ownership, routing, and inventory metadata.
+- [`copilot-instructions.md`](../../../.github/copilot-instructions.md) is a regular import-only
+  adapter to `AGENTS.md`; it is not a policy owner.
+- [`instruction-update.md`](../../../runbooks/instruction-update.md) is the required
+  impact review for every material instruction change.
+- [`learning-capture.md`](../../../runbooks/learning-capture.md) defines the
+  evidence, destination, authority, and completion-review workflow.
+- [`review-project-learning`](../../../.github/skills/review-project-learning/SKILL.md) is the
+  advisory reusable skill for that workflow.
+- [`.github/instructions/zsh/scripting.instructions.md`](../../../.github/instructions/zsh/scripting.instructions.md)
+  is the canonical detailed Zsh standard.
+- [`knowledge/domains/zsh/data/zsh-standard-policy.json`](../../../knowledge/domains/zsh/data/zsh-standard-policy.json) is the
+  machine-readable stable-release, execution-profile, rule, and source-class
+  contract.
+- [`automation/ci/validate-zsh-standard-policy.py`](../../../automation/ci/validate-zsh-standard-policy.py)
+  validates Phase 1 ownership and drift across the instruction, policy,
+  manifest, dispatcher, and public consumers.
+- [`validate-agent-policy.py`](../../../automation/agents/validate-agent-policy.py) and
+  [`agent-instructions.yml`](../../../.github/workflows/agent-instructions.yml) enforce the public
+  instruction contract.
+
+Root `CLAUDE.md` and `GEMINI.md` are intentionally absent. Supported runtimes
+receive mandatory policy through the canonical baseline or an explicitly
+routed adapter, not through duplicate root policy files.
+
+### Community Health Files and Shared Organization Resources
+
+GitHub inherits supported community defaults such as CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md and issue, pull-request and discussion templates when a repository has no local replacement. Its [supported file list](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file) defines this behavior.
+
+Governance, charter, membership, trademark, antitrust and handoff documents below are shared z-shell resources. They are not automatically inherited GitHub defaults. Agent instructions and adapters follow their runtime-specific discovery and routing contracts. Keep their consumers explicit and their generated delivery checked.
+
+| File                                                 | Purpose                                                       |
+| ---------------------------------------------------- | ------------------------------------------------------------- |
+| [`CODE_OF_CONDUCT.md`](../../../.github/CODE_OF_CONDUCT.md)           | Contributor Covenant code of conduct                          |
+| [`CONTRIBUTING.md`](../../../.github/CONTRIBUTING.md)                 | Contribution guidelines and requirements                      |
+| [`SECURITY.md`](../../../.github/SECURITY.md)                         | Security vulnerability reporting policy                       |
+| [`GOVERNANCE.md`](../../../.github/GOVERNANCE.md)                     | Project governance roles and decision-making                  |
+| [`CHARTER.md`](../../../.github/CHARTER.md)                           | Organizational charter and mission                            |
+| [`STEERING_COMMITTEE.md`](../../../.github/STEERING_COMMITTEE.md)     | Steering committee membership                                 |
+| [`MAINTAINERS.md`](../../../.github/MAINTAINERS.md)                   | Project maintainer list                                       |
+| [`AGENT_MEMORY.md`](../../../.github/AGENT_MEMORY.md)                 | Cross-agent handoff and progress-tracking protocol            |
+| [`copilot-instructions.md`](../../../.github/copilot-instructions.md) | Copilot entry point that defers to the canonical `AGENTS.md`  |
+| [`TRADEMARKS.md`](../../../.github/TRADEMARKS.md)                     | Trademark usage policy                                        |
+| [`ANTITRUST.md`](../../../.github/ANTITRUST.md)                       | Antitrust compliance policy                                   |
+| [`ISSUE_TEMPLATE/`](../../../.github/ISSUE_TEMPLATE/)                 | Default issue forms (bug reports, features, docs, membership) |
+| [`DISCUSSION_TEMPLATE/`](../../../.github/DISCUSSION_TEMPLATE/)       | Default discussion category forms                             |
+
+---
+
+## Shared Actions
+
+Composite actions currently available to all repositories via `z-shell/.github/actions/<name>`:
+
+| Action                              | Description                 |
+| ----------------------------------- | --------------------------- |
+| [`setup-zsh`](../../../actions/setup-zsh) | Set up Zsh for CI workflows |
+| [`commit`](../../../actions/commit)       | Commit generated changes    |
+| [`rclone`](../../../actions/rclone)       | Sync files with rclone      |
+
+**Usage example:**
+
+```yaml
+steps:
+  # After checking out this repository; external callers use a full SHA pin.
+  - uses: ./actions/setup-zsh
+```
+
+For the version contract and exact Linux installs, see the [`setup-zsh` action documentation](../../../actions/setup-zsh/README.md).
+
+## Workflow Templates
+
+Starter workflows available in every org repository under **Actions > New workflow**:
+
+| Template      | Description                 |
+| ------------- | --------------------------- |
+| Trunk         | Trunk code-quality workflow |
+| Zsh CI        | Starter Zsh CI workflow     |
+| Rclone Action | File sync with rclone       |
+
+Label definitions live in [`knowledge/domains/governance/data/labels.yml`](../../../knowledge/domains/governance/data/labels.yml) and should be applied through org maintenance scripts or API-driven automation, not via a generic starter workflow template.
+
+Task tracking is documented in [`../runbooks/project-tracker.md`](../../../runbooks/project-tracker.md).
+
+## Dependency Management
+
+Z-Shell separates routine maintenance from security remediation:
+
+- [Renovate](https://docs.renovatebot.com/) owns routine dependency version updates.
+- GitHub Dependabot owns dependency graph alerts and security update pull requests.
+
+Repositories must not configure both bots for routine version updates. Renovate
+discovers the shared organization preset automatically during onboarding, or a
+repository can reference it explicitly:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["local>z-shell/.github:renovate-config"]
+}
+```
+
+See [`../runbooks/dependency-management.md`](../../../runbooks/dependency-management.md)
+for onboarding, validation, migration, and rollback.
+
+## Scheduled Workflow Inventory
+
+Use `automation/ci/audit-scheduled-workflows.rb` to produce a reproducible inventory
+of scheduled workflows. The command performs read-only GitHub API requests.
+
+```sh
+automation/ci/audit-scheduled-workflows.rb --org z-shell --public-only --format json
+```
+
+Disabled workflows are included unless `--active-only` is supplied. Use
+`--public-only` when writing a report intended for public distribution. JSON
+for a target set that includes private repositories must use `--output FILE`;
+the command creates that destination with mode `0600`. Markdown always omits
+private repository names.
+
+Follow the
+[`recurring-operations` runbook](../../../runbooks/recurring-operations.md) to
+classify the inventory, review failures, and draft evidence-backed follow-ups.
+
+---
+
+## Common Use Cases
+
+This repository is the right place for any **organization-level** configuration:
+
+- **Adding a new default issue/PR template** — add it to `.github/ISSUE_TEMPLATE/`
+- **Updating agent instructions, runbooks, patterns or community policies:** edit the source declared in `knowledge/delivery.json` and regenerate its native consumer; edit historical ADRs at their existing `decisions/` owner
+- **Defining weekly review, ADR, or release coordination procedures:** update the declared source under `knowledge/domains/` and regenerate its `runbooks/` consumer
+- **Recording cross-agent progress:** follow `.github/AGENT_MEMORY.md` and keep authoritative state in the owning GitHub issue or pull request; add a Linear mirror only when `../runbooks/project-tracker.md` calls for one
+- **Managing organization task tracking** — follow `../runbooks/project-tracker.md`
+- **Updating the shared label set** — edit `knowledge/domains/governance/data/labels.yml` and roll it out via the org's maintenance automation
+- **Cleaning legacy labels** — follow `../runbooks/labels.md` before deleting labels from live repositories
+- **Creating a reusable CI action** — add a composite action under `actions/<name>/action.yml`
+- **Providing a starter workflow** — add `.yml` + `.properties.json` to `workflow-templates/`
+- **Updating the organization profile** — edit `profile/README.md` or add assets to `profile/img/`
+- **Changing contribution or security policies:** edit the corresponding `knowledge/domains/governance/` source and regenerate its `.github/` consumer
+- **Updating dependency automation** — edit `renovate-config.json` and follow `../runbooks/dependency-management.md`
+
+For a repository-specific Renovate exception, add a minimal
+`.github/renovate.json` that extends the organization preset and contains only
+the required override.
+
+## Links
+
+- [**Z-Shell Organization**](https://github.com/z-shell) — All repositories
+- [**Wiki & Documentation**](https://github.com/z-shell/wiki) — Guides and reference
+- [**Discussions**](https://github.com/orgs/z-shell/discussions) — Community forum
+- [**GitHub Docs: Default Community Health Files**](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file)
+- [**GitHub Docs: Workflow Templates**](https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization)
+
+---
+
+<div align="center">
+  <p>Developed with ❤️ by the <a href="https://github.com/z-shell">Z-Shell Community</a>.</p>
+</div>
+
+## Controlled Linux validation
+
+Use the portable [`zd-test`](../../../.github/skills/zd-test/SKILL.md) skill for container-sensitive reproduction, explicit Zsh runtime checks and controlled benchmarks. The [selection guidance](../../../.github/instructions/quality/controlled-validation.instructions.md) explains when zd helps, and the [integration runbook](../../../runbooks/zd-validation.md) describes the `run-zd` composite action and repository-owned pilot commands. Native platform and terminal checks retain their own coverage.

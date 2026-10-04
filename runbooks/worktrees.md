@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/worktrees.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook: Worktree Management
 
 Use this runbook to create, discover, hand off, and retire Git worktrees across

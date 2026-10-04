@@ -10,12 +10,12 @@ on:
     paths:
       - ".github/workflows/commit-lint.yml"
       - ".github/workflows/commit-lint-test.yml"
-      - "scripts/test-commit-lint-policy.sh"
+      - "automation/ci/test-commit-lint-policy.sh"
   pull_request:
     paths:
       - ".github/workflows/commit-lint.yml"
       - ".github/workflows/commit-lint-test.yml"
-      - "scripts/test-commit-lint-policy.sh"
+      - "automation/ci/test-commit-lint-policy.sh"
   workflow_dispatch: {}
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
           persist-credentials: false
 
       - name: Check shell syntax
-        run: bash -n scripts/test-commit-lint-policy.sh
+        run: bash -n automation/ci/test-commit-lint-policy.sh
 
       - name: Test commit-lint policy patterns
-        run: bash scripts/test-commit-lint-policy.sh
+        run: bash automation/ci/test-commit-lint-policy.sh

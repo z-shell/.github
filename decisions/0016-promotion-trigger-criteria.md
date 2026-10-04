@@ -53,7 +53,7 @@ mechanism for every `next` → `main` repository, implemented as a reusable
   of the deployed branch, whether it has been green for the repository's
   configured bake window, and whether any open issue carries the
   `status:blocked` label (reused from the existing triage taxonomy —
-  `lib/labels.yml` — rather than adding a new label).
+  `knowledge/domains/governance/data/labels.yml` — rather than adding a new label).
 - If all three conditions hold, it opens or updates a single
   development-branch → deployed-branch pull request. It never merges. The PR
   body restates the `runbooks/branch-protection.md` merge requirements
@@ -123,7 +123,7 @@ detail under ADR-0008's table.
 - `runbooks/branch-protection.md` — merge mechanics the promotion PR body
   must restate (squash trailers, admin-bypass path, post-promotion reconcile).
 - `runbooks/release.md` — `release-prepare.yml` reference implementation.
-- `lib/labels.yml` — `status:blocked`, reused rather than duplicated.
+- `knowledge/domains/governance/data/labels.yml` — `status:blocked`, reused rather than duplicated.
 - [z-shell/.github#513](https://github.com/z-shell/.github/issues/513) — the
   issue this ADR resolves.
 - `.github/workflows/promote-prepare.yml` — draft reference implementation

@@ -37,7 +37,7 @@ rollout status per repository is tracked in issue #454, not restated here.
 - Workflows comply with the org workflow conventions (SHA-pinned actions,
   least-privilege `permissions:`, `concurrency:`, no-emoji `name:` per ADR-0005,
   kebab-case filenames), defined in
-  `.github/instructions/github-actions-ci-cd-best-practices.instructions.md`
+  `.github/instructions/ci/workflow-contract.instructions.md`
   and `decisions/0005-workflow-naming-conventions.md`; `AGENTS.md` only
   summarizes them.
 - Zsh sources pass `zsh -n` (syntax) and `zcompile` (compile) checks.

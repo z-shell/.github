@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/triage.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook: Triage
 
 Classify issues and pull requests, verify whether work is still needed, and maintain the owning GitHub record and Project 28 view. GitHub remains authoritative; Linear is a selective linked mirror.
@@ -45,7 +49,7 @@ Report the recommendation, current reality and history, the confirmed finding, v
 
 ## 3. Classify with canonical labels
 
-[lib/labels.yml](../lib/labels.yml) owns label names and definitions. Every triaged issue and PR needs a work-type label and, when known, at least one area label. Inspect current repository definitions before applying them. Missing definitions belong to the [label maintenance procedure](labels.md), not an opportunistic create or rename during triage.
+[knowledge/domains/governance/data/labels.yml](../knowledge/domains/governance/data/labels.yml) owns label names and definitions. Every triaged issue and PR needs a work-type label and, when known, at least one area label. Inspect current repository definitions before applying them. Missing definitions belong to the [label maintenance procedure](labels.md), not an opportunistic create or rename during triage.
 
 | Work                             | Label              |
 | -------------------------------- | ------------------ |
@@ -128,7 +132,7 @@ Do not silently leave metadata incomplete, repeatedly request already granted sc
 ## References
 
 - [Organization instructions](../AGENTS.md)
-- [Canonical labels](../lib/labels.yml) and [label maintenance](labels.md)
+- [Canonical labels](../knowledge/domains/governance/data/labels.yml) and [label maintenance](labels.md)
 - [Project tracking](project-tracker.md) and [sub-issues](sub-issues.md)
 - [PR lifecycle](pull-requests.md) and [learning capture](learning-capture.md)
 - [Security policy](../.github/SECURITY.md) and [incident response](security-incident-response.md)

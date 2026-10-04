@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/adr.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — ADR drafting
 
 Use this workflow when a discussion, issue, or pull request makes a non-obvious decision that should become durable project memory.

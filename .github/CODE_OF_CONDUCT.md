@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/code-of-conduct.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

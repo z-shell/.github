@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/ci/rclone-action.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Github Action - `rclone`
 
 Run [rclone](https://rclone.org) to sync files and directories from different cloud storage providers.

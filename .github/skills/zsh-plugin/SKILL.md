@@ -13,8 +13,8 @@ semantics.
 ## Steps
 
 1. **Read context and classify**:
-   - Read `.github/instructions/zsh-scripting.instructions.md` and
-     `lib/zsh-standard-policy.json` first.
+   - Read `.github/instructions/zsh/scripting.instructions.md` and
+     `knowledge/domains/zsh/data/zsh-standard-policy.json` first.
    - Read root `AGENTS.md` and the owning repository's local `AGENTS.md` when
      present.
    - Identify the repository compatibility floor.

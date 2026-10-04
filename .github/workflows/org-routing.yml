@@ -2,7 +2,8 @@ name: Org Routing
 
 # Decision 0031: every organization repository carries a generated routing
 # preamble in AGENTS.md and vendors organization skills only at an approved
-# revision. Repositories call this workflow; it checks the caller's checkout
+# revision. Approved complete project instructions also have byte-drift checks.
+# Repositories call this workflow; it checks the caller's checkout
 # against the canonical inventory at the called workflow's own commit, and
 # reports drift without writing anything.
 #
@@ -24,11 +25,15 @@ on:
       - ".github/instruction-surfaces.json"
       - ".github/skills/**"
       - ".github/workflows/org-routing.yml"
-      - "lib/approved-skills.json"
-      - "scripts/org-routing.py"
-      - "scripts/test_org_routing.py"
-      - "scripts/org_policy_report.py"
-      - "scripts/test_org_policy_report.py"
+      - "knowledge/domains/agents/data/approved-skills.json"
+      - "knowledge/project-delivery.json"
+      - "knowledge/domains/**"
+      - "automation/knowledge/knowledge-delivery.py"
+      - "automation/knowledge/test_knowledge_delivery.py"
+      - "automation/agents/org-routing.py"
+      - "automation/agents/test_org_routing.py"
+      - "automation/agents/org_policy_report.py"
+      - "automation/agents/test_org_policy_report.py"
   push:
     branches:
       - main
@@ -36,11 +41,15 @@ on:
       - ".github/instruction-surfaces.json"
       - ".github/skills/**"
       - ".github/workflows/org-routing.yml"
-      - "lib/approved-skills.json"
-      - "scripts/org-routing.py"
-      - "scripts/test_org_routing.py"
-      - "scripts/org_policy_report.py"
-      - "scripts/test_org_policy_report.py"
+      - "knowledge/domains/agents/data/approved-skills.json"
+      - "knowledge/project-delivery.json"
+      - "knowledge/domains/**"
+      - "automation/knowledge/knowledge-delivery.py"
+      - "automation/knowledge/test_knowledge_delivery.py"
+      - "automation/agents/org-routing.py"
+      - "automation/agents/test_org_routing.py"
+      - "automation/agents/org_policy_report.py"
+      - "automation/agents/test_org_policy_report.py"
 
 permissions:
   contents: read
@@ -96,8 +105,11 @@ jobs:
           sparse-checkout: |
             .github/instruction-surfaces.json
             .github/skills
-            lib/approved-skills.json
-            scripts/org-routing.py
+            knowledge/domains/agents/data/approved-skills.json
+            knowledge/project-delivery.json
+            knowledge/domains
+            automation/knowledge/knowledge-delivery.py
+            automation/agents/org-routing.py
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
@@ -107,15 +119,15 @@ jobs:
 
       - name: Test routing generator
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
-        run: python3 -m unittest scripts/test_org_routing.py scripts/test_org_policy_report.py -v
+        run: python3 -m unittest automation/agents/test_org_routing.py automation/agents/test_org_policy_report.py automation/knowledge/test_knowledge_delivery.py -v
 
       - name: Validate inventory and approved revisions
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
         run: |
-          python3 scripts/org-routing.py validate
-          python3 scripts/org-routing.py verify-approved
+          python3 automation/agents/org-routing.py validate
+          python3 automation/agents/org-routing.py verify-approved
 
-      - name: Check caller routing and vendored skills
+      - name: Check caller routing, vendored skills and complete instructions
         if: ${{ steps.workflow-source.outputs.self != 'true' }}
         shell: bash
         env:
@@ -123,5 +135,5 @@ jobs:
         run: |
           tooling="$RUNNER_TEMP/z-shell-org-routing"
           mv -- .z-shell-org-routing "$tooling"
-          python3 "$tooling/scripts/org-routing.py" --org-root "$tooling" \
+          python3 "$tooling/automation/agents/org-routing.py" --org-root "$tooling" \
             check --repository "$CALLER" --root "$GITHUB_WORKSPACE"

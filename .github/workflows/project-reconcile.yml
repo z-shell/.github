@@ -41,7 +41,7 @@ jobs:
           if [[ "${APPLY}" == 'true' ]]; then
             args+=(--apply)
           fi
-          python3 scripts/project_reconcile_live.py \
+          python3 automation/governance/project_reconcile_live.py \
             --organization "${ORGANIZATION}" \
             --project-number "${PROJECT_NUMBER}" \
             --output "${REPORT_PATH}" --require-token "${args[@]}"

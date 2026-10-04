@@ -4,17 +4,17 @@ on:
   workflow_call: {}
   push:
     paths:
-      - "scripts/labels-sync.rb"
-      - "scripts/labels-dry-run.rb"
-      - "scripts/test-labels-dry-run.sh"
-      - "lib/labels.yml"
+      - "automation/governance/labels-sync.rb"
+      - "automation/governance/labels-dry-run.rb"
+      - "automation/governance/test-labels-dry-run.sh"
+      - "knowledge/domains/governance/data/labels.yml"
       - ".github/workflows/labels-sync-test.yml"
   pull_request:
     paths:
-      - "scripts/labels-sync.rb"
-      - "scripts/labels-dry-run.rb"
-      - "scripts/test-labels-dry-run.sh"
-      - "lib/labels.yml"
+      - "automation/governance/labels-sync.rb"
+      - "automation/governance/labels-dry-run.rb"
+      - "automation/governance/test-labels-dry-run.sh"
+      - "knowledge/domains/governance/data/labels.yml"
       - ".github/workflows/labels-sync-test.yml"
   workflow_dispatch: {}
 
@@ -43,4 +43,4 @@ jobs:
       - name: "🧪 Run labels-sync smoke tests"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: sh scripts/test-labels-dry-run.sh
+        run: sh automation/governance/test-labels-dry-run.sh

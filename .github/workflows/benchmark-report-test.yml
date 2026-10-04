@@ -3,14 +3,14 @@ on:
   push:
     branches: [main]
     paths:
-      - scripts/benchmark_report.py
-      - scripts/test_benchmark_report.py
+      - automation/ci/benchmark_report.py
+      - automation/ci/test_benchmark_report.py
       - actions/benchmark-report/**
       - .github/workflows/benchmark-report-test.yml
   pull_request:
     paths:
-      - scripts/benchmark_report.py
-      - scripts/test_benchmark_report.py
+      - automation/ci/benchmark_report.py
+      - automation/ci/test_benchmark_report.py
       - actions/benchmark-report/**
       - .github/workflows/benchmark-report-test.yml
 permissions:
@@ -30,11 +30,11 @@ jobs:
           persist-credentials: false
       - name: Test validation and prepare smoke reports
         run: |
-          python3 -m unittest scripts/test_benchmark_report.py -v
+          python3 -m unittest automation/ci/test_benchmark_report.py -v
           python3 - <<'PY'
           import json
           from pathlib import Path
-          from scripts.test_benchmark_report import fixture
+          from automation.ci.test_benchmark_report import fixture
           Path('slowdown.json').write_text(json.dumps(fixture(slow=True)))
           report = fixture()
           report['candidate']['environment']['runner_image'] = 'incompatible-image'

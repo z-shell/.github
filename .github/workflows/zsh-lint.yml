@@ -68,7 +68,7 @@ jobs:
           ref: ${{ steps.source.outputs.sha }}
           path: workflow-tooling
           persist-credentials: false
-          sparse-checkout: scripts/zsh_lint_ci.py
+          sparse-checkout: automation/ci/zsh_lint_ci.py
           sparse-checkout-cone-mode: false
 
       - name: Check out calling repository
@@ -105,7 +105,7 @@ jobs:
           ZSH_LINT_REF: ${{ inputs.zsh-lint-ref }}
           ZSH_LINT_WORKFLOW_SHA: ${{ steps.source.outputs.sha }}
         run: |
-          python3 workflow-tooling/scripts/zsh_lint_ci.py \
+          python3 workflow-tooling/automation/ci/zsh_lint_ci.py \
             --root target --analyzer "$RUNNER_TEMP/zsh-lint" \
             --output "$RUNNER_TEMP/zsh-lint-report" \
             --config "$ZSH_LINT_CONFIG" --mode "$ZSH_LINT_MODE"

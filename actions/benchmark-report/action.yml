@@ -37,7 +37,7 @@ runs:
         CONTROL_REPORT_PATH: ${{ inputs.control-report }}
         EVIDENCE_DIRECTORY: ${{ steps.prepare.outputs.directory }}
       run: |
-        python3 "$ACTION_DIRECTORY/../../scripts/benchmark_report.py" \
+        python3 "$ACTION_DIRECTORY/../../automation/ci/benchmark_report.py" \
           --root "$REPORT_ROOT" --report "$REPORT_PATH" \
           --control-report "$CONTROL_REPORT_PATH" --output "$EVIDENCE_DIRECTORY"
     - name: Preserve benchmark evidence

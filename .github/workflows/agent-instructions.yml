@@ -5,6 +5,11 @@ on:
     paths:
       - "AGENTS.md"
       - "PATTERNS.md"
+      - "knowledge/**"
+      - "automation/knowledge/knowledge-delivery.py"
+      - "automation/knowledge/test_knowledge_delivery.py"
+      - "automation/knowledge/knowledge-coverage.py"
+      - "automation/knowledge/test_knowledge_coverage.py"
       - "CLAUDE.md"
       - "GEMINI.md"
       - ".claude/**"
@@ -21,24 +26,29 @@ on:
       - ".github/workflows/agent-instructions.yml"
       - "decisions/**"
       - "runbooks/**"
-      - "lib/zsh-standard-policy.json"
-      - "lib/approved-skills.json"
-      - "scripts/org-routing.py"
-      - "scripts/test_org_routing.py"
-      - "scripts/org_policy_report.py"
-      - "scripts/test_org_policy_report.py"
-      - "scripts/validate-agent-policy.py"
-      - "scripts/test_validate_agent_policy.py"
-      - "scripts/validate-zsh-standard-policy.py"
-      - "scripts/test_validate_zsh_standard_policy.py"
-      - "scripts/decision-records.py"
-      - "scripts/test_decision_records.py"
+      - "knowledge/domains/zsh/data/zsh-standard-policy.json"
+      - "knowledge/domains/agents/data/approved-skills.json"
+      - "automation/agents/org-routing.py"
+      - "automation/agents/test_org_routing.py"
+      - "automation/agents/org_policy_report.py"
+      - "automation/agents/test_org_policy_report.py"
+      - "automation/agents/validate-agent-policy.py"
+      - "automation/agents/test_validate_agent_policy.py"
+      - "automation/ci/validate-zsh-standard-policy.py"
+      - "automation/ci/test_validate_zsh_standard_policy.py"
+      - "automation/governance/decision-records.py"
+      - "automation/governance/test_decision_records.py"
   push:
     branches:
       - main
     paths:
       - "AGENTS.md"
       - "PATTERNS.md"
+      - "knowledge/**"
+      - "automation/knowledge/knowledge-delivery.py"
+      - "automation/knowledge/test_knowledge_delivery.py"
+      - "automation/knowledge/knowledge-coverage.py"
+      - "automation/knowledge/test_knowledge_coverage.py"
       - "CLAUDE.md"
       - "GEMINI.md"
       - ".claude/**"
@@ -55,18 +65,18 @@ on:
       - ".github/workflows/agent-instructions.yml"
       - "decisions/**"
       - "runbooks/**"
-      - "lib/zsh-standard-policy.json"
-      - "lib/approved-skills.json"
-      - "scripts/org-routing.py"
-      - "scripts/test_org_routing.py"
-      - "scripts/org_policy_report.py"
-      - "scripts/test_org_policy_report.py"
-      - "scripts/validate-agent-policy.py"
-      - "scripts/test_validate_agent_policy.py"
-      - "scripts/validate-zsh-standard-policy.py"
-      - "scripts/test_validate_zsh_standard_policy.py"
-      - "scripts/decision-records.py"
-      - "scripts/test_decision_records.py"
+      - "knowledge/domains/zsh/data/zsh-standard-policy.json"
+      - "knowledge/domains/agents/data/approved-skills.json"
+      - "automation/agents/org-routing.py"
+      - "automation/agents/test_org_routing.py"
+      - "automation/agents/org_policy_report.py"
+      - "automation/agents/test_org_policy_report.py"
+      - "automation/agents/validate-agent-policy.py"
+      - "automation/agents/test_validate_agent_policy.py"
+      - "automation/ci/validate-zsh-standard-policy.py"
+      - "automation/ci/test_validate_zsh_standard_policy.py"
+      - "automation/governance/decision-records.py"
+      - "automation/governance/test_decision_records.py"
 
 permissions:
   contents: read
@@ -92,22 +102,34 @@ jobs:
         uses: ./actions/setup-zsh
 
       - name: Run agent policy unit tests
-        run: python3 -m unittest scripts/test_validate_agent_policy.py -v
+        run: python3 -m unittest automation/agents/test_validate_agent_policy.py -v
+
+      - name: Check central knowledge delivery
+        run: python3 automation/knowledge/knowledge-delivery.py --check
+
+      - name: Run knowledge delivery unit tests
+        run: python3 -m unittest automation/knowledge/test_knowledge_delivery.py -v
+
+      - name: Check repository knowledge coverage
+        run: python3 automation/knowledge/knowledge-coverage.py
+
+      - name: Run knowledge coverage unit tests
+        run: python3 -m unittest automation/knowledge/test_knowledge_coverage.py -v
 
       - name: Run routing generator unit tests
-        run: python3 -m unittest scripts/test_org_routing.py scripts/test_org_policy_report.py -v
+        run: python3 -m unittest automation/agents/test_org_routing.py automation/agents/test_org_policy_report.py -v
 
       - name: Run decision record unit tests
-        run: python3 -m unittest scripts/test_decision_records.py -v
+        run: python3 -m unittest automation/governance/test_decision_records.py -v
 
       - name: Run Zsh standard policy unit tests
-        run: python3 -m unittest scripts/test_validate_zsh_standard_policy.py -v
+        run: python3 -m unittest automation/ci/test_validate_zsh_standard_policy.py -v
 
       - name: Validate Zsh standard policy
-        run: python3 scripts/validate-zsh-standard-policy.py
+        run: python3 automation/ci/validate-zsh-standard-policy.py
 
       - name: Validate agent policy
-        run: python3 scripts/validate-agent-policy.py
+        run: python3 automation/agents/validate-agent-policy.py
 
       - name: Validate decision records and index
-        run: python3 scripts/decision-records.py --check
+        run: python3 automation/governance/decision-records.py --check

@@ -1,0 +1,2449 @@
+#!/usr/bin/env python3
+
+import copy
+import importlib.util
+import json
+import os
+
+# CLI tests invoke only the repository-local validator with fixed arguments.
+import subprocess  # nosec B404
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+SCRIPT_PATH = Path(__file__).with_name("validate-agent-policy.py")
+PUBLIC_ROOT = SCRIPT_PATH.parents[2]
+PUBLIC_POLICY_BYTE_LIMIT = 32_768
+REVIEW_SKILL_PATH = ".github/skills/code-review/SKILL.md"
+REVIEW_SKILL_TEXT = (
+    "---\nname: code-review\ndescription: Review changes using repository contracts.\n"
+    "---\n\nInspect the diff and report findings without editing files.\n"
+)
+REQUIRED_IMPACT_QUESTIONS = (
+    "Is this shared policy, scoped guidance, runtime-only behavior, or enforcement?",
+    "Which runtimes and repository contexts must receive it?",
+    "Is the canonical owner still correct?",
+    "Does another surface now duplicate or contradict it?",
+    "Does either manifest need an added, changed, or removed route?",
+    "Can each supported runtime still receive the mandatory rule without relying on an optional hook or skill?",
+    "Do generated output and size limits still pass?",
+)
+SPEC = importlib.util.spec_from_file_location("validate_agent_policy", SCRIPT_PATH)
+if SPEC is None or SPEC.loader is None:
+    raise RuntimeError(f"cannot load validator from {SCRIPT_PATH}")
+validator = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(validator)
+
+
+BASE_MANIFEST = {
+    "version": 1,
+    "repository": "z-shell/.github",
+    "canonical_policy": "AGENTS.md",
+    "surfaces": [
+        {
+            "id": "organization-policy",
+            "path": "AGENTS.md",
+            "kind": "shared-policy",
+            "authority": "canonical",
+            "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+            "tasks": ["all"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": ["organization-policy"],
+        },
+        {
+            "id": "organization-patterns",
+            "path": "PATTERNS.md",
+            "kind": "shared-policy",
+            "authority": "canonical-detail",
+            "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+            "tasks": ["implementation"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": ["implementation-patterns"],
+        },
+        {
+            "id": "agent-memory",
+            "path": ".github/AGENT_MEMORY.md",
+            "kind": "runbook",
+            "authority": "canonical-detail",
+            "consumers": ["codex", "claude-code", "copilot", "gemini-cli", "human"],
+            "tasks": ["handoff"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": ["agent-handoffs"],
+        },
+        {
+            "id": "public-agent-catalog",
+            "path": ".github/README.md",
+            "kind": "runbook",
+            "authority": "advisory",
+            "consumers": ["human"],
+            "tasks": ["onboarding"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
+        {
+            "id": "copilot-adapter",
+            "path": ".github/copilot-instructions.md",
+            "kind": "adapter",
+            "authority": "adapter-only",
+            "consumers": ["copilot"],
+            "tasks": ["all"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
+        {
+            "id": "gemini-adapter",
+            "path": ".gemini/settings.json",
+            "kind": "adapter",
+            "authority": "adapter-only",
+            "consumers": ["gemini-cli"],
+            "tasks": ["all"],
+            "file_patterns": ["**"],
+            "required": True,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
+        {
+            "id": "skill-code-review",
+            "path": REVIEW_SKILL_PATH,
+            "kind": "skill",
+            "authority": "advisory",
+            "consumers": ["copilot"],
+            "tasks": ["code-review", "review-readiness"],
+            "file_patterns": ["**"],
+            "required": False,
+            "review_owner": "z-shell maintainers",
+            "canonical_for": [],
+        },
+    ],
+}
+
+
+def write_file(root: Path, relative_path: str, content: str) -> None:
+    path = root / relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def write_manifest(root: Path, manifest: dict[str, object]) -> None:
+    write_file(
+        root,
+        ".github/instruction-surfaces.json",
+        json.dumps(manifest, indent=2) + "\n",
+    )
+
+
+def make_repository(root: Path) -> dict[str, object]:
+    manifest = copy.deepcopy(BASE_MANIFEST)
+    write_file(root, "AGENTS.md", "# Agent policy\n")
+    write_file(root, "PATTERNS.md", "# Organization patterns\n")
+    write_file(root, ".github/AGENT_MEMORY.md", "# Agent handoffs\n")
+    write_file(root, ".github/README.md", "# Public agent catalog\n")
+    write_file(root, ".github/copilot-instructions.md", "@../AGENTS.md\n")
+    write_file(root, REVIEW_SKILL_PATH, REVIEW_SKILL_TEXT)
+    write_file(
+        root,
+        ".gemini/settings.json",
+        '{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n',
+    )
+    write_manifest(root, manifest)
+    return manifest
+
+
+def make_surface(
+    surface_id: str,
+    path: str,
+    *,
+    kind: str = "runbook",
+    authority: str = "advisory",
+    consumers: list[str] | None = None,
+    tasks: list[str] | None = None,
+    file_patterns: list[str] | None = None,
+    required: bool = True,
+    canonical_for: list[str] | None = None,
+) -> dict[str, object]:
+    return {
+        "id": surface_id,
+        "path": path,
+        "kind": kind,
+        "authority": authority,
+        "consumers": consumers or ["human"],
+        "tasks": tasks or ["all"],
+        "file_patterns": file_patterns or ["**"],
+        "required": required,
+        "review_owner": "z-shell maintainers",
+        "canonical_for": canonical_for or [],
+    }
+
+
+class AgentPolicyValidatorTests(unittest.TestCase):
+    def setUp(self) -> None:
+        temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary_directory.cleanup)
+        self.root = Path(temporary_directory.name)
+        self.manifest = make_repository(self.root)
+
+    def assert_error_contains(self, errors: list[str], *needles: str) -> None:
+        self.assertTrue(
+            any(all(needle in message for needle in needles) for message in errors),
+            f"expected one error containing {needles!r}; got {errors!r}",
+        )
+
+    def test_valid_repository_has_no_errors(self) -> None:
+        self.assertEqual(validator.validate(self.root), [])
+
+    def _install_org_routing(self, downstream: object) -> None:
+        write_file(
+            self.root,
+            validator.ORG_ROUTING_SCRIPT,
+            (PUBLIC_ROOT / validator.ORG_ROUTING_SCRIPT).read_text(encoding="utf-8"),
+        )
+        write_file(
+            self.root,
+            "automation/knowledge/knowledge-delivery.py",
+            (PUBLIC_ROOT / "automation/knowledge/knowledge-delivery.py").read_text(encoding="utf-8"),
+        )
+        self.manifest["surfaces"].append(
+            make_surface(
+                "org-routing-generator",
+                validator.ORG_ROUTING_SCRIPT,
+                kind="enforcement",
+                authority="canonical-detail",
+                consumers=["ci", "human"],
+                tasks=["validation"],
+            )
+        )
+        self.manifest["surfaces"].append(
+            make_surface(
+                "skill-code-review",
+                REVIEW_SKILL_PATH,
+                kind="skill",
+                tasks=["code-review"],
+                required=False,
+            )
+        )
+        if downstream is not None:
+            self.manifest["downstream"] = downstream
+        write_manifest(self.root, self.manifest)
+        write_file(
+            self.root,
+            "knowledge/domains/agents/data/approved-skills.json",
+            json.dumps(
+                {
+                    "version": 1,
+                    "source": "z-shell/.github",
+                    "skills": {
+                        "code-review": {
+                            "path": ".github/skills/code-review",
+                            "revision": "a" * 40,
+                            "digest": "b" * 64,
+                            "files": ["SKILL.md"],
+                        }
+                    },
+                }
+            )
+            + "\n",
+        )
+
+    def test_downstream_inventory_is_validated_once_the_generator_exists(self) -> None:
+        self.manifest["surfaces"] = [
+            surface
+            for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(
+            [{"repository": "z-shell/zi", "vendored_skills": ["code-review"]}]
+        )
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_invalid_project_delivery_manifest_is_rejected(self) -> None:
+        self.manifest["surfaces"] = [
+            surface for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(
+            [{"repository": "z-shell/zi", "vendored_skills": ["code-review"]}]
+        )
+        write_file(self.root, "knowledge/project-delivery.json", '{"version": 1, "consumers": [{}]}')
+        self.assert_error_contains(validator.validate(self.root), "declared provenance fields")
+
+    def test_missing_downstream_inventory_is_rejected(self) -> None:
+        self.manifest["surfaces"] = [
+            surface
+            for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(None)
+        self.assert_error_contains(
+            validator.validate(self.root), "downstream inventory is missing"
+        )
+
+    def test_invalid_downstream_inventory_is_rejected(self) -> None:
+        self.manifest["surfaces"] = [
+            surface
+            for surface in self.manifest["surfaces"]
+            if surface["path"] != REVIEW_SKILL_PATH
+        ]
+        self._install_org_routing(
+            [
+                {"repository": "z-shell/zi", "vendored_skills": ["unapproved"]},
+                {"repository": "z-shell/.github"},
+            ]
+        )
+        errors = validator.validate(self.root)
+        self.assert_error_contains(errors, "unapproved", "no approved revision")
+        self.assert_error_contains(errors, "canonical repository is not downstream")
+
+    def test_rejects_corrupt_canonical_review_skill(self) -> None:
+        cases = (
+            "not frontmatter\n",
+            REVIEW_SKILL_TEXT.replace("name: code-review\n", ""),
+            REVIEW_SKILL_TEXT.replace("name: code-review", "name: other"),
+            REVIEW_SKILL_TEXT.replace(
+                "name: code-review", "name: code-review\nname: code-review"
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: [Review]",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: Review:",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.\n", ""
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: Review changes.\ndescription: Review again.",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: 'Review",
+            ),
+            REVIEW_SKILL_TEXT.replace(
+                "description: Review changes using repository contracts.",
+                "description: Unrelated work",
+            ),
+            REVIEW_SKILL_TEXT.replace("contracts.\n---", "contracts.---"),
+            REVIEW_SKILL_TEXT.replace("name: code-review", "\tname: code-review"),
+            REVIEW_SKILL_TEXT.split("\n\n", 1)[0] + "\n\n",
+        )
+        for text in cases:
+            with self.subTest(text=text):
+                write_file(self.root, REVIEW_SKILL_PATH, text)
+                self.assert_error_contains(
+                    validator.validate(self.root), REVIEW_SKILL_PATH
+                )
+
+    def test_accepts_quoted_review_skill_fields(self) -> None:
+        write_file(
+            self.root,
+            REVIEW_SKILL_PATH,
+            REVIEW_SKILL_TEXT.replace(
+                "name: code-review", "name: 'code-review'"
+            ).replace(
+                "description: Review changes using repository contracts.",
+                'description: "Review changes using repository contracts."',
+            ),
+        )
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_review_skill_cannot_be_deleted_with_its_manifest_entry(self) -> None:
+        (self.root / REVIEW_SKILL_PATH).unlink()
+        self.assert_error_contains(
+            validator.validate(self.root), REVIEW_SKILL_PATH, "regular file"
+        )
+        self.manifest["surfaces"] = [
+            item
+            for item in self.manifest["surfaces"]
+            if item["path"] != REVIEW_SKILL_PATH
+        ]
+        write_manifest(self.root, self.manifest)
+        self.assert_error_contains(
+            validator.validate(self.root), REVIEW_SKILL_PATH, "missing from manifest"
+        )
+
+    def test_rejects_invalid_json(self) -> None:
+        write_file(self.root, ".github/instruction-surfaces.json", "{not json\n")
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "invalid JSON",
+        )
+
+    def test_rejects_duplicate_top_level_json_keys(self) -> None:
+        manifest_text = json.dumps(self.manifest, indent=2) + "\n"
+        manifest_text = manifest_text.replace(
+            '  "repository": "z-shell/.github",',
+            '  "repository": "workspace/repos.yml",\n'
+            '  "repository": "z-shell/.github",',
+            1,
+        )
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            manifest_text,
+        )
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "duplicate JSON key 'repository'",
+        )
+
+    def test_rejects_duplicate_nested_json_keys(self) -> None:
+        manifest_text = json.dumps(self.manifest, indent=2) + "\n"
+        manifest_text = manifest_text.replace(
+            '      "path": "AGENTS.md",',
+            '      "path": "workspace/repos.yml",\n' '      "path": "AGENTS.md",',
+            1,
+        )
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            manifest_text,
+        )
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "duplicate JSON key 'path'",
+        )
+
+    def test_rejects_manifest_symlink_to_outside_file(self) -> None:
+        with tempfile.TemporaryDirectory() as outside_directory:
+            outside_manifest = Path(outside_directory) / "instruction-surfaces.json"
+            outside_manifest.write_text(
+                json.dumps(self.manifest, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            manifest_path = self.root / ".github/instruction-surfaces.json"
+            manifest_path.unlink()
+            manifest_path.symlink_to(outside_manifest)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "symlink",
+        )
+
+    def test_rejects_forbidden_reference_in_manifest_metadata(self) -> None:
+        self.manifest["metadata"] = {
+            "maintainer_note": "Read workspace/repos.yml before editing."
+        }
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "workspace/repos.yml",
+        )
+
+    def test_rejects_forbidden_reference_in_manifest_metadata_key(self) -> None:
+        self.manifest["metadata"] = {"workspace/repos.yml": "private source"}
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "workspace/repos.yml",
+        )
+
+    def test_rejects_unknown_schema_version(self) -> None:
+        self.manifest["version"] = 2
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors, ".github/instruction-surfaces.json", "version"
+        )
+
+    def test_rejects_wrong_repository_identity(self) -> None:
+        self.manifest["repository"] = "z-shell/wiki"
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "repository must be exactly 'z-shell/.github'",
+        )
+
+    def test_accepts_portable_agent_audience(self) -> None:
+        self.manifest["surfaces"][0]["consumers"] = ["agent", "human", "ci"]
+        write_manifest(self.root, self.manifest)
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_consumers_remain_required(self) -> None:
+        del self.manifest["surfaces"][0]["consumers"]
+        write_manifest(self.root, self.manifest)
+        self.assert_error_contains(validator.validate(self.root), "consumers")
+
+    def test_generic_audience_cannot_replace_adapter_runtime(self) -> None:
+        for adapter_id in ("copilot-adapter", "gemini-adapter"):
+            with self.subTest(adapter=adapter_id):
+                surface = next(
+                    item
+                    for item in self.manifest["surfaces"]
+                    if item["id"] == adapter_id
+                )
+                prior = surface["consumers"]
+                surface["consumers"] = ["agent"]
+                write_manifest(self.root, self.manifest)
+                self.assert_error_contains(
+                    validator.validate(self.root), adapter_id, "delivery contract"
+                )
+                surface["consumers"] = prior
+
+    def test_rejects_unknown_enum_values(self) -> None:
+        cases = (
+            ("kind", "unknown-kind"),
+            ("authority", "unknown-authority"),
+            ("consumer", "unknown-consumer"),
+        )
+        for field, invalid_value in cases:
+            with self.subTest(field=field):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    surface = manifest["surfaces"][0]
+                    if field == "consumer":
+                        surface["consumers"] = [invalid_value]
+                    else:
+                        surface[field] = invalid_value
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors, "organization-policy", invalid_value
+                    )
+
+    def test_rejects_kind_mismatch_for_inventoried_paths(self) -> None:
+        cases = (
+            ("AGENTS.md", "shared-policy", "# Agent policy\n"),
+            ("PATTERNS.md", "shared-policy", "# Patterns\n"),
+            (".github/AGENT_MEMORY.md", "runbook", "# Memory\n"),
+            (".github/README.md", "runbook", "# Catalog\n"),
+            (".github/copilot-instructions.md", "adapter", "@../AGENTS.md\n"),
+            (
+                ".github/instructions/example.instructions.md",
+                "scoped-guidance",
+                '---\napplyTo: "**"\n---\n\n# Example\n',
+            ),
+            (
+                ".github/instructions/nested/example.instructions.md",
+                "scoped-guidance",
+                '---\napplyTo: "**"\n---\n\n# Nested example\n',
+            ),
+            (".github/agents/example.agent.md", "agent", "# Example agent\n"),
+            (".github/agents/example.md", "agent", "# Example custom agent\n"),
+            (".github/skills/example/SKILL.md", "skill", "# Example skill\n"),
+            ("runbooks/example.md", "runbook", "# Example runbook\n"),
+            ("decisions/0001-example.md", "decision", "# Example decision\n"),
+            (
+                ".github/workflows/agent-instructions.yml",
+                "enforcement",
+                "name: Agent Instructions\n",
+            ),
+            (
+                "automation/agents/validate-agent-policy.py",
+                "enforcement",
+                "# Validator fixture\n",
+            ),
+        )
+        for relative_path, expected_kind, content in cases:
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    surface = next(
+                        (
+                            item
+                            for item in manifest["surfaces"]
+                            if item["path"] == relative_path
+                        ),
+                        None,
+                    )
+                    wrong_kind = (
+                        "runbook" if expected_kind == "decision" else "decision"
+                    )
+                    if surface is None:
+                        surface = make_surface(
+                            f"fixture-{expected_kind}",
+                            relative_path,
+                            kind=wrong_kind,
+                            authority="canonical-detail",
+                            consumers=["human"],
+                        )
+                        manifest["surfaces"].append(surface)
+                        write_file(root, relative_path, content)
+                    else:
+                        surface["kind"] = wrong_kind
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        f"declared kind {wrong_kind!r}",
+                        f"inventory kind {expected_kind!r}",
+                    )
+
+    def test_rejects_non_string_enum_values_without_traceback(self) -> None:
+        cases = (("kind", ["adapter"]), ("authority", {"name": "canonical"}))
+        for field, invalid_value in cases:
+            with self.subTest(field=field):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"][0][field] = invalid_value
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        "organization-policy",
+                        repr(invalid_value),
+                    )
+
+    def test_rejects_duplicate_ids(self) -> None:
+        duplicate = make_surface("organization-policy", "DUPLICATE.md")
+        self.manifest["surfaces"].append(duplicate)
+        write_file(self.root, "DUPLICATE.md", "# Duplicate\n")
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "organization-policy", "duplicate")
+
+    def test_rejects_duplicate_route_selectors(self) -> None:
+        route = copy.deepcopy(self.manifest["surfaces"][0])
+        route["id"] = "duplicate-agent-policy"
+        route["canonical_for"] = []
+        self.manifest["surfaces"].append(route)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "AGENTS.md", "duplicate route selectors")
+
+    def test_allows_distinct_routes_to_the_same_path(self) -> None:
+        route = copy.deepcopy(self.manifest["surfaces"][0])
+        route["id"] = "agent-policy-implementation"
+        route["tasks"] = ["implementation"]
+        route["file_patterns"] = ["public/sh/setup.sh"]
+        route["canonical_for"] = []
+        self.manifest["surfaces"].append(route)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assertEqual(errors, [])
+
+    def test_rejects_conflicting_metadata_for_shared_path(self) -> None:
+        route = make_surface(
+            "agent-policy-implementation",
+            "AGENTS.md",
+            kind="decision",
+            tasks=["implementation"],
+            file_patterns=["public/sh/setup.sh"],
+        )
+        route["canonical_for"] = []
+        self.manifest["surfaces"].append(route)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "AGENTS.md", "shared-file field 'kind'")
+
+    def test_rejects_duplicate_canonical_owner(self) -> None:
+        self.manifest["surfaces"][1]["canonical_for"].append("organization-policy")
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "organization-policy", "duplicate")
+
+    def test_rejects_agent_or_skill_canonical_owner(self) -> None:
+        cases = (
+            ("agent", ".github/agents/policy.agent.md"),
+            ("skill", ".github/skills/policy/SKILL.md"),
+        )
+        for kind, path in cases:
+            with self.subTest(kind=kind):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"].append(
+                        make_surface(
+                            f"canonical-{kind}",
+                            path,
+                            kind=kind,
+                            authority="canonical-detail",
+                            consumers=["codex"],
+                            canonical_for=["mandatory-policy"],
+                        )
+                    )
+                    write_file(root, path, f"# Canonical {kind}\n")
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        f"canonical-{kind}",
+                        kind,
+                        "mandatory-policy",
+                    )
+
+    def test_rejects_adapter_as_canonical(self) -> None:
+        self.manifest["surfaces"][4]["authority"] = "canonical"
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "copilot-adapter", "adapter", "canonical")
+
+    def test_rejects_optional_canonical_owner(self) -> None:
+        self.manifest["surfaces"][0]["required"] = False
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "organization-policy", "required")
+
+    def test_rejects_missing_canonical_policy(self) -> None:
+        for value in (None, "PATTERNS.md"):
+            with self.subTest(canonical_policy=value):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    if value is None:
+                        manifest.pop("canonical_policy")
+                    else:
+                        manifest["canonical_policy"] = value
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        ".github/instruction-surfaces.json",
+                        "canonical_policy",
+                    )
+
+    def test_rejects_relocated_canonical_policy(self) -> None:
+        organization_policy = self.manifest["surfaces"][0]
+        organization_patterns = self.manifest["surfaces"][1]
+        organization_policy["authority"] = "canonical-detail"
+        organization_policy["canonical_for"] = []
+        organization_patterns["authority"] = "canonical"
+        organization_patterns["canonical_for"] = ["organization-policy"]
+        self.manifest["canonical_policy"] = "PATTERNS.md"
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/instruction-surfaces.json",
+            "canonical_policy",
+            "AGENTS.md",
+        )
+
+    def test_rejects_missing_declared_path(self) -> None:
+        cases = (("AGENTS.md", True), (".github/README.md", False))
+        for relative_path, required in cases:
+            with self.subTest(path=relative_path, required=required):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    surface = next(
+                        item
+                        for item in manifest["surfaces"]
+                        if item["path"] == relative_path
+                    )
+                    surface["required"] = required
+                    (root / relative_path).unlink()
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(errors, relative_path, "regular file")
+
+    def test_rejects_parent_path(self) -> None:
+        self.manifest["surfaces"][3]["path"] = "../outside.md"
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "../outside.md", "escapes repository")
+
+    def test_rejects_outside_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as outside_directory:
+            outside = Path(outside_directory) / "AGENTS.md"
+            outside.write_text("# Outside\n", encoding="utf-8")
+            (self.root / "AGENTS.md").unlink()
+            (self.root / "AGENTS.md").symlink_to(outside)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "AGENTS.md", "symlink")
+
+    def test_rejects_private_reference_in_active_surface(self) -> None:
+        with (self.root / "AGENTS.md").open("a", encoding="utf-8") as policy:
+            policy.write("Read workspace/repos.yml before editing.\n")
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "AGENTS.md", "workspace/repos.yml")
+
+    def test_rejects_private_reference_when_active_surface_is_relabeled_decision(
+        self,
+    ) -> None:
+        self.manifest["surfaces"][1]["kind"] = "decision"
+        write_file(self.root, "PATTERNS.md", "Read workspace/repos.yml.\n")
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "PATTERNS.md", "workspace/repos.yml")
+
+    def test_exempts_historical_decision_by_path(self) -> None:
+        decision_path = "decisions/0001-historical.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "historical-decision",
+                decision_path,
+                kind="decision",
+                authority="canonical-detail",
+                consumers=["human"],
+                tasks=["history"],
+            )
+        )
+        write_file(
+            self.root,
+            decision_path,
+            "The historical process used workspace/repos.yml.\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_private_reference_in_declared_enforcement_surface(self) -> None:
+        workflow_path = ".github/workflows/agent-instructions.yml"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "agent-instruction-workflow",
+                workflow_path,
+                kind="enforcement",
+                authority="canonical-detail",
+                consumers=["ci"],
+                tasks=["validation"],
+            )
+        )
+        write_file(
+            self.root,
+            workflow_path,
+            "run: cat workspace/repos.yml\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, workflow_path, "workspace/repos.yml")
+
+    def test_rejects_invalid_utf8_active_surface(self) -> None:
+        (self.root / "PATTERNS.md").write_bytes(b"# Patterns\n\xff\n")
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "PATTERNS.md", "UTF-8")
+
+    def test_rejects_workspace_group_path(self) -> None:
+        with (self.root / "PATTERNS.md").open("a", encoding="utf-8") as patterns:
+            patterns.write("See repos/docs/wiki/docs/example.md.\n")
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "PATTERNS.md", "repos/docs/")
+
+    def test_allows_github_api_and_privacy_prose(self) -> None:
+        with (self.root / "AGENTS.md").open("a", encoding="utf-8") as policy:
+            policy.write(
+                "Use gh api repos/{owner}/{repo} for public metadata.\n"
+                "Protect private information and explain the privacy boundary.\n"
+            )
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_allows_agents_at_exact_byte_limit(self) -> None:
+        policy = self.root / "AGENTS.md"
+        policy.write_text(
+            "\N{LATIN SMALL LETTER E WITH ACUTE}" * (PUBLIC_POLICY_BYTE_LIMIT // 2),
+            encoding="utf-8",
+        )
+        self.assertEqual(len(policy.read_bytes()), PUBLIC_POLICY_BYTE_LIMIT)
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_agents_one_byte_over_limit(self) -> None:
+        policy = self.root / "AGENTS.md"
+        policy.write_text(
+            "\N{LATIN SMALL LETTER E WITH ACUTE}" * (PUBLIC_POLICY_BYTE_LIMIT // 2)
+            + "a",
+            encoding="utf-8",
+        )
+        self.assertEqual(len(policy.read_bytes()), PUBLIC_POLICY_BYTE_LIMIT + 1)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            "AGENTS.md",
+            "32,769 bytes",
+            "32,768",
+        )
+
+    def test_does_not_scan_historical_unrouted_file(self) -> None:
+        write_file(
+            self.root,
+            "decisions/archive/0001-legacy.md",
+            "The old process used workspace/repos.yml.\n",
+        )
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_public_vendor_root_files(self) -> None:
+        for filename in ("CLAUDE.md", "GEMINI.md"):
+            for variant in ("regular", "broken-symlink"):
+                with self.subTest(filename=filename, variant=variant):
+                    with tempfile.TemporaryDirectory() as directory:
+                        root = Path(directory)
+                        make_repository(root)
+                        path = root / filename
+                        if variant == "regular":
+                            path.write_text("# Vendor policy\n", encoding="utf-8")
+                        else:
+                            os.symlink(root / "missing-target", path)
+
+                        errors = validator.validate(root)
+
+                        self.assert_error_contains(errors, filename, "vendor root")
+
+    def test_rejects_nested_agents_md_even_when_declared(self) -> None:
+        nested_path = "packages/example/config/AGENTS.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "nested-agent-policy",
+                nested_path,
+                kind="shared-policy",
+                authority="canonical-detail",
+                consumers=["codex"],
+                file_patterns=["packages/example/config/**"],
+            )
+        )
+        write_file(self.root, nested_path, "# Nested policy\n")
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            nested_path,
+            "nested AGENTS.md is unsupported",
+            ".github/instructions",
+        )
+
+    def test_rejects_agents_override_files_at_any_depth(self) -> None:
+        for relative_path in (
+            "AGENTS.override.md",
+            "packages/example/config/AGENTS.override.md",
+        ):
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    write_file(root, relative_path, "# Override policy\n")
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        "AGENTS.override.md is unsupported",
+                        ".github/instructions",
+                    )
+
+    def test_ignores_codex_guidance_names_below_git_metadata(self) -> None:
+        write_file(self.root, ".git/private/AGENTS.md", "# Git metadata\n")
+        write_file(
+            self.root,
+            ".git/private/AGENTS.override.md",
+            "# Git metadata override\n",
+        )
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_wrong_copilot_adapter(self) -> None:
+        with (self.root / ".github/copilot-instructions.md").open(
+            "a", encoding="utf-8"
+        ) as adapter:
+            adapter.write("Additional policy.\n")
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/copilot-instructions.md",
+            "exact template",
+        )
+
+    def test_rejects_wrong_runtime_adapter_contract(self) -> None:
+        surface = next(
+            item for item in self.manifest["surfaces"] if item["id"] == "gemini-adapter"
+        )
+        surface["consumers"] = ["human"]
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "gemini-adapter", "delivery contract")
+
+    def test_rejects_parallel_runtime_instruction_carriers(self) -> None:
+        cases = (
+            ".claude/rules/hidden.md",
+            "src/CLAUDE.md",
+            ".agents/skills/hidden/SKILL.md",
+            ".gemini/GEMINI.md",
+        )
+        for relative_path in cases:
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    write_file(root, relative_path, "# Hidden policy\n")
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        "runtime-specific instruction carrier",
+                    )
+
+    def test_rejects_invalid_exclude_agent_frontmatter(self) -> None:
+        path = ".github/instructions/review.instructions.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "review-guidance",
+                path,
+                kind="scoped-guidance",
+                authority="canonical-detail",
+                consumers=["copilot"],
+                file_patterns=["**"],
+            )
+        )
+        write_file(
+            self.root,
+            path,
+            '---\napplyTo: "**"\nexcludeAgent: ["coding-agent"]\n---\n',
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, path, "excludeAgent", "scalar")
+
+    def test_accepts_supported_exclude_agent_frontmatter(self) -> None:
+        for value in ("cloud-agent", "code-review"):
+            with self.subTest(value=value):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    path = ".github/instructions/review.instructions.md"
+                    manifest["surfaces"].append(
+                        make_surface(
+                            "review-guidance",
+                            path,
+                            kind="scoped-guidance",
+                            authority="canonical-detail",
+                            consumers=["copilot"],
+                            file_patterns=["**"],
+                        )
+                    )
+                    write_file(
+                        root,
+                        path,
+                        f'---\napplyTo: "**"\nexcludeAgent: "{value}"\n---\n',
+                    )
+                    write_manifest(root, manifest)
+
+                    self.assertEqual(validator.validate(root), [])
+
+    def test_rejects_unknown_manifest_and_surface_fields(self) -> None:
+        self.manifest["unexpected"] = True
+        self.manifest["surfaces"][0]["unexpected"] = True
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "unknown top-level field", "unexpected")
+        self.assert_error_contains(errors, "organization-policy", "unknown field")
+
+    def test_rejects_missing_apply_to(self) -> None:
+        path = ".github/instructions/python.instructions.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "python-guidance",
+                path,
+                kind="scoped-guidance",
+                authority="canonical-detail",
+                consumers=["copilot"],
+                file_patterns=["**/*.py"],
+            )
+        )
+        write_file(
+            self.root,
+            path,
+            '---\ndescription: "Python guidance"\n---\n\n# Python\n',
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, path, "applyTo")
+
+    def test_rejects_apply_to_manifest_mismatch(self) -> None:
+        path = ".github/instructions/python.instructions.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "python-guidance",
+                path,
+                kind="scoped-guidance",
+                authority="canonical-detail",
+                consumers=["copilot"],
+                file_patterns=["**/*.sh"],
+            )
+        )
+        write_file(
+            self.root,
+            path,
+            '---\napplyTo: "**/*.py"\n---\n\n# Python\n',
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, path, "**/*.py", "**/*.sh")
+
+    def test_rejects_nested_or_malformed_apply_to(self) -> None:
+        cases = (
+            (
+                "nested",
+                '---\ncontainer:\n  applyTo: "**/*.py"\n---\n\n# Python\n',
+                "**/*.py",
+            ),
+            (
+                "unterminated-quote",
+                '---\napplyTo: "**/*.py\n---\n\n# Python\n',
+                '"**/*.py',
+            ),
+        )
+        for variant, content, manifest_pattern in cases:
+            with self.subTest(variant=variant):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    path = ".github/instructions/python.instructions.md"
+                    manifest["surfaces"].append(
+                        make_surface(
+                            "python-guidance",
+                            path,
+                            kind="scoped-guidance",
+                            authority="canonical-detail",
+                            consumers=["copilot"],
+                            file_patterns=[manifest_pattern],
+                        )
+                    )
+                    write_file(root, path, content)
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(errors, path, "applyTo")
+
+    def test_rejects_ambiguous_apply_to_yaml_syntax(self) -> None:
+        cases = (
+            ("alias", "*patterns", "*patterns"),
+            ("anchor", '&patterns "**/*.py"', '&patterns "**/*.py"'),
+            ("tag", '!glob "**/*.py"', '!glob "**/*.py"'),
+            ("flow-sequence", '["**/*.py"]', '["**/*.py"]'),
+            ("implicit-boolean", "true", "true"),
+            ("invalid-double-escape", r'"**/\q.py"', r"**/\q.py"),
+            ("invalid-single-quote", "'**/*.py'junk'", "**/*.py'junk"),
+        )
+        for variant, apply_to_source, manifest_pattern in cases:
+            with self.subTest(variant=variant):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    path = ".github/instructions/python.instructions.md"
+                    manifest["surfaces"].append(
+                        make_surface(
+                            "python-guidance",
+                            path,
+                            kind="scoped-guidance",
+                            authority="canonical-detail",
+                            consumers=["copilot"],
+                            file_patterns=[manifest_pattern],
+                        )
+                    )
+                    write_file(
+                        root,
+                        path,
+                        f"---\napplyTo: {apply_to_source}\n---\n\n# Python\n",
+                    )
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(errors, path, "applyTo")
+
+    def test_rejects_inventory_omission(self) -> None:
+        omitted_paths = (
+            ".github/instructions/unlisted.instructions.md",
+            ".github/instructions/nested/unlisted.instructions.md",
+            ".github/agents/unlisted.agent.md",
+            ".github/agents/unlisted.md",
+            ".github/skills/unlisted/SKILL.md",
+            ".github/workflows/agent-instructions.yml",
+            "runbooks/unlisted.md",
+            "decisions/unlisted.md",
+            "automation/agents/validate-agent-policy.py",
+        )
+        for omitted_path in omitted_paths:
+            with self.subTest(path=omitted_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    write_file(root, omitted_path, "# Unlisted surface\n")
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(errors, omitted_path, "inventory")
+
+    def test_scans_declared_recursive_instruction_and_direct_agent_markdown(
+        self,
+    ) -> None:
+        cases = (
+            (
+                ".github/instructions/nested/private.instructions.md",
+                "scoped-guidance",
+                '---\napplyTo: "**/*.py"\n---\n\nRead workspace/repos.yml.\n',
+                ["**/*.py"],
+            ),
+            (
+                ".github/agents/private.md",
+                "agent",
+                "Read workspace/repos.yml.\n",
+                ["**"],
+            ),
+        )
+        for relative_path, kind, content, file_patterns in cases:
+            with self.subTest(path=relative_path):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"].append(
+                        make_surface(
+                            f"private-{kind}",
+                            relative_path,
+                            kind=kind,
+                            authority="canonical-detail",
+                            consumers=["codex"],
+                            file_patterns=file_patterns,
+                        )
+                    )
+                    write_file(root, relative_path, content)
+                    write_manifest(root, manifest)
+
+                    errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_path,
+                        "workspace/repos.yml",
+                    )
+
+    def test_inventory_requires_the_actual_surface_path(self) -> None:
+        instruction_path = ".github/instructions/unlisted.instructions.md"
+        alias_path = "instruction-alias.md"
+        write_file(self.root, instruction_path, "# Unlisted surface\n")
+        (self.root / alias_path).symlink_to(self.root / instruction_path)
+        self.manifest["surfaces"].append(
+            make_surface(
+                "instruction-alias",
+                alias_path,
+                kind="scoped-guidance",
+                authority="canonical-detail",
+                consumers=["copilot"],
+                file_patterns=["**/*.md"],
+            )
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, instruction_path, "inventory")
+
+    def test_scans_declared_skill_resources(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        resource_path = ".github/skills/example/references/private.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex", "claude-code"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            resource_path,
+            "Load workspace/repos.yml before continuing.\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, resource_path, "workspace/repos.yml")
+
+    def test_scans_skill_resources_when_surface_is_relabeled_decision(self) -> None:
+        skill_path = "./.github/skills/example/SKILL.md"
+        resource_path = ".github/skills/example/references/private.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="decision",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            resource_path,
+            "Load workspace/repos.yml before continuing.\n",
+        )
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, resource_path, "workspace/repos.yml")
+
+    def test_rejects_in_repository_skill_directory_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        target_path = self.root / ".github/skills/example/resource-target"
+        link_path = self.root / ".github/skills/example/references"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            ".github/skills/example/resource-target/example.md",
+            "# Example resource\n",
+        )
+        link_path.symlink_to(target_path, target_is_directory=True)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references",
+            "directory symlink",
+            "; fix:",
+            "regular directory",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
+    def test_rejects_outside_skill_directory_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        with tempfile.TemporaryDirectory() as outside_directory:
+            link_path = self.root / ".github/skills/example/references"
+            link_path.symlink_to(
+                Path(outside_directory),
+                target_is_directory=True,
+            )
+            write_manifest(self.root, self.manifest)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references",
+            "directory symlink",
+            "; fix:",
+            "regular directory",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
+    def test_rejects_in_repository_skill_file_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        target_path = self.root / ".github/skills/example/resource-target.md"
+        link_path = self.root / ".github/skills/example/references/example.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            ".github/skills/example/resource-target.md",
+            "# Example resource\n",
+        )
+        link_path.parent.mkdir(parents=True, exist_ok=True)
+        link_path.symlink_to(target_path)
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references/example.md",
+            "skill resource symlink",
+            "; fix:",
+            "regular file",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
+    def test_rejects_broken_absolute_skill_resource_symlink(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        with tempfile.TemporaryDirectory() as outside_directory:
+            link_path = self.root / ".github/skills/example/references/missing.md"
+            link_path.parent.mkdir(parents=True, exist_ok=True)
+            link_path.symlink_to(Path(outside_directory) / "missing.md")
+            write_manifest(self.root, self.manifest)
+
+            errors = validator.validate(self.root)
+
+        self.assert_error_contains(
+            errors,
+            ".github/skills/example/references/missing.md",
+            "skill resource symlink",
+            "; fix:",
+            "regular file",
+        )
+        self.assertTrue(all("\n" not in message for message in errors), errors)
+
+    def test_rejects_unreadable_inventory_directory(self) -> None:
+        instructions = self.root / ".github/instructions"
+        write_file(
+            self.root,
+            ".github/instructions/hidden.instructions.md",
+            "# Hidden guidance\n",
+        )
+        instructions.chmod(0)
+        try:
+            errors = validator.validate(self.root)
+        finally:
+            instructions.chmod(0o700)
+
+        self.assert_error_contains(errors, ".github/instructions", "inventory")
+
+    def test_rejects_external_empty_inventory_directory_symlinks(self) -> None:
+        for relative_directory in (
+            ".github/instructions",
+            ".github/agents",
+            "runbooks",
+            "decisions",
+            ".github/skills",
+        ):
+            with self.subTest(path=relative_directory):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    make_repository(root)
+                    with tempfile.TemporaryDirectory() as outside_directory:
+                        link_path = root / relative_directory
+                        link_path.parent.mkdir(parents=True, exist_ok=True)
+                        if relative_directory == ".github/skills":
+                            (root / REVIEW_SKILL_PATH).unlink()
+                            (root / REVIEW_SKILL_PATH).parent.rmdir()
+                            link_path.rmdir()
+                        link_path.symlink_to(
+                            Path(outside_directory),
+                            target_is_directory=True,
+                        )
+
+                        errors = validator.validate(root)
+
+                    self.assert_error_contains(
+                        errors,
+                        relative_directory,
+                        "inventory directory symlink is not allowed",
+                        "; fix:",
+                        "regular directory",
+                    )
+                    self.assertTrue(
+                        all("\n" not in message for message in errors),
+                        errors,
+                    )
+
+    def test_rejects_unreadable_skill_resource_directory(self) -> None:
+        skill_path = ".github/skills/example/SKILL.md"
+        resources = self.root / ".github/skills/example/references"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "example-skill",
+                skill_path,
+                kind="skill",
+                authority="canonical-detail",
+                consumers=["codex"],
+                tasks=["example"],
+            )
+        )
+        write_file(self.root, skill_path, "# Example skill\n")
+        write_file(
+            self.root,
+            ".github/skills/example/references/private.md",
+            "Read workspace/repos.yml.\n",
+        )
+        write_manifest(self.root, self.manifest)
+        resources.chmod(0)
+        try:
+            errors = validator.validate(self.root)
+        finally:
+            resources.chmod(0o700)
+
+        self.assert_error_contains(errors, "references", "scan skill resources")
+
+    def test_validator_does_not_scan_itself(self) -> None:
+        validator_path = "automation/agents/validate-agent-policy.py"
+        self.manifest["surfaces"].append(
+            make_surface(
+                "agent-policy-validator",
+                validator_path,
+                kind="enforcement",
+                authority="canonical-detail",
+                consumers=["ci"],
+                tasks=["validation"],
+            )
+        )
+        write_file(
+            self.root,
+            validator_path,
+            'FORBIDDEN_PUBLIC_TOKENS = ("workspace/repos.yml", "memory/")\n',
+        )
+        write_manifest(self.root, self.manifest)
+
+        self.assertEqual(validator.validate(self.root), [])
+
+    def test_rejects_relabeled_copilot_adapter(self) -> None:
+        adapter = self.manifest["surfaces"][4]
+        adapter["kind"] = "runbook"
+        adapter["authority"] = "canonical"
+        adapter["canonical_for"] = ["copilot-routing"]
+        write_manifest(self.root, self.manifest)
+
+        errors = validator.validate(self.root)
+
+        self.assert_error_contains(errors, "copilot-adapter", "adapter-only")
+
+    def test_errors_include_fix_command(self) -> None:
+        for family in ("json", "manifest", "public", "scoped", "adapter"):
+            with self.subTest(family=family):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    if family == "json":
+                        write_file(root, ".github/instruction-surfaces.json", "{")
+                    elif family == "manifest":
+                        manifest["version"] = 2
+                        write_manifest(root, manifest)
+                    elif family == "public":
+                        write_file(root, "AGENTS.md", "Read workspace/repos.yml.\n")
+                    elif family == "scoped":
+                        path = ".github/instructions/python.instructions.md"
+                        manifest["surfaces"].append(
+                            make_surface(
+                                "python-guidance",
+                                path,
+                                kind="scoped-guidance",
+                                authority="canonical-detail",
+                                consumers=["copilot"],
+                                file_patterns=["**/*.py"],
+                            )
+                        )
+                        write_file(root, path, "---\n---\n# Python\n")
+                        write_manifest(root, manifest)
+                    else:
+                        write_file(
+                            root,
+                            ".github/copilot-instructions.md",
+                            "Additional policy.\n",
+                        )
+
+                    errors = validator.validate(root)
+
+                    self.assertTrue(errors, f"{family} did not produce an error")
+                    self.assertTrue(
+                        all("; fix: " in message for message in errors),
+                        f"{family} returned an error without a fix: {errors!r}",
+                    )
+
+    def test_cli_exit_codes(self) -> None:
+        # The argv uses the current interpreter and repository-local validator.
+        valid = subprocess.run(  # nosec B603
+            [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(valid.returncode, 0, valid.stdout + valid.stderr)
+        self.assertIn("agent policy validation passed", valid.stdout)
+
+        self.manifest["version"] = 2
+        write_manifest(self.root, self.manifest)
+        # The argv uses the current interpreter and repository-local validator.
+        invalid = subprocess.run(  # nosec B603
+            [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(invalid.returncode, 1, invalid.stdout + invalid.stderr)
+        self.assertIn("ERROR: .github/instruction-surfaces.json:", invalid.stdout)
+
+    def test_cli_rejects_json_parser_limits_without_traceback(self) -> None:
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            '{"version": ' + ("9" * 5000) + "}\n",
+        )
+
+        # The argv uses the current interpreter and repository-local validator.
+        completed = subprocess.run(  # nosec B603
+            [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        self.assertNotIn("Traceback", completed.stdout + completed.stderr)
+        self.assert_error_contains(
+            [line.removeprefix("ERROR: ") for line in completed.stdout.splitlines()],
+            ".github/instruction-surfaces.json",
+            "invalid JSON",
+            "fix:",
+        )
+
+    def test_cli_rejects_duplicate_json_keys_on_one_line(self) -> None:
+        manifest_text = json.dumps(self.manifest, indent=2) + "\n"
+        manifest_text = manifest_text.replace(
+            '      "path": "AGENTS.md",',
+            '      "path": "workspace/repos.yml",\n' '      "path": "AGENTS.md",',
+            1,
+        )
+        write_file(
+            self.root,
+            ".github/instruction-surfaces.json",
+            manifest_text,
+        )
+
+        # The argv uses the current interpreter and repository-local validator.
+        completed = subprocess.run(  # nosec B603
+            [sys.executable, str(SCRIPT_PATH), "--root", str(self.root)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        output_lines = completed.stdout.splitlines()
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        self.assertEqual(len(output_lines), 1, completed.stdout)
+        self.assertIn("duplicate JSON key 'path'", output_lines[0])
+        self.assertIn("; fix:", output_lines[0])
+        self.assertNotIn("Traceback", completed.stdout + completed.stderr)
+
+    def test_cli_errors_remain_one_line_for_control_character_path(self) -> None:
+        for separator in ("\n", "\u0085", "\u2028", "\u2029"):
+            with self.subTest(separator=repr(separator)):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    manifest["surfaces"][3]["path"] = f"bad{separator}INJECTED"
+                    write_manifest(root, manifest)
+
+                    # The argv runs only the local validator against a temp root.
+                    completed = subprocess.run(  # nosec B603
+                        [sys.executable, str(SCRIPT_PATH), "--root", str(root)],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
+
+                    self.assertEqual(
+                        completed.returncode,
+                        1,
+                        completed.stdout + completed.stderr,
+                    )
+                    self.assertTrue(completed.stdout.splitlines())
+                    self.assertTrue(
+                        all(
+                            line.startswith("ERROR: ")
+                            for line in completed.stdout.splitlines()
+                        ),
+                        completed.stdout,
+                    )
+
+    def test_cli_escapes_control_characters_in_discovered_paths(self) -> None:
+        cases = (
+            ("inventory", "\n"),
+            ("skill-resource", "\n"),
+            ("inventory", "\u0085"),
+            ("skill-resource", "\u2028"),
+        )
+        for variant, separator in cases:
+            with self.subTest(variant=variant, separator=repr(separator)):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest = make_repository(root)
+                    if variant == "inventory":
+                        write_file(
+                            root,
+                            f".github/instructions/bad{separator}name.instructions.md",
+                            "# Undeclared guidance\n",
+                        )
+                    else:
+                        skill_path = ".github/skills/example/SKILL.md"
+                        manifest["surfaces"].append(
+                            make_surface(
+                                "example-skill",
+                                skill_path,
+                                kind="skill",
+                                authority="canonical-detail",
+                                consumers=["codex"],
+                            )
+                        )
+                        write_file(root, skill_path, "# Example skill\n")
+                        write_file(
+                            root,
+                            f".github/skills/example/bad{separator}resource.md",
+                            "Read workspace/repos.yml.\n",
+                        )
+                        write_manifest(root, manifest)
+
+                    expected_errors = validator.validate(root)
+                    # The argv runs only the local validator against a temp root.
+                    completed = subprocess.run(  # nosec B603
+                        [sys.executable, str(SCRIPT_PATH), "--root", str(root)],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
+
+                    output_lines = completed.stdout.splitlines()
+                    self.assertEqual(
+                        completed.returncode,
+                        1,
+                        completed.stdout + completed.stderr,
+                    )
+                    self.assertEqual(len(output_lines), len(expected_errors))
+                    self.assertTrue(expected_errors)
+                    self.assertTrue(
+                        all(
+                            "; fix: rename or remove the invalid path " in message
+                            for message in expected_errors
+                        ),
+                        expected_errors,
+                    )
+                    self.assertTrue(
+                        all(line.startswith("ERROR: ") for line in output_lines),
+                        completed.stdout,
+                    )
+
+
+class PublicRepositoryTests(unittest.TestCase):
+    def test_review_readiness_remains_required_without_skill_invocation(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        runbook = surfaces["runbook-org-review"]
+        skill = surfaces["skill-code-review"]
+        health_tasks = {
+            "review-readiness",
+            "organization-review",
+            "project-health",
+            "repository-health",
+            "repository-health-audit",
+            "repository-health-check",
+        }
+        self.assertTrue(runbook["required"])
+        self.assertEqual(runbook["path"], "runbooks/org-review.md")
+        self.assertEqual(runbook["authority"], "canonical-detail")
+        self.assertIn("review-readiness", runbook["canonical_for"])
+        self.assertTrue(
+            (health_tasks | {"repository-bootstrap"}).issubset(runbook["tasks"])
+        )
+        self.assertEqual(skill["path"], REVIEW_SKILL_PATH)
+        self.assertEqual(skill["authority"], "advisory")
+        self.assertFalse(skill["required"])
+        self.assertEqual(skill["canonical_for"], [])
+        self.assertTrue((health_tasks | {"code-review"}).issubset(skill["tasks"]))
+        for item in (runbook, skill):
+            self.assertEqual(item["file_patterns"], ["**"])
+            self.assertTrue({"agent", "human"}.issubset(item["consumers"]))
+        policy = " ".join((PUBLIC_ROOT / "AGENTS.md").read_text().split())
+        self.assertIn(
+            "Every repository-health evaluation, including quick checks and bootstrap, must assess",
+            policy,
+        )
+        self.assertIn(f"`{REVIEW_SKILL_PATH}`", policy)
+        self.assertIn(
+            "applies even when a runtime does not discover or use skills", policy
+        )
+
+    def test_public_manifest_routes_zsh_scripting_standard(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        self.assertEqual(
+            surfaces["instruction-zsh-scripting"]["tasks"],
+            ["all"],
+        )
+        self.assertEqual(
+            surfaces["instruction-zsh-scripting"]["canonical_for"],
+            ["zsh-scripting"],
+        )
+        self.assertEqual(
+            surfaces["zsh-standard-policy"]["canonical_for"],
+            [
+                "zsh-release-metadata",
+                "zsh-rule-metadata",
+                "zsh-source-classification",
+            ],
+        )
+        self.assertEqual(
+            surfaces["zsh-standard-validator"]["canonical_for"],
+            ["zsh-standard-validation"],
+        )
+
+    def test_public_policy_requires_zsh_standard_for_read_and_write(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        required = (
+            "reading, reviewing, diagnosing, creating, or changing Zsh source",
+            ".github/instructions/zsh/scripting.instructions.md",
+            "current released official Zsh manual",
+            "Native Zsh validity",
+            "does not authorize unrelated cleanup",
+        )
+        for fragment in required:
+            self.assertIn(fragment, policy)
+
+    def test_public_repository_declares_accepted_zsh_standard_adr(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["decision-0015"],
+            {
+                "id": "decision-0015",
+                "path": "decisions/0015-zsh-scripting-standard.md",
+                "kind": "decision",
+                "authority": "canonical-detail",
+                "consumers": ["agent", "human"],
+                "tasks": ["architecture-decision", "zsh-standard"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
+        )
+
+        adr = (PUBLIC_ROOT / "decisions/0015-zsh-scripting-standard.md").read_text()
+        required = (
+            "# 15. Adopt an organization-wide Zsh scripting standard",
+            "**Status:** ACCEPTED",
+            "**Deciders:** ss-o",
+            "Zsh 5.9.2",
+            "per-repository compatibility floor",
+            "five source classes",
+            "`startup-file`",
+            "startup and shutdown files are read by Zsh for defined "
+            "lifecycle phases",
+            "may make phase-owned effects",
+            "caller-preserving sourced libraries",
+            "https://zsh.sourceforge.io/Doc/Release/Files.html",
+            "generated, digest-checked delivery",
+            "ShellCheck is not used for Zsh",
+        )
+        for fragment in required:
+            self.assertIn(fragment, adr)
+        self.assertNotIn("Pending maintainer acceptance", adr)
+
+    def test_public_manifest_routes_recurring_operations_runbook(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        recurring_operations_surfaces = [
+            surface
+            for surface in manifest["surfaces"]
+            if "recurring-operations" in surface.get("canonical_for", [])
+        ]
+
+        self.assertEqual(
+            recurring_operations_surfaces,
+            [
+                {
+                    "id": "runbook-recurring-operations",
+                    "path": "runbooks/recurring-operations.md",
+                    "kind": "runbook",
+                    "authority": "canonical-detail",
+                    "consumers": ["agent", "human"],
+                    "tasks": [
+                        "recurring-operations",
+                        "scheduled-workflow-audit",
+                        "automation-review",
+                        "zsh-plugin-standard-review",
+                    ],
+                    "file_patterns": ["**"],
+                    "required": True,
+                    "review_owner": "z-shell maintainers",
+                    "canonical_for": [
+                        "recurring-operations",
+                        "zsh-plugin-standard-review",
+                    ],
+                }
+            ],
+        )
+
+    def test_public_manifest_routes_zsh_plugin_standard(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {surface["id"]: surface for surface in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["instruction-zsh-plugin-standard"],
+            {
+                "id": "instruction-zsh-plugin-standard",
+                "path": ".github/instructions/plugins/standard-selection.instructions.md",
+                "kind": "scoped-guidance",
+                "authority": "canonical-detail",
+                "consumers": ["agent", "human"],
+                "tasks": [
+                    "zsh-plugin-creation",
+                    "zsh-plugin-review",
+                    "zsh-plugin-code-change",
+                    "zsh-plugin-template",
+                    "zsh-plugin-documentation",
+                    "zsh-plugin-scaffolding",
+                ],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": ["zsh-plugin-standard-application"],
+            },
+        )
+        self.assertEqual(
+            surfaces["instruction-zsh-plugin-standard-aliases"],
+            {
+                "id": "instruction-zsh-plugin-standard-aliases",
+                "path": (
+                    ".github/instructions/"
+                    "plugins/review-routing.instructions.md"
+                ),
+                "kind": "scoped-guidance",
+                "authority": "canonical-detail",
+                "consumers": ["agent", "human"],
+                "tasks": [
+                    "code-review",
+                    "readme-authoring",
+                    "zsh-plugin-scaffolding",
+                ],
+                "file_patterns": [
+                    "**/*.plugin.zsh,**/init.zsh,"
+                    "knowledge/domains/documentation/templates/zsh-plugin.md,"
+                    ".github/skills/zsh-plugin/**,"
+                    ".github/agents/plugins-plugin-reviewer.agent.md"
+                ],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
+        )
+
+    def test_public_repository_documents_instruction_governance(self) -> None:
+        adr = (
+            PUBLIC_ROOT / "decisions/0014-portable-agent-instruction-architecture.md"
+        ).read_text()
+        self.assertIn("**Status:** ACCEPTED", adr)
+        self.assertIn("**Deciders:** ss-o", adr)
+        self.assertNotIn("remains a proposal", adr)
+        self.assertNotIn("Upon acceptance", adr)
+        self.assertIn("z-shell/.github#475", adr)
+
+        superseded_adr = (
+            PUBLIC_ROOT / "decisions/0001-meta-repo-and-agents-md.md"
+        ).read_text()
+        self.assertIn("**Status:** ACCEPTED", superseded_adr)
+        self.assertIn(
+            "**Superseded by:** "
+            "`decisions/0014-portable-agent-instruction-architecture.md` "
+            "for the vendor-entry-point layout",
+            superseded_adr,
+        )
+
+        runbook = (PUBLIC_ROOT / "runbooks/instruction-update.md").read_text()
+        for question in REQUIRED_IMPACT_QUESTIONS:
+            self.assertIn(question, runbook)
+
+    def test_public_repository_aligns_readme_template_scope_and_location(self) -> None:
+        documentation = (
+            PUBLIC_ROOT / ".github/instructions/documentation/content-placement.instructions.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("default `preserve` behavior", documentation)
+        self.assertIn("## Repository READMEs", documentation)
+        self.assertIn(
+            "Every maintained repository has exactly one repository landing README",
+            documentation,
+        )
+        self.assertIn(
+            "[`knowledge/domains/documentation/templates/zsh-plugin.md`](../../../knowledge/domains/documentation/templates/zsh-plugin.md)",
+            documentation,
+        )
+        self.assertIn("**Compiled modules:**", documentation)
+        self.assertIn("when the repository is not Zsh-facing", documentation)
+
+        skill = (PUBLIC_ROOT / ".github/skills/create-readme/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Place exactly one repository README", skill)
+        self.assertIn(
+            "**Zi Annexes (`z-a-*`):** Keep Zi as the installation path",
+            skill,
+        )
+        self.assertIn("**Compiled Modules:**", skill)
+        self.assertIn(
+            "Add Zsh Plugin Standard v2 compliance only for plugin-shaped repositories",
+            skill,
+        )
+        self.assertIn(
+            "Use official Zsh manual sections for Zsh-facing repositories", skill
+        )
+
+        runbook = (PUBLIC_ROOT / "runbooks/new-repository.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "Every repository starts with exactly one repository README", runbook
+        )
+        self.assertNotIn(".prettierrc", runbook)
+
+        template = (PUBLIC_ROOT / "knowledge/domains/documentation/templates/zsh-plugin.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("`docs/README.md`", template)
+        self.assertEqual(template.count('href="<license-path>"'), 2)
+        self.assertNotIn("](<license-path>)", template)
+        self.assertIn('src="<logo-path-or-url>"', template)
+        self.assertIn("default Markdown `preserve` behavior", template)
+        self.assertIn("Plugin-shaped repositories only, installation paths", template)
+        self.assertIn("Zsh plugins only, Plugin Standard", template)
+        self.assertIn("Zi annexes only", template)
+        self.assertIn("> [!IMPORTANT]\n> <Removed setting>", template)
+        self.assertNotIn("> [!IMPORTANT] <Removed setting>", template)
+
+        lychee = (PUBLIC_ROOT / ".github/lychee.toml").read_text(encoding="utf-8")
+        self.assertIn("%3Clicense-path%3E", lychee)
+        self.assertIn("%3Clogo-path-or-url%3E", lychee)
+
+    def test_public_repository_requires_manifest_routing_for_all_runtimes(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        required_fragments = (
+            "Before non-trivial work, inspect " "`.github/instruction-surfaces.json`.",
+            "This applies to every supported runtime.",
+            "current task categories and repository-relative file patterns",
+            "both dimensions must match",
+            "Read every matched required surface before acting.",
+            "does not auto-load scoped guidance, open each matched required "
+            "surface explicitly.",
+            "(repository, task class, normalized matched path set, relevant "
+            "content hashes)",
+            "Reuse it only while every key component is unchanged",
+            "same physical file, read it once and retain their combined provenance",
+            "selected guidance at distinct paths is byte-identical, load its "
+            "content once and retain the combined provenance of every matching route",
+            "byte-identical generation source already embedded in an active "
+            "composite counts as loaded",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, policy)
+
+    def test_public_repository_deduplicates_loaded_content_and_gates_external_writes(
+        self,
+    ) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        memory = (PUBLIC_ROOT / ".github/AGENT_MEMORY.md").read_text()
+
+        policy_fragments = (
+            "Treat byte-exact instruction content already present in the active "
+            "instruction context as loaded.",
+            "Manifest ownership entries and repository links do not request a "
+            "second read.",
+            "Creating or updating issues, comments, pull requests, or tracker "
+            "records requires explicit external-write authority.",
+            "Without that authority, report the proposed external write instead.",
+            "If no issue exists for non-trivial planned work, propose one.",
+        )
+        for fragment in policy_fragments:
+            self.assertIn(fragment, policy)
+
+        memory_fragments = (
+            "External writes require explicit authorization.",
+            "Without it, report the proposed issue, comment, or tracker update "
+            "instead of performing it.",
+            "If no issue exists for planned or deferred work, propose one.",
+        )
+        for fragment in memory_fragments:
+            self.assertIn(fragment, memory)
+
+        self.assertNotIn(
+            "If no issue exists for non-trivial planned work, create one",
+            policy,
+        )
+        self.assertNotIn(
+            "If no issue exists for planned or deferred work, create one",
+            memory,
+        )
+
+    def test_public_policy_routes_triage_and_recurring_procedure_detail(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+
+        self.assertIn("## Triage and recurring operations", policy)
+        self.assertIn("`runbooks/triage.md`", policy)
+        self.assertIn("`runbooks/recurring-operations.md`", policy)
+        self.assertIn("Keep\nthe first pass non-destructive", policy)
+        self.assertIn("produce\ndrafts only", policy)
+        self.assertNotIn("Short version:", policy)
+        self.assertNotIn("weekly org review:", policy)
+
+    def test_public_manifest_uses_workflow_specific_task_labels(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertIn("code-review", surfaces["organization-patterns"]["tasks"])
+        self.assertNotIn("review", surfaces["organization-patterns"]["tasks"])
+        self.assertEqual(
+            surfaces["instruction-generator-verifier-workflow"]["tasks"],
+            [
+                "generator-verifier-workflow",
+                "generator-verifier-architecture",
+                "generator-verifier-concurrency",
+            ],
+        )
+        self.assertEqual(surfaces["zsh-standard-policy"]["tasks"], ["zsh-standard"])
+
+    def test_public_manifest_routes_guided_setup_decisions_to_implementation(
+        self,
+    ) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+        architecture = surfaces["decision-0029"]
+        planner = surfaces["decision-0025-planner-implementation"]
+        topology = surfaces["decision-0029-planner-implementation"]
+
+        self.assertEqual(architecture["tasks"], ["architecture-decision"])
+        self.assertEqual(architecture["file_patterns"], ["**"])
+        self.assertNotEqual(planner["path"], architecture["path"])
+        self.assertEqual(topology["path"], architecture["path"])
+        for implementation in (planner, topology):
+            self.assertEqual(implementation["tasks"], ["implementation"])
+            self.assertEqual(
+                implementation["file_patterns"],
+                [
+                    "public/sh/install.sh,public/sh/setup.sh,public/setup/**,"
+                    "tests/installers.sh"
+                ],
+            )
+            self.assertTrue(implementation["required"])
+
+    def test_public_repository_declares_learning_capture_surfaces(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["runbook-learning-capture"],
+            {
+                "id": "runbook-learning-capture",
+                "path": "runbooks/learning-capture.md",
+                "kind": "runbook",
+                "authority": "canonical-detail",
+                "consumers": ["agent", "human"],
+                "tasks": ["learning-capture", "completion-review"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": ["learning-capture"],
+            },
+        )
+        self.assertEqual(
+            surfaces["skill-review-project-learning"],
+            {
+                "id": "skill-review-project-learning",
+                "path": ".github/skills/review-project-learning/SKILL.md",
+                "kind": "skill",
+                "authority": "advisory",
+                "consumers": ["agent"],
+                "tasks": ["learning-capture", "completion-review"],
+                "file_patterns": ["**"],
+                "required": False,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": [],
+            },
+        )
+
+    def test_public_repository_declares_sub_issue_policy(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["runbook-sub-issues"],
+            {
+                "id": "runbook-sub-issues",
+                "path": "runbooks/sub-issues.md",
+                "kind": "runbook",
+                "authority": "canonical-detail",
+                "consumers": ["agent", "human"],
+                "tasks": ["project-tracking", "sub-issue-management"],
+                "file_patterns": ["**"],
+                "required": True,
+                "review_owner": "z-shell maintainers",
+                "canonical_for": ["sub-issue-management"],
+            },
+        )
+
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        runbook = (PUBLIC_ROOT / "runbooks/sub-issues.md").read_text()
+        labels = (PUBLIC_ROOT / "knowledge/domains/governance/data/labels.yml").read_text()
+        issue_form = (
+            PUBLIC_ROOT / ".github/ISSUE_TEMPLATE/07_delivery_initiative.yml"
+        ).read_text()
+
+        self.assertIn("follow `runbooks/sub-issues.md`", policy)
+        self.assertIn("Apply `meta:initiative` to the parent only.", runbook)
+        self.assertIn("- name: meta:initiative", labels)
+        self.assertIn('  - "meta:initiative"', issue_form)
+        self.assertIn('  - "meta:org-tracked"', issue_form)
+
+    def test_public_repository_routes_portable_worktree_management(self) -> None:
+        manifest = json.loads(
+            (PUBLIC_ROOT / ".github/instruction-surfaces.json").read_text()
+        )
+        surfaces = {item["id"]: item for item in manifest["surfaces"]}
+
+        self.assertEqual(
+            surfaces["instruction-worktree-management"]["tasks"],
+            ["worktree-management"],
+        )
+        self.assertEqual(
+            surfaces["runbook-worktrees"]["path"],
+            "runbooks/worktrees.md",
+        )
+        self.assertIn("worktree-management", surfaces["decision-0018"]["tasks"])
+        self.assertIn(
+            "`git worktree list --porcelain` as the authoritative inventory",
+            (PUBLIC_ROOT / "AGENTS.md").read_text(),
+        )
+        record = (
+            PUBLIC_ROOT / "decisions/0018-portable-worktree-management.md"
+        ).read_text()
+        # The record is accepted; automation/governance/decision-records.py owns the general
+        # header contract, so this only pins the routed decision's own state.
+        self.assertIn("- **Status:** ACCEPTED", record)
+        self.assertIn("- **Deciders:** ss-o", record)
+
+    def test_public_repository_prohibits_vendor_root_instruction_files(self) -> None:
+        policy = (PUBLIC_ROOT / "AGENTS.md").read_text()
+        self.assertIn(
+            "Organization repository roots use `AGENTS.md` and permitted "
+            "`.github/*` instruction surfaces.",
+            policy,
+        )
+        self.assertIn(
+            "They must not contain root `CLAUDE.md` or `GEMINI.md`.",
+            policy,
+        )
+        self.assertNotIn("private meta-workspace", policy.casefold())
+
+    def test_public_repository_validates_agent_policy_in_ci(self) -> None:
+        workflow = (
+            PUBLIC_ROOT / ".github/workflows/agent-instructions.yml"
+        ).read_text()
+        required_fragments = (
+            "name: Agent Instruction Validation\n",
+            "on:\n  pull_request:\n    paths:\n",
+            "  push:\n    branches:\n      - main\n    paths:\n",
+            "permissions:\n  contents: read\n",
+            "concurrency:\n"
+            "  group: ${{ github.workflow }}-${{ github.ref }}\n"
+            "  cancel-in-progress: true\n",
+            "jobs:\n  validate:\n"
+            "    name: Validate Agent Instructions\n"
+            "    runs-on: ubuntu-latest\n",
+            "      - name: Check out repository\n"
+            "        uses: actions/checkout@"
+            "df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3\n",
+            "      - name: Set up Python\n"
+            "        uses: actions/setup-python@"
+            "a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0\n"
+            "        with:\n"
+            '          python-version: "3.10"\n',
+            "      - name: Set up Zsh\n" "        uses: ./actions/setup-zsh\n",
+            "      - name: Run agent policy unit tests\n"
+            "        run: python3 -m unittest "
+            "automation/agents/test_validate_agent_policy.py -v\n",
+            "      - name: Run Zsh standard policy unit tests\n"
+            "        run: python3 -m unittest "
+            "automation/ci/test_validate_zsh_standard_policy.py -v\n",
+            "      - name: Validate Zsh standard policy\n"
+            "        run: python3 automation/ci/validate-zsh-standard-policy.py\n",
+            "      - name: Validate agent policy\n"
+            "        run: python3 automation/agents/validate-agent-policy.py\n",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, workflow)
+
+        filtered_paths = (
+            "AGENTS.md",
+            "PATTERNS.md",
+            "CLAUDE.md",
+            "GEMINI.md",
+            ".claude/**",
+            ".gemini/**",
+            ".github/AGENT_MEMORY.md",
+            ".github/README.md",
+            ".github/copilot-instructions.md",
+            ".github/instruction-surfaces.json",
+            ".github/agents/**",
+            ".github/instructions/**",
+            ".github/skills/**",
+            "**/AGENTS.md",
+            "**/AGENTS.override.md",
+            ".github/workflows/agent-instructions.yml",
+            "decisions/**",
+            "runbooks/**",
+            "automation/agents/validate-agent-policy.py",
+            "automation/agents/test_validate_agent_policy.py",
+            "knowledge/domains/zsh/data/zsh-standard-policy.json",
+            "automation/ci/validate-zsh-standard-policy.py",
+            "automation/ci/test_validate_zsh_standard_policy.py",
+        )
+        for path in filtered_paths:
+            self.assertEqual(workflow.count(f'      - "{path}"'), 2, path)
+
+    def test_public_repository_has_no_validation_errors(self) -> None:
+        self.assertEqual(validator.validate(PUBLIC_ROOT), [])
+
+    def test_public_repository_uses_manifest_declared_runtime_adapters(self) -> None:
+        self.assertFalse((PUBLIC_ROOT / "CLAUDE.md").exists())
+        self.assertFalse((PUBLIC_ROOT / ".claude/CLAUDE.md").exists())
+        self.assertFalse((PUBLIC_ROOT / "GEMINI.md").exists())
+        expected = {
+            ".github/copilot-instructions.md": "@../AGENTS.md\n",
+            ".gemini/settings.json": (
+                '{\n  "context": {\n    "fileName": ["AGENTS.md"]\n  }\n}\n'
+            ),
+        }
+        for relative_path, content in expected.items():
+            path = PUBLIC_ROOT / relative_path
+            self.assertFalse(path.is_symlink())
+            self.assertEqual(path.read_text(), content)
+
+
+if __name__ == "__main__":
+    unittest.main()

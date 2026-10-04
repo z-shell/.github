@@ -1,0 +1,59 @@
+{
+  "repository": "mattpocock/skills",
+  "checked": "2026-10-04",
+  "adaptation": "Conditional procedures in z-shell knowledge management; upstream skills are not installed.",
+  "selected": [
+    {
+      "path": "skills/engineering/ask-matt/SKILL.md",
+      "blob_sha": "ce33ac632400b1f439695bd2b5274fd903355323"
+    },
+    {
+      "path": "skills/engineering/domain-modeling/SKILL.md",
+      "blob_sha": "a4438c6879c517d1a08e2b5fbca049b632688dfe"
+    },
+    {
+      "path": "skills/engineering/grill-with-docs/SKILL.md",
+      "blob_sha": "62b9efb6f991d1b229adee7506962f13ced0c499"
+    },
+    {
+      "path": "skills/engineering/research/SKILL.md",
+      "blob_sha": "fecee97e9457ba039678d2fcf1b1bc9fca78307d"
+    },
+    {
+      "path": "skills/engineering/retro/SKILL.md",
+      "blob_sha": "12149acf2dd23b4514dec57b04a6293eaa1352fa"
+    },
+    {
+      "path": "skills/engineering/to-spec/SKILL.md",
+      "blob_sha": "3f52599ae2a4347aee5a07432c2707518e691a7f"
+    },
+    {
+      "path": "skills/engineering/to-tickets/SKILL.md",
+      "blob_sha": "e868c831fcfb1e124e010bcdf84a429ec879160f"
+    },
+    {
+      "path": "skills/engineering/wayfinder/SKILL.md",
+      "blob_sha": "812805b760baf328db0ebdef6f3807e381f97016"
+    },
+    {
+      "path": "skills/productivity/grilling/SKILL.md",
+      "blob_sha": "8ca78c6d8f901aab0c5a1f896034b70e666ff2a3"
+    },
+    {
+      "path": "skills/productivity/writing-for-agents/SKILL.md",
+      "blob_sha": "a37608daf6e835e767deecfb498facecaaba82ba"
+    },
+    {
+      "path": "skills/engineering/domain-modeling/ADR-FORMAT.md",
+      "blob_sha": "d7e61f30a9fd8ca70d9ee68f019c2a9ebf2d13f7"
+    },
+    {
+      "path": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "blob_sha": "9c0b4c7a2e8507c23cbb5e0baa66d81699321cc6"
+    },
+    {
+      "path": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "blob_sha": "9cdbdb22aadc438755392216e75ad9a14cc9832e"
+    }
+  ]
+}

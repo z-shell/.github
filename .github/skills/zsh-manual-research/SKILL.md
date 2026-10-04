@@ -7,14 +7,14 @@ description: Use when a task depends on what Zsh itself does, such as investigat
 
 The released official Zsh manual is the semantic authority
 (`zsh/authority/released-manual` in the
-[Zsh scripting standard](https://github.com/z-shell/.github/blob/main/.github/instructions/zsh-scripting.instructions.md)),
+[Zsh scripting standard](https://github.com/z-shell/.github/blob/main/.github/instructions/zsh/scripting.instructions.md)),
 and released `zsh` is the syntax authority (`zsh/validation/native-authority`). This skill says how
 to reach both and how to record what you found. It adds no rules of its own.
 
 ## Find the baseline
 
 1. Read the reviewed release, `stable_release.version` in the
-   [standard policy record](https://github.com/z-shell/.github/blob/main/lib/zsh-standard-policy.json), and the owning
+   [standard policy record](https://github.com/z-shell/.github/blob/main/knowledge/domains/zsh/data/zsh-standard-policy.json), and the owning
    repository's compatibility floor.
 2. Run `zsh --version` for the binary you will use as the oracle. If it
    differs from the reviewed release, say so wherever you cite it.

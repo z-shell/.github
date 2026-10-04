@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/new-repository.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — New Repository Bootstrap
 
 How to create a new z-shell plugin, annex, or module repository without copying
@@ -60,7 +64,7 @@ For organization-authored code, note that the choice is effectively permanent,
 since a license grant already published cannot be revoked and a later change
 reaches only future releases.
 
-For a maintained plugin, annex, tool, or module README, start from [`templates/readme/zsh-plugin.md`](../templates/readme/zsh-plugin.md) and place it at the selected README location above. The initial README must state the purpose, features, install path, supported shell/runtime, public configuration, lifecycle behavior, verification command, release model, and wiki link. Preserve the template's accessible visual hierarchy, replace its placeholders, adapt plugin-specific sections to the repository archetype, and omit optional sections that do not serve the repository.
+For a maintained plugin, annex, tool, or module README, start from [`knowledge/domains/documentation/templates/zsh-plugin.md`](../knowledge/domains/documentation/templates/zsh-plugin.md) and place it at the selected README location above. The initial README must state the purpose, features, install path, supported shell/runtime, public configuration, lifecycle behavior, verification command, release model, and wiki link. Preserve the template's accessible visual hierarchy, replace its placeholders, adapt plugin-specific sections to the repository archetype, and omit optional sections that do not serve the repository.
 
 Do not copy generic `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/agents/`, or
 `.github/instructions/` files into child repositories. Link to the organization
@@ -188,7 +192,7 @@ Before opening the bootstrap pull request:
 ## Deferred scaffold assets
 
 The organization maintains focused templates such as
-`templates/readme/zsh-plugin.md`, but does not maintain a generated repository
+`knowledge/domains/documentation/templates/zsh-plugin.md`, but does not maintain a generated repository
 source tree. Create dedicated template repositories only through separate
 tracked issues after repeated bootstrap work proves a stable full-repository
 scaffold.

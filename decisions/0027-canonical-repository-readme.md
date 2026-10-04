@@ -21,7 +21,7 @@ Issue [#624](https://github.com/z-shell/.github/issues/624) records the concrete
 1. Every maintained repository has exactly one repository landing README.
 2. Use `docs/README.md` when `docs/` already exists, otherwise `.github/README.md` when `.github/` exists, and otherwise `README.md` in the repository root. Do not create `docs/` solely to host the README.
 3. Adjust relative links for the selected location, including links to the repository license and repository-owned assets.
-4. When creating a repository README or substantially restructuring one, start from `templates/readme/zsh-plugin.md`. Focused corrections do not require a full rewrite.
+4. When creating a repository README or substantially restructuring one, start from `knowledge/domains/documentation/templates/zsh-plugin.md`. Focused corrections do not require a full rewrite.
 5. The shared template owns the common information order and accessible visual hierarchy. Zsh plugins may use its body directly. Annexes, compiled modules, tools, and environment or meta repositories adapt plugin-specific headings, examples, links, and checklist items to their archetype.
 6. Plugin Standard, Zi, plugin-manager, Zsh-manual, and shell-lifecycle requirements apply only where the repository archetype uses them. Every repository links the authoritative documentation for its actual user-facing surface.
 7. Repositories that use Prettier for Markdown retain the default `proseWrap: preserve` behavior unless a separately documented repository requirement says otherwise. GitHub alert markers and bodies remain on separate quoted lines.
@@ -59,6 +59,6 @@ Issue [#624](https://github.com/z-shell/.github/issues/624) records the concrete
 - [GitHub alert syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#alerts)
 - [Prettier prose-wrap options](https://prettier.io/docs/options#prose-wrap)
 - `runbooks/instruction-update.md`
-- `.github/instructions/documentation.instructions.md`
+- `.github/instructions/documentation/content-placement.instructions.md`
 - `.github/skills/create-readme/SKILL.md`
-- `templates/readme/zsh-plugin.md`
+- `knowledge/domains/documentation/templates/zsh-plugin.md`

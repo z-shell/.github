@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/quality/org-review.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Weekly org review
 
 Use this workflow to turn organization-wide GitHub activity into a short prioritized draft for maintainers.
@@ -78,10 +82,10 @@ classes, and these results for each repository:
   A successful review without attribution does not establish skill use.
 
 The approved canonical revision is the one recorded for the skill in
-`lib/approved-skills.json`. For a repository declared in the `downstream`
+`knowledge/domains/agents/data/approved-skills.json`. For a repository declared in the `downstream`
 section of `.github/instruction-surfaces.json`, the provenance, currency, and
 local-drift dimensions are deterministic: run
-`python3 scripts/org-routing.py check --repository z-shell/<name> --root <checkout>`
+`python3 automation/agents/org-routing.py check --repository z-shell/<name> --root <checkout>`
 from a `z-shell/.github` clone, or read the repository's `Org Routing` check
 (decisions/0031). A pinned revision other than the approved one is stale even
 when the content is identical. Presence, suitability, and runtime evidence
@@ -105,7 +109,7 @@ skills are not selected by the runtime.
 During health evaluation, record whether the repository selects the `github`
 baseline, `github-docs`, or no MCP profile, and why that choice fits its actual
 components. Optional services are not a health prerequisite. Follow
-[integration guidance](../.github/instructions/mcp-plugins.instructions.md#copilot-hosted-review)
+[integration guidance](../.github/instructions/agents/tool-integration.instructions.md#copilot-hosted-review)
 for hosted compatibility and tool selection. Keep these evidence dimensions
 separate:
 
@@ -145,7 +149,7 @@ or new hosted reviews.
 The canonical source is this repository's
 [code-review skill](../.github/skills/code-review/SKILL.md). Keep shared review
 criteria in
-[code-review-generic.instructions.md](../.github/instructions/code-review-generic.instructions.md).
+[code-review.instructions.md](../.github/instructions/quality/code-review.instructions.md).
 The portable skill discovers local contracts and links to canonical criteria;
 it does not require this repository to be a sibling checkout.
 
@@ -167,7 +171,7 @@ claiming a remote installation. See the
 
 For updates, compare the recorded source revision and actual installed files
 against the currently approved canonical revision explicitly;
-`scripts/org-routing.py check` does this for declared repositories. `gh skill update
+`automation/agents/org-routing.py check` does this for declared repositories. `gh skill update
 --dry-run` skips pinned skills, so its output cannot establish currency. Once
 the differences and update scope are approved, reinstall at the new approved
 commit and verify the resulting content and metadata. An unchanged repeated
@@ -175,8 +179,8 @@ installation should leave no diff. See the
 [GitHub CLI update manual](https://cli.github.com/manual/gh_skill_update).
 
 Advancing the approved revision is a reviewed change to
-`lib/approved-skills.json` in this repository: set the new commit, run
-`python3 scripts/org-routing.py verify-approved` to confirm the digest and
+`knowledge/domains/agents/data/approved-skills.json` in this repository: set the new commit, run
+`python3 automation/agents/org-routing.py verify-approved` to confirm the digest and
 file list, and merge it before any downstream repository re-pins. Each
 downstream re-pin is then a separately authorized change in that repository.
 
@@ -189,7 +193,7 @@ use from skill presence. See
 
 ## Read-only coverage report
 
-Run `python3 scripts/org_policy_report.py coverage --live` from a current, reviewed organization checkout. It uses read-only `gh api` calls, fully paginates the repository inventory, and observes declared active consumers at immutable default-branch commits. It reports generated routing-block currency, workflow caller references, approved skill pins and content, resource inventory, and effective ruleset-required check names. It performs no installation, dispatch, tracker write, repository edit or settings change. Keep output containing private repositories private.
+Run `python3 automation/agents/org_policy_report.py coverage --live` from a current, reviewed organization checkout. It uses read-only `gh api` calls, fully paginates the repository inventory, and observes declared active consumers at immutable default-branch commits. It reports generated routing-block currency, workflow caller references, approved skill pins and content, resource inventory, and effective ruleset-required check names. It performs no installation, dispatch, tracker write, repository edit or settings change. Keep output containing private repositories private.
 
 For an offline report, save the REST repository inventory as a JSON array (or the page arrays produced by `gh api --paginate --slurp`) and pass `coverage --inventory inventory.json`. An optional `--checkouts checkouts.json` maps full repository names to local checkout paths and runs the local routing verifier. Local validation and published observations remain separate. The report includes its canonical source revision and observation time; record the collection time of an offline inventory separately.
 

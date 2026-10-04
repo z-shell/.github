@@ -3,13 +3,13 @@ on:
   pull_request:
     paths:
       - actions/run-zd/**
-      - scripts/test_run_zd.py
+      - automation/ci/test_run_zd.py
       - .github/workflows/zd-action.yml
   push:
     branches: [main]
     paths:
       - actions/run-zd/**
-      - scripts/test_run_zd.py
+      - automation/ci/test_run_zd.py
       - .github/workflows/zd-action.yml
   workflow_dispatch:
     inputs:
@@ -35,7 +35,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Check adapter contracts
-        run: python3 -m unittest scripts/test_run_zd.py -v
+        run: python3 -m unittest automation/ci/test_run_zd.py -v
   qualify:
     name: Execution (${{ matrix.name }})
     if: github.event_name == 'workflow_dispatch'

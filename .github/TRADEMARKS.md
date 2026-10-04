@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/trademarks.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 ## Introduction
 
 This is the Organization's policy for the use of our trademarks. While our work is available under free and open source software licenses, those licenses do not include a license to use our trademarks.

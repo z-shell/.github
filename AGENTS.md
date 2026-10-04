@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/agents/organization-policy.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Agent instructions — z-shell
 
 This file is the canonical instruction set for AI coding agents working in the z-shell organization. Read it before doing non-trivial work. Repository-local guidance may narrow implementation details, but it must not silently contradict organization policy; raise any mismatch in an issue or handoff.
@@ -8,6 +12,7 @@ This file is intentionally short. It complements, not replaces:
 - `PATTERNS.md` for cross-repo implementation idioms
 - `decisions/` for ADRs and durable architectural choices
 - `runbooks/` for repeatable operational workflows
+- [knowledge domains](knowledge/index.md) for task-specific navigation to those owners
 
 ## Required instruction routing
 
@@ -47,6 +52,8 @@ Use the right home for each kind of knowledge:
 | Long-form user and maintainer docs    | `wiki/` where practical                                                      |
 | Local LLM memory                      | Optional cache only, never the only record                                   |
 
+For migrated content, `knowledge/domains/` holds the editable source and `knowledge/delivery.json` maps its generated consumers. AGENTS.md remains the complete runtime baseline, and runbooks remain complete public procedures. Edit the declared source and run `python3 automation/knowledge/knowledge-delivery.py`; never maintain a second editable version in a generated consumer. Existing owners remain active for content awaiting a coordinated migration.
+
 For handoffs, follow `.github/AGENT_MEMORY.md`.
 
 ## Core objective for AI assistants
@@ -64,7 +71,7 @@ When working in z-shell repositories, optimize for:
 - **Zsh source:** Before reading, reviewing, diagnosing, creating, or changing Zsh source,
   classify its dialect and execution profile, identify the
   repository compatibility floor, and follow
-  `.github/instructions/zsh-scripting.instructions.md`. The current released official Zsh manual
+  `.github/instructions/zsh/scripting.instructions.md`. The current released official Zsh manual
   is semantic authority. Native Zsh validity outranks
   supplemental parser, linter, or formatter limitations. Report relevant
   defects during read-only work, but that does not authorize unrelated cleanup.

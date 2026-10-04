@@ -4,15 +4,15 @@ on:
   push:
     branches: [main]
     paths:
-      - scripts/zsh_lint_ci.py
-      - scripts/test_zsh_lint_ci.py
-      - scripts/fixtures/zsh-lint/**
+      - automation/ci/zsh_lint_ci.py
+      - automation/ci/test_zsh_lint_ci.py
+      - automation/ci/fixtures/zsh-lint/**
       - .github/workflows/zsh-lint*.yml
   pull_request:
     paths:
-      - scripts/zsh_lint_ci.py
-      - scripts/test_zsh_lint_ci.py
-      - scripts/fixtures/zsh-lint/**
+      - automation/ci/zsh_lint_ci.py
+      - automation/ci/test_zsh_lint_ci.py
+      - automation/ci/fixtures/zsh-lint/**
       - .github/workflows/zsh-lint*.yml
 
 permissions:
@@ -33,10 +33,10 @@ jobs:
         with:
           persist-credentials: false
       - name: Test lint integration
-        run: python3 -m unittest scripts/test_zsh_lint_ci.py -v
+        run: python3 -m unittest automation/ci/test_zsh_lint_ci.py -v
   released-analyzer:
     name: Released Analyzer Contract
     uses: ./.github/workflows/zsh-lint.yml
     with:
-      paths: scripts/fixtures/zsh-lint/clean.txt
+      paths: automation/ci/fixtures/zsh-lint/clean.txt
       zsh-lint-ref: 999cb76cc65ef6af56c0ae65ab0f3622eb527944 # v1.3.0

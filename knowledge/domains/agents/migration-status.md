@@ -1,0 +1,91 @@
+# Knowledge migration status
+
+Tracking: [z-shell/.github issue 717](https://github.com/z-shell/.github/issues/717). Local implementation is unpublished. This page records coverage and remaining ownership transitions, not runtime availability.
+
+## Current batch
+
+### Approved layout refactor progress
+
+| Batch | State | Completion evidence |
+| --- | --- | --- |
+| Ownership and placement contract | Local implementation | [Repository layout rules](repository-layout.md); maintainer approved proceeding on 2026-10-04 |
+| Move four structured policies from lib into owning knowledge domains | Locally verified | Policy values preserved; only the repository-class file's reader-path comment changed; local readers and references repaired |
+| Group maintenance programs, tests and fixtures under automation domains | Locally verified | 43 programs/tests and 14 fixtures moved; root resolution, imports, filters and sparse-checkout inputs repaired; affected suites passed |
+| README/template placement and inheritance correction | Locally verified | README template moved to documentation/templates; complete native README regenerated with the documented GitHub inheritance boundary |
+| Historical ADR ownership | Local contract documented | Numbered decisions remain historical editable owners; domain navigation references them; decision-records.py alone generates their index; ADR-0036 acceptance still pending |
+| Compatibility consumer transitions | Retention contract documented | All 55 consumers classified by their delivery role in knowledge-maintenance.md; no consumer retired; replacement discovery, downstream coordination and exact removal approval remain prerequisites |
+| Terminal-demo module and organization-wide agent delivery | Source scope assessed | Module identity, internal imports and module-local Docker build verified by inspection; three profiles remain repository-native; tool execution and organization discovery remain unverified |
+| Publication, downstream pins and private gitlinks | Not authorized | Local source changes do not establish published availability |
+
+### Local layout verification
+
+On 2026-10-04, all 353 Python tests passed across agents (149), governance (42), ci (149) and knowledge (13), together with three Ruby suites and four shell suites. Syntax checks covered 28 Python, eight Ruby and seven shell files. Generation and drift checks cover 55 native consumers, and file coverage checks account for 357 files outside knowledge/: 55 imported and 302 referenced. A standalone export without Git metadata passed generation, coverage, agent-policy, routing and Zsh-policy checks. Local Markdown target checks exclude README-template placeholders.
+
+Workflow lint still reports two pre-existing diagnostics: the cache-mode job key in .github/workflows/zsh-lint.yml and an unquoted runner-temporary command in .github/workflows/trunk.yml. Both are present in the pre-refactor snapshot; this batch does not claim clean workflow lint or hosted execution. The affected Zsh consumer snapshots were reviewed and refreshed for relocated paths, generation commands and the intended README inheritance correction.
+
+The retained pinact template is a referenced CI compatibility resource, not a generic new template location. Its coordinated immutable-release replacement is tracked by the existing workflow-contract guidance. Historical ADR ownership, complete compatibility consumers, independent tools and downstream publication remain separate batches above.
+
+### Continuation verification
+
+The continuation resumed the existing worktree at daee4d0627f7072fe8209300dca8734dd6745081 on 2026-10-04. A file-hash baseline and binary diff preserved the unpublished state before this batch. Generation, file coverage and decision-record checks passed before edits. Issue 717 remains open in Z-shell Delivery with Triage status; no open organization pull request was returned by the read-only query.
+
+The [placement contract](repository-layout.md) now records the concrete historical-record, independent-module and profile boundaries. [Knowledge maintenance](knowledge-maintenance.md#preserve-complete-consumers) accounts for every generated consumer class and the evidence needed before retirement. Proposed ADR-0036 now distinguishes authoring changes from preserved delivery and historical acceptance; no accepted decision's status changed in this batch.
+
+After these documentation changes, all 204 affected Python tests passed: knowledge 13, governance 42 and agents 149. Generation for 55 consumers, coverage for 357 files, agent-policy, organization-routing, Zsh-policy and decision-record checks passed. CI, Ruby, shell and terminal-demo code were not changed in this continuation; their earlier test results above are prior evidence. Hosted discovery, cross-project migrations, ADR acceptance, tool retirement, publication and downstream adoption remain unresolved separate phases.
+
+55 editable sources are centralized under knowledge/domains/: 14 scoped instruction documents, three role profiles, 22 organization runbooks, the organization baseline, patterns and handoff guidance, nine community policy and membership documents, the organization repository README and three action guides. knowledge/delivery.json maps their complete generated consumers. Native selectors, stable Zsh rule IDs and the machine policy remain unchanged.
+
+Domain indexes select the editable sources. Context selection and CI roles were rewritten to remove duplicate checklists and clarify authorization and optional integrations. Other inherited content was preserved during this batch; moving it is not an accuracy certification.
+
+The [repository file inventory](../../repository-files.json) gives every current tracked or non-ignored file outside knowledge/ an imported or referenced disposition. Domain resource pages explain the remaining files and link to their actual owners. The organization profile stays with its HTML-relative image assets; historical ADRs, native skills, executable configuration, implementations, regression tests and provenance retain their file contracts. python3 automation/knowledge/knowledge-coverage.py detects unclassified additions, missing files, mismatched import owners and generated reference drift whenever run. It is included in the existing knowledge validation workflow; that workflow's scoped triggers do not promise execution on every unrelated repository change.
+
+The orphaned project-tracker starter metadata was removed after explicit maintainer approval. [Imported accuracy gaps](../governance/accuracy-gaps.md) records the missing conduct-reporting file and legacy example/governance review needs without inventing new policy.
+
+## Organization inventory and remaining batches
+
+### Local readiness review continuation
+
+On 2026-10-04, the preserved migration was reviewed through its complete-consumer content diff, relocated automation call paths, generation and routing contracts. Three confirmed migration defects were corrected locally: impact reports now select a declared source's generated consumer relationship and include the delivery map hash; the moved README template retains its caller-inventory classification; the Project tracker test command and repository README authoring instruction now use their maintained owners. Source and generated consumer changes were kept together.
+
+Verification passed across 355 Python tests (agents 151, governance 42, CI 149 and knowledge 13), three Ruby suites and four shell suites. The final README correction changed the frozen consumer snapshot; a parsed before/after comparison proved the sole difference was its corrected authoring instruction, and the reviewed snapshot refresh passed the targeted test. Generation, 357-file coverage, policy/routing, approved skill revisions, decision records, whitespace and a standalone export passed. Local knowledge checks resolved 741 link targets, excluding template placeholders. The unchanged approved-skills, Zsh-policy and label datasets matched the base revision byte-for-byte.
+
+The maintainer approved the C2 extension locally: the existing organization-routing pipeline now accepts declared complete project consumers, approved organization commits and blobs, project reconciliation provenance and complete-byte drift checks. The knowledge renderer preserves native frontmatter and rebases organization links to immutable revisions and tested project links to local consumers. Validation checks schema and declarations; verify-approved checks source reachability, blobs, digests and native selectors. apply preflights every selected consumer before writing; the reusable workflow checks callers using its expanded sparse tooling inputs. The project delivery manifest is empty until approved source publication and coordinated project delivery. Existing project source owners and pins remain active. No project edits, publication, ADR acceptance or private delivery changes were performed.
+
+C2 verification passed 177 affected Python tests (agents 160 and knowledge 17), workflow actionlint, generation, coverage, policy/routing/approved-revision and decision checks, standalone export and whitespace validation. Tests exercise dirty authoring sources, missing or wrong approved blobs and digests, selector mismatches, broken symlinks, content/frontmatter/link/provenance drift, preflight preservation and sparse caller execution without organization source history. Project compatibility and runtime discovery remain separate unverified evidence.
+
+This is local migration-readiness evidence, not certification of all inherited prose or hosted discovery. The C1 local-readiness and C2 delivery-contract work unit was completed after its acceptance evidence was recorded. C3-C6 remain pending; local source preparation does not complete project migration or adoption. Review-skill format and suitability were assessed locally; its source has intentional unpublished path updates relative to the approved published revision, and hosted skill discovery and invocation remain unverified.
+
+### zsh-lint source preparation
+
+The maintainer approved preparing two organization source drafts with tooling navigation and status updates on 2026-10-04. The [Go AST draft](../tooling/zsh-lint-go-ast.md) preserves rule interfaces, registration, traversal, extraction, testing and nil checks. The [parser-front-end draft](../tooling/zsh-lint-parser-front-end.md) preserves fork-first strategy, the existing-adapter scanner exception, retry/source-map/typed-AST contracts, fixture names, citations and dependency-change evidence. Its gap-proof wording now explicitly follows the project workflow's stderr-based native verdict through `-judge`; no parser behavior changed.
+
+Both drafts are reconciled against project revision `7ff05091a5489becf32069db1738d38ec23c8fd5`. Project instructions, parser-gap-fix and docs/project contracts retain their active ownership. The skill's setup, judge/reduce, issue, fixture, implementation, verification and reporting steps remain in the project; source preparation accounts for them without reducing the skill or removing its gates. The complete project delivery manifest remains empty. Source publication, approved organization blobs and digests, a separately owned project migration task, project compatibility checks and native discovery are still required before adoption. No C3 completion or runtime verification is claimed.
+
+On 2026-10-04, the live default-branch trees of all 91 public z-shell repositories were inspected without truncated or failed tree requests. The inventory selected organization policy, handoffs, native instructions, role profiles, skills and resources, runbooks and existing knowledge directories. 16 repositories contain those surfaces. This is a scoped instruction-and-knowledge inventory, not an audit of every README or translated documentation page.
+
+| Repository group | Remaining work | Current source |
+| --- | --- | --- |
+| z-shell/wiki | Migrate the Plugin Standard with MDX, anchors, examples, frontmatter, builds and publication checks; reconcile eight instructions, two role profiles and reusable knowledge in its skills | Wiki until coordinated delivery passes |
+| z-shell/zsh-lint | Reconcile parser-front-end and Go AST guidance and knowledge embedded in parser-gap-fix against a tested project revision; preserve adapter and dual-oracle contracts | Project until version-compatible delivery passes |
+| F-Sy-H, z-a-meta-plugins, zsh, z-a-default-ice, z-a-eval, zi, src, zd, zpmod, zsh-eza, zsh-fancy-completions, zunit, zi-setup | Inspect project-specific AGENTS.md content and any embedded knowledge; distinguish project contracts from approved vendored review/install skills before moving it | Owning project |
+| z-shell/.github and downstream consumers | Publish reviewed sources before changing private routing, approved revisions, vendored copies or gitlinks; update pinned tooling and verify native discovery independently | Current published revisions |
+
+These coordinated cases are tracked in workspace notes at their owning repositories. Existing public issues and ADRs remain authoritative for active delivery and accepted decisions. No external repository's editable source has been replaced by a local copy.
+
+### Next project slice: zsh-lint guidance
+
+Read-only planning on 2026-10-04 checked zsh-lint at revision 7ff05091a5489becf32069db1738d38ec23c8fd5, matching its live main and local remote-tracking ref. The next bounded candidates are its Go AST and parser-front-end instructions; retain complete project-native consumers, selectors and revision provenance. Reconcile knowledge embedded in parser-gap-fix against the living parser-gap workflow before reducing the skill to routing. Project rule interfaces, parser implementation and docs/project contracts retain their current owners.
+
+The local knowledge generator currently targets one repository root. Cross-repository source delivery needs a verified approved-revision contract before replacing project authoring ownership; declared downstream selection alone does not provide that delivery. A project edit batch needs its own approved exact scope and task worktree. Preserve fork-first strategy, existing adapter exceptions, dual verdicts, native placement and runtime-tier limits, fixture citations and structural-oracle checks. No zsh-lint files or project behavior were changed or executed during planning.
+
+The resumed organization task passed all 204 knowledge, agents and governance Python tests, 55-consumer generation, 357-file coverage, policy/routing and decision checks, and whitespace validation. Existing unpublished work and HEAD were preserved before this progress update. These checks do not establish complete semantic accuracy or hosted discovery.
+
+## Impact review
+
+1. This changes the authoring location of public policy detail, procedures and advisory roles; native consumers retain their authority.
+2. Standalone contributors and supported agent runtimes receive complete generated consumers. Hosted runtime discovery is unverified.
+3. Migrated editable owners are declared in knowledge/delivery.json. Native paths retain their delivery role. Unmigrated wiki and project owners remain active.
+4. Generated copies are checked, rather than independently maintained. Inherited content still needs semantic review where the inventory identifies a conflict.
+5. Public native routes retain their selectors and IDs, with repaired paths. Knowledge-maintenance and domain-modeling procedures are explicitly routed. Private routes wait for source publication.
+6. Mandatory content remains complete in baseline and scoped consumers; it does not depend on a skill, hook or navigation link.
+7. Generation, drift checks, source/consumer links, policy limits, routing, decision records and affected tests are checked locally. Cross-repository builds and hosted delivery remain follow-ups.

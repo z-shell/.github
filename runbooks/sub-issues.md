@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/sub-issues.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook: Parent issues and sub-issues
 
 Use this runbook to coordinate an outcome through GitHub's native parent issue,

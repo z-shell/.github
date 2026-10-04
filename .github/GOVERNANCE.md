@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/project-governance.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Governance Policy
 
 This document provides the governance policy for the Project. Maintainers agree to this policy and to abide by all Project polices, including the [code of conduct](CODE_OF_CONDUCT.md), [trademark policy](TRADEMARKS.md), and [antitrust policy](ANTITRUST.md) by adding their name to the [maintainers.md](MAINTAINERS.md) file.

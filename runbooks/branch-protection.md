@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/branch-protection.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook: Persistent Integration Branch Protection
 
 Use this runbook for a repository explicitly approved to retain a persistent

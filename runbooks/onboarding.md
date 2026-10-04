@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/onboarding.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Maintainer Onboarding
 
 How to bring a new maintainer (or a new agent operator) up to speed on the

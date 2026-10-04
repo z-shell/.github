@@ -39,6 +39,6 @@ The independent second reader is absent. Separate automated review passes can sh
 
 - [ADR-0026](0026-review-triggers-and-fallback.md), the review procedure amended here.
 - [Pull-request runbook](../runbooks/pull-requests.md), request diagnosis, fallback execution and merge verification.
-- [Testing instructions](../.github/instructions/testing.instructions.md), Class 1 validation before deployment.
+- [Testing instructions](../.github/instructions/quality/testing.instructions.md), Class 1 validation before deployment.
 - [zd PR #126](https://github.com/z-shell/zd/pull/126), the controlled-execution prerequisite affected by the unavailable reviewer.
 - [Issue #673](https://github.com/z-shell/.github/issues/673), the coordinated quality and performance delivery parent.
