@@ -10,7 +10,7 @@
 
 [ADR-0014](0014-portable-agent-instruction-architecture.md) made this repository's `AGENTS.md` the organization baseline and required every active instruction surface to be declared in `.github/instruction-surfaces.json`. [ADR-0031](0031-per-repository-instruction-routing-delivery.md) delivers that routing into every repository and verifies vendored skill pins. Neither says where a repeatable organization procedure lives, such as triaging an issue, taking a pull request from branch to merge, or updating Project 28, nor how an agent is meant to find it.
 
-The procedures mostly exist, as runbooks: `triage.md`, `project-tracker.md`, `release.md`, `org-review.md`, `learning-capture.md`, and thirteen more. The skills an agent discovers automatically do not reach them. Of the ten skills here, none covers triage, pull requests, the tracker, or releases, and only `code-review` and `zi-install` are vendored downstream (`lib/approved-skills.json`).
+The procedures mostly exist, as runbooks: `triage.md`, `project-tracker.md`, `release.md`, `org-review.md`, `learning-capture.md`, and thirteen more. The skills an agent discovers automatically do not reach them. Of the ten skills here, none covers triage, pull requests, the tracker, or releases, and only `code-review` and `zi-install` are vendored downstream (`knowledge/domains/agents/data/approved-skills.json`).
 
 A review of one agent session on 2026-09-26, working through the `z-shell/zsh-lint` backlog, showed what fills that gap:
 
@@ -33,7 +33,7 @@ Different runtimes and projects therefore run the same organization tasks from d
 3. **Few skills, strong triggers.** A skill is added only for a task agents perform repeatedly, where a checklist or script adds something policy text cannot. Skills that only restate `AGENTS.md` are removed; #623 applies this to `git-commit` and `gh-cli`.
 4. **Enforce what can be enforced.** A rule whose violation is detectable before merge becomes a check (CI, a validator, a workspace hook), with the runbook explaining it. Prose is for judgment.
 5. **Runtime-private skills hold runtime mechanics only.** For work in z-shell repositories, a skill or memory inside one runtime's profile may describe how that runtime behaves (for example its kernel or compaction quirks), and must point to the organization skill for any organization rule. A private copy of an organization procedure is treated as drift.
-6. **Delivery is verified per runtime.** Every organization skill is declared in `.github/instruction-surfaces.json`. Those meant for every repository are pinned in `lib/approved-skills.json` and checked by `org-routing.yml` (ADR-0031). A workspace that delivers organization skills to local runtimes verifies that each supported runtime actually discovers them, including runtimes that need an explicit trust or directory setting.
+6. **Delivery is verified per runtime.** Every organization skill is declared in `.github/instruction-surfaces.json`. Those meant for every repository are pinned in `knowledge/domains/agents/data/approved-skills.json` and checked by `org-routing.yml` (ADR-0031). A workspace that delivers organization skills to local runtimes verifies that each supported runtime actually discovers them, including runtimes that need an explicit trust or directory setting.
 
 ## Consequences
 

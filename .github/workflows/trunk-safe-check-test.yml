@@ -4,18 +4,18 @@ name: Trunk Safe Check Tests
 on:
   push:
     paths:
-      - "scripts/trunk-safe-check.sh"
-      - "scripts/trunk-safe-ci.sh"
-      - "scripts/test-trunk-safe-check.sh"
-      - "scripts/test-trunk-safe-ci.sh"
+      - "automation/ci/trunk-safe-check.sh"
+      - "automation/ci/trunk-safe-ci.sh"
+      - "automation/ci/test-trunk-safe-check.sh"
+      - "automation/ci/test-trunk-safe-ci.sh"
       - ".github/workflows/trunk.yml"
       - ".github/workflows/trunk-safe-check-test.yml"
   pull_request:
     paths:
-      - "scripts/trunk-safe-check.sh"
-      - "scripts/trunk-safe-ci.sh"
-      - "scripts/test-trunk-safe-check.sh"
-      - "scripts/test-trunk-safe-ci.sh"
+      - "automation/ci/trunk-safe-check.sh"
+      - "automation/ci/trunk-safe-ci.sh"
+      - "automation/ci/test-trunk-safe-check.sh"
+      - "automation/ci/test-trunk-safe-ci.sh"
       - ".github/workflows/trunk.yml"
       - ".github/workflows/trunk-safe-check-test.yml"
   workflow_dispatch: {}
@@ -40,11 +40,11 @@ jobs:
       - name: Check shell syntax
         shell: bash
         run: |
-          sh -n scripts/trunk-safe-check.sh scripts/test-trunk-safe-check.sh
-          bash -n scripts/trunk-safe-ci.sh scripts/test-trunk-safe-ci.sh
+          sh -n automation/ci/trunk-safe-check.sh automation/ci/test-trunk-safe-check.sh
+          bash -n automation/ci/trunk-safe-ci.sh automation/ci/test-trunk-safe-ci.sh
 
       - name: Test isolated Trunk execution
-        run: sh scripts/test-trunk-safe-check.sh
+        run: sh automation/ci/test-trunk-safe-check.sh
 
       - name: Test CI check-mode translation
-        run: bash scripts/test-trunk-safe-ci.sh
+        run: bash automation/ci/test-trunk-safe-ci.sh

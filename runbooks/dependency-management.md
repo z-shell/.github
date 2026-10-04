@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/ci/dependency-management.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Dependency Management
 
 Use this runbook to configure or troubleshoot dependency automation across

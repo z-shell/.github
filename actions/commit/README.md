@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/ci/commit-action.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # GitHub Action for Git commit
 
 This Action for git commits any changed files and pushes those changes back to the origin repository.

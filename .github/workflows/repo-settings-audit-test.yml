@@ -4,20 +4,20 @@ on:
   workflow_call: {}
   push:
     paths:
-      - "scripts/repo-settings-audit.rb"
-      - "scripts/test-repo-settings-audit.rb"
-      - "lib/repository-classes.yml"
+      - "automation/governance/repo-settings-audit.rb"
+      - "automation/governance/test-repo-settings-audit.rb"
+      - "knowledge/domains/governance/data/repository-classes.yml"
       - ".github/workflows/repo-settings-audit-test.yml"
   pull_request:
     paths:
-      - "scripts/repo-settings-audit.rb"
-      - "scripts/test-repo-settings-audit.rb"
-      - "lib/repository-classes.yml"
+      - "automation/governance/repo-settings-audit.rb"
+      - "automation/governance/test-repo-settings-audit.rb"
+      - "knowledge/domains/governance/data/repository-classes.yml"
       - ".github/workflows/repo-settings-audit-test.yml"
   workflow_dispatch: {}
 
 # The suite runs entirely against an injected fixture client (see
-# scripts/test-repo-settings-audit.rb); it makes no live `gh api` calls, so it
+# automation/governance/test-repo-settings-audit.rb); it makes no live `gh api` calls, so it
 # needs no repository permissions beyond checkout.
 permissions:
   contents: read
@@ -39,8 +39,8 @@ jobs:
 
       - name: "🧹 Syntax check"
         run: |
-          ruby -c scripts/repo-settings-audit.rb
-          ruby -c scripts/test-repo-settings-audit.rb
+          ruby -c automation/governance/repo-settings-audit.rb
+          ruby -c automation/governance/test-repo-settings-audit.rb
 
       - name: "🧪 Run repo-settings-audit unit tests"
-        run: ruby scripts/test-repo-settings-audit.rb
+        run: ruby automation/governance/test-repo-settings-audit.rb

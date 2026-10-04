@@ -33,8 +33,8 @@ These startup and shutdown files are read by Zsh for defined lifecycle phases
 and may make phase-owned effects, unlike caller-preserving sourced libraries.
 
 Detailed normative prose lives in
-`.github/instructions/zsh-scripting.instructions.md`. Machine-readable release,
-rule, profile, and source-class data lives in `lib/zsh-standard-policy.json`.
+`.github/instructions/zsh/scripting.instructions.md`. Machine-readable release,
+rule, profile, and source-class data lives in `knowledge/domains/zsh/data/zsh-standard-policy.json`.
 
 Enrolled repositories eventually receive generated, digest-checked delivery in
 repository-local artifacts. Generated artifacts are consumers, not policy owners.

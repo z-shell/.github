@@ -1,6 +1,10 @@
+<!-- GENERATED from knowledge/domains/quality/zd-validation.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Controlled zd validation
 
-zd owns the execution environment; repositories own their test commands and benchmark workloads. The organization action transports those commands and retains evidence. It does not install a plugin manager or choose a workload. Use the [selection guidance](../.github/instructions/zd-validation.instructions.md) to decide when a container helps.
+zd owns the execution environment; repositories own their test commands and benchmark workloads. The organization action transports those commands and retains evidence. It does not install a plugin manager or choose a workload. Use the [selection guidance](../.github/instructions/quality/controlled-validation.instructions.md) to decide when a container helps.
 
 ## Prepare and qualify the environment
 

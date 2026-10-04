@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/recurring-operations.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook: Recurring Operations
 
 Use this runbook to classify and review scheduled workflows and other recurring

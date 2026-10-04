@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/contributing.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Contributing
 
 This Project welcomes contributions, suggestions, and feedback. All contributions, suggestions, and feedback you submitted are accepted under the [Project's license](../LICENSE).

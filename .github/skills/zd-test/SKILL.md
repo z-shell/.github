@@ -5,7 +5,7 @@ description: Reproduce Linux Zsh failures, validate module ABI boundaries, or co
 
 # Controlled Zsh execution
 
-Read the owning repository's checks and compatibility floor, then the organization [selection guidance](../../instructions/zd-validation.instructions.md). Keep the user's workload and target versions.
+Read the owning repository's checks and compatibility floor, then the organization [selection guidance](../../instructions/quality/controlled-validation.instructions.md). Keep the user's workload and target versions.
 
 Choose `runtime` for source tests or `module-build` for a compiled module. Obtain an already qualified immutable image and the corresponding pinned zd runner. Inspect the runner's `--help` and [controlled-execution contract](https://github.com/z-shell/zd/blob/f8d74a1c916d42c99fea2600adff3607f67ee4bc/docs/controlled-execution.md) when preparing a run. Do not infer installed tools from a legacy zd tag.
 

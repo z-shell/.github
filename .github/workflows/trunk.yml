@@ -163,17 +163,17 @@ jobs:
           path: .z-shell-workflow
           persist-credentials: false
           sparse-checkout: |
-            scripts/trunk-safe-check.sh
-            scripts/trunk-safe-ci.sh
+            automation/ci/trunk-safe-check.sh
+            automation/ci/trunk-safe-ci.sh
           sparse-checkout-cone-mode: false
 
       - name: Install safe Trunk tooling
         shell: bash
         run: |
           install -d -m 700 "$RUNNER_TEMP/z-shell-trunk-safe"
-          install -m 700 .z-shell-workflow/scripts/trunk-safe-check.sh \
+          install -m 700 .z-shell-workflow/automation/ci/trunk-safe-check.sh \
             "$RUNNER_TEMP/z-shell-trunk-safe/trunk-safe-check.sh"
-          install -m 700 .z-shell-workflow/scripts/trunk-safe-ci.sh \
+          install -m 700 .z-shell-workflow/automation/ci/trunk-safe-ci.sh \
             "$RUNNER_TEMP/z-shell-trunk-safe/trunk-safe-ci.sh"
           rm -rf -- .z-shell-workflow
 

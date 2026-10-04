@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/quality/benchmark-report.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Shared benchmark report validation
 
 `actions/benchmark-report` validates and presents a completed ADR-0024 comparison in the workload's existing job. It never executes a benchmark or installs zpmod. Repositories retain their own fixtures, correctness assertions, baseline selection and balanced sampling. Timing flags request review; malformed evidence and functional failures fail validation.
@@ -11,7 +15,7 @@ Inputs are literal repository-relative regular files; absolute paths, parent tra
 For local verification:
 
 ```sh
-python3 scripts/benchmark_report.py --root /checkouts/project \
+python3 automation/ci/benchmark_report.py --root /checkouts/project \
   --report benchmark-comparison.json --control-report results/control.json \
   --output /scratch/benchmark-validation
 ```
@@ -30,7 +34,7 @@ This is consistency validation, not attestation that a producer used the declare
 
 ## Verification and upgrades
 
-Run `python3 -m unittest scripts/test_benchmark_report.py -v`. `Benchmark Report Tests` exercises both a nonfatal slowdown and a rejected incompatible report through the real action, with artifacts retained for both. Consumer adoption should use positive, negative and noise-control evidence before changing a pin. Roll back by restoring the previously reviewed action pin; never waive invalid evidence to obtain a passing job.
+Run `python3 -m unittest automation/ci/test_benchmark_report.py -v`. `Benchmark Report Tests` exercises both a nonfatal slowdown and a rejected incompatible report through the real action, with artifacts retained for both. Consumer adoption should use positive, negative and noise-control evidence before changing a pin. Roll back by restoring the previously reviewed action pin; never waive invalid evidence to obtain a passing job.
 
 Current producer references are [Zi's comparison](https://github.com/z-shell/zi/blob/8448b4a2323099b3034db9b40b598eef702ae9b2/benchmarks/compare.zsh) and [the annex's runner](https://github.com/z-shell/z-a-meta-plugins/blob/f3f95b9ec33978b18813ed6b02285cc58548c339/benchmarks/run.py). Zi's comparison alone omits the control identity and does not compare runner-image/CPU fields; the raw control report and this validator close those evidence gaps without editing its workload runner.
 

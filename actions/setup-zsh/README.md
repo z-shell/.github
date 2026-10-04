@@ -1,6 +1,10 @@
+<!-- GENERATED from knowledge/domains/ci/setup-zsh-action.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Setup Zsh
 
-Set up Zsh for GitHub Actions. Pin this action to a full commit SHA when using it from another repository, following the [organization workflow conventions](../../.github/instructions/github-actions-ci-cd-best-practices.instructions.md).
+Set up Zsh for GitHub Actions. Pin this action to a full commit SHA when using it from another repository, following the [organization workflow conventions](../../.github/instructions/ci/workflow-contract.instructions.md).
 
 ## Version contract
 
@@ -34,7 +38,7 @@ Request an exact version in native-oracle jobs. Compatibility jobs choose their 
 Run the installer regressions without network access or package installation:
 
 ```sh
-python3 -m unittest scripts/test_setup_zsh.py -v
+python3 -m unittest automation/ci/test_setup_zsh.py -v
 bash -n actions/setup-zsh/install.sh
 shellcheck -s bash actions/setup-zsh/install.sh
 actionlint .github/workflows/setup-zsh-test.yml

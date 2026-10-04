@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/project-tracker.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook - Project tracker
 
 Use this runbook for organization-wide work tracking in GitHub Project 28,
@@ -64,7 +68,7 @@ idempotent, emits a counts-only drift summary, and never overwrites human-set fi
 Manual dispatch remains read-only unless a maintainer sets `apply=true` after
 reviewing the report.
 
-`scripts/project_reconcile_live.py` collects API responses in memory, verifies
+`automation/governance/project_reconcile_live.py` collects API responses in memory, verifies
 source repository visibility and organization ownership, and rechecks each
 mutation target before applying it. Private and foreign-owner sources are
 omitted. Redacted and draft Project items are counted but never mutated.
@@ -88,8 +92,8 @@ privacy and membership regressions on pull requests and changes to `main`.
 Local verification uses:
 
 ```sh
-python3 -m unittest discover -s scripts -p 'test_project_reconcile*.py' -v
-python3 scripts/project_reconcile_live.py --output /tmp/project-reconcile-summary.json
+python3 -m unittest discover -s automation/governance -p 'test_project_reconcile*.py' -v
+python3 automation/governance/project_reconcile_live.py --output /tmp/project-reconcile-summary.json
 ```
 
 The live command above is read-only. `--apply` requires separate maintainer

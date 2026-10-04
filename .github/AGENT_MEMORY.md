@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/agents/handoffs.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Z-Shell Agent Memory Protocol
 
 Z-Shell uses GitHub-native records as the shared memory between humans and LLM agents. Local LLM memory is useful as a cache, but it is never the source of truth for organization progress.

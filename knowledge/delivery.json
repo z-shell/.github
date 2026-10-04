@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "source": "knowledge/domains/agents/context-routing.md",
+      "target": ".github/instructions/agents/context-routing.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/agents/tool-integration.md",
+      "target": ".github/instructions/agents/tool-integration.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/ci/workflow-contract.md",
+      "target": ".github/instructions/ci/workflow-contract.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/documentation/accessibility.md",
+      "target": ".github/instructions/documentation/accessibility.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/documentation/content-placement.md",
+      "target": ".github/instructions/documentation/content-placement.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/governance/worktree-selection.md",
+      "target": ".github/instructions/governance/worktrees.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/plugins/review-routing.md",
+      "target": ".github/instructions/plugins/review-routing.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/plugins/standard-selection.md",
+      "target": ".github/instructions/plugins/standard-selection.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/quality/code-review.md",
+      "target": ".github/instructions/quality/code-review.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/quality/controlled-validation.md",
+      "target": ".github/instructions/quality/controlled-validation.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/quality/independent-verification.md",
+      "target": ".github/instructions/quality/independent-verification.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/quality/testing.md",
+      "target": ".github/instructions/quality/testing.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/zsh/dialect-selection.md",
+      "target": ".github/instructions/zsh/dialect-selection.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/zsh/scripting.md",
+      "target": ".github/instructions/zsh/scripting.instructions.md"
+    },
+    {
+      "source": "knowledge/domains/ci/roles/ci-workflow-author.md",
+      "target": ".github/agents/ci-workflow-author.agent.md"
+    },
+    {
+      "source": "knowledge/domains/ci/roles/ci-workflow-reviewer.md",
+      "target": ".github/agents/ci-workflow-reviewer.agent.md"
+    },
+    {
+      "source": "knowledge/domains/plugins/roles/plugins-plugin-reviewer.md",
+      "target": ".github/agents/plugins-plugin-reviewer.agent.md"
+    },
+    {
+      "source": "knowledge/domains/governance/adr.md",
+      "target": "runbooks/adr.md"
+    },
+    {
+      "source": "knowledge/domains/quality/benchmark-report.md",
+      "target": "runbooks/benchmark-report.md"
+    },
+    {
+      "source": "knowledge/domains/governance/branch-protection.md",
+      "target": "runbooks/branch-protection.md"
+    },
+    {
+      "source": "knowledge/domains/documentation/cloudflare-wiki-policy.md",
+      "target": "runbooks/cloudflare-wiki-policy.md"
+    },
+    {
+      "source": "knowledge/domains/ci/dependency-management.md",
+      "target": "runbooks/dependency-management.md"
+    },
+    {
+      "source": "knowledge/domains/governance/deprecation.md",
+      "target": "runbooks/deprecation.md"
+    },
+    {
+      "source": "knowledge/domains/agents/instruction-update.md",
+      "target": "runbooks/instruction-update.md"
+    },
+    {
+      "source": "knowledge/domains/governance/labels.md",
+      "target": "runbooks/labels.md"
+    },
+    {
+      "source": "knowledge/domains/governance/learning-capture.md",
+      "target": "runbooks/learning-capture.md"
+    },
+    {
+      "source": "knowledge/domains/governance/new-repository.md",
+      "target": "runbooks/new-repository.md"
+    },
+    {
+      "source": "knowledge/domains/governance/onboarding.md",
+      "target": "runbooks/onboarding.md"
+    },
+    {
+      "source": "knowledge/domains/quality/org-review.md",
+      "target": "runbooks/org-review.md"
+    },
+    {
+      "source": "knowledge/domains/governance/project-tracker.md",
+      "target": "runbooks/project-tracker.md"
+    },
+    {
+      "source": "knowledge/domains/governance/pull-requests.md",
+      "target": "runbooks/pull-requests.md"
+    },
+    {
+      "source": "knowledge/domains/governance/recurring-operations.md",
+      "target": "runbooks/recurring-operations.md"
+    },
+    {
+      "source": "knowledge/domains/governance/release.md",
+      "target": "runbooks/release.md"
+    },
+    {
+      "source": "knowledge/domains/governance/security-incident-response.md",
+      "target": "runbooks/security-incident-response.md"
+    },
+    {
+      "source": "knowledge/domains/governance/sub-issues.md",
+      "target": "runbooks/sub-issues.md"
+    },
+    {
+      "source": "knowledge/domains/governance/triage.md",
+      "target": "runbooks/triage.md"
+    },
+    {
+      "source": "knowledge/domains/governance/worktrees.md",
+      "target": "runbooks/worktrees.md"
+    },
+    {
+      "source": "knowledge/domains/quality/zd-validation.md",
+      "target": "runbooks/zd-validation.md"
+    },
+    {
+      "source": "knowledge/domains/ci/zsh-lint-ci.md",
+      "target": "runbooks/zsh-lint-ci.md"
+    },
+    {
+      "source": "knowledge/domains/agents/organization-policy.md",
+      "target": "AGENTS.md"
+    },
+    {
+      "source": "knowledge/domains/agents/implementation-patterns.md",
+      "target": "PATTERNS.md"
+    },
+    {
+      "source": "knowledge/domains/agents/handoffs.md",
+      "target": ".github/AGENT_MEMORY.md"
+    },
+    {
+      "source": "knowledge/domains/governance/antitrust.md",
+      "target": ".github/ANTITRUST.md"
+    },
+    {
+      "source": "knowledge/domains/governance/charter.md",
+      "target": ".github/CHARTER.md"
+    },
+    {
+      "source": "knowledge/domains/governance/code-of-conduct.md",
+      "target": ".github/CODE_OF_CONDUCT.md"
+    },
+    {
+      "source": "knowledge/domains/governance/contributing.md",
+      "target": ".github/CONTRIBUTING.md"
+    },
+    {
+      "source": "knowledge/domains/governance/project-governance.md",
+      "target": ".github/GOVERNANCE.md"
+    },
+    {
+      "source": "knowledge/domains/governance/maintainers.md",
+      "target": ".github/MAINTAINERS.md"
+    },
+    {
+      "source": "knowledge/domains/governance/security-reporting.md",
+      "target": ".github/SECURITY.md"
+    },
+    {
+      "source": "knowledge/domains/governance/steering-committee.md",
+      "target": ".github/STEERING_COMMITTEE.md"
+    },
+    {
+      "source": "knowledge/domains/governance/trademarks.md",
+      "target": ".github/TRADEMARKS.md"
+    },
+    {
+      "source": "knowledge/domains/documentation/organization-repository.md",
+      "target": ".github/README.md"
+    },
+    {
+      "source": "knowledge/domains/ci/commit-action.md",
+      "target": "actions/commit/README.md"
+    },
+    {
+      "source": "knowledge/domains/ci/rclone-action.md",
+      "target": "actions/rclone/README.md"
+    },
+    {
+      "source": "knowledge/domains/ci/setup-zsh-action.md",
+      "target": "actions/setup-zsh/README.md"
+    }
+  ]
+}

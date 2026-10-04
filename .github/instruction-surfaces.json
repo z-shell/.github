@@ -64,6 +64,102 @@
       "canonical_for": []
     },
     {
+      "id": "knowledge-domain-navigation",
+      "path": "knowledge/index.md",
+      "kind": "runbook",
+      "authority": "advisory",
+      "consumers": ["agent", "human"],
+      "tasks": ["knowledge-lookup", "onboarding"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
+      "id": "knowledge-maintenance",
+      "path": "knowledge/domains/agents/knowledge-maintenance.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["agent", "human"],
+      "tasks": ["knowledge-management", "knowledge-migration"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["knowledge-maintenance"]
+    },
+    {
+      "id": "knowledge-domain-modeling",
+      "path": "knowledge/domains/agents/domain-modeling.md",
+      "kind": "runbook",
+      "authority": "canonical-detail",
+      "consumers": ["agent", "human"],
+      "tasks": ["domain-modeling", "knowledge-domain-design"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["knowledge-domain-modeling"]
+    },
+    {
+      "id": "knowledge-delivery-map",
+      "path": "knowledge/delivery.json",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["human", "ci"],
+      "tasks": ["knowledge-management", "instruction-change"],
+      "file_patterns": ["knowledge/**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["knowledge-source-delivery-map"]
+    },
+    {
+      "id": "knowledge-project-delivery-map",
+      "path": "knowledge/project-delivery.json",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["human", "ci"],
+      "tasks": ["knowledge-management", "instruction-change"],
+      "file_patterns": ["knowledge/**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["approved-project-knowledge-delivery"]
+    },
+    {
+      "id": "knowledge-file-dispositions",
+      "path": "knowledge/repository-files.json",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["human", "ci"],
+      "tasks": ["knowledge-coverage"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["knowledge-file-dispositions"]
+    },
+    {
+      "id": "knowledge-coverage-validator",
+      "path": "automation/knowledge/knowledge-coverage.py",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["human", "ci"],
+      "tasks": ["knowledge-coverage"],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["knowledge-file-coverage-validation"]
+    },
+    {
+      "id": "decision-0036",
+      "path": "decisions/0036-central-editable-knowledge-and-generated-consumers.md",
+      "kind": "decision",
+      "authority": "advisory",
+      "consumers": ["agent", "human"],
+      "tasks": ["knowledge-migration", "architecture-decision"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "organization-patterns",
       "path": "PATTERNS.md",
       "kind": "shared-policy",
@@ -84,7 +180,7 @@
     },
     {
       "id": "instruction-code-review",
-      "path": ".github/instructions/code-review-generic.instructions.md",
+      "path": ".github/instructions/quality/code-review.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -96,7 +192,7 @@
     },
     {
       "id": "instruction-generator-verifier-workflow",
-      "path": ".github/instructions/generator-verifier-workflow.instructions.md",
+      "path": ".github/instructions/quality/independent-verification.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -112,7 +208,7 @@
     },
     {
       "id": "instruction-context-engineering",
-      "path": ".github/instructions/context-engineering.instructions.md",
+      "path": ".github/instructions/agents/context-routing.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -124,7 +220,7 @@
     },
     {
       "id": "instruction-documentation",
-      "path": ".github/instructions/documentation.instructions.md",
+      "path": ".github/instructions/documentation/content-placement.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -136,7 +232,7 @@
     },
     {
       "id": "instruction-github-actions",
-      "path": ".github/instructions/github-actions-ci-cd-best-practices.instructions.md",
+      "path": ".github/instructions/ci/workflow-contract.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -148,7 +244,7 @@
     },
     {
       "id": "instruction-markdown-accessibility",
-      "path": ".github/instructions/markdown-accessibility.instructions.md",
+      "path": ".github/instructions/documentation/accessibility.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -160,7 +256,7 @@
     },
     {
       "id": "instruction-tool-integrations",
-      "path": ".github/instructions/mcp-plugins.instructions.md",
+      "path": ".github/instructions/agents/tool-integration.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -172,7 +268,7 @@
     },
     {
       "id": "instruction-worktree-management",
-      "path": ".github/instructions/worktree-management.instructions.md",
+      "path": ".github/instructions/governance/worktrees.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -184,7 +280,7 @@
     },
     {
       "id": "instruction-shell-dialect-dispatch",
-      "path": ".github/instructions/shell.instructions.md",
+      "path": ".github/instructions/zsh/dialect-selection.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -196,7 +292,7 @@
     },
     {
       "id": "instruction-zsh-scripting",
-      "path": ".github/instructions/zsh-scripting.instructions.md",
+      "path": ".github/instructions/zsh/scripting.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -210,7 +306,7 @@
     },
     {
       "id": "instruction-zsh-plugin-standard",
-      "path": ".github/instructions/zsh-plugin-standard.instructions.md",
+      "path": ".github/instructions/plugins/standard-selection.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -229,13 +325,13 @@
     },
     {
       "id": "instruction-zsh-plugin-standard-aliases",
-      "path": ".github/instructions/zsh-plugin-standard-aliases.instructions.md",
+      "path": ".github/instructions/plugins/review-routing.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
       "tasks": ["code-review", "readme-authoring", "zsh-plugin-scaffolding"],
       "file_patterns": [
-        "**/*.plugin.zsh,**/init.zsh,templates/readme/zsh-plugin.md,.github/skills/zsh-plugin/**,.github/agents/zsh-plugin-standard-reviewer.agent.md"
+        "**/*.plugin.zsh,**/init.zsh,knowledge/domains/documentation/templates/zsh-plugin.md,.github/skills/zsh-plugin/**,.github/agents/plugins-plugin-reviewer.agent.md"
       ],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -243,7 +339,7 @@
     },
     {
       "id": "instruction-testing",
-      "path": ".github/instructions/testing.instructions.md",
+      "path": ".github/instructions/quality/testing.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],
@@ -255,7 +351,7 @@
     },
     {
       "id": "agent-github-actions-expert",
-      "path": ".github/agents/github-actions-expert.agent.md",
+      "path": ".github/agents/ci-workflow-author.agent.md",
       "kind": "agent",
       "authority": "advisory",
       "consumers": ["copilot"],
@@ -267,7 +363,7 @@
     },
     {
       "id": "agent-workflow-conventions-auditor",
-      "path": ".github/agents/workflow-conventions-auditor.agent.md",
+      "path": ".github/agents/ci-workflow-reviewer.agent.md",
       "kind": "agent",
       "authority": "advisory",
       "consumers": ["copilot"],
@@ -279,7 +375,7 @@
     },
     {
       "id": "agent-zsh-plugin-standard-reviewer",
-      "path": ".github/agents/zsh-plugin-standard-reviewer.agent.md",
+      "path": ".github/agents/plugins-plugin-reviewer.agent.md",
       "kind": "agent",
       "authority": "advisory",
       "consumers": ["copilot"],
@@ -1135,7 +1231,7 @@
     },
     {
       "id": "zsh-standard-policy",
-      "path": "lib/zsh-standard-policy.json",
+      "path": "knowledge/domains/zsh/data/zsh-standard-policy.json",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["agent", "human", "ci"],
@@ -1151,7 +1247,7 @@
     },
     {
       "id": "zsh-standard-validator",
-      "path": "scripts/validate-zsh-standard-policy.py",
+      "path": "automation/ci/validate-zsh-standard-policy.py",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["human", "ci"],
@@ -1163,7 +1259,7 @@
     },
     {
       "id": "agent-policy-validator",
-      "path": "scripts/validate-agent-policy.py",
+      "path": "automation/agents/validate-agent-policy.py",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["ci", "human"],
@@ -1175,7 +1271,7 @@
     },
     {
       "id": "decision-records-validator",
-      "path": "scripts/decision-records.py",
+      "path": "automation/governance/decision-records.py",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["ci", "human"],
@@ -1199,7 +1295,7 @@
     },
     {
       "id": "org-routing-generator",
-      "path": "scripts/org-routing.py",
+      "path": "automation/agents/org-routing.py",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["ci", "human"],
@@ -1223,7 +1319,7 @@
     },
     {
       "id": "approved-skill-revisions",
-      "path": "lib/approved-skills.json",
+      "path": "knowledge/domains/agents/data/approved-skills.json",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["agent", "human", "ci"],
@@ -1268,7 +1364,7 @@
     },
     {
       "id": "org-policy-report",
-      "path": "scripts/org_policy_report.py",
+      "path": "automation/agents/org_policy_report.py",
       "kind": "enforcement",
       "authority": "canonical-detail",
       "consumers": ["agent", "human", "ci"],
@@ -1284,7 +1380,7 @@
     },
     {
       "id": "instruction-zd-validation",
-      "path": ".github/instructions/zd-validation.instructions.md",
+      "path": ".github/instructions/quality/controlled-validation.instructions.md",
       "kind": "scoped-guidance",
       "authority": "canonical-detail",
       "consumers": ["agent", "human"],

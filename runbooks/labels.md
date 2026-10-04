@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/labels.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Label maintenance
 
 Use this runbook when cleaning or syncing labels across z-shell repositories.
@@ -5,7 +9,7 @@ Use this runbook when cleaning or syncing labels across z-shell repositories.
 ## Sync scope
 
 Canonical label sync targets **active, public, non-fork** repositories only.
-`scripts/labels-sync.rb --all-repos` audits every repository the token can see,
+`automation/governance/labels-sync.rb --all-repos` audits every repository the token can see,
 so its raw output is wider than the sync scope. Filter before reading drift
 totals, or private and fork repositories will keep reporting as regressions
 when they are simply out of scope.
@@ -26,7 +30,7 @@ and should be synced like any other.
 
 ## Source of truth
 
-`lib/labels.yml` is the canonical organization label set.
+`knowledge/domains/governance/data/labels.yml` is the canonical organization label set.
 
 Use compact namespace names:
 
@@ -135,20 +139,20 @@ Also retire spaced namespace variants such as `type: bug`, `area: docs`, `priori
 2. Run a dry-run audit before applying anything:
 
    ```sh
-   scripts/labels-sync.rb --repo z-shell/REPO
+   automation/governance/labels-sync.rb --repo z-shell/REPO
    ```
 
    For an org-wide read-only report:
 
    ```sh
-   scripts/labels-sync.rb --all-repos > /tmp/z-shell-labels-dry-run.md
+   automation/governance/labels-sync.rb --all-repos > /tmp/z-shell-labels-dry-run.md
    ```
 
-3. Create or update every canonical label from `lib/labels.yml`.
+3. Create or update every canonical label from `knowledge/domains/governance/data/labels.yml`.
 4. For each legacy label, find open issues and pull requests using it.
 5. Add the canonical replacement to each item before removing the legacy label.
 6. Delete legacy labels only after they are no longer used.
-7. Re-run the dry-run audit and compare it with `lib/labels.yml`.
+7. Re-run the dry-run audit and compare it with `knowledge/domains/governance/data/labels.yml`.
 
 Do not delete unknown labels in bulk. If a repository has a local label that is not obviously legacy, open or update an issue before removing it.
 
@@ -195,9 +199,9 @@ survivor re-verified as in use or configuration-referenced.
 
 ## Label sync script
 
-`scripts/labels-sync.rb` is the canonical entrypoint. The older `scripts/labels-dry-run.rb` name remains as a compatibility wrapper for existing local commands, but new runbook examples should use `scripts/labels-sync.rb`.
+`automation/governance/labels-sync.rb` is the canonical entrypoint. The older `automation/governance/labels-dry-run.rb` name remains as a compatibility wrapper for existing local commands, but new runbook examples should use `automation/governance/labels-sync.rb`.
 
-`scripts/labels-sync.rb` is read-only by default. It consumes `lib/labels.yml`, queries GitHub through `gh api`, and reports:
+`automation/governance/labels-sync.rb` is read-only by default. It consumes `knowledge/domains/governance/data/labels.yml`, queries GitHub through `gh api`, and reports:
 
 - canonical labels that would be created
 - canonical labels whose color or description would be updated
@@ -208,13 +212,13 @@ Useful examples:
 
 ```sh
 # Audit one repository and include clean output.
-scripts/labels-sync.rb --repo z-shell/.github --include-clean
+automation/governance/labels-sync.rb --repo z-shell/.github --include-clean
 
 # Audit several repositories.
-scripts/labels-sync.rb --repo z-shell/zi --repo z-shell/wiki
+automation/governance/labels-sync.rb --repo z-shell/zi --repo z-shell/wiki
 
 # Emit machine-readable output for follow-up tooling.
-scripts/labels-sync.rb --repo z-shell/zi --json
+automation/governance/labels-sync.rb --repo z-shell/zi --json
 ```
 
 ## Apply-mode pilot
@@ -235,20 +239,20 @@ Preview commands:
 
 ```sh
 # Preview canonical create/update operations for one repo.
-scripts/labels-sync.rb --repo z-shell/REPO --apply
+automation/governance/labels-sync.rb --repo z-shell/REPO --apply
 
 # Preview in JSON for artifact comparison.
-scripts/labels-sync.rb --repo z-shell/REPO --apply --json
+automation/governance/labels-sync.rb --repo z-shell/REPO --apply --json
 ```
 
 Confirmed apply commands require maintainer approval because they mutate GitHub labels:
 
 ```sh
 # No-op safety apply on the clean org metadata repo.
-scripts/labels-sync.rb --repo z-shell/.github --apply --confirm-apply --include-clean
+automation/governance/labels-sync.rb --repo z-shell/.github --apply --confirm-apply --include-clean
 
 # Approved pilot outside the temporary allowlist.
-scripts/labels-sync.rb \
+automation/governance/labels-sync.rb \
   --repo z-shell/REPO \
   --apply \
   --confirm-apply \
@@ -257,7 +261,7 @@ scripts/labels-sync.rb \
 
 ## See also
 
-- `lib/labels.yml`
+- `knowledge/domains/governance/data/labels.yml`
 - `runbooks/triage.md`
 - `runbooks/org-review.md`
 - `runbooks/sub-issues.md`

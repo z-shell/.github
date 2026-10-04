@@ -131,7 +131,7 @@ text.
 
 6. **The approved canonical skill revision is declared, not inferred.** This
    repository records the revision downstream repositories are expected to pin,
-   in `lib/repository-classes.yml` or a sibling machine-readable file under
+   in `knowledge/domains/governance/data/repository-classes.yml` or a sibling machine-readable file under
    `lib/`, following the precedent that file already sets for per-repository
    facts consumed by tooling. Advancing it is a reviewed change here, and
    downstream re-pinning follows the existing authorized-installation procedure
@@ -161,11 +161,11 @@ Material changes under this decision follow the impact review in
   instructions, agents, prompts, and local skills) with their tasks and file
   patterns, plus the organization skills it vendors. An adapter that is a
   symbolic link to the repository's `AGENTS.md` is an alias, not a surface.
-- `lib/approved-skills.json` records, per vendored organization skill, the
+- `knowledge/domains/agents/data/approved-skills.json` records, per vendored organization skill, the
   approved commit, the file list, and a SHA-256 digest of the skill with the
   installer's `metadata` block excluded. Frontmatter keys are compared in
   sorted order, so installer key order and indentation are not drift.
-- `scripts/org-routing.py` is the only generator and verifier. `apply` writes
+- `automation/agents/org-routing.py` is the only generator and verifier. `apply` writes
   the block into one checkout, `check` verifies one checkout, `validate`
   checks the inventory, and `verify-approved` confirms each approved digest
   against the recorded commit in this repository's history.
@@ -181,7 +181,7 @@ Material changes under this decision follow the impact review in
   caller against the inventory at the called workflow's own commit, so a
   caller's pin selects the inventory it is held to. In this repository it runs
   the generator's tests and `verify-approved` instead.
-- `scripts/validate-agent-policy.py` validates the `downstream` section with the
+- `automation/agents/validate-agent-policy.py` validates the `downstream` section with the
   generator's own schema check, so the two cannot disagree.
 
 The survey figures in Context are as drafted. The inventory taken for this
@@ -268,4 +268,4 @@ has drifted.
 - `runbooks/instruction-update.md`: the required impact review.
 - `runbooks/org-review.md`: the review-skill readiness dimensions this decision
   makes deterministic, and the authorized installation procedure.
-- `scripts/validate-agent-policy.py`: the existing public validator.
+- `automation/agents/validate-agent-policy.py`: the existing public validator.

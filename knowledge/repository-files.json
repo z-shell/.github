@@ -1,0 +1,2504 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": ".editorconfig",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".gemini/settings.json",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Runtime adapter, routing manifest or approved-revision contract. It describes configuration and intended delivery, not observed discovery."
+    },
+    {
+      "path": ".github/AGENT_MEMORY.md",
+      "domain": "agents",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/agents/handoffs.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/ANTITRUST.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/antitrust.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/CHARTER.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/charter.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/CODE_OF_CONDUCT.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/code-of-conduct.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/CONTRIBUTING.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/contributing.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/DISCUSSION_TEMPLATE/general.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/GOVERNANCE.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/project-governance.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/01_bug_report.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/02_feature_request.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/03_codebase_improvement.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/04_documentation.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/05_membership.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/06_agent_handoff.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/07_delivery_initiative.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/config.yml",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/MAINTAINERS.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/maintainers.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": ".github/README.md",
+      "domain": "documentation",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/documentation/organization-repository.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/SECURITY.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/security-reporting.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/STEERING_COMMITTEE.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/steering-committee.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/TRADEMARKS.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/trademarks.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/agents/ci-workflow-author.agent.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/roles/ci-workflow-author.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/agents/ci-workflow-reviewer.agent.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/roles/ci-workflow-reviewer.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/agents/plugins-plugin-reviewer.agent.md",
+      "domain": "plugins",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/plugins/roles/plugins-plugin-reviewer.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Runtime adapter, routing manifest or approved-revision contract. It describes configuration and intended delivery, not observed discovery."
+    },
+    {
+      "path": ".github/img/github_actions.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": ".github/instruction-surfaces.json",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Runtime adapter, routing manifest or approved-revision contract. It describes configuration and intended delivery, not observed discovery."
+    },
+    {
+      "path": ".github/instructions/agents/context-routing.instructions.md",
+      "domain": "agents",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/agents/context-routing.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/agents/tool-integration.instructions.md",
+      "domain": "agents",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/agents/tool-integration.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/ci/workflow-contract.instructions.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/workflow-contract.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/documentation/accessibility.instructions.md",
+      "domain": "documentation",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/documentation/accessibility.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/documentation/content-placement.instructions.md",
+      "domain": "documentation",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/documentation/content-placement.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/governance/worktrees.instructions.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/worktree-selection.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/plugins/review-routing.instructions.md",
+      "domain": "plugins",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/plugins/review-routing.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/plugins/standard-selection.instructions.md",
+      "domain": "plugins",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/plugins/standard-selection.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/quality/code-review.instructions.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/code-review.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/quality/controlled-validation.instructions.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/controlled-validation.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/quality/independent-verification.instructions.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/independent-verification.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/quality/testing.instructions.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/testing.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/zsh/dialect-selection.instructions.md",
+      "domain": "zsh",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/zsh/dialect-selection.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/instructions/zsh/scripting.instructions.md",
+      "domain": "zsh",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/zsh/scripting.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": ".github/lychee.toml",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".github/renovate.json",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable Renovate configuration; inspect with dependency-management guidance. This inventory does not change bot ownership or update policy."
+    },
+    {
+      "path": ".github/skills/code-review/SKILL.md",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/create-readme/SKILL.md",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/SKILL.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/dependencies.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/images.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/issue-fields.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/issue-links.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/issue-types.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/projects.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/search.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/sub-issues.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/github-issues/references/templates.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/project-tracker/SKILL.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/pull-request/SKILL.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/review-project-learning/SKILL.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/zd-test/SKILL.md",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/zi-install/SKILL.md",
+      "domain": "zi",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zi/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/zsh-manual-research/SKILL.md",
+      "domain": "zsh",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zsh/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/zsh-plugin/SKILL.md",
+      "domain": "plugins",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/plugins/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
+      "domain": "plugins",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/plugins/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/skills/zunit-test/SKILL.md",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/benchmark-report-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/codeql.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/commit-lint-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/commit-lint.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/dependency-review.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/labeler-config-audit-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/labels-sync-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/lychee.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/metrics.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/org-routing.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/pagespeed.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/project-reconcile-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/project-reconcile.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/reader.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/release-prepare.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/repo-settings-audit-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/setup-zsh-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/static.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/trunk-safe-check-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/trunk.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/zd-action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/zsh-ci.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/zsh-lint-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".github/workflows/zsh-lint.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": ".gitignore",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Repository file-discovery boundary; tracked files remain inventoried and ignored local/generated state is outside this public inventory."
+    },
+    {
+      "path": ".imgbotconfig",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/.gitignore",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/.flake8",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/.hadolint.yaml",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/.isort.cfg",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/.markdownlint.yaml",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/.yamllint.yaml",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/ruff.toml",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/configs/svgo.config.js",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": ".trunk/trunk.yaml",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Tool-consumed lint, formatting or link/image-check configuration. Inspect actual settings before changing verification behavior."
+    },
+    {
+      "path": "AGENTS.md",
+      "domain": "agents",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/agents/organization-policy.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "LICENSE",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Native contribution, ownership, licensing or delivery configuration. Read with the applicable governance procedure; retain the file consumed by GitHub or maintenance tooling."
+    },
+    {
+      "path": "PATTERNS.md",
+      "domain": "agents",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/agents/implementation-patterns.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "actions/benchmark-report/action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/commit/README.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/commit-action.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "actions/commit/action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/commit/entrypoint.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/rclone/Dockerfile",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/rclone/README.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/rclone-action.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "actions/rclone/action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/rclone/entrypoint.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/run-zd/action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/run-zd/run.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/setup-zsh/README.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/setup-zsh-action.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "actions/setup-zsh/ZSH-LICENSE.txt",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/setup-zsh/action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/setup-zsh/install.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/setup-zsh/provenance.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "actions/setup-zsh/trap-bounds-a3547fd4.patch",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable action contract, implementation or source provenance. Read with its action documentation and tests; do not duplicate source-derived behavior."
+    },
+    {
+      "path": "decisions/0001-meta-repo-and-agents-md.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0002-zi-as-canonical-plugin-manager.md",
+      "domain": "zi",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zi/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0003-conventional-commits.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0004-dependabot-unification.md",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0005-workflow-naming-conventions.md",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0006-wiki-content-root-boundaries.md",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0007-release-publication-flow.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0008-branching-model.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0009-testing-ci-strategy.md",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0010-security-incident-response.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0011-zsh-lint-semantic-analyzer-architecture.md",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0012-hybrid-dependency-management.md",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0013-repository-settings-baseline.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0014-portable-agent-instruction-architecture.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0015-zsh-scripting-standard.md",
+      "domain": "zsh",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zsh/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0016-promotion-trigger-criteria.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0017-licensing-standard-by-provenance.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0018-portable-worktree-management.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0019-trunk-on-main-default.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0020-adopt-zsh-plugin-standard-2.md",
+      "domain": "plugins",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/plugins/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0021-derive-chroma-knowledge-at-runtime.md",
+      "domain": "plugins",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/plugins/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0022-issue-traceability-on-pull-requests.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0023-zsh-lint-parser-front-end-strategy.md",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0024-benchmarks-observed-not-gated.md",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0025-guided-setup-planner-first.md",
+      "domain": "zi",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zi/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0026-review-triggers-and-fallback.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0027-canonical-repository-readme.md",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0028-zi-promotion-is-release-authorization.md",
+      "domain": "zi",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zi/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0029-guided-setup-configuration-topology-and-entrypoint.md",
+      "domain": "zi",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/zi/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0030-zsh-lint-parser-fork-trigger-fired.md",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0031-per-repository-instruction-routing-delivery.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0032-organization-procedures-live-once-as-public-runbooks.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0033-shared-zsh-quality-boundaries.md",
+      "domain": "quality",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/quality/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0034-portable-consumer-audiences.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0035-sole-maintainer-class-1-review-exception.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/0036-central-editable-knowledge-and-generated-consumers.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "decisions/README.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
+      "path": "profile/README.md",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/128x128.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/501x501.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/banner_source.tar.gz",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/branch_box.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/branch_box.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/card-community.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/card-ecosystem.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/card-plugin-mgr.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/card-turbo.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/divider.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/hero.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/logo.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/logo.svg",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/logo_source.tar.gz",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/transparnet_box.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "profile/img/z_git.png",
+      "domain": "documentation",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/documentation/repository-resources.md",
+      "reason": "Organization presentation or source asset; retained with its relative asset paths. Select for profile or visual-content maintenance."
+    },
+    {
+      "path": "renovate-config.json",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable Renovate configuration; inspect with dependency-management guidance. This inventory does not change bot ownership or update policy."
+    },
+    {
+      "path": "runbooks/adr.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/adr.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/benchmark-report.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/benchmark-report.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/branch-protection.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/branch-protection.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/cloudflare-wiki-policy.md",
+      "domain": "documentation",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/documentation/cloudflare-wiki-policy.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/dependency-management.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/dependency-management.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/deprecation.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/deprecation.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/instruction-update.md",
+      "domain": "agents",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/agents/instruction-update.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/labels.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/labels.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/learning-capture.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/learning-capture.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/new-repository.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/new-repository.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/onboarding.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/onboarding.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/org-review.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/org-review.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/project-tracker.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/project-tracker.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/pull-requests.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/pull-requests.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/recurring-operations.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/recurring-operations.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/release.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/release.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/security-incident-response.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/security-incident-response.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/sub-issues.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/sub-issues.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/triage.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/triage.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/worktrees.md",
+      "domain": "governance",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/governance/worktrees.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/zd-validation.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/zd-validation.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "runbooks/zsh-lint-ci.md",
+      "domain": "ci",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/ci/zsh-lint-ci.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
+      "path": "automation/ci/audit-scheduled-workflows.rb",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/benchmark_report.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/governance/decision-records.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/active-iana-timezone.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/active-utc.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/comment-only-workflow.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/directory-api-error.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/disabled-inactivity.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/job-level-controls.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/missing-workflow-directory.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/multiple-cron.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/private-no-schedule.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/private-redaction.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/rate-limit-error.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/reusable-workflow-caller.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/scheduled-workflows/top-level-controls.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/fixtures/zsh-lint/clean.txt",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/knowledge/knowledge-coverage.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Knowledge generation, coverage validation and adjacent regression tests; edit declared domain sources and verify complete native delivery."
+    },
+    {
+      "path": "automation/knowledge/knowledge-delivery.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Knowledge generation, coverage validation and adjacent regression tests; edit declared domain sources and verify complete native delivery."
+    },
+    {
+      "path": "automation/governance/labeler-config-audit.rb",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/labels-dry-run.rb",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/labels-sync.rb",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/agents/org-routing.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Agent routing, policy validation and adjacent regression tests; run from the repository root with the declared source policy."
+    },
+    {
+      "path": "automation/agents/org_policy_report.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Agent routing, policy validation and adjacent regression tests; run from the repository root with the declared source policy."
+    },
+    {
+      "path": "automation/governance/project_reconcile.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/project_reconcile_live.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/repo-settings-audit.rb",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/ci/test-audit-scheduled-workflows.rb",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/test-commit-lint-policy.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/governance/test-labeler-config-audit.rb",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/test-labels-dry-run.sh",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/test-repo-settings-audit.rb",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/ci/test-trunk-safe-check.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/test-trunk-safe-ci.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/test_benchmark_report.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/governance/test_decision_records.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/knowledge/test_knowledge_coverage.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Knowledge generation, coverage validation and adjacent regression tests; edit declared domain sources and verify complete native delivery."
+    },
+    {
+      "path": "automation/knowledge/test_knowledge_delivery.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Knowledge generation, coverage validation and adjacent regression tests; edit declared domain sources and verify complete native delivery."
+    },
+    {
+      "path": "automation/agents/test_org_policy_report.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Agent routing, policy validation and adjacent regression tests; run from the repository root with the declared source policy."
+    },
+    {
+      "path": "automation/agents/test_org_routing.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Agent routing, policy validation and adjacent regression tests; run from the repository root with the declared source policy."
+    },
+    {
+      "path": "automation/governance/test_project_reconcile.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/test_project_reconcile_live.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/test_project_reconcile_privacy.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/test_project_reconcile_removal.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/governance/test_project_reconcile_workflow.py",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/ci/test_run_zd.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/test_setup_zsh.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/agents/test_validate_agent_policy.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Agent routing, policy validation and adjacent regression tests; run from the repository root with the declared source policy."
+    },
+    {
+      "path": "automation/ci/test_validate_zsh_standard_policy.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/test_zsh_lint_ci.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/trunk-safe-check.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/trunk-safe-ci.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/agents/validate-agent-policy.py",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Agent routing, policy validation and adjacent regression tests; run from the repository root with the declared source policy."
+    },
+    {
+      "path": "automation/ci/validate-zsh-standard-policy.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/verify_zsh_signals.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/zsh-syntax-check.sh",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "automation/ci/zsh_lint_ci.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
+    },
+    {
+      "path": "templates/pinact/.pinact.yaml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "tools/readme-terminal-demo/.gitattributes",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/Dockerfile",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/cmd/readme-terminal-demo/main.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/cmd/readme-terminal-demo/main_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/dependencies.env",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/go.mod",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/go.sum",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/failure/failure.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/failure/failure_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/limits/limits.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/manifest/decode.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/manifest/manifest_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/manifest/model.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/manifest/validate.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/repopath/open_linux.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/repopath/repopath_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/repopath/validate.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/exec_linux.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/fds_linux.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/landlock_linux.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/landlock_syscall_linux.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/launcher_internal_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/launcher_structure_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/process_linux.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/sandbox/sandbox_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/tape/compose.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/tape/parse.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/internal/tape/tape_test.go",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/manifest.schema.json",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/bootstrap-gh.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/bootstrap-gh_test.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/in-go-image.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/in-go-image_test.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/verify-gh-assets.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/verify-gh-assets_test.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/verify-release-assets.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/scripts/verify-release-assets_test.sh",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-bidi-format-only.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-bool.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-control-character.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-empty.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-format-only.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-multiline.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-null.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/alt-number.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/fixtures-bool.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/fixtures-null.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/fixtures-number.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/fixtures-wrong-root.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/gif-nested-empty-stem.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/gif-wrong-root.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-fixtures.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-output-gif.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-output-png.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-outputs.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-readme-alt.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-readme-path.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-readme.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-scenario.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/missing-version.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/output-gif-bool.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/output-gif-null.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/output-gif-number.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/output-png-bool.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/output-png-null.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/output-png-number.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/png-nested-empty-stem.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/png-wrong-extension.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/readme-nested-empty-stem.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/readme-path-bool.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/readme-path-null.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/readme-path-number.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/readme-wrong-extension.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/readme-wrong-root.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-absolute.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-bool.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-dot-dot.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-nested-empty-stem.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-null.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-number.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/scenario-wrong-extension.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/tapes/output-directive.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/tapes/set-directive.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/tapes/source-indirection.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/tapes/timing-override.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/unknown-key.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/version-2.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/invalid/version-fractional.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/smoke/readme.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/valid/manifest-minimal.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/valid/manifest-visible-zwj.yml",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/valid/tapes/behavior.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "tools/readme-terminal-demo/testdata/valid/tapes/every-directive.tape",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Terminal-demo implementation, build contract, regression test or fixture. Retained as source-coupled tool material; no abandonment or deletion is implied."
+    },
+    {
+      "path": "workflow-templates/rclone-action.properties.json",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "workflow-templates/rclone-action.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "workflow-templates/trunk.properties.json",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "workflow-templates/trunk.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "workflow-templates/z-shell.svg",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "workflow-templates/zsh-ci.properties.json",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
+      "path": "workflow-templates/zsh-ci.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    }
+  ]
+}

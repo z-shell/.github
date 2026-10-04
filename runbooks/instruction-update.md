@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/agents/instruction-update.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Instruction Update
 
 Use this workflow to keep agent and contributor instructions current when the
@@ -82,7 +86,7 @@ answers is not an impact review.
 
 - [ ] Decision-level change? Draft an ADR — see `runbooks/adr.md` (status starts `PROPOSED`).
 - [ ] Update affected runbooks and `.github/instructions/`.
-- [ ] New tooling/plugin? Update `.github/instructions/mcp-plugins.instructions.md`.
+- [ ] New tooling/plugin? Update `.github/instructions/agents/tool-integration.instructions.md`.
 - [ ] For Plugin Standard governance, update its routed scoped guidance,
       templates, patterns, and recurring-review procedure without duplicating
       the public standard.
@@ -98,7 +102,7 @@ answers is not an impact review.
       organization skill is a `downstream` change in this repository's
       `.github/instruction-surfaces.json`. Land it here first, then regenerate
       the repository's block with
-      `python3 scripts/org-routing.py apply --repository z-shell/<name> --root <checkout>`
+      `python3 automation/agents/org-routing.py apply --repository z-shell/<name> --root <checkout>`
       and verify with `check`.
 - [ ] Prefer linking to canonical organization or wiki guidance over duplicating
       it.
@@ -114,11 +118,11 @@ private commands do not replace public-repository validation.
 Run from the root of a standalone `z-shell/.github` clone:
 
 ```bash
-python3 scripts/validate-agent-policy.py
-python3 -m unittest scripts/test_validate_agent_policy.py -v
-python3 scripts/org-routing.py validate
-python3 scripts/org-routing.py verify-approved
-python3 -m unittest scripts/test_org_routing.py -v
+python3 automation/agents/validate-agent-policy.py
+python3 -m unittest automation/agents/test_validate_agent_policy.py -v
+python3 automation/agents/org-routing.py validate
+python3 automation/agents/org-routing.py verify-approved
+python3 -m unittest automation/agents/test_org_routing.py -v
 ```
 
 ### Private-meta-workspace commands
@@ -133,9 +137,11 @@ python3 scripts/test-agent-instructions.py
 
 ## Read-only change-impact report
 
-Before editing consumers, run `python3 scripts/org_policy_report.py impact --changed runbooks/triage.md` from the organization checkout. Repeat `--changed` for every added, modified, renamed or removed path, including both names of a rename. The JSON report uses the existing manifest and approved-skill inventory: shared policy selects all declared consumers for review, while approved skill changes select their declared vendors. Workflow, action and template changes explicitly require a caller inventory. Unmapped paths remain visible for manual review. This is a conservative review list, not a complete prose-reference graph or permission to edit consumers.
+Before editing consumers, run `python3 automation/agents/org_policy_report.py impact --changed runbooks/triage.md` from the organization checkout. Repeat `--changed` for every added, modified, renamed or removed path, including both names of a rename. The JSON report uses the existing manifest and approved-skill inventory: shared policy selects all declared consumers for review, while approved skill changes select their declared vendors. Editable sources in knowledge/delivery.json receive their generated consumer's relationship and review candidates; the report records the delivery map's content hash. Workflow, action and template changes explicitly require a caller inventory. Unmapped paths remain visible for manual review. This is a conservative review list, not a complete prose-reference graph or permission to edit consumers.
 
 The report does not advance approved revisions. Merge an approved-source change before downstream re-pinning; verify each caller against both its pinned tooling and the intended current baseline. A passing check at an older pin establishes compatibility with that pin, not currency with newer policy.
+
+Complete project instructions use knowledge/project-delivery.json in the same routing pipeline. Follow [central knowledge maintenance](../knowledge/domains/agents/knowledge-maintenance.md) for the record schema, approved-source rendering and project compatibility boundary. apply writes only the selected complete consumers and generated routing block after preflight; check rejects content, provenance and selector drift. verify-approved validates organization source commits and blobs with full history. The change-impact report selects declared project consumers for their source changes and binds its observations to the project delivery manifest hash.
 
 `org-routing.py check` discovers tracked and non-ignored files when its target is a Git checkout. Tracked files remain checked even if an ignore rule matches them; required declared files and vendored resources are always checked. Ignored dependency files are outside this repository-content check. Exported trees without their own Git metadata retain filesystem discovery. This boundary does not establish that a runtime ignores ambient local guidance; runtime discovery remains a separate observation.
 

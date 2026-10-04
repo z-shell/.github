@@ -1,11 +1,15 @@
+<!-- GENERATED from knowledge/domains/agents/implementation-patterns.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Patterns — z-shell
 
 This file records implementation idioms already observed in multiple z-shell repositories. It exists to reduce drift, not to invent new style rules.
 
 The canonical Zsh requirements live in
-`.github/instructions/zsh-scripting.instructions.md`; machine-readable release,
+`.github/instructions/zsh/scripting.instructions.md`; machine-readable release,
 profile, rule, and source-class metadata lives in
-`lib/zsh-standard-policy.json`. Patterns below are observed examples, not a
+`knowledge/domains/zsh/data/zsh-standard-policy.json`. Patterns below are observed examples, not a
 second policy source. When an observed pattern conflicts with a required rule,
 the canonical standard wins and the pattern must be corrected.
 
@@ -29,7 +33,7 @@ deriving a reusable path from `${0:h}` after entering a function can select the
 function name instead of the source file.
 
 New work must follow
-`.github/instructions/zsh-scripting.instructions.md` and start from
+`.github/instructions/zsh/scripting.instructions.md` and start from
 `.github/skills/zsh-plugin/templates/plugin.plugin.zsh`. No replacement is
 published here because a safe replacement has not yet been observed in at least
 two listed repositories.
@@ -52,7 +56,7 @@ It overwrites caller state without preserving whether the key was absent or its
 exact pre-load value, so an unload function cannot restore that state.
 
 New work must follow
-`.github/instructions/zsh-scripting.instructions.md` and use
+`.github/instructions/zsh/scripting.instructions.md` and use
 `.github/skills/zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
 not publish a replacement until the complete snapshot and restoration shape is
 observed in at least two listed repositories.
@@ -77,7 +81,7 @@ The localized literal-membership calculation alone does not make that path
 derivation or lifecycle ownership safe.
 
 New work must follow
-`.github/instructions/zsh-scripting.instructions.md` and use
+`.github/instructions/zsh/scripting.instructions.md` and use
 `.github/skills/zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
 not publish a replacement because the complete first-source ownership and
 unload-restoration shape has not been observed in at least two listed
@@ -101,7 +105,7 @@ Pattern:
 - Pin all remote GitHub Action and reusable workflow references, external and organization-owned, to a full 40-character commit SHA.
 - Append the associated release version comment. Organization reusable workflows from `z-shell/.github/.github/workflows/` without an adopted workflow release retain the interim `# main` comment; it does not change the immutable ref.
 
-The pinact exception for that interim workflow comment is observed in `z-shell/zunit:.pinact.yaml` and `z-shell/zpmod:.pinact.yaml`. Follow the [canonical CI pinning guidance](.github/instructions/github-actions-ci-cd-best-practices.instructions.md#interim-pinact-exception-for-organization-reusable-workflows) and reuse its linked template rather than creating another exception shape.
+The pinact exception for that interim workflow comment is observed in `z-shell/zunit:.pinact.yaml` and `z-shell/zpmod:.pinact.yaml`. Follow the [canonical CI pinning guidance](.github/instructions/ci/workflow-contract.instructions.md#interim-pinact-exception-for-organization-reusable-workflows) and reuse its linked template rather than creating another exception shape.
 
 ```yaml
 # Good: pinned to SHA with version comment

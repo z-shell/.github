@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/maintainers.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Maintainers
 
 This document lists the Maintainers of the Project. Maintainers may be added once approved by the existing maintainers as described in the [Governance document](./GOVERNANCE.md). By adding your name to this list you are agreeing to abide by the Project governance documents and to abide by all of the Organization's polices, including the [code of conduct](./CODE_OF_CONDUCT.md), [trademark policy](./TRADEMARKS.md), and [antitrust policy](./ANTITRUST.md). If you are participating because of your affiliation with another organization (designated below), you represent that you have the authority to bind that organization to these policies.

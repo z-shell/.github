@@ -97,5 +97,5 @@ cleanup, or preservation of post-load user changes.
 - [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard)
 - `decisions/0002-zi-as-canonical-plugin-manager.md`
 - `decisions/0009-testing-ci-strategy.md`
-- `.github/instructions/zsh-plugin-standard.instructions.md`
-- `.github/instructions/testing.instructions.md`
+- `.github/instructions/plugins/standard-selection.instructions.md`
+- `.github/instructions/quality/testing.instructions.md`

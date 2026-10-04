@@ -48,11 +48,11 @@ Apply this rule to all existing workflow files and all new workflows going forwa
 
 1. **Emojis everywhere** — standardize on a canonical emoji per workflow category. Rejected: requires ongoing governance of emoji assignments and makes names harder to script against.
 2. **Per-repo choice** — each repo decides. Rejected: this is exactly what produced the current drift; the organization benefits from one standard.
-3. **Trunk custom lint check** — add a grep-based custom linter to `trunk.yaml`. Rejected for now: the org has no precedent for custom Trunk lint definitions, and the documentation layers (this ADR, `github-actions-ci-cd-best-practices.instructions.md`, workspace CLAUDE.md) are the established enforcement mechanism for style rules.
+3. **Trunk custom lint check** — add a grep-based custom linter to `trunk.yaml`. Rejected for now: the org has no precedent for custom Trunk lint definitions, and the documentation layers (this ADR, `.github/instructions/ci/workflow-contract.instructions.md`, workspace CLAUDE.md) are the established enforcement mechanism for style rules.
 
 ## References
 
 - `AGENTS.md`
-- `.github/instructions/github-actions-ci-cd-best-practices.instructions.md`
+- `.github/instructions/ci/workflow-contract.instructions.md`
 - `PATTERNS.md`
 - Workspace `CLAUDE.md` (workflow naming conventions section)

@@ -106,7 +106,7 @@ Rationale for the differences:
   explicitly overrides this row to `-` for `z-shell/zi`: its persistent
   `next` branch must be promoted with a merge commit to preserve ancestry, and
   linear history on `main` would forbid that method. The read-only settings
-  audit applies that named override from `lib/repository-classes.yml`.
+  audit applies that named override from `knowledge/domains/governance/data/repository-classes.yml`.
 - **Copilot code review** is required wherever a change reaches users or other
   repositories without a second human necessarily reading it.
 - **Review thread resolution before merge** (`required_review_thread_resolution`
@@ -180,7 +180,7 @@ as failures.
 2. Add a settings step to `runbooks/new-repository.md` so new repositories start
    conformant.
 3. Build a read-only audit that reports drift per repository against this table,
-   following the `scripts/labels-sync.rb` pattern: read-only by default, an apply
+   following the `automation/governance/labels-sync.rb` pattern: read-only by default, an apply
    mode behind both `--apply` and `--confirm-apply`, and a pilot allowlist.
 4. Apply per repository, deliberately, starting with class 1 and class 2.
 
@@ -267,7 +267,7 @@ With that row excluded, nothing the audit applies is irreversible.
   step.
 - `runbooks/release.md` — records that classic protection and rulesets are
   independent systems whose effective rule is their union.
-- `scripts/labels-sync.rb` — the audit-then-gated-apply pattern the eventual
+- `automation/governance/labels-sync.rb` — the audit-then-gated-apply pattern the eventual
   settings audit should follow.
 - [Issue #464](https://github.com/z-shell/.github/issues/464) — the declared-but-
   unenforced-control pattern this ADR generalizes from CI to repository settings.

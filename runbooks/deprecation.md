@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/governance/deprecation.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook — Deprecation and Sunset
 
 How to retire a plugin, annex, package, or other artifact without breaking the

@@ -1,3 +1,7 @@
+<!-- GENERATED from knowledge/domains/documentation/cloudflare-wiki-policy.md. Do not edit this delivery copy.
+Regenerate: python3 automation/knowledge/knowledge-delivery.py
+Check: python3 automation/knowledge/knowledge-delivery.py --check -->
+
 # Runbook - Cloudflare Wiki Policy Inspection and Rollback
 
 Use this runbook to inspect the Cloudflare controls that affect the public

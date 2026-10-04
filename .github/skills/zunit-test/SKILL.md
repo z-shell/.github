@@ -14,8 +14,8 @@ language standard.
 
 Before writing tests:
 
-1. Read `.github/instructions/zsh-scripting.instructions.md` and
-   `lib/zsh-standard-policy.json`.
+1. Read `.github/instructions/zsh/scripting.instructions.md` and
+   `knowledge/domains/zsh/data/zsh-standard-policy.json`.
 2. Classify each `.zunit` source as `test-fixture` and name the production
    profile exercised by the fixture.
 3. Isolate temporary `HOME` and `ZDOTDIR` under
