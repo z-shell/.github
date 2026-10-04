@@ -179,7 +179,7 @@ class ProjectDeliveryTests(unittest.TestCase):
         path.parent.mkdir(parents=True)
         path.write_text('---\napplyTo: "internal/**"\n---\n\n# Project rules\n\n[procedure](../../../runbooks/triage.md)\n')
         git(self.fixture.root, "add", self.source)
-        git(self.fixture.root, "commit", "-qm", "approved source")
+        git(self.fixture.root, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "approved source")
         self.record = {
             "repository": "z-shell/tool", "source": self.source,
             "target": ".github/instructions/go.instructions.md",
