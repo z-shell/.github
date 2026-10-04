@@ -19,7 +19,7 @@ Good: `Read my blog post "[Crafting an accessible resume](https://example.com)"`
 
 ## 2. Image Alt Text
 
-- Flag images with empty alt text (e.g., `![](../../../.github/instructions/documentation/path/to/image.png)`) unless they are explicitly decorative.
+- Flag images with empty alt text (e.g., `![](path/to/image.png)`) unless they are explicitly decorative.
 - Flag alt text that is a filename (e.g., `img_1234.jpg`) or generic placeholder (e.g., `screenshot`, `image`).
 - Alt text should be succinct and descriptive. Include any text visible in the image.
 - Use "screenshot of" where relevant, but do not prefix with "image of" since screen readers announce that automatically.

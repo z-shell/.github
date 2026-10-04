@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest import mock
+import unittest.mock
 
 spec = importlib.util.spec_from_file_location("knowledge_coverage", Path(__file__).with_name("knowledge-coverage.py"))
 coverage = importlib.util.module_from_spec(spec)
@@ -76,8 +76,8 @@ class KnowledgeCoverageTests(unittest.TestCase):
     def test_git_discovery_keeps_tracked_and_nonignored_files_and_omits_deleted(self):
         (self.root / ".git").write_text("gitdir: registered-worktree\n")
         (self.root / "ignored.txt").write_text("Ignored local state\n")
-        result = mock.Mock(stdout=b"AGENTS.md\0config.json\0deleted.txt\0knowledge/delivery.json\0")
-        with mock.patch.object(coverage.subprocess, "run", return_value=result) as command:
+        result = unittest.mock.Mock(stdout=b"AGENTS.md\0config.json\0deleted.txt\0knowledge/delivery.json\0")
+        with unittest.mock.patch.object(coverage.subprocess, "run", return_value=result) as command:
             self.assertEqual(coverage.repository_files(self.root), {"AGENTS.md", "config.json"})
         self.assertIn("--cached", command.call_args.args[0])
         self.assertIn("--exclude-standard", command.call_args.args[0])

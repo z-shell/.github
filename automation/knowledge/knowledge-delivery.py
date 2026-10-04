@@ -41,8 +41,27 @@ def local_path(root, name):
     return candidate
 
 
+def _mask_code(text):
+    placeholders = []
+
+    def mask(match):
+        placeholders.append(match.group(0))
+        return f"\x00CODE_{len(placeholders) - 1}\x00"
+
+    masked = re.sub(r"(?s)(```.*?```|~~~.*?~~~|`+[^`\n]+?`+)", mask, text)
+
+    def unmask(content):
+        if not placeholders:
+            return content
+        return re.sub(r"\x00CODE_(\d+)\x00", lambda match: placeholders[int(match.group(1))], content)
+
+    return masked, unmask
+
+
 def rebase_links(text, origin, destination):
     """Keep relative Markdown link destinations stable across a source move."""
+    masked, unmask = _mask_code(text)
+
     def replace(match):
         raw = match.group("url")
         angled = raw.startswith("<") and raw.endswith(">")
@@ -64,8 +83,8 @@ def rebase_links(text, origin, destination):
             moved = "<" + moved + ">"
         return match.group("prefix") + moved + match.groupdict().get("suffix", "")
 
-    text = LINK.sub(replace, text)
-    return DEFINITION.sub(replace, text)
+    rebased = DEFINITION.sub(replace, LINK.sub(replace, masked))
+    return unmask(rebased)
 
 
 def load_entries(root):
@@ -152,6 +171,8 @@ def load_project_entries(root, downstream):
 
 def render_project(text, entry):
     """Keep org links immutable and tested-project links local to the consumer."""
+    masked, unmask = _mask_code(text)
+
     def replace(match):
         raw = match.group("url")
         angled = raw.startswith("<") and raw.endswith(">")
@@ -179,10 +200,10 @@ def render_project(text, entry):
             moved = "<" + moved + ">"
         return match.group("prefix") + moved + match.groupdict().get("suffix", "")
 
-    text = DEFINITION.sub(replace, LINK.sub(replace, text))
+    rebased = unmask(DEFINITION.sub(replace, LINK.sub(replace, masked)))
     provenance = {key: entry[key] for key in sorted(entry) if key != "content_sha256"}
     header = "<!-- PROJECT KNOWLEDGE " + json.dumps(provenance, sort_keys=True, separators=(",", ":")) + " -->\n\n"
-    return with_provenance(text, header, entry["source"])
+    return with_provenance(rebased, header, entry["source"])
 
 
 def approved_project_content(org_root, entry):

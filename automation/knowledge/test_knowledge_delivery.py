@@ -84,10 +84,20 @@ class KnowledgeDeliveryTests(unittest.TestCase):
     def test_link_relocation_roundtrip_preserves_fragment_query_and_definitions(self):
         source = self.root / 'runbooks/procedure.md'
         destination = self.root / 'knowledge/domains/governance/procedure.md'
-        text = '[local](./other.md?q=yes#section)\n[ref]: ../AGENTS.md#policy\n[directory](../decisions/)\n[web](https://example.org/path)\n[anchor](#local)\n'
+        text = (
+            '[local](./other.md?q=yes#section)\n'
+            '[ref]: ../AGENTS.md#policy\n'
+            '[directory](../decisions/)\n'
+            '[web](https://example.org/path)\n'
+            '[anchor](#local)\n'
+            '`![](path/to/image.png)`\n'
+            '```markdown\n[code](./local.md)\n```\n'
+        )
         moved = delivery.rebase_links(text, source, destination)
         self.assertIn('https://example.org/path', moved)
         self.assertIn('[anchor](#local)', moved)
+        self.assertIn('`![](path/to/image.png)`', moved)
+        self.assertIn('```markdown\n[code](./local.md)\n```', moved)
         self.assertEqual(delivery.rebase_links(moved, destination, source), text)
 
     def test_duplicate_json_keys_are_rejected(self):
