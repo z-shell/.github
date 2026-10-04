@@ -1,6 +1,6 @@
 # Knowledge migration status
 
-Tracking: [z-shell/.github issue 717](https://github.com/z-shell/.github/issues/717). Local implementation is unpublished. This page records coverage and remaining ownership transitions, not runtime availability.
+Tracking: [z-shell/.github issue 717](https://github.com/z-shell/.github/issues/717). The initial organization migration and delivery tooling were published in [PR 718](https://github.com/z-shell/.github/pull/718). The C3 source repairs below remain local. This page records coverage and remaining ownership transitions, not runtime availability.
 
 ## Current batch
 
@@ -56,6 +56,12 @@ C2 verification passed 177 affected Python tests (agents 160 and knowledge 17), 
 This is local migration-readiness evidence, not certification of all inherited prose or hosted discovery. The C1 local-readiness and C2 delivery-contract work unit was completed after its acceptance evidence was recorded. C3-C6 remain pending; local source preparation does not complete project migration or adoption. Review-skill format and suitability were assessed locally; its source has intentional unpublished path updates relative to the approved published revision, and hosted skill discovery and invocation remain unverified.
 
 ### zsh-lint source preparation
+
+The C3 adoption preflight at organization revision `9c96960532066b8686b0bf74628f859990a9231b` found that both published draft sources fail the verifier's exact `applyTo` comparison: their comma-separated selectors contain spaces absent from the declared patterns. Their draft-only ownership paragraph also needs promotion before native delivery. The two-source local repair normalizes only those separators and replaces that paragraph with the approved source/consumer ownership boundary; every substantive rule and example remains unchanged. Repaired source publication must precede approved delivery records and project workflow pins. The delivery manifest remains empty while that publication is pending.
+
+Project reconciliation still uses `7ff05091a5489becf32069db1738d38ec23c8fd5`. Tests passed with Go 1.26.0 and Zsh 5.9.2 for `internal/analyzer`, `internal/parse`, `internal/survey` and `internal/manualcite`, including adapter composition, native stderr judgment, corpus and structural oracles, and fixture citation contracts. The local parser-gap-fix repair points to the living project contracts and current immutable organization instructions while retaining all seven steps, code blocks and command options. Parser code, dependencies, fixtures and project execution contracts remain unchanged. Complete project delivery, workflow adoption, native discovery and C3 completion remain pending.
+
+The repaired source previews pass exact selector checks, and comparison against their published revision confirms that every substantive rule and example is unchanged. All 177 affected Python tests (160 agents and 17 knowledge), 55-consumer generation, 357-file coverage, policy/routing/existing approved revisions, Zsh policy, decisions, whitespace and standalone export checks passed; 12 source/preview links resolve. The existing approved-revision check still uses an empty project manifest and therefore does not prove adoption of these consumers.
 
 The maintainer approved preparing two organization source drafts with tooling navigation and status updates on 2026-10-04. The [Go AST draft](../tooling/zsh-lint-go-ast.md) preserves rule interfaces, registration, traversal, extraction, testing and nil checks. The [parser-front-end draft](../tooling/zsh-lint-parser-front-end.md) preserves fork-first strategy, the existing-adapter scanner exception, retry/source-map/typed-AST contracts, fixture names, citations and dependency-change evidence. Its gap-proof wording now explicitly follows the project workflow's stderr-based native verdict through `-judge`; no parser behavior changed.
 
