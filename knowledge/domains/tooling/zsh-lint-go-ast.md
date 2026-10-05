@@ -3,9 +3,9 @@ description: "Guidelines for writing semantic analysis rules and AST traversals 
 applyTo: "internal/analyzer/**,internal/rules/**"
 ---
 
-This organization source supplies complete native project guidance through the approved records in `knowledge/project-delivery.json`. Edit the organization source, then publish and approve its revision before regenerating a project consumer; the generated consumer is not independently editable. Project instructions retain their existing authoring ownership until approved source publication, complete delivery and compatibility checks pass. Reconciled against project revision `7ff05091a5489becf32069db1738d38ec23c8fd5`; repository-relative code, command and fixture paths below refer to that project.
-
 # Go AST Linting & Semantic Analysis
+
+This organization source supplies complete native project guidance through the approved records in `knowledge/project-delivery.json`. Edit the organization source, then publish and approve its revision before regenerating a project consumer; the generated consumer is not independently editable. Project instructions retain their existing authoring ownership until approved source publication, complete delivery and compatibility checks pass. Reconciled against project revision `7ff05091a5489becf32069db1738d38ec23c8fd5`; repository-relative code, command and fixture paths below refer to that project.
 
 These instructions dictate how to build the semantic analyzer engine and lint rules for `zsh-lint` using the `mvdan/sh` parser.
 
