@@ -5,21 +5,21 @@
       "repository": "z-shell/zsh-lint",
       "source": "knowledge/domains/tooling/zsh-lint-go-ast.md",
       "target": ".github/instructions/go-ast-linting.instructions.md",
-      "revision": "761d9691c7c28b6a169ef4e5f674612d297c94fa",
-      "source_blob": "64f82138bbfbef879187036897de6f79c0c2c346",
+      "revision": "21693189f16af6810e54f04b47789aef76dc5db3",
+      "source_blob": "bff7df62645be1a406f4950ef9419365e884a79b",
       "project_revision": "7ff05091a5489becf32069db1738d38ec23c8fd5",
       "project_source_blob": "401c00159ccb871763b3aaaecfb7d7b0c891ec6b",
-      "content_sha256": "7e00497afe05ae14f3c37bcd740854eff97a23befc0949cc17ff2931ddb0033a"
+      "content_sha256": "b5bf62fb5e0946cd742d5a23efe205eceb04a2911ed6f2cdf53f674309773a7d"
     },
     {
       "repository": "z-shell/zsh-lint",
       "source": "knowledge/domains/tooling/zsh-lint-parser-front-end.md",
       "target": ".github/instructions/parser-front-end.instructions.md",
-      "revision": "761d9691c7c28b6a169ef4e5f674612d297c94fa",
-      "source_blob": "c1637e97a257b9bb87cf4d60206080600883d268",
+      "revision": "21693189f16af6810e54f04b47789aef76dc5db3",
+      "source_blob": "610500c13d663476012cf7e7ffd13298d7c1897e",
       "project_revision": "7ff05091a5489becf32069db1738d38ec23c8fd5",
       "project_source_blob": "cb36318050d353acd8624f612fb41544635ebcb4",
-      "content_sha256": "93a14d17d632e3e5532480d1ebc6957c5d6b89f503d744b65e996497d69e5d4c"
+      "content_sha256": "0b5ba51f38da7caece1b93457a5b68469edaa73dc4e3c43d5ee75709a2552a5c"
     }
   ]
 }
