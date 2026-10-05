@@ -22,14 +22,13 @@ Keep source-coupled project contracts tied to the owning project's tested revisi
 The wiki has three independent content roots. Place content by audience and
 purpose, not by topic:
 
-- **`docs/`** — Zi **end-user** documentation: getting started, usage, guides for
-  people _using_ the tools.
-- **`community/`** — community-facing material: standards, contribution norms,
-  ecosystem-wide conventions.
-- **`ecosystem/`** — ecosystem catalog: plugins, annexes, and related projects.
+- **`docs/`** — Zi plugin-manager **user** documentation only: installation, commands and usage guides.
+- **`community/`** — Z-Shell ecosystem community content: contributing, the Zsh handbook and Plugin Standard, and community tools such as ZUnit and Zsh Lint.
+- **`ecosystem/`** — third-party catalog: annexes, packages and plugins.
 
-Maintainer/operational guides are **not** end-user docs — do not place them under
-`docs/` just because they concern the tools.
+Maintainer, operational and infrastructure runbooks do not belong anywhere on the public wiki, in any content root. They live in `runbooks/` in `z-shell/.github`. Feature implementation stays in its owning repository.
+
+The wiki's MDX authoring instruction, including its content-root selection table, is drafted centrally as [wiki authoring](wiki-authoring.md). The wiki's own `.github/instructions/docs-authoring.instructions.md` stays authoritative until that source is published and its project delivery is approved.
 
 ### Hard rules
 

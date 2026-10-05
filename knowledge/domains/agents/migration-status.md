@@ -79,12 +79,20 @@ On 2026-10-04, the live default-branch trees of all 91 public z-shell repositori
 
 | Repository group | Remaining work | Current source |
 | --- | --- | --- |
-| z-shell/wiki | Migrate the Plugin Standard with MDX, anchors, examples, frontmatter, builds and publication checks; reconcile eight instructions, two role profiles and reusable knowledge in its skills | Wiki until coordinated delivery passes |
+| z-shell/wiki | Plugin Standard migration (MDX, anchors, examples, frontmatter, builds and publication checks) is not started and needs a delivery contract for MDX pages. Instruction-surface slice prepared as a draft; see below | Wiki until coordinated delivery passes |
 | z-shell/zsh-lint | Reconcile parser-front-end and Go AST guidance and knowledge embedded in parser-gap-fix against a tested project revision; preserve adapter and dual-oracle contracts | Project until version-compatible delivery passes |
 | F-Sy-H, z-a-meta-plugins, zsh, z-a-default-ice, z-a-eval, zi, src, zd, zpmod, zsh-eza, zsh-fancy-completions, zunit, zi-setup | Inspect project-specific AGENTS.md content and any embedded knowledge; distinguish project contracts from approved vendored review/install skills before moving it | Owning project |
 | z-shell/.github and downstream consumers | Publish reviewed sources before changing private routing, approved revisions, vendored copies or gitlinks; update pinned tooling and verify native discovery independently | Current published revisions |
 
 These coordinated cases are tracked in workspace notes at their owning repositories. Existing public issues and ADRs remain authoritative for active delivery and accepted decisions. No external repository's editable source has been replaced by a local copy.
+
+### Wiki instruction-surface preparation
+
+On 2026-10-05 the maintainer approved a bounded wiki slice: reconcile the wiki's eight scoped instructions, two role profiles, prompts and skills against the organization domains, and move only guidance that overlaps them. The Plugin Standard page, its validator and its semiannual review workflow stay authored in the wiki; the project delivery contract accepts only complete scoped-instruction consumers, so that page needs a separate MDX delivery decision.
+
+Only `.github/instructions/docs-authoring.instructions.md` overlaps organization knowledge (the ADR-0006 content roots and accessibility rules). Its draft source is [wiki authoring](../documentation/wiki-authoring.md), reconciled against wiki revision `8de78c6b9d658dbf8ce73fdc4f84c0778d12cbc9`: the source adds the ownership paragraph and rejoins two rows that a blank line had split off its affordances table; every other line, the frontmatter and the selector are unchanged. The other instructions, both role profiles, prompts and skills are wiki-specific and keep their owner. [Content placement](../documentation/content-placement.md) now states the ADR-0006 scopes accurately: maintainer, operational and infrastructure runbooks stay off the whole public wiki.
+
+No project delivery record exists for this draft. A preview consumer rendered with a deliberate placeholder revision is checked in the wiki task only; the real record waits for source publication. The wiki instruction remains authoritative until then.
 
 ### Next project slice: zsh-lint guidance
 

@@ -12,4 +12,8 @@ Select this domain for content placement, documentation changes, repository READ
 
 Select the actual repository archetype. Plugin documentation follows [plugins](../plugins/index.md); tools, modules and organization infrastructure use their own public interfaces and verification contracts.
 
+## Pending project-source adoption
+
+The [wiki authoring draft](wiki-authoring.md) prepares the complete native `.github/instructions/docs-authoring.instructions.md` consumer for z-shell/wiki. It preserves that instruction's frontmatter and selector and refers to wiki revision `8de78c6b9d658dbf8ce73fdc4f84c0778d12cbc9`. The wiki instruction remains authoritative until this source is published and its project delivery and compatibility checks are approved. No project delivery record or source pin is active for this draft. The Plugin Standard page, its validator and its review workflow stay authored in the wiki.
+
 For native packages, historical records, implementation and supporting files in this domain, use [repository resources](repository-resources.md). Each file has an imported source or retained-owner reference in the checked repository inventory.
