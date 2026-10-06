@@ -3,6 +3,7 @@
 
 require "json"
 require "stringio"
+require "tmpdir"
 require "yaml"
 
 require_relative "repo-settings-audit"
@@ -501,6 +502,231 @@ class RepoSettingsAuditTest
       client: client, stdout: StringIO.new, stderr: StringIO.new
     )
     assert_equal(1, status)
+  end
+
+  # --- CommunityHealth (#720) ----------------------------------------------
+
+  EXCEPTIONS_FILE = File.expand_path("../../knowledge/domains/governance/data/template-exceptions.yml", __dir__)
+  ORG_BUG_FORM = "a" * 40
+  ORG_CONFIG = "b" * 40
+
+  def org_defaults
+    { ".github/ISSUE_TEMPLATE/01_bug_report.yml" => ORG_BUG_FORM, ".github/ISSUE_TEMPLATE/config.yml" => ORG_CONFIG }
+  end
+
+  def exceptions
+    RepoSettingsAudit::CommunityHealth.new(
+      repositories: {
+        "z-shell/zsh-lint" => {
+          "vendor_org_forms" => true,
+          "exceptions" => [{ "path" => ".github/ISSUE_TEMPLATE/parser-gap.yml", "blob" => "c" * 40, "reason" => "intake" }]
+        }
+      }
+    )
+  end
+
+  def write_exceptions(data)
+    path = File.join(Dir.mktmpdir, "template-exceptions.yml")
+    File.write(path, data.to_yaml)
+    path
+  end
+
+  def load_error(data)
+    RepoSettingsAudit::CommunityHealth.load(write_exceptions(data))
+    nil
+  rescue ArgumentError => e
+    e
+  end
+
+  def test_community_health_matches_the_inherited_paths_only
+    candidate = ->(path) { RepoSettingsAudit::CommunityHealth.candidate?(path) }
+
+    [
+      ".github/ISSUE_TEMPLATE/01_bug_report.yml", ".github/ISSUE_TEMPLATE/config.yml",
+      ".github/PULL_REQUEST_TEMPLATE.md", ".github/PULL_REQUEST_TEMPLATE/promotion.md", "docs/pull_request_template.md",
+      "docs/CODE_OF_CONDUCT.md", "docs/SECURITY.md", ".github/CONTRIBUTING.md", "contributing.md", "SUPPORT.md",
+      ".github/FUNDING.yml", ".github/copilot-instructions.md"
+    ].each { |path| assert(candidate.call(path), "expected #{path} to match") }
+    [
+      ".github/CODEOWNERS", "CODEOWNERS", "src/CONTRIBUTING.md", "docs/guide/SECURITY.md", "README.md",
+      "docs/copilot-instructions.md", ".github/workflows/security.yml"
+    ].each { |path| refute(candidate.call(path), "expected #{path} not to match") }
+  end
+
+  def test_community_health_reports_each_status
+    files = {
+      ".github/ISSUE_TEMPLATE/01_bug_report.yml" => ORG_BUG_FORM,
+      ".github/ISSUE_TEMPLATE/config.yml" => "d" * 40,
+      ".github/ISSUE_TEMPLATE/parser-gap.yml" => "c" * 40,
+      ".github/copilot-instructions.md" => "e" * 40,
+      "docs/SECURITY.md" => "f" * 40
+    }
+    result = exceptions.evaluate(repo: "z-shell/zsh-lint", files: files, org_defaults: org_defaults)
+    statuses = result.fetch("files").to_h { |row| [row.fetch("path"), row.fetch("status")] }
+
+    assert_equal("vendored", statuses.fetch(".github/ISSUE_TEMPLATE/01_bug_report.yml"))
+    assert_equal("vendored_drift", statuses.fetch(".github/ISSUE_TEMPLATE/config.yml"))
+    assert_equal("approved", statuses.fetch(".github/ISSUE_TEMPLATE/parser-gap.yml"))
+    assert_equal("adapter", statuses.fetch(".github/copilot-instructions.md"))
+    assert_equal("shadow", statuses.fetch("docs/SECURITY.md"))
+    assert_equal(3, result.fetch("drift"))
+  end
+
+  def test_community_health_flags_a_changed_or_missing_exception
+    changed = exceptions.evaluate(
+      repo: "z-shell/zsh-lint", files: { ".github/ISSUE_TEMPLATE/parser-gap.yml" => "9" * 40 }, org_defaults: org_defaults
+    )
+    missing = exceptions.evaluate(repo: "z-shell/zsh-lint", files: {}, org_defaults: org_defaults)
+
+    assert_equal(["exception_changed"], changed.fetch("files").map { |row| row.fetch("status") })
+    assert_equal(["exception_missing"], missing.fetch("files").map { |row| row.fetch("status") })
+    assert_equal(1, missing.fetch("drift"))
+  end
+
+  def test_community_health_treats_an_unlisted_repo_copy_as_shadow_and_marks_identical_content
+    files = { ".github/ISSUE_TEMPLATE/01_bug_report.yml" => ORG_BUG_FORM, ".github/ISSUE_TEMPLATE/config.yml" => "d" * 40 }
+    result = exceptions.evaluate(repo: "z-shell/some-plugin", files: files, org_defaults: org_defaults)
+
+    assert_equal(%w[shadow shadow], result.fetch("files").map { |row| row.fetch("status") })
+    assert_equal([true, false], result.fetch("files").map { |row| row.fetch("identical_to_org") })
+    assert_equal(2, result.fetch("drift"))
+  end
+
+  def test_community_health_reports_no_drift_without_local_files
+    result = exceptions.evaluate(repo: "z-shell/some-plugin", files: {}, org_defaults: org_defaults)
+
+    assert_equal([], result.fetch("files"))
+    assert_equal(0, result.fetch("drift"))
+  end
+
+  def test_community_health_loads_the_checked_in_exceptions
+    manifest = RepoSettingsAudit::CommunityHealth.load(EXCEPTIONS_FILE)
+
+    %w[z-shell/wiki z-shell/zi z-shell/zsh-lint].each do |repo|
+      entry = manifest.entry_for(repo)
+      assert(entry.fetch("vendor_org_forms"), "expected #{repo} to vendor the organization forms")
+      refute(entry.fetch("exceptions").empty?, "expected #{repo} to list an exception")
+    end
+    assert_equal({ "vendor_org_forms" => false, "exceptions" => [] }, manifest.entry_for("z-shell/some-plugin"))
+  end
+
+  def test_community_health_load_rejects_invalid_entries
+    entry = ->(exception) { { "version" => 1, "repositories" => { "z-shell/x" => { "exceptions" => [exception] } } } }
+    good = { "path" => ".github/ISSUE_TEMPLATE/x.yml", "blob" => "c" * 40, "reason" => "intake" }
+
+    assert(load_error("version" => 2, "repositories" => {}), "expected an unknown version to be rejected")
+    assert(load_error("version" => 1, "repositories" => { "no-slash" => {} }), "expected OWNER/REPO to be required")
+    assert(load_error(entry.call(good.merge("path" => "README.md"))), "expected a non community health path to be rejected")
+    assert(load_error(entry.call(good.merge("blob" => "c0ffee"))), "expected a short blob id to be rejected")
+    assert(load_error(entry.call(good.merge("reason" => " "))), "expected a missing reason to be rejected")
+    assert(load_error("version" => 1, "repositories" => { "z-shell/x" => { "vendor_org_forms" => "yes" } }),
+           "expected a non-boolean vendor_org_forms to be rejected")
+    assert_equal(nil, load_error(entry.call(good)))
+  end
+
+  def test_community_health_tree_files_rejects_a_truncated_tree
+    client = FixtureClient.new("/repos/z-shell/big/git/trees/main?recursive=1" => { "truncated" => true, "tree" => [] })
+    error = begin
+      RepoSettingsAudit::CommunityHealth.tree_files(client, "z-shell/big", "main")
+    rescue RepoSettingsAudit::GitHubError => e
+      e
+    end
+
+    assert(error, "expected a truncated tree to raise")
+  end
+
+  def community_health_routes(repo, tree)
+    {
+      "/repos/z-shell/.github" => { "default_branch" => "main" },
+      "/repos/z-shell/.github/git/trees/main?recursive=1" => {
+        "truncated" => false,
+        "tree" => [
+          { "path" => ".github/ISSUE_TEMPLATE/01_bug_report.yml", "type" => "blob", "sha" => ORG_BUG_FORM },
+          { "path" => ".github/copilot-instructions.md", "type" => "blob", "sha" => "0" * 40 },
+          { "path" => ".github/CODEOWNERS", "type" => "blob", "sha" => "1" * 40 }
+        ]
+      },
+      "/repos/#{repo}" => { "default_branch" => "main" },
+      "/repos/#{repo}/rulesets" => [],
+      "/repos/#{repo}/branches/main/protection" => GitHubErrorResponse.new(status: 404),
+      "/repos/#{repo}/actions/workflows" => { "total_count" => 0 },
+      "/repos/#{repo}/git/trees/main?recursive=1" => { "truncated" => false, "tree" => tree }
+    }
+  end
+
+  def test_community_health_org_defaults_exclude_the_adapter_and_codeowners
+    client = FixtureClient.new(community_health_routes("z-shell/p", []))
+
+    assert_equal({ ".github/ISSUE_TEMPLATE/01_bug_report.yml" => ORG_BUG_FORM },
+                 RepoSettingsAudit::CommunityHealth.org_defaults(client, "z-shell"))
+  end
+
+  def test_cli_community_health_reports_drift_and_exits_0_without_fail_on_drift
+    tree = [{ "path" => ".github/ISSUE_TEMPLATE/01_bug_report.yml", "type" => "blob", "sha" => ORG_BUG_FORM }]
+    stdout = StringIO.new
+    status = RepoSettingsAudit::CLI.run(
+      ["--repo", "z-shell/p", "--classes-file", CLASSES_FILE, "--community-health", "--exceptions-file", EXCEPTIONS_FILE],
+      client: FixtureClient.new(community_health_routes("z-shell/p", tree)), stdout: stdout, stderr: StringIO.new
+    )
+
+    assert_equal(0, status)
+    assert(stdout.string.include?("`.github/ISSUE_TEMPLATE/01_bug_report.yml`: shadow, identical to the organization default"))
+  end
+
+  def test_cli_fail_on_drift_exits_1_on_drift_and_0_when_clean
+    tree = [{ "path" => ".github/ISSUE_TEMPLATE/01_bug_report.yml", "type" => "blob", "sha" => ORG_BUG_FORM }]
+    args = ["--repo", "z-shell/p", "--classes-file", CLASSES_FILE, "--community-health", "--exceptions-file", EXCEPTIONS_FILE,
+            "--fail-on-drift", "--json"]
+    drift = RepoSettingsAudit::CLI.run(args.dup, client: FixtureClient.new(community_health_routes("z-shell/p", tree)),
+                                                 stdout: StringIO.new, stderr: StringIO.new)
+    stdout = StringIO.new
+    clean = RepoSettingsAudit::CLI.run(args.dup, client: FixtureClient.new(community_health_routes("z-shell/p", [])),
+                                                 stdout: stdout, stderr: StringIO.new)
+
+    assert_equal(1, drift)
+    assert_equal(0, clean)
+    assert_equal(0, JSON.parse(stdout.string).fetch("repos_with_community_health_drift"))
+  end
+
+  def test_cli_fail_on_drift_requires_community_health
+    status = RepoSettingsAudit::CLI.run(
+      ["--repo", "z-shell/wiki", "--fail-on-drift"], client: cli_client, stdout: StringIO.new, stderr: StringIO.new
+    )
+    assert_equal(2, status)
+  end
+
+  def test_cli_json_omits_the_community_health_counter_without_the_flag
+    stdout = StringIO.new
+    RepoSettingsAudit::CLI.run(
+      ["--repo", "z-shell/wiki", "--classes-file", CLASSES_FILE, "--json"], client: cli_client, stdout: stdout, stderr: StringIO.new
+    )
+    refute(JSON.parse(stdout.string).key?("repos_with_community_health_drift"))
+  end
+
+  def test_auditor_skips_community_health_for_the_organization_repository
+    routes = community_health_routes("z-shell/.github", [])
+    routes["/repos/z-shell/.github"] = { "default_branch" => "main" }
+    context = { exceptions: exceptions, org_defaults: org_defaults, org: "z-shell" }
+
+    result = RepoSettingsAudit::RepoAuditor.audit(
+      client: FixtureClient.new(routes), repo: "z-shell/.github", class_resolver: resolver, community_health: context
+    )
+
+    assert_equal(0, result.fetch("community_health").fetch("drift"))
+    assert(result.fetch("community_health").key?("skipped"))
+  end
+
+  def test_auditor_records_a_tree_failure_as_an_error_and_keeps_settings
+    routes = community_health_routes("z-shell/p", [])
+    routes["/repos/z-shell/p/git/trees/main?recursive=1"] = GitHubErrorResponse.new(status: 409, message: "Git Repository is empty.")
+    context = { exceptions: exceptions, org_defaults: org_defaults, org: "z-shell" }
+
+    result = RepoSettingsAudit::RepoAuditor.audit(
+      client: FixtureClient.new(routes), repo: "z-shell/p", class_resolver: resolver, community_health: context
+    )
+
+    assert_equal(1, result.fetch("errors").length)
+    refute(result.fetch("settings").empty?, "expected the settings verdicts to remain")
   end
 end
 

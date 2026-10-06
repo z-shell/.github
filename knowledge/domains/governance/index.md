@@ -23,3 +23,4 @@ Structured policy owned by this domain:
 
 - [labels.yml](data/labels.yml)
 - [repository-classes.yml](data/repository-classes.yml)
+- [template-exceptions.yml](data/template-exceptions.yml)
