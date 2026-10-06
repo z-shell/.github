@@ -15,7 +15,7 @@ Select this domain for organization procedures, repository lifecycle and deliver
 | Report a vulnerability or review shared legal policies | [Private security reporting](security-reporting.md), [trademarks](trademarks.md) and [antitrust policy](antitrust.md) |
 | Review inherited accuracy questions | [Accuracy gaps and remaining decisions](accuracy-gaps.md) |
 
-Migrated organization procedures have editable domain sources and complete generated public runbooks. The delivery model preserves [ADR-0032](../../../decisions/0032-organization-procedures-live-once-as-public-runbooks.md) runtime responsibilities while proposed ADR-0036 records the authoring transition. Skills and domain indexes route to the applicable owner. Active state belongs in issues and pull requests, not these indexes.
+Migrated organization procedures have editable domain sources and complete generated public runbooks. The delivery model preserves [ADR-0032](../../../decisions/0032-organization-procedures-live-once-as-public-runbooks.md) runtime responsibilities while accepted ADR-0036 records the authoring transition. Skills and domain indexes route to the applicable owner. Active state belongs in issues and pull requests, not these indexes.
 
 For native packages, historical records, implementation and supporting files in this domain, use [repository resources](repository-resources.md). Each file has an imported source or retained-owner reference in the checked repository inventory.
 

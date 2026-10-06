@@ -89,3 +89,14 @@ the repository's actual components and instructions. Missing or unsuitable
 guidance is a remediation finding, not authorization to install or rewrite it.
 File presence and a passing static check do not prove a runtime selected the
 skill. Report observed invocation evidence separately, or mark it unverified.
+
+## Ask before electing a fallback
+
+When a pull-request review is complete and no review of record is registered on
+the current head, for example because a Copilot request did not register, do
+not stop silently. Present the finished review to the maintainer and ask
+whether to elect the ADR-0026 fallback and post it as the review of record,
+following
+[pull-request review](https://github.com/z-shell/.github/blob/main/runbooks/pull-requests.md#3-review).
+Electing the fallback is the maintainer's decision. Do not elect it, or post
+the review as a review of record, without that answer.

@@ -12,7 +12,7 @@ Tracking: [z-shell/.github issue 717](https://github.com/z-shell/.github/issues/
 | Move four structured policies from lib into owning knowledge domains | Locally verified | Policy values preserved; only the repository-class file's reader-path comment changed; local readers and references repaired |
 | Group maintenance programs, tests and fixtures under automation domains | Locally verified | 43 programs/tests and 14 fixtures moved; root resolution, imports, filters and sparse-checkout inputs repaired; affected suites passed |
 | README/template placement and inheritance correction | Locally verified | README template moved to documentation/templates; complete native README regenerated with the documented GitHub inheritance boundary |
-| Historical ADR ownership | Local contract documented | Numbered decisions remain historical editable owners; domain navigation references them; decision-records.py alone generates their index; ADR-0036 acceptance still pending |
+| Historical ADR ownership | Local contract documented | Numbered decisions remain historical editable owners; domain navigation references them; decision-records.py alone generates their index; ADR-0036 accepted |
 | Compatibility consumer transitions | Retention contract documented | All 55 consumers classified by their delivery role in knowledge-maintenance.md; no consumer retired; replacement discovery, downstream coordination and exact removal approval remain prerequisites |
 | Terminal-demo module and organization-wide agent delivery | Source scope assessed | Module identity, internal imports and module-local Docker build verified by inspection; three profiles remain repository-native; tool execution and organization discovery remain unverified |
 | Publication, downstream pins and private gitlinks | Not authorized | Local source changes do not establish published availability |
@@ -92,7 +92,7 @@ On 2026-10-05 the maintainer approved a bounded wiki slice: reconcile the wiki's
 
 Only `.github/instructions/docs-authoring.instructions.md` overlaps organization knowledge (the ADR-0006 content roots and accessibility rules). Its source is [wiki authoring](../documentation/wiki-authoring.md), reconciled against wiki revision `8de78c6b9d658dbf8ce73fdc4f84c0778d12cbc9`: the source adds the ownership paragraph and rejoins two rows that a blank line had split off its affordances table; every other line, the frontmatter and the selector are unchanged. The other instructions, both role profiles, prompts and skills are wiki-specific and keep their owner. [Content placement](../documentation/content-placement.md) now states the ADR-0006 scopes accurately: maintainer, operational and infrastructure runbooks stay off the whole public wiki.
 
-PR 724 published the source at `162f6f91401925a4c56691a3155cda842967d444` after a current-head maintainer-elected fallback review, 12 passing hosted checks and no review threads. The [project delivery manifest](../../project-delivery.json) records the complete z-shell/wiki consumer: it pins that revision, source blob `2a5c18f3d7c30f9b50d874ab6c8722316c6ac445`, the wiki reconciliation blob `c759eb00c300a37b34f3bb1681fb082f6dfe7c14` at `8de78c6b9d658dbf8ce73fdc4f84c0778d12cbc9` and the rendered SHA-256 digest. Record publication must precede wiki regeneration. The wiki instruction remains authoritative until the regenerated consumer is merged in the wiki.
+PR 724 published the source at `162f6f91401925a4c56691a3155cda842967d444` after a current-head maintainer-elected fallback review, 12 passing hosted checks and no review threads. The [project delivery manifest](../../project-delivery.json) records the complete z-shell/wiki consumer: it pins that revision, source blob `2a5c18f3d7c30f9b50d874ab6c8722316c6ac445`, the wiki reconciliation blob `c759eb00c300a37b34f3bb1681fb082f6dfe7c14` at `8de78c6b9d658dbf8ce73fdc4f84c0778d12cbc9` and the rendered SHA-256 digest. Record publication preceded wiki regeneration; the regenerated consumer is merged in z-shell/wiki#935.
 
 ### Next project slice: zsh-lint guidance
 
@@ -101,6 +101,14 @@ Read-only planning on 2026-10-04 checked zsh-lint at revision 7ff05091a5489becf3
 The local knowledge generator currently targets one repository root. Cross-repository source delivery needs a verified approved-revision contract before replacing project authoring ownership; declared downstream selection alone does not provide that delivery. A project edit batch needs its own approved exact scope and task worktree. Preserve fork-first strategy, existing adapter exceptions, dual verdicts, native placement and runtime-tier limits, fixture citations and structural-oracle checks. No zsh-lint files or project behavior were changed or executed during planning.
 
 The resumed organization task passed all 204 knowledge, agents and governance Python tests, 55-consumer generation, 357-file coverage, policy/routing and decision checks, and whitespace validation. Existing unpublished work and HEAD were preserved before this progress update. These checks do not establish complete semantic accuracy or hosted discovery.
+
+### Adoption and retained exceptions
+
+ADR-0036 is accepted. The zsh-lint and wiki consumers are delivered through approved records in the project delivery manifest. The other inventoried projects keep their project-owned guidance with recorded reasons; their links to organization guidance were repaired after the relocation.
+
+The Zsh Plugin Standard is a retained exception. The wiki page stays its single editable source, with its own validator and semiannual review workflow, and organization knowledge links to it. The project delivery contract accepts only Markdown sources and scoped-instruction targets and is not extended to MDX pages.
+
+Project repositories carry no `.github/copilot-instructions.md` adapter; their `AGENTS.md` is the instruction entry point. Downstream routing pins and the vendored code-review skill are refreshed once per project after the skill's next approved revision.
 
 ## Impact review
 

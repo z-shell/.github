@@ -66,6 +66,8 @@ Do not copy generic `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/agents/`, or
 `.github/instructions/` files into child repositories. Link to the organization
 guidance when a short project-specific `AGENTS.md` is genuinely required.
 
+The repository's `AGENTS.md` is its only agent instruction entry point. Copilot code review and the Copilot cloud agent read `AGENTS.md` natively, so do not add a `.github/copilot-instructions.md` adapter that links to it, imports it or duplicates its guidance.
+
 Install the centrally owned `code-review` skill using the approved published
 source revision and explicit `.github/skills` destination in
 [`runbooks/org-review.md`](../../../runbooks/org-review.md#install-or-update-after-authorization).
@@ -74,9 +76,9 @@ Use existing local instructions and validation commands to establish that its
 guidance suits the repository's actual components; add focused local guidance
 only for a demonstrated gap.
 
-Use organization issue and pull-request templates by default. Add a child
-template only when the repository has a specific intake field that the shared
-template cannot express.
+Use the organization's community health files by default. GitHub applies the issue forms, pull-request template and other community health files in z-shell/.github to every repository that has no file of its own, so do not copy them. A local file replaces the organization default for that repository: any file in the repository's `.github/ISSUE_TEMPLATE/`, a `config.yml` included, hides the whole organization issue-template folder, and a local pull-request template replaces the organization one. GitHub documents this in [creating a default community health file](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file).
+
+Add a child template only when the repository has a specific intake field that the shared template cannot express, and record it as an approved exception. Because one local form hides the organization folder, such a repository also carries the general organization forms as mechanically vendored copies that are checked for drift, so its contributors do not lose them.
 
 ## Step 3 — Add the artifact structure
 

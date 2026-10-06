@@ -46,4 +46,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0033](0033-shared-zsh-quality-boundaries.md)                        | Shared Zsh Quality Integrations Keep Analysis and Workloads Repository-Owned                       | PROPOSED | 2026-09-26 | TBD      |
 | [0034](0034-portable-consumer-audiences.md)                          | Use portable audiences for shared instruction surfaces                                             | ACCEPTED | 2026-09-27 | ss-o     |
 | [0035](0035-sole-maintainer-class-1-review-exception.md)             | Allow a bounded Class 1 review exception for a sole maintainer                                     | ACCEPTED | 2026-09-27 | ss-o     |
-| [0036](0036-central-editable-knowledge-and-generated-consumers.md)   | Central Editable Knowledge With Complete Generated Consumers                                       | PROPOSED | 2026-10-04 | TBD      |
+| [0036](0036-central-editable-knowledge-and-generated-consumers.md)   | Central Editable Knowledge With Complete Generated Consumers                                       | ACCEPTED | 2026-10-04 | ss-o     |
