@@ -4,7 +4,7 @@
 - **Date:** 2026-09-26
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** [#735](https://github.com/z-shell/.github/pull/735) for the project Copilot adapter (in part; see Implementation)
 
 ## Context
 
@@ -154,6 +154,9 @@ Material changes under this decision follow the impact review in
 `runbooks/instruction-update.md`.
 
 ### Implementation
+
+> **Superseded in part by [#735](https://github.com/z-shell/.github/pull/735).**
+> A project repository no longer has a Copilot adapter: its `AGENTS.md` is the only agent instruction entry point. The `downstream` entries declare no adapter surface, and `check` reports a project's `.github/copilot-instructions.md`, a symbolic link included, as an error. The adapter wording in the first item below is historical. See `runbooks/new-repository.md`.
 
 - `.github/instruction-surfaces.json` gains a top-level `downstream` list, one
   entry per consuming repository, sorted by repository. Each entry declares
