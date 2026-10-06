@@ -545,11 +545,12 @@ class RepoSettingsAuditTest
       ".github/ISSUE_TEMPLATE/01_bug_report.yml", ".github/ISSUE_TEMPLATE/config.yml",
       ".github/PULL_REQUEST_TEMPLATE.md", ".github/PULL_REQUEST_TEMPLATE/promotion.md", "docs/pull_request_template.md",
       "docs/CODE_OF_CONDUCT.md", "docs/SECURITY.md", ".github/CONTRIBUTING.md", "contributing.md", "SUPPORT.md",
-      ".github/FUNDING.yml", ".github/copilot-instructions.md"
+      ".github/FUNDING.yml", ".github/copilot-instructions.md", "code-of-conduct.md", "Code-Of-Conduct.md",
+      "CODE-OF-CONDUCT.md", "code_of_conduct.md", ".github/code-of-conduct.md"
     ].each { |path| assert(candidate.call(path), "expected #{path} to match") }
     [
       ".github/CODEOWNERS", "CODEOWNERS", "src/CONTRIBUTING.md", "docs/guide/SECURITY.md", "README.md",
-      "docs/copilot-instructions.md", ".github/workflows/security.yml"
+      "docs/copilot-instructions.md", ".github/workflows/security.yml", "src/code-of-conduct.md", "code-of-conduct-notes.md"
     ].each { |path| refute(candidate.call(path), "expected #{path} not to match") }
   end
 
@@ -570,6 +571,13 @@ class RepoSettingsAuditTest
     assert_equal("adapter", statuses.fetch(".github/copilot-instructions.md"))
     assert_equal("shadow", statuses.fetch("docs/SECURITY.md"))
     assert_equal(3, result.fetch("drift"))
+  end
+
+  def test_community_health_reports_a_hyphenated_root_code_of_conduct_as_shadow
+    result = exceptions.evaluate(repo: "z-shell/zunit", files: { "code-of-conduct.md" => "a" * 40 }, org_defaults: org_defaults)
+
+    assert_equal([["code-of-conduct.md", "shadow"]], result.fetch("files").map { |row| [row.fetch("path"), row.fetch("status")] })
+    assert_equal(1, result.fetch("drift"))
   end
 
   def test_community_health_flags_a_changed_or_missing_exception

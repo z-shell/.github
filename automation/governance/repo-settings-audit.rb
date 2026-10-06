@@ -312,14 +312,16 @@ module RepoSettingsAudit
   # non-zero for drift only with --fail-on-drift.
   class CommunityHealth
     # Paths GitHub reads community health files from: the repository root,
-    # .github/ or docs/. CODEOWNERS is not inherited from the organization,
-    # so it is not a shadow file.
+    # .github/ or docs/. Names match in any case, and a code of conduct also
+    # with hyphens (code-of-conduct.md), a common upstream spelling that still
+    # duplicates the organization file. CODEOWNERS is not inherited from the
+    # organization, so it is not a shadow file.
     PATH_PATTERN = %r{
       \A(?:\.github/|docs/)?
       (?:
         (?:ISSUE_TEMPLATE|PULL_REQUEST_TEMPLATE|DISCUSSION_TEMPLATE)/.+
         |
-        (?:CONTRIBUTING|SECURITY|CODE_OF_CONDUCT|SUPPORT|GOVERNANCE|FUNDING|PULL_REQUEST_TEMPLATE|ISSUE_TEMPLATE)(?:\.[A-Za-z0-9]+)?
+        (?:CONTRIBUTING|SECURITY|CODE[-_]OF[-_]CONDUCT|SUPPORT|GOVERNANCE|FUNDING|PULL_REQUEST_TEMPLATE|ISSUE_TEMPLATE)(?:\.[A-Za-z0-9]+)?
       )\z
     }ix
     ADAPTER_PATH = ".github/copilot-instructions.md"
