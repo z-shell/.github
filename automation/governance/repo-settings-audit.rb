@@ -13,6 +13,9 @@ require "yaml"
 # ("Build a read-only audit...") tracked on z-shell/.github#478. With
 # --community-health it also reports shadow community health files against
 # knowledge/domains/governance/data/template-exceptions.yml (z-shell/.github#720).
+# --skip-settings narrows a --community-health run to the community health
+# files: it reads no settings, rulesets or branch protection, so a token that
+# cannot read them still produces a complete community health report.
 #
 # Read-only by design: this script has no --apply/--confirm-apply mode. The
 # settings changes recorded in #478 were hand-judged, per-repository ruleset
@@ -436,10 +439,17 @@ module RepoSettingsAudit
   class RepoAuditor
     # community_health, when given, is { exceptions: CommunityHealth,
     # org_defaults: { path => blob }, org: "z-shell" } and adds a
-    # community_health section to the result.
-    def self.audit(client:, repo:, class_resolver:, community_health: nil)
+    # community_health section to the result. skip_settings reads only the
+    # repository and its community health files: no rulesets, branch
+    # protection or workflows, and no settings verdicts.
+    def self.audit(client:, repo:, class_resolver:, community_health: nil, skip_settings: false)
       repository = client.json("/repos/#{repo}")
       default_branch = repository.fetch("default_branch", "main")
+      if skip_settings
+        result = settings_skipped_result(repo, class_resolver, default_branch)
+        add_community_health(result, client, repo, default_branch, community_health) if community_health
+        return result
+      end
 
       rulesets = branch_ruleset_details(client, repo)
       classic_protection = fetch_classic_protection(client, repo, default_branch)
@@ -469,6 +479,23 @@ module RepoSettingsAudit
       }
       add_community_health(result, client, repo, default_branch, community_health) if community_health
       result
+    end
+
+    def self.settings_skipped_result(repo, class_resolver, default_branch)
+      {
+        "schema" => SCHEMA,
+        "repository" => repo,
+        "class" => class_resolver.class_for(repo),
+        "class_source" => class_resolver.source_for(repo),
+        "default_branch" => default_branch,
+        "default_branch_is_main" => default_branch == "main",
+        "has_ci" => nil,
+        "settings" => [],
+        "summary" => { "pass" => 0, "fail" => 0, "warn" => 0, "na" => 0 },
+        "settings_skipped" => true,
+        "flags" => {},
+        "errors" => []
+      }
     end
 
     # The organization repository is the source of the defaults, so it is
@@ -509,7 +536,7 @@ module RepoSettingsAudit
       client.json("/repos/#{repo}/actions/workflows").fetch("total_count", 0)
     end
 
-    private_class_method :add_community_health, :branch_ruleset_details, :fetch_classic_protection, :fetch_workflow_count
+    private_class_method :settings_skipped_result, :add_community_health, :branch_ruleset_details, :fetch_classic_protection, :fetch_workflow_count
   end
 
   # Enumerates target repositories -- an explicit list, or every active,
@@ -518,17 +545,19 @@ module RepoSettingsAudit
   # A single repository's failure becomes an error record, not a crash: one
   # broken `gh api` call must not blank out the rest of the org's results.
   class Inventory
-    def initialize(client:, org:, class_resolver:, repos: nil, community_health: nil)
+    def initialize(client:, org:, class_resolver:, repos: nil, community_health: nil, skip_settings: false)
       @client = client
       @org = org
       @class_resolver = class_resolver
       @repos = repos
       @community_health = community_health
+      @skip_settings = skip_settings
     end
 
     def run
       target_repos.map do |repo|
-        RepoAuditor.audit(client: @client, repo: repo, class_resolver: @class_resolver, community_health: @community_health)
+        RepoAuditor.audit(client: @client, repo: repo, class_resolver: @class_resolver, community_health: @community_health,
+                          skip_settings: @skip_settings)
       rescue GitHubError => error
         error_record(repo, error)
       end
@@ -602,6 +631,9 @@ module RepoSettingsAudit
 
     def markdown(results, include_clean:)
       lines = ["# Repository Settings Audit", "", "Baseline: decisions/0013-repository-settings-baseline.md", ""]
+      if results.any? { |result| result["settings_skipped"] }
+        lines.concat(["Settings, rulesets and branch protection were not read (--skip-settings).", ""])
+      end
       results.each do |result|
         next if clean?(result) && !include_clean
 
@@ -680,7 +712,7 @@ module RepoSettingsAudit
   class CLI
     def self.run(argv, client: GitHubClient.new, stdout: $stdout, stderr: $stderr)
       options = { org: "z-shell", repos: [], all_repos: false, json: false, include_clean: false,
-                  community_health: false, fail_on_drift: false,
+                  community_health: false, fail_on_drift: false, skip_settings: false,
                   classes_file: File.expand_path("../../knowledge/domains/governance/data/repository-classes.yml", __dir__),
                   exceptions_file: File.expand_path("../../knowledge/domains/governance/data/template-exceptions.yml", __dir__) }
       parser = build_parser(options)
@@ -692,7 +724,8 @@ module RepoSettingsAudit
       community_health = community_health_context(client, options) if options[:community_health]
       inventory = Inventory.new(
         client: client, org: options[:org], class_resolver: class_resolver,
-        repos: options[:all_repos] ? nil : options[:repos], community_health: community_health
+        repos: options[:all_repos] ? nil : options[:repos], community_health: community_health,
+        skip_settings: options[:skip_settings]
       )
       results = inventory.run
 
@@ -733,6 +766,9 @@ module RepoSettingsAudit
           options[:exceptions_file] = value
         end
         option.on("--fail-on-drift", "Exit 1 when --community-health finds drift (default: report only)") { options[:fail_on_drift] = true }
+        option.on("--skip-settings", "With --community-health, read no settings, rulesets or branch protection") do
+          options[:skip_settings] = true
+        end
       end
     end
 
@@ -742,6 +778,7 @@ module RepoSettingsAudit
       end
       raise OptionParser::MissingArgument, "pass at least one --repo OWNER/REPO or --all-repos" if !options[:all_repos] && options[:repos].empty?
       raise OptionParser::InvalidOption, "--fail-on-drift needs --community-health" if options[:fail_on_drift] && !options[:community_health]
+      raise OptionParser::InvalidOption, "--skip-settings needs --community-health" if options[:skip_settings] && !options[:community_health]
 
       options[:repos].each do |repo|
         raise OptionParser::InvalidArgument, "--repo must be OWNER/REPO: #{repo}" unless repo.match?(%r{\A[^/]+/[^/]+\z})

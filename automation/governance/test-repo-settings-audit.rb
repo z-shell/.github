@@ -748,6 +748,74 @@ class RepoSettingsAuditTest
     refute(JSON.parse(stdout.string).key?("repos_with_community_health_drift"))
   end
 
+  # A token that cannot read settings: every settings request answers 403.
+  def settings_forbidden_routes(repo, tree)
+    forbidden = GitHubErrorResponse.new(status: 403, message: "Resource not accessible by integration")
+    routes = community_health_routes(repo, tree)
+    %W[/repos/#{repo}/rulesets /repos/#{repo}/branches/main/protection /repos/#{repo}/actions/workflows].each do |path|
+      routes[path] = forbidden
+    end
+    routes
+  end
+
+  def skip_settings_args(*extra)
+    ["--repo", "z-shell/p", "--classes-file", CLASSES_FILE, "--community-health", "--exceptions-file", EXCEPTIONS_FILE,
+     "--skip-settings", *extra]
+  end
+
+  def test_cli_skip_settings_requires_community_health
+    status = RepoSettingsAudit::CLI.run(
+      ["--repo", "z-shell/wiki", "--skip-settings"], client: cli_client, stdout: StringIO.new, stderr: StringIO.new
+    )
+    assert_equal(2, status)
+  end
+
+  def test_cli_skip_settings_reads_no_settings_and_exits_0_when_clean
+    stdout = StringIO.new
+    status = RepoSettingsAudit::CLI.run(
+      skip_settings_args("--fail-on-drift", "--json"),
+      client: FixtureClient.new(settings_forbidden_routes("z-shell/p", [])), stdout: stdout, stderr: StringIO.new
+    )
+    payload = JSON.parse(stdout.string)
+    result = payload.fetch("results").first
+
+    assert_equal(0, status)
+    assert_equal(0, payload.fetch("repos_with_errors"))
+    assert_equal(0, payload.fetch("repos_with_community_health_drift"))
+    assert(result.fetch("settings_skipped"), "expected the result to say settings were skipped")
+    assert_equal([], result.fetch("settings"))
+    assert_equal(0, result.fetch("community_health").fetch("drift"))
+  end
+
+  def test_cli_skip_settings_fail_on_drift_exits_1_on_an_injected_shadow_file
+    tree = [{ "path" => "docs/SECURITY.md", "type" => "blob", "sha" => "f" * 40 }]
+    drift = RepoSettingsAudit::CLI.run(
+      skip_settings_args("--fail-on-drift"),
+      client: FixtureClient.new(settings_forbidden_routes("z-shell/p", tree)), stdout: StringIO.new, stderr: StringIO.new
+    )
+    stdout = StringIO.new
+    report = RepoSettingsAudit::CLI.run(
+      skip_settings_args, client: FixtureClient.new(settings_forbidden_routes("z-shell/p", tree)), stdout: stdout, stderr: StringIO.new
+    )
+
+    assert_equal(1, drift)
+    assert_equal(0, report)
+    assert(stdout.string.include?("not read (--skip-settings)"))
+    assert(stdout.string.include?("`docs/SECURITY.md`: shadow"))
+  end
+
+  def test_cli_skip_settings_still_exits_1_when_a_community_health_read_fails
+    routes = settings_forbidden_routes("z-shell/p", [])
+    routes["/repos/z-shell/p/git/trees/main?recursive=1"] = GitHubErrorResponse.new(status: 500)
+    stdout = StringIO.new
+    status = RepoSettingsAudit::CLI.run(
+      skip_settings_args("--fail-on-drift", "--json"), client: FixtureClient.new(routes), stdout: stdout, stderr: StringIO.new
+    )
+
+    assert_equal(1, status)
+    assert_equal(1, JSON.parse(stdout.string).fetch("repos_with_errors"))
+  end
+
   def test_auditor_skips_community_health_for_the_organization_repository
     routes = community_health_routes("z-shell/.github", [])
     routes["/repos/z-shell/.github"] = { "default_branch" => "main" }
