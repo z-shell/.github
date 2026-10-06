@@ -39,7 +39,7 @@ Domain indexes select the editable sources. Context selection and CI roles were 
 
 The [repository file inventory](../../repository-files.json) gives every current tracked or non-ignored file outside knowledge/ an imported or referenced disposition. Domain resource pages explain the remaining files and link to their actual owners. The organization profile stays with its HTML-relative image assets; historical ADRs, native skills, executable configuration, implementations, regression tests and provenance retain their file contracts. python3 automation/knowledge/knowledge-coverage.py detects unclassified additions, missing files, mismatched import owners and generated reference drift whenever run. It is included in the existing knowledge validation workflow; that workflow's scoped triggers do not promise execution on every unrelated repository change.
 
-The orphaned project-tracker starter metadata was removed after explicit maintainer approval. [Imported accuracy gaps](../governance/accuracy-gaps.md) records the missing conduct-reporting file and legacy example/governance review needs without inventing new policy.
+The orphaned project-tracker starter metadata was removed after explicit maintainer approval. [Imported accuracy gaps](../governance/accuracy-gaps.md) records the legacy example and governance review needs without inventing new policy.
 
 ## Organization inventory and remaining batches
 
