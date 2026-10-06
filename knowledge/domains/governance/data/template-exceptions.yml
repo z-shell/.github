@@ -65,13 +65,13 @@ repositories:
         blob: eec969d68b7915633ff49ca7bca6605a63eb764d
         reason: The next-to-main promotion pull request (ADR-0019) records the candidate identity, required validation, readiness review, merge contract and rollback readiness.
       - path: docs/CONTRIBUTING.md
-        blob: b453cd7907585781b4fad2fba124af364155dcde
+        blob: 77a24d62d49c30d8662ad32c0c5cffdc83286f43
         reason: The zi contributing guide documents the next and main branch model, hotfix branches, promotion by merge commit and the release and tagging process, none of which the organization contributing guide covers.
   z-shell/zsh-lint:
     vendor_org_forms: true
     exceptions:
       - path: .github/ISSUE_TEMPLATE/config.yml
-        blob: 9687882933b957533206a88d0b05eaadfecbc061
+        blob: 23d252b0c4c5398af3141788e412277a193232b0
         reason: The documentation link points at the zsh-lint guide on the wiki, and the translation link is left out because zsh-lint has no translated content.
       - path: .github/ISSUE_TEMPLATE/parser-gap.yml
         blob: e9b4dadce312ad227a108d993ba40a2960ab70e8
