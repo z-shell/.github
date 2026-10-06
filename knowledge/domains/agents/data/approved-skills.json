@@ -4,8 +4,8 @@
   "skills": {
     "code-review": {
       "path": ".github/skills/code-review",
-      "revision": "e1f8f6c1c9dd61e87f2e5f44ef6285992b8b892d",
-      "digest": "1bd83aa417ab0aaf7ad3e26d6027435b4938cfc1dfda933aa5c702c829f37b02",
+      "revision": "5593b7d284304ea711de72d128a8ff8f9611205d",
+      "digest": "3a22608567e74047822e00cbc70ea098bdf5e9466d32305c13fa033383e5001d",
       "files": ["SKILL.md"]
     },
     "zi-install": {
