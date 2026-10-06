@@ -12,6 +12,7 @@ Select this domain for context selection, instruction changes, runtime integrati
 | Maintain editable sources and delivery | [Knowledge maintenance](knowledge-maintenance.md) and [delivery map](../../delivery.json) |
 | Define boundaries and terminology | [Domain modeling](domain-modeling.md) and [knowledge glossary](glossary.md) |
 | Verify evidence and write maintained guidance | [Knowledge research](knowledge-research.md) and [writing for agents](writing-for-agents.md) |
+| Name, scope, split or rename an agent skill | [Skill naming and scope](skill-naming.md) |
 | Resolve choices and coordinate migrations | [Decision clarification](decision-clarification.md) and [migration planning](migration-planning.md) |
 | Review adopted upstream workflows | [Selection and dependency report](upstream-adoption.md) |
 | Check rollout coverage and unresolved owners | [Migration status](migration-status.md) |
