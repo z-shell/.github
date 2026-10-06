@@ -587,9 +587,39 @@ class CheckTests(unittest.TestCase):
             any(line.startswith("::") for e in errors for line in e.splitlines())
         )
 
-    def test_adapter_symlink_to_agents_is_not_a_surface(self) -> None:
-        (self.root / ".github/copilot-instructions.md").symlink_to("../AGENTS.md")
+    def test_project_without_adapter_passes(self) -> None:
+        self.assertFalse((self.root / ".github/copilot-instructions.md").exists())
         self.assertEqual(self.check(), [])
+
+    def test_adapter_file_fails_with_removal_fix(self) -> None:
+        path = self.root / ".github/copilot-instructions.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        for text in ("@../AGENTS.md\n", "# Copilot\n\nLocal guidance.\n"):
+            with self.subTest(text=text):
+                path.write_text(text)
+                errors = self.check()
+                self.assertTrue(
+                    any(
+                        item.startswith(".github/copilot-instructions.md: ")
+                        and "carry no Copilot adapter" in item
+                        and "only instruction entry point" in item
+                        for item in errors
+                    ),
+                    errors,
+                )
+                self.assertFalse(any("downstream manifest" in e for e in errors))
+                path.unlink()
+
+    def test_adapter_symlink_to_agents_fails_with_removal_fix(self) -> None:
+        (self.root / ".github/copilot-instructions.md").symlink_to("../AGENTS.md")
+        self.assertEqual(
+            self.check(),
+            [
+                ".github/copilot-instructions.md: project repositories carry no "
+                "Copilot adapter; fix: remove it; AGENTS.md is the project's only "
+                "instruction entry point (runbooks/new-repository.md)"
+            ],
+        )
 
     def test_undeclared_organization_skill_fails_with_vendoring_fix(self) -> None:
         other = self.root / ".github/skills/zi-install/SKILL.md"
@@ -723,6 +753,14 @@ class InventoryValidationTests(unittest.TestCase):
                     "tasks": ["x"],
                     "file_patterns": ["**"],
                 }
+            ),
+            "which project repositories do not carry": lambda d: d[1]["surfaces"].insert(
+                0,
+                {
+                    "path": ".github/copilot-instructions.md",
+                    "tasks": ["all"],
+                    "file_patterns": ["**"],
+                },
             ),
             "tasks must be a non-empty unique string list": lambda d: d[1]["surfaces"][
                 0

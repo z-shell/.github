@@ -66,7 +66,7 @@ Do not copy generic `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/agents/`, or
 `.github/instructions/` files into child repositories. Link to the organization
 guidance when a short project-specific `AGENTS.md` is genuinely required.
 
-The repository's `AGENTS.md` is its only agent instruction entry point. Copilot code review and the Copilot cloud agent read `AGENTS.md` natively, so do not add a `.github/copilot-instructions.md` adapter that links to it, imports it or duplicates its guidance.
+The repository's `AGENTS.md` is its only agent instruction entry point. Copilot code review and the Copilot cloud agent read `AGENTS.md` natively, so do not add a `.github/copilot-instructions.md` adapter that links to it, imports it or duplicates its guidance. The organization manifest declares no adapter for a project repository, and the Org Routing check reports an adapter there, a symbolic link included, as an error. Only this organization repository keeps its own adapter.
 
 Install the centrally owned `code-review` skill using the approved published
 source revision and explicit `.github/skills` destination in

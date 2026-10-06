@@ -97,7 +97,7 @@ answers is not an impact review.
       scoped `.github/instructions/*.instructions.md` that describes the changed
       area. Edit only outside the `org-routing` markers; the block between them
       is generated (decisions/0031).
-- [ ] Adding, removing, or renaming a routable surface (Copilot adapter, scoped
+- [ ] Adding, removing, or renaming a routable surface (scoped
       instructions, agent, prompt, or local skill) or vendoring an
       organization skill is a `downstream` change in this repository's
       `.github/instruction-surfaces.json`. Land it here first, then regenerate

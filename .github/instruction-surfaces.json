@@ -1590,13 +1590,6 @@
     },
     {
       "repository": "z-shell/zi",
-      "surfaces": [
-        {
-          "path": ".github/copilot-instructions.md",
-          "tasks": ["all"],
-          "file_patterns": ["**"]
-        }
-      ],
       "vendored_skills": ["code-review"]
     },
     {
@@ -1605,13 +1598,6 @@
     },
     {
       "repository": "z-shell/zpmod",
-      "surfaces": [
-        {
-          "path": ".github/copilot-instructions.md",
-          "tasks": ["all"],
-          "file_patterns": ["**"]
-        }
-      ],
       "vendored_skills": ["code-review"]
     },
     {
@@ -1620,13 +1606,6 @@
     },
     {
       "repository": "z-shell/zsh-eza",
-      "surfaces": [
-        {
-          "path": ".github/copilot-instructions.md",
-          "tasks": ["all"],
-          "file_patterns": ["**"]
-        }
-      ],
       "vendored_skills": ["code-review"]
     },
     {

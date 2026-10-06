@@ -128,6 +128,14 @@ def _safe_relative(path: object) -> bool:
 
 
 _NAME = r"[A-Za-z0-9][A-Za-z0-9._-]*"
+# The organization repository keeps its own Copilot adapter; a project
+# repository's AGENTS.md is its only instruction entry point
+# (runbooks/new-repository.md), so a downstream entry never declares it.
+ADAPTER_PATH = ".github/copilot-instructions.md"
+ADAPTER_FIX = (
+    "remove it; AGENTS.md is the project's only instruction entry point "
+    "(runbooks/new-repository.md)"
+)
 SURFACE_PATTERNS = (
     ("adapter", re.compile(r"^\.github/copilot-instructions\.md$")),
     (
@@ -265,6 +273,15 @@ def validate_downstream(downstream: object) -> list[str]:
                         where,
                         f"{repository} surface path {path!r} is not a routable instruction surface",
                         "declare one of: " + ", ".join(DISCOVERY_GLOBS),
+                    )
+                )
+                continue
+            if path == ADAPTER_PATH:
+                errors.append(
+                    error(
+                        where,
+                        f"{repository} declares {path}, which project repositories do not carry",
+                        ADAPTER_FIX,
                     )
                 )
                 continue
@@ -905,8 +922,22 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
                 "(decisions/0031); runtimes may load it unrouted",
             )
         )
+    adapter = root / ADAPTER_PATH
+    if adapter.exists() or adapter.is_symlink():
+        # A symbolic link to AGENTS.md is an adapter too: report every form.
+        errors.append(
+            error(
+                ADAPTER_PATH,
+                "project repositories carry no Copilot adapter",
+                ADAPTER_FIX,
+            )
+        )
     for relative in surfaces:
-        if relative in declared or relative in vendored_paths:
+        if (
+            relative in declared
+            or relative in vendored_paths
+            or relative == ADAPTER_PATH
+        ):
             continue
         text = _read_regular(root, relative)
         metadata: dict[str, str] = {}
