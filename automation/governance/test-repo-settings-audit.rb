@@ -610,6 +610,22 @@ class RepoSettingsAuditTest
     assert_equal({ "vendor_org_forms" => false, "exceptions" => [] }, manifest.entry_for("z-shell/some-plugin"))
   end
 
+  def test_community_health_approves_a_complete_local_set_without_vendoring
+    manifest = RepoSettingsAudit::CommunityHealth.load(EXCEPTIONS_FILE)
+    entry = manifest.entry_for("z-shell/F-Sy-H")
+    files = entry.fetch("exceptions").to_h { |exception| [exception.fetch("path"), exception.fetch("blob")] }
+
+    refute(entry.fetch("vendor_org_forms"), "expected F-Sy-H to keep its own forms instead of vendored copies")
+    assert_equal(
+      %w[.github/ISSUE_TEMPLATE/01_bug_report.yml .github/ISSUE_TEMPLATE/02_feature_request.yml
+         .github/ISSUE_TEMPLATE/04_documentation.yml .github/ISSUE_TEMPLATE/config.yml .github/PULL_REQUEST_TEMPLATE.md],
+      files.keys.sort
+    )
+    result = manifest.evaluate(repo: "z-shell/F-Sy-H", files: files, org_defaults: org_defaults)
+    assert_equal(["approved"] * 5, result.fetch("files").map { |row| row.fetch("status") })
+    assert_equal(0, result.fetch("drift"))
+  end
+
   def test_community_health_load_rejects_invalid_entries
     entry = ->(exception) { { "version" => 1, "repositories" => { "z-shell/x" => { "exceptions" => [exception] } } } }
     good = { "path" => ".github/ISSUE_TEMPLATE/x.yml", "blob" => "c" * 40, "reason" => "intake" }
