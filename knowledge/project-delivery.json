@@ -20,6 +20,16 @@
       "project_revision": "7ff05091a5489becf32069db1738d38ec23c8fd5",
       "project_source_blob": "cb36318050d353acd8624f612fb41544635ebcb4",
       "content_sha256": "0b5ba51f38da7caece1b93457a5b68469edaa73dc4e3c43d5ee75709a2552a5c"
+    },
+    {
+      "repository": "z-shell/wiki",
+      "source": "knowledge/domains/documentation/wiki-authoring.md",
+      "target": ".github/instructions/docs-authoring.instructions.md",
+      "revision": "162f6f91401925a4c56691a3155cda842967d444",
+      "source_blob": "2a5c18f3d7c30f9b50d874ab6c8722316c6ac445",
+      "project_revision": "8de78c6b9d658dbf8ce73fdc4f84c0778d12cbc9",
+      "project_source_blob": "c759eb00c300a37b34f3bb1681fb082f6dfe7c14",
+      "content_sha256": "a0aa7271c078b30bf13bfc409f41c338798842bb4cc17ac03c3cd20e1c235608"
     }
   ]
 }
