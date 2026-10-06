@@ -62,6 +62,20 @@ DOWNSTREAM_FIELDS = {"repository", "surfaces", "vendored_skills"}
 SURFACE_FIELDS = {"path", "tasks", "file_patterns"}
 APPROVED_FIELDS = {"version", "source", "skills"}
 APPROVED_SKILL_FIELDS = {"path", "revision", "digest", "files"}
+APPROVED_SKILL_OPTIONAL_FIELDS = {"source", "tasks"}
+# Repositories an approved skill may come from (decisions/0037), with the shape
+# of a skill path in each. A skill without its own source comes from the
+# top-level source, which stays the canonical repository.
+APPROVED_SOURCES = {
+    CANONICAL_REPOSITORY: re.compile(r"^\.github/skills/(?P<name>[a-z0-9][a-z0-9-]*)$"),
+    "z-shell/agent-skills": re.compile(
+        r"^plugins/[a-z0-9][a-z0-9-]*/skills/(?P<name>[a-z0-9][a-z0-9-]*)$"
+    ),
+}
+APPROVED_SOURCE_PATHS = {
+    CANONICAL_REPOSITORY: SKILLS_DIR + "/{name}",
+    "z-shell/agent-skills": "plugins/<plugin>/skills/{name}",
+}
 METADATA_KEYS = {
     "github-path",
     "github-pinned",
@@ -73,6 +87,16 @@ METADATA_KEYS = {
 
 class RoutingError(Exception):
     pass
+
+
+def source_url(source: str) -> str:
+    """Return the repository URL ``gh skill install`` records for a source."""
+    return f"https://github.com/{source}"
+
+
+def skill_source(record: dict) -> str:
+    """Return the approved repository a skill comes from."""
+    return record.get("source", CANONICAL_REPOSITORY)
 
 
 def error(path: str, rule: str, fix: str) -> str:
@@ -394,7 +418,9 @@ def validate_approved(
                 )
             )
             continue
-        for field in sorted(set(record) - APPROVED_SKILL_FIELDS):
+        for field in sorted(
+            set(record) - APPROVED_SKILL_FIELDS - APPROVED_SKILL_OPTIONAL_FIELDS
+        ):
             errors.append(
                 error(
                     APPROVED_PATH,
@@ -410,15 +436,38 @@ def validate_approved(
                     f"add {field!r}",
                 )
             )
-        if record.get("path") != f"{SKILLS_DIR}/{name}":
+        source = skill_source(record)
+        if "source" in record and (
+            not isinstance(source, str)
+            or source not in APPROVED_SOURCES
+            or source == CANONICAL_REPOSITORY
+        ):
+            others = sorted(set(APPROVED_SOURCES) - {CANONICAL_REPOSITORY})
             errors.append(
                 error(
                     APPROVED_PATH,
-                    f"skill {name} path must be {SKILLS_DIR}/{name}",
+                    f"skill {name} source must be one of {others}",
+                    f"omit source for {CANONICAL_REPOSITORY} skills",
+                )
+            )
+            continue
+        path = record.get("path")
+        match = (
+            APPROVED_SOURCES[source].fullmatch(path) if isinstance(path, str) else None
+        )
+        if not match or match["name"] != name:
+            expected = APPROVED_SOURCE_PATHS[source].format(name=name)
+            errors.append(
+                error(
+                    APPROVED_PATH,
+                    f"skill {name} path must be {expected}",
                     "fix path",
                 )
             )
-        elif not (org_root / record["path"] / "SKILL.md").is_file():
+        elif (
+            source == CANONICAL_REPOSITORY
+            and not (org_root / str(path) / "SKILL.md").is_file()
+        ):
             errors.append(
                 error(
                     APPROVED_PATH,
@@ -463,11 +512,33 @@ def validate_approved(
             errors.append(
                 error(APPROVED_PATH, f"skill {name} files must be sorted", "sort files")
             )
-        if isinstance(org_surfaces, list) and not any(
-            isinstance(surface, dict)
-            and surface.get("kind") == "skill"
-            and surface.get("path") == f"{SKILLS_DIR}/{name}/SKILL.md"
-            for surface in org_surfaces
+        if source != CANONICAL_REPOSITORY:
+            tasks = record.get("tasks")
+            if not _string_list(tasks):
+                errors.append(
+                    error(
+                        APPROVED_PATH,
+                        f"skill {name} from {source} needs tasks as a non-empty unique string list",
+                        "declare the tasks that select the vendored skill",
+                    )
+                )
+        elif "tasks" in record:
+            errors.append(
+                error(
+                    APPROVED_PATH,
+                    f"skill {name} takes its tasks from its organization skill surface",
+                    f"remove tasks; edit the surface in {MANIFEST_PATH}",
+                )
+            )
+        if (
+            source == CANONICAL_REPOSITORY
+            and isinstance(org_surfaces, list)
+            and not any(
+                isinstance(surface, dict)
+                and surface.get("kind") == "skill"
+                and surface.get("path") == f"{SKILLS_DIR}/{name}/SKILL.md"
+                for surface in org_surfaces
+            )
         ):
             errors.append(
                 error(
@@ -510,7 +581,13 @@ class Org:
         }
 
     def tasks_for_skill(self, name: str) -> list[str]:
+        record = self.approved["skills"][name]
+        if "tasks" in record:
+            return list(record["tasks"])
         return list(self.skill_tasks.get(f"{SKILLS_DIR}/{name}/SKILL.md", []))
+
+    def source_of(self, name: str) -> str:
+        return skill_source(self.approved["skills"][name])
 
 
 def load_org(org_root: Path) -> Org:
@@ -587,9 +664,15 @@ def render(entry: dict, org: Org) -> str:
         )
     for name in entry.get("vendored_skills", []):
         revision = org.approved["skills"][name]["revision"]
+        source = org.source_of(name)
+        origin = (
+            "organization skill"
+            if source == CANONICAL_REPOSITORY
+            else f"skill from `{source}`"
+        )
         lines.append(
             f"- `{SKILLS_DIR}/{name}/SKILL.md`: tasks {_code_list(org.tasks_for_skill(name))}; "
-            + f"files `**`; organization skill vendored at approved revision `{revision[:12]}`"
+            + f"files `**`; {origin} vendored at approved revision `{revision[:12]}`"
         )
     lines += ["", footer, "", END_MARKER]
     return "\n".join(lines) + "\n"
@@ -946,7 +1029,9 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
                 _scalars, metadata, _body = parse_skill(text)
             except ValueError:
                 metadata = {}
-        if metadata.get("github-repo") == CANONICAL_REPO_URL:
+        if metadata.get("github-repo") in {
+            source_url(source) for source in APPROVED_SOURCES
+        }:
             name = relative.split("/")[2]
             errors.append(
                 error(
@@ -979,10 +1064,14 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
 
 
 def _check_skill(root: Path, name: str, record: dict) -> list[str]:
-    relative = f"{record['path']}/SKILL.md"
+    # gh skill install --dir .github/skills places every skill at
+    # .github/skills/<name>, whatever its path in the source repository.
+    local = f"{SKILLS_DIR}/{name}"
+    relative = f"{local}/SKILL.md"
     revision = record["revision"]
+    source = skill_source(record)
     reinstall = (
-        f"gh skill install {CANONICAL_REPOSITORY} {record['path']} --pin {revision} --dir {SKILLS_DIR} "
+        f"gh skill install {source} {record['path']} --pin {revision} --dir {SKILLS_DIR} "
         "(authorized installation, runbooks/org-review.md)"
     )
     text = _read_regular(root, relative)
@@ -995,13 +1084,13 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
         return [error(relative, f"invalid skill frontmatter: {exc}", reinstall)]
     errors: list[str] = []
     if (
-        metadata.get("github-repo") != CANONICAL_REPO_URL
+        metadata.get("github-repo") != source_url(source)
         or metadata.get("github-path") != record["path"]
     ):
         errors.append(
             error(
                 relative,
-                "installer metadata does not name the canonical source",
+                "installer metadata does not name the approved source",
                 reinstall,
             )
         )
@@ -1025,14 +1114,14 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
     if digest != record["digest"]:
         errors.append(
             error(
-                relative, "content differs from the approved canonical skill", reinstall
+                relative, "content differs from the approved skill", reinstall
             )
         )
-    files = _skill_entries(root / record["path"])
+    files = _skill_entries(root / local)
     if files != record["files"]:
         errors.append(
             error(
-                record["path"],
+                local,
                 f"files {files} differ from approved {record['files']}",
                 reinstall,
             )
@@ -1045,16 +1134,39 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
 # --------------------------------------------------------------------------
 
 
-def verify_approved(org_root: Path, approved: dict) -> list[str]:
+def verify_approved(
+    org_root: Path, approved: dict, source_roots: dict[str, Path] | None = None
+) -> list[str]:
+    """Verify each approved revision against a full-history checkout of its source.
+
+    Canonical skills are read from ``org_root``. A skill from another approved
+    source needs that repository's checkout in ``source_roots``; without one it
+    fails rather than passing unverified.
+    """
     errors: list[str] = []
     for name, record in sorted(approved["skills"].items()):
         revision = record["revision"]
+        source = skill_source(record)
+        source_root = (
+            org_root
+            if source == CANONICAL_REPOSITORY
+            else (source_roots or {}).get(source)
+        )
+        if source_root is None:
+            errors.append(
+                error(
+                    APPROVED_PATH,
+                    f"skill {name} comes from {source}, and no checkout of it was given",
+                    f"pass --source-root {source}=PATH with full history",
+                )
+            )
+            continue
         try:
             text = subprocess.run(  # nosec B603 B607 - fixed git arguments
                 [
                     "git",
                     "-C",
-                    str(org_root),
+                    str(source_root),
                     "show",
                     f"{revision}:{record['path']}/SKILL.md",
                 ],
@@ -1066,7 +1178,7 @@ def verify_approved(org_root: Path, approved: dict) -> list[str]:
                 [
                     "git",
                     "-C",
-                    str(org_root),
+                    str(source_root),
                     "ls-tree",
                     "-r",
                     "--name-only",
@@ -1091,7 +1203,7 @@ def verify_approved(org_root: Path, approved: dict) -> list[str]:
             [
                 "git",
                 "-C",
-                str(org_root),
+                str(source_root),
                 "merge-base",
                 "--is-ancestor",
                 revision,
@@ -1147,7 +1259,15 @@ def main(argv: list[str] | None = None) -> int:
         if name != "render":
             command.add_argument("--root", type=Path, required=True)
     commands.add_parser("validate")
-    commands.add_parser("verify-approved")
+    verify = commands.add_parser("verify-approved")
+    verify.add_argument(
+        "--source-root",
+        action="append",
+        default=[],
+        metavar="OWNER/REPO=PATH",
+        help="full-history checkout of an approved source other than "
+        + CANONICAL_REPOSITORY,
+    )
     arguments = parser.parse_args(argv)
 
     try:
@@ -1156,7 +1276,26 @@ def main(argv: list[str] | None = None) -> int:
             print("org routing inventory is valid")
             return 0
         if arguments.command == "verify-approved":
-            errors = verify_approved(arguments.org_root, org.approved)
+            source_roots: dict[str, Path] = {}
+            for item in arguments.source_root:
+                source, separator, path = item.partition("=")
+                if (
+                    not separator
+                    or not path
+                    or source not in APPROVED_SOURCES
+                    or source == CANONICAL_REPOSITORY
+                    or source in source_roots
+                ):
+                    raise RoutingError(
+                        error(
+                            "--source-root",
+                            f"{item!r} must be OWNER/REPO=PATH for one approved source "
+                            + "other than the canonical repository",
+                            "name each approved source once",
+                        )
+                    )
+                source_roots[source] = Path(path)
+            errors = verify_approved(arguments.org_root, org.approved, source_roots)
             for record in org.project_entries:
                 try:
                     content = delivery.approved_project_content(arguments.org_root, record)

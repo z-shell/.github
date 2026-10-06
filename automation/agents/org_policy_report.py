@@ -173,7 +173,8 @@ def published(name: str, entry: dict, org, api=github) -> dict:
                 state["revision"] = metadata.get("github-pinned")
                 state["provenance"] = (
                     "current"
-                    if metadata.get("github-repo") == routing.CANONICAL_REPO_URL
+                    if metadata.get("github-repo")
+                    == routing.source_url(routing.skill_source(record))
                     and metadata.get("github-path") == record["path"]
                     and metadata.get("github-ref", state["revision"])
                     == state["revision"]
@@ -335,7 +336,11 @@ def impact(org_root: Path, changed: list[str]) -> dict:
             (
                 name
                 for name, record in org.approved["skills"].items()
-                if consumer == record["path"] or consumer.startswith(record["path"] + "/")
+                if routing.skill_source(record) == routing.CANONICAL_REPOSITORY
+                and (
+                    consumer == record["path"]
+                    or consumer.startswith(record["path"] + "/")
+                )
             ),
             None,
         )

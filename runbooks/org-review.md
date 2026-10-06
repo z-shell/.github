@@ -82,7 +82,7 @@ classes, and these results for each repository:
   A successful review without attribution does not establish skill use.
 
 The approved canonical revision is the one recorded for the skill in
-`knowledge/domains/agents/data/approved-skills.json`. For a repository declared in the `downstream`
+`knowledge/domains/agents/data/approved-skills.json`. A record that names its own `source` is approved from that repository instead of `z-shell/.github` (decisions/0037). For a repository declared in the `downstream`
 section of `.github/instruction-surfaces.json`, the provenance, currency, and
 local-drift dimensions are deterministic: run
 `python3 automation/agents/org-routing.py check --repository z-shell/<name> --root <checkout>`
