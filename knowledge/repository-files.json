@@ -506,6 +506,13 @@
       "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
     },
     {
+      "path": ".github/workflows/community-health-audit.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
+    },
+    {
       "path": ".github/workflows/dependency-review.yml",
       "domain": "ci",
       "disposition": "referenced",
