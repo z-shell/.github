@@ -125,6 +125,8 @@ python3 automation/agents/org-routing.py verify-approved
 python3 -m unittest automation/agents/test_org_routing.py -v
 ```
 
+An approved skill comes from `z-shell/.github` unless its record names another approved `source` (decisions/0037); such a record also declares the `tasks` that select its vendored copy, since no organization surface describes it. `verify-approved` reads each skill from a full-history checkout of its own source and fails when none is given: pass one `--source-root OWNER/REPO=PATH` per other source, for example `--source-root z-shell/agent-skills=../agent-skills`. Its vendored copy still lives at `.github/skills/<name>`, and `check` requires its installer metadata to name that source.
+
 ### Private-meta-workspace commands
 
 Run only from the private control-workspace root:

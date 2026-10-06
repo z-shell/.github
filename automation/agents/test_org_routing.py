@@ -863,6 +863,223 @@ class InventoryValidationTests(unittest.TestCase):
         self.assertTrue(any("not an ancestor of HEAD" in item for item in errors))
 
 
+EXTERNAL_SKILL = "---\ndescription: Install Zi.\nname: zi-install\n---\n\n# Zi install\n\nRun the installer.\n"
+EXTERNAL_PATH = "plugins/z-shell/skills/zi-install"
+
+
+def commit_all(root: Path, message: str) -> str:
+    git(root, "add", ".")
+    git(
+        root,
+        "-c",
+        "user.name=t",
+        "-c",
+        "user.email=t@example.invalid",
+        "commit",
+        "-q",
+        "--no-verify",
+        "-m",
+        message,
+    )
+    return git(root, "rev-parse", "HEAD")
+
+
+def installed_external(
+    pinned: str, *, repo: str = "https://github.com/z-shell/agent-skills"
+) -> str:
+    """Render the external skill as ``gh skill install --pin`` writes it."""
+    metadata = "".join(
+        f"  {key}: {value}\n"
+        for key, value in (
+            ("github-path", EXTERNAL_PATH),
+            ("github-pinned", pinned),
+            ("github-ref", pinned),
+            ("github-repo", repo),
+            ("github-tree-sha", "0" * 40),
+        )
+    )
+    return (
+        "---\ndescription: Install Zi.\nmetadata:\n"
+        + metadata
+        + "name: zi-install\n---\n\n# Zi install\n\nRun the installer.\n"
+    )
+
+
+class ApprovedSourceTests(unittest.TestCase):
+    """Approved skills from a source other than the canonical repository (decisions/0037)."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        base = Path(self.directory.name)
+        self.fixture = OrgFixture(base)
+        self.source = base / "agent-skills"
+        skill = self.source / EXTERNAL_PATH / "SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text(EXTERNAL_SKILL, encoding="utf-8")
+        git(self.source, "init", "-q")
+        self.revision = commit_all(self.source, "skill")
+        self.fixture.approved["skills"]["zi-install"] = {
+            "source": "z-shell/agent-skills",
+            "path": EXTERNAL_PATH,
+            "revision": self.revision,
+            "digest": routing.skill_digest(EXTERNAL_SKILL),
+            "files": ["SKILL.md"],
+            "tasks": ["zi-install"],
+        }
+        self.fixture.manifest["downstream"][1]["vendored_skills"] = [
+            "code-review",
+            "zi-install",
+        ]
+        self.fixture.write()
+
+    def errors(self) -> list[str]:
+        self.fixture.write()
+        try:
+            self.fixture.load()
+        except routing.RoutingError as exc:
+            return str(exc).splitlines()
+        return []
+
+    def test_external_skill_needs_no_canonical_copy_or_surface(self) -> None:
+        self.assertEqual(self.errors(), [])
+        org = self.fixture.load()
+        self.assertEqual(org.source_of("zi-install"), "z-shell/agent-skills")
+        self.assertEqual(org.source_of("code-review"), "z-shell/.github")
+        self.assertEqual(org.tasks_for_skill("zi-install"), ["zi-install"])
+
+    def test_source_schema_violations(self) -> None:
+        original = copy.deepcopy(self.fixture.approved)
+        cases = {
+            "source must be one of": lambda r, c: r.update(source="someone/else"),
+            "omit source for z-shell/.github skills": lambda r, c: c.update(
+                source="z-shell/.github"
+            ),
+            "path must be plugins/<plugin>/skills/zi-install": lambda r, c: r.update(
+                path=".github/skills/zi-install"
+            ),
+            "needs tasks": lambda r, c: r.pop("tasks"),
+            "takes its tasks from its organization skill surface": lambda r, c: c.update(
+                tasks=["code-review"]
+            ),
+        }
+        for expected, mutate in cases.items():
+            with self.subTest(expected=expected):
+                self.fixture.approved = copy.deepcopy(original)
+                skills = self.fixture.approved["skills"]
+                mutate(skills["zi-install"], skills["code-review"])
+                self.assertTrue(
+                    any(expected in item for item in self.errors()), self.errors()
+                )
+
+    def test_verify_approved_requires_a_checkout_of_the_source(self) -> None:
+        org = self.fixture.load()
+        errors = routing.verify_approved(self.fixture.root, org.approved)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("no checkout of it was given", errors[0])
+        self.assertIn("--source-root z-shell/agent-skills=PATH", errors[0])
+        roots = {"z-shell/agent-skills": self.source}
+        self.assertEqual(
+            routing.verify_approved(self.fixture.root, org.approved, roots), []
+        )
+        org.approved["skills"]["zi-install"]["digest"] = "0" * 64
+        errors = routing.verify_approved(self.fixture.root, org.approved, roots)
+        self.assertTrue(
+            any("zi-install digest does not match" in e for e in errors), errors
+        )
+
+    def test_verify_approved_reads_the_source_not_the_organization(self) -> None:
+        # The organization checkout lacks the source revision, so reading it there fails.
+        org = self.fixture.load()
+        roots = {"z-shell/agent-skills": self.fixture.root}
+        errors = routing.verify_approved(self.fixture.root, org.approved, roots)
+        self.assertTrue(any("cannot read zi-install" in e for e in errors), errors)
+
+    def test_cli_source_root(self) -> None:
+        root = str(self.fixture.root)
+        self.assertEqual(run_main("--org-root", root, "verify-approved")[0], 1)
+        status, output = run_main(
+            "--org-root",
+            root,
+            "verify-approved",
+            "--source-root",
+            f"z-shell/agent-skills={self.source}",
+        )
+        self.assertEqual(
+            (status, output.strip()),
+            (0, "approved skill and project knowledge revisions verified"),
+        )
+        for value in ("z-shell/.github=x", "someone/else=x", "z-shell/agent-skills"):
+            with self.subTest(value=value):
+                status, output = run_main(
+                    "--org-root", root, "verify-approved", "--source-root", value
+                )
+                self.assertEqual(status, 1)
+                self.assertIn("must be OWNER/REPO=PATH", output)
+
+    def test_downstream_check_uses_the_skill_source(self) -> None:
+        base = Path(self.directory.name)
+        downstream = make_downstream(base, self.fixture.revision)
+        skill = downstream / ".github/skills/zi-install/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text(installed_external(self.revision), encoding="utf-8")
+        arguments = ("--org-root", str(self.fixture.root))
+        target = ("--repository", "z-shell/tool", "--root", str(downstream))
+        self.assertEqual(run_main(*arguments, "apply", *target)[0], 0)
+        block = (downstream / "AGENTS.md").read_text()
+        self.assertIn(
+            "- `.github/skills/zi-install/SKILL.md`: tasks `zi-install`; files `**`; "
+            f"skill from `z-shell/agent-skills` vendored at approved revision `{self.revision[:12]}`",
+            block,
+        )
+        self.assertIn("organization skill vendored at approved revision", block)
+        org = self.fixture.load()
+        self.assertEqual(routing.check(downstream, "z-shell/tool", org), [])
+        skill.write_text(
+            installed_external(
+                self.revision, repo="https://github.com/z-shell/.github"
+            ),
+            encoding="utf-8",
+        )
+        errors = routing.check(downstream, "z-shell/tool", org)
+        self.assertTrue(
+            any(
+                "does not name the approved source" in e
+                and f"gh skill install z-shell/agent-skills {EXTERNAL_PATH} --pin {self.revision}"
+                in e
+                for e in errors
+            ),
+            errors,
+        )
+
+    def test_undeclared_skill_from_an_approved_source_is_reported(self) -> None:
+        base = Path(self.directory.name)
+        downstream = make_downstream(base, self.fixture.revision)
+        self.fixture.manifest["downstream"][1]["vendored_skills"] = ["code-review"]
+        self.fixture.approved["skills"].pop("zi-install")
+        self.fixture.write()
+        org = self.fixture.load()
+        self.assertEqual(
+            run_main(
+                "--org-root",
+                str(self.fixture.root),
+                "apply",
+                "--repository",
+                "z-shell/tool",
+                "--root",
+                str(downstream),
+            )[0],
+            0,
+        )
+        skill = downstream / ".github/skills/zi-install/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text(installed_external(self.revision), encoding="utf-8")
+        errors = routing.check(downstream, "z-shell/tool", org)
+        self.assertTrue(
+            any("add zi-install to vendored_skills" in e for e in errors), errors
+        )
+
+
 class RepositoryInventoryTests(unittest.TestCase):
     """The committed inventory is valid and its approved revisions are real."""
 
