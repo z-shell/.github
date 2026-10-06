@@ -438,7 +438,9 @@ def validate_approved(
             )
         source = skill_source(record)
         if "source" in record and (
-            source not in APPROVED_SOURCES or source == CANONICAL_REPOSITORY
+            not isinstance(source, str)
+            or source not in APPROVED_SOURCES
+            or source == CANONICAL_REPOSITORY
         ):
             others = sorted(set(APPROVED_SOURCES) - {CANONICAL_REPOSITORY})
             errors.append(

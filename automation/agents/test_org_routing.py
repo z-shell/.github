@@ -952,6 +952,9 @@ class ApprovedSourceTests(unittest.TestCase):
         original = copy.deepcopy(self.fixture.approved)
         cases = {
             "source must be one of": lambda r, c: r.update(source="someone/else"),
+            "source must be one of ['z-shell/agent-skills']": lambda r, c: r.update(
+                source=["z-shell/agent-skills"]
+            ),
             "omit source for z-shell/.github skills": lambda r, c: c.update(
                 source="z-shell/.github"
             ),
