@@ -1,8 +1,8 @@
 # 36. Central Editable Knowledge With Complete Generated Consumers
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-10-04
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -27,6 +27,15 @@ This proposal changes the editable authoring location of migrated material, not 
 Numbered ADRs retain their existing editable owner in decisions/. Domain navigation references them without creating generated copies; automation/governance/decision-records.py alone generates decisions/README.md. A source-location exception for historical records preserves their header, numbering and acceptance contract.
 
 Generated consumers are retained interfaces. Their removal is not part of this proposal's local implementation: each retirement needs verified replacement delivery, a consumer inventory, coordinated publication and separately approved deletion. Repository profiles remain at .github/agents/ until organization-wide scope and native discovery are verified. Independent modules retain their module and build contracts during knowledge organization.
+
+## Acceptance
+
+Accepted by ss-o on 2026-10-06, after the zsh-lint and wiki deliveries tracked in issue 717 exercised the model with approved project delivery records. Acceptance reconciles the earlier decisions' authoring-location wording as follows. Their recorded status and supersession metadata do not change.
+
+- ADR-0014: `AGENTS.md` remains the complete standalone organization baseline. Where its content has a source declared in knowledge/delivery.json, that source is the editable owner and `AGENTS.md` is its checked consumer.
+- ADR-0031: the instruction-surface manifest, downstream routing blocks and approved skill pins keep their ownership. An approved revision still names a commit on the default branch.
+- ADR-0032: "one canonical text, a runbook in runbooks/" means one editable source and one complete public runbook generated from it. No second editable version of a procedure exists.
+- The Zsh Plugin Standard stays authored in z-shell/wiki as its single editable source, with its own validator and review workflow. Organization knowledge links to it; the project delivery contract is not extended to MDX pages.
 
 ## Consequences
 
