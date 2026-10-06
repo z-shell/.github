@@ -16,6 +16,23 @@
 #     path; a differing copy is drift.
 version: 1
 repositories:
+  z-shell/F-Sy-H:
+    exceptions:
+      - path: .github/ISSUE_TEMPLATE/01_bug_report.yml
+        blob: 434728851e5021e1c9b6046b7af501a23b5742da
+        reason: The plugin bug report asks for a summary, a minimal reproduction and the actual behavior, and applies the area:plugin label; the organization bug report has none of these.
+      - path: .github/ISSUE_TEMPLATE/02_feature_request.yml
+        blob: f004e5185ac38290d2e5d66ea0d05c1ce80fdfda
+        reason: The plugin feature request asks for the problem or use case, the proposed behavior, the alternatives considered and the compatibility considerations, and applies the area:plugin label.
+      - path: .github/ISSUE_TEMPLATE/04_documentation.yml
+        blob: 491aa8086f612f7711d0b2e217b4ad1f2d754c25
+        reason: The documentation form asks for the documentation location, the problem and the suggested change, which the organization documentation form does not ask for.
+      - path: .github/ISSUE_TEMPLATE/config.yml
+        blob: fa9e7de4bb29fe0610ff4b5b002c9a94aa29357c
+        reason: The local forms hide the organization folder, so the repository keeps its own contact links, including a private security report through its advisories.
+      - path: .github/PULL_REQUEST_TEMPLATE.md
+        blob: 64e345515e694798a3fc1998a6fd541bfad4608c
+        reason: The plugin pull-request template asks for the compatibility and lifecycle impact of a change (entrypoint, supported Zsh versions, plugin manager compatibility, hooks, widgets and unload behavior), a section the organization template does not have.
   z-shell/wiki:
     vendor_org_forms: true
     exceptions:
