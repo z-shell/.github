@@ -13,7 +13,8 @@
 #   - vendor_org_forms: one local issue form hides the whole organization
 #     issue-template folder, so the repository carries the organization forms
 #     as vendored copies. A copy must match the organization blob at the same
-#     path; a differing copy is drift.
+#     path; a differing copy is drift, and a missing copy of an organization
+#     .github/ISSUE_TEMPLATE file that is not listed as an exception is drift.
 version: 1
 repositories:
   z-shell/F-Sy-H:
@@ -42,12 +43,18 @@ repositories:
   z-shell/zi:
     vendor_org_forms: true
     exceptions:
+      - path: .github/ISSUE_TEMPLATE/config.yml
+        blob: 37d8e92dc567492699acf51ecdcd73d08f370371
+        reason: Blank issues are turned off, so every zi issue starts from a form; the contact links are the organization's.
       - path: .github/PULL_REQUEST_TEMPLATE/promotion.md
         blob: eec969d68b7915633ff49ca7bca6605a63eb764d
         reason: The next-to-main promotion pull request (ADR-0019) records the candidate identity, required validation, readiness review, merge contract and rollback readiness.
   z-shell/zsh-lint:
     vendor_org_forms: true
     exceptions:
+      - path: .github/ISSUE_TEMPLATE/config.yml
+        blob: 9687882933b957533206a88d0b05eaadfecbc061
+        reason: The documentation link points at the zsh-lint guide on the wiki, and the translation link is left out because zsh-lint has no translated content.
       - path: .github/ISSUE_TEMPLATE/parser-gap.yml
         blob: e9b4dadce312ad227a108d993ba40a2960ab70e8
         reason: Parser gaps follow docs/project/parser-gap-workflow.md and need the minimized script, its `zsh -f -n` result, the zsh-lint output and the Zsh manual section.
