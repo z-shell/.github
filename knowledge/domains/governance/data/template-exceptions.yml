@@ -1,0 +1,39 @@
+# Approved repository-local community health files (z-shell/.github#720).
+#
+# GitHub applies the community health files in z-shell/.github to every
+# repository that has no file of its own. A repository listed here keeps the
+# named local files because they collect intake fields the organization forms
+# cannot express. Every other local issue form, pull-request template,
+# contribution, security, conduct, support or funding file, and any
+# .github/copilot-instructions.md adapter, is drift.
+#
+# Read by automation/governance/repo-settings-audit.rb --community-health:
+#   - exceptions: path, the approved blob id at the repository's default
+#     branch, and the reason. A changed blob or a missing file is drift.
+#   - vendor_org_forms: one local issue form hides the whole organization
+#     issue-template folder, so the repository carries the organization forms
+#     as vendored copies. A copy must match the organization blob at the same
+#     path; a differing copy is drift.
+version: 1
+repositories:
+  z-shell/wiki:
+    vendor_org_forms: true
+    exceptions:
+      - path: .github/ISSUE_TEMPLATE/01_request_documentation.yml
+        blob: 63efae7d592a58da12bbb28019794d388ea7ed53
+        reason: Wiki documentation requests ask which locale the issue concerns, a field the organization documentation form does not have.
+  z-shell/zi:
+    vendor_org_forms: true
+    exceptions:
+      - path: .github/PULL_REQUEST_TEMPLATE/promotion.md
+        blob: eec969d68b7915633ff49ca7bca6605a63eb764d
+        reason: The next-to-main promotion pull request (ADR-0019) records the candidate identity, required validation, readiness review, merge contract and rollback readiness.
+  z-shell/zsh-lint:
+    vendor_org_forms: true
+    exceptions:
+      - path: .github/ISSUE_TEMPLATE/parser-gap.yml
+        blob: e9b4dadce312ad227a108d993ba40a2960ab70e8
+        reason: Parser gaps follow docs/project/parser-gap-workflow.md and need the minimized script, its `zsh -f -n` result, the zsh-lint output and the Zsh manual section.
+      - path: .github/ISSUE_TEMPLATE/rule-proposal.yml
+        blob: d97ecee53df82b2083f0edc2d5cfc36e7da7ab21
+        reason: Rule proposals follow docs/project/rule-policy.md and need the rule ID and name, corpus evidence, bad and good examples and the proposed severity.

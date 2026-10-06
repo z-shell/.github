@@ -7,12 +7,14 @@ on:
       - "automation/governance/repo-settings-audit.rb"
       - "automation/governance/test-repo-settings-audit.rb"
       - "knowledge/domains/governance/data/repository-classes.yml"
+      - "knowledge/domains/governance/data/template-exceptions.yml"
       - ".github/workflows/repo-settings-audit-test.yml"
   pull_request:
     paths:
       - "automation/governance/repo-settings-audit.rb"
       - "automation/governance/test-repo-settings-audit.rb"
       - "knowledge/domains/governance/data/repository-classes.yml"
+      - "knowledge/domains/governance/data/template-exceptions.yml"
       - ".github/workflows/repo-settings-audit-test.yml"
   workflow_dispatch: {}
 

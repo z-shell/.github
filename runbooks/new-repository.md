@@ -84,6 +84,8 @@ Use the organization's community health files by default. GitHub applies the iss
 
 Add a child template only when the repository has a specific intake field that the shared template cannot express, and record it as an approved exception. Because one local form hides the organization folder, such a repository also carries the general organization forms as mechanically vendored copies that are checked for drift, so its contributors do not lose them.
 
+Approved exceptions live in [template-exceptions.yml](../knowledge/domains/governance/data/template-exceptions.yml) with the approved blob and the reason; `vendor_org_forms: true` marks a repository that carries the vendored organization forms. `ruby automation/governance/repo-settings-audit.rb --all-repos --community-health` reports every other local community health file and any `.github/copilot-instructions.md` adapter as drift, together with changed or missing exceptions and vendored copies that differ from the organization. It only reports; `--fail-on-drift` makes drift exit 1.
+
 ## Step 3 — Add the artifact structure
 
 ### Plugin
