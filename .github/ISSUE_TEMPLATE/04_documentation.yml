@@ -48,13 +48,13 @@ body:
     attributes:
       label: Have you read the Contributing Guidelines?
       options:
-        - label: I have read the [Contributing Guidelines](../CONTRIBUTING.md).
+        - label: I have read the [Contributing Guidelines](https://github.com/z-shell/.github/blob/main/.github/CONTRIBUTING.md).
           required: true
   - type: checkboxes
     attributes:
       label: Are you familiar with the Contributor Covenant Code of Conduct?
       options:
-        - label: I have read the [Contributor Covenant Code of Conduct](../CODE_OF_CONDUCT.md).
+        - label: I have read the [Contributor Covenant Code of Conduct](https://github.com/z-shell/.github/blob/main/.github/CODE_OF_CONDUCT.md).
           required: true
   - type: input
     id: contact
