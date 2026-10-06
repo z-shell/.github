@@ -323,7 +323,8 @@ module RepoSettingsAudit
       )\z
     }ix
     ADAPTER_PATH = ".github/copilot-instructions.md"
-    DRIFT_STATUSES = %w[shadow adapter exception_changed exception_missing vendored_drift].freeze
+    DRIFT_STATUSES = %w[shadow adapter exception_changed exception_missing vendored_drift vendored_missing].freeze
+    VENDORED_PREFIX = ".github/ISSUE_TEMPLATE/"
     STATUSES = (%w[approved vendored] + DRIFT_STATUSES).freeze
     BLOB_PATTERN = /\A[0-9a-f]{40}\z/
 
@@ -403,6 +404,14 @@ module RepoSettingsAudit
       end
       approved.each_key do |path|
         rows << { "path" => path, "blob" => nil, "status" => "exception_missing" } unless files.key?(path)
+      end
+      if entry.fetch("vendor_org_forms")
+        org_defaults.each_key.sort.each do |path|
+          next unless path.start_with?(VENDORED_PREFIX)
+          next if files.key?(path) || approved.key?(path)
+
+          rows << { "path" => path, "blob" => nil, "status" => "vendored_missing" }
+        end
       end
 
       summary = STATUSES.to_h { |status| [status, rows.count { |row| row.fetch("status") == status }] }

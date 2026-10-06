@@ -574,13 +574,34 @@ class RepoSettingsAuditTest
 
   def test_community_health_flags_a_changed_or_missing_exception
     changed = exceptions.evaluate(
-      repo: "z-shell/zsh-lint", files: { ".github/ISSUE_TEMPLATE/parser-gap.yml" => "9" * 40 }, org_defaults: org_defaults
+      repo: "z-shell/zsh-lint", files: org_defaults.merge(".github/ISSUE_TEMPLATE/parser-gap.yml" => "9" * 40), org_defaults: org_defaults
     )
-    missing = exceptions.evaluate(repo: "z-shell/zsh-lint", files: {}, org_defaults: org_defaults)
+    missing = exceptions.evaluate(repo: "z-shell/zsh-lint", files: org_defaults, org_defaults: org_defaults)
 
-    assert_equal(["exception_changed"], changed.fetch("files").map { |row| row.fetch("status") })
-    assert_equal(["exception_missing"], missing.fetch("files").map { |row| row.fetch("status") })
+    assert_equal(%w[vendored vendored exception_changed], changed.fetch("files").map { |row| row.fetch("status") })
+    assert_equal(%w[vendored vendored exception_missing], missing.fetch("files").map { |row| row.fetch("status") })
     assert_equal(1, missing.fetch("drift"))
+  end
+
+  def test_community_health_flags_a_missing_vendored_form_but_not_an_approved_path
+    defaults = org_defaults.merge(".github/PULL_REQUEST_TEMPLATE.md" => "e" * 40)
+    manifest = RepoSettingsAudit::CommunityHealth.new(
+      repositories: {
+        "z-shell/zsh-lint" => {
+          "vendor_org_forms" => true,
+          "exceptions" => [{ "path" => ".github/ISSUE_TEMPLATE/config.yml", "blob" => "c" * 40, "reason" => "links" }]
+        }
+      }
+    )
+    result = manifest.evaluate(repo: "z-shell/zsh-lint", files: { ".github/ISSUE_TEMPLATE/config.yml" => "c" * 40 }, org_defaults: defaults)
+    statuses = result.fetch("files").to_h { |row| [row.fetch("path"), row.fetch("status")] }
+
+    assert_equal(
+      { ".github/ISSUE_TEMPLATE/config.yml" => "approved", ".github/ISSUE_TEMPLATE/01_bug_report.yml" => "vendored_missing" },
+      statuses
+    )
+    assert_equal(1, result.fetch("drift"))
+    assert_equal([], exceptions.evaluate(repo: "z-shell/some-plugin", files: {}, org_defaults: defaults).fetch("files"))
   end
 
   def test_community_health_treats_an_unlisted_repo_copy_as_shadow_and_marks_identical_content
