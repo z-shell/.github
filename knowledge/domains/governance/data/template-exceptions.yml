@@ -43,12 +43,30 @@ repositories:
   z-shell/zi:
     vendor_org_forms: true
     exceptions:
+      - path: .github/ISSUE_TEMPLATE/01_bug_report.yml
+        blob: a35e694bbaa8e043be5c8fb471264e6cbca93846
+        reason: The zi bug report asks for the Zi commit and a minimal reproduction as Zsh commands, and requires only what a Zi bug needs; the organization bug report also requires a code snippet and additional information.
+      - path: .github/ISSUE_TEMPLATE/02_feature_request.yml
+        blob: aeca2c63228e4a76ee6225d38295f6acd8e79502
+        reason: The zi feature request asks for the problem, the proposed solution and the alternatives considered, and applies status:triage with type:feature; the organization form asks for a one-line description and applies type:feature only.
+      - path: .github/ISSUE_TEMPLATE/03_codebase_improvement.yml
+        blob: bf6a21e588487361cd4fabcae6d8d88553c78cac
+        reason: The zi improvement form asks for the current limitation and the proposed improvement and applies status:triage with type:maintenance; the organization form has one free-text feedback field and applies type:maintenance only.
+      - path: .github/ISSUE_TEMPLATE/04_documentation.yml
+        blob: c4a04596989273d55f3dd57457ca653c379cdd7a
+        reason: The zi documentation form requires the documentation area (zi repository, wiki, annexes, plugins, packages), the location and the requested change; the organization form has one free-text description and an optional area.
       - path: .github/ISSUE_TEMPLATE/config.yml
         blob: 37d8e92dc567492699acf51ecdcd73d08f370371
         reason: Blank issues are turned off, so every zi issue starts from a form; the contact links are the organization's.
+      - path: .github/PULL_REQUEST_TEMPLATE.md
+        blob: 26335d16864d8af2e710d14b82e71d47fae68fe5
+        reason: The zi pull-request template states the next and main branch model (ADR-0019) and carries the migration plan lines that the required Public contract impact check reads from the pull request body.
       - path: .github/PULL_REQUEST_TEMPLATE/promotion.md
         blob: eec969d68b7915633ff49ca7bca6605a63eb764d
         reason: The next-to-main promotion pull request (ADR-0019) records the candidate identity, required validation, readiness review, merge contract and rollback readiness.
+      - path: docs/CONTRIBUTING.md
+        blob: b453cd7907585781b4fad2fba124af364155dcde
+        reason: The zi contributing guide documents the next and main branch model, hotfix branches, promotion by merge commit and the release and tagging process, none of which the organization contributing guide covers.
   z-shell/zsh-lint:
     vendor_org_forms: true
     exceptions:
