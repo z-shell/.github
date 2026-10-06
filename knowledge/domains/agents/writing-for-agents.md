@@ -8,7 +8,7 @@ Write pointers that name the relevant task, the resource and when to read it. Di
 
 Prefer current configuration or source for cheap factual lookups. Maintain durable reasoning and recurring pitfalls where source alone cannot explain them. Remove verified duplication and stale guidance with a recorded disposition, while retaining mandatory content until replacement delivery passes.
 
-For skills, use the owning runtime's supported metadata and discovery contract. Conditional references are portable relationships; runtime invocation flags are host-specific. Create a separate skill only when its independent trigger or reusable workflow justifies discovery cost. Existing z-shell management skills can route to these procedures without installing every upstream skill.
+For skills, use the owning runtime's supported metadata and discovery contract. Conditional references are portable relationships; runtime invocation flags are host-specific. Create a separate skill only when its independent trigger or reusable workflow justifies discovery cost; [skill naming and scope](skill-naming.md) owns when to split and what to call it. Existing z-shell management skills can route to these procedures without installing every upstream skill.
 
 Check the result through representative positive and negative tasks, required context coverage, link validity and generated drift checks. Shorter text alone is not proof of useful guidance.
 
