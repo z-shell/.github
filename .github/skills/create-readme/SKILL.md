@@ -25,6 +25,7 @@ Create an accurate, visually polished, and technically rigorous repository landi
    - **Zsh Plugins (`zsh-*`):** Follow the [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard). Document namespaced `zstyle` contexts and clean `<plugin>_plugin_unload` routines.
    - **Zi Annexes (`z-a-*`):** Keep Zi as the installation path, adapt the Lifecycle and Zi integration sections to document registered ice modifiers, annex hooks (`before_load`, `after_load`), owned state parameters, and the unload function, and keep Portable shell contract content limited to manager-independent behavior.
    - **Compiled Modules:** Adapt plugin-specific sections into module-specific build toolchain, supported Zsh/platform matrix, loader and install path, verification, and release artifact policy.
+   - **Plugin Managers (Zi):** Show requirements, installation, and the first useful shell configuration. Link to command, configuration, lifecycle, and installer integration references instead of imposing a plugin's portable contract on the manager.
    - **Go / CLI Tools (`zsh-lint`):** Adapt plugin-specific sections into tool-specific installation, binary distribution, CLI flags, verification, and generated API reference coverage.
    - **Environment / Meta (`zd`, `wiki`):** Adapt plugin-specific sections into environment-specific targets, local preview or container workflows, verification steps, and configuration mounts.
 4. Verify every feature, setting, default, alias, lifecycle claim, command, and branch statement against the current implementation.
@@ -33,6 +34,9 @@ Create an accurate, visually polished, and technically rigorous repository landi
 7. Preserve meaningful visual identity: a clear header, a restrained maintained badge set, accessible alt text, and an optional behavior-focused screenshot or demo.
 8. Do not add competitor comparisons unless comparison is the document's explicit purpose.
 9. Run repository-appropriate Markdownlint, link, syntax, and behavior checks before claiming completion.
+10. Review a GitHub-compatible preview at desktop and about 375 CSS pixels wide. Check table readability, alert rendering, heading navigation, and the path from installation to first use. Record the preview method and any rendering limits; lint alone is not visual verification.
+
+Required template categories are coverage requirements, not a demand for full sections on the landing page. Link to maintained references for detailed contracts and contributor procedures. Keep prerequisites, basic setup, and safety-critical warnings visible.
 
 ---
 
@@ -50,6 +54,13 @@ Use a centered HTML block for brand identity and status:
 
 Highlight operational details with native GFM alerts:
 
+Put the marker on its own quoted line and the body on the next. Keep alerts outside HTML containers and nested elements, and verify that the repository formatter preserves the boundary:
+
+```markdown
+> [!NOTE]
+> Set configuration before loading the plugin.
+```
+
 - `> [!TIP]` for performance optimizations (e.g. `wait lucid` turbo mode).
 - `> [!NOTE]` for compatibility floors or optional dependencies.
 - `> [!IMPORTANT]` for mandatory prerequisites or breaking configuration changes.
@@ -64,13 +75,14 @@ Use `<details><summary>...</summary></details>` for:
 - Migration notes from legacy or predecessor plugins.
 - Troubleshooting guides and edge-case workarounds.
 
-### 4. Tables with Proper Spacing
+### 4. Compact Tables
 
 All tables must comply with Markdownlint MD058 and MD060:
 
 - Surround every table with blank lines before and after.
 - Use explicit column alignments (`:---`, `:---:`, `---:`).
 - Document configuration contexts, options, and defaults clearly.
+- Prefer two columns; use three only for short comparable values. State shared context above the table. Put long commands in fenced blocks and explain complex settings under headings, rather than adding columns or repeating private expansion syntax.
 
 ### 5. Syntax-Highlighted Code Blocks
 

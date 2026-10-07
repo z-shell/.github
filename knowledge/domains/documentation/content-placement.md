@@ -49,9 +49,20 @@ When creating a repository README or substantially restructuring one, start from
 - **Zsh plugins:** lead installation with Zi, follow the [Zsh Plugin Standard](https://wiki.zshell.dev/community/zsh_plugin_standard), and document namespaced configuration plus exact load and unload behavior.
 - **Zi annexes:** use the Zi installation path and document registered ice modifiers, annex hooks, owned state, unload behavior, and only manager-independent portable behavior.
 - **Compiled modules:** document the build toolchain, supported Zsh and platform matrix, loader and installation paths, verification, and release artifacts.
+- **Plugin managers (Zi):** lead with requirements, installation, and a first working shell configuration. Link to command, configuration, lifecycle, and installer integration references; do not apply a plugin's load/unload checklist to the manager itself.
 - **Tools and environment/meta repositories:** document the applicable runtime, installation or deployment path, public interface, verification, and release or deployment model without adding plugin-only claims.
 
 Link to authoritative documentation for the archetype. Use the official Zsh manual for Zsh-facing repositories; use the applicable runtime or tool documentation when the repository is not Zsh-facing. Plugin Standard and plugin-manager requirements apply only to plugin-shaped repositories.
+
+### Landing-page readability
+
+The template's required categories describe information coverage, not mandatory full-length sections. Keep purpose, prerequisites, installation, and the smallest useful example visible. Cover detailed contracts, contributor verification, and release procedures through descriptive links to maintained references when they would interrupt onboarding. Never hide required setup or a safety-critical warning in a disclosure.
+
+Prefer two-column tables for short mappings; use three columns only when every cell remains concise. State shared context once outside the table. Use headings, lists, and fenced examples for long commands or prose instead of adding columns or repeating implementation details. Keep semantic headings and descriptive links; visual polish must not depend on a large hero image or badge collection.
+
+GitHub alert markers must occupy their own quoted line, followed by quoted body text. Keep alerts outside HTML containers, lists, and other nested elements. Use blank lines around tables and Markdown inside disclosures. Preserve these boundaries through the repository formatter.
+
+Before handing off a substantial README change, check links relative to its final location, run the repository Markdown checks, and confirm formatting preserves alerts. Inspect a GitHub-compatible rendered preview at desktop and narrow widths (about 375 CSS pixels): body text and tables should not require horizontal scrolling; long commands may scroll within code blocks. A lint pass does not prove readability. Record the preview method and any unverified GitHub-specific rendering.
 
 ## Line wrapping
 
