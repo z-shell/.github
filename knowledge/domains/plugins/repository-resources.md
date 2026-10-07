@@ -6,7 +6,7 @@ Select a file for the task described below. Imported files have an editable know
 
 | File | Disposition | Purpose and reading context |
 | --- | --- | --- |
-| [.github/agents/plugins-plugin-reviewer.agent.md](../../../.github/agents/plugins-plugin-reviewer.agent.md) | [Imported source](roles/plugins-plugin-reviewer.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
+| [.github/agents/zsh-plugin-reviewer.agent.md](../../../.github/agents/zsh-plugin-reviewer.agent.md) | [Imported source](roles/zsh-plugin-reviewer.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
 | [.github/instructions/plugins/review-routing.instructions.md](../../../.github/instructions/plugins/review-routing.instructions.md) | [Imported source](review-routing.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
 | [.github/instructions/plugins/standard-selection.instructions.md](../../../.github/instructions/plugins/standard-selection.instructions.md) | [Imported source](standard-selection.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
 | [.github/skills/zsh-plugin/SKILL.md](../../../.github/skills/zsh-plugin/SKILL.md) | referenced | Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures. |

@@ -343,7 +343,7 @@
       "consumers": ["agent", "human"],
       "tasks": ["code-review", "readme-authoring", "zsh-plugin-scaffolding"],
       "file_patterns": [
-        "**/*.plugin.zsh,**/init.zsh,knowledge/domains/documentation/templates/zsh-plugin.md,.github/skills/zsh-plugin/**,.github/agents/plugins-plugin-reviewer.agent.md"
+        "**/*.plugin.zsh,**/init.zsh,knowledge/domains/documentation/templates/zsh-plugin.md,.github/skills/zsh-plugin/**,.github/agents/zsh-plugin-reviewer.agent.md"
       ],
       "required": true,
       "review_owner": "z-shell maintainers",
@@ -386,8 +386,8 @@
       "canonical_for": []
     },
     {
-      "id": "agent-zsh-plugin-standard-reviewer",
-      "path": ".github/agents/plugins-plugin-reviewer.agent.md",
+      "id": "agent-zsh-plugin-reviewer",
+      "path": ".github/agents/zsh-plugin-reviewer.agent.md",
       "kind": "agent",
       "authority": "advisory",
       "consumers": ["copilot"],

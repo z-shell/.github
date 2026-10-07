@@ -1,9 +1,9 @@
 ---
-name: zsh-plugin-standard-reviewer
+name: zsh-plugin-reviewer
 description: Use when a .plugin.zsh or .zsh plugin entry file changes, or when a user asks for a read-only Zsh plugin compliance review.
 ---
 
-<!-- GENERATED from knowledge/domains/plugins/roles/plugins-plugin-reviewer.md. Do not edit this delivery copy.
+<!-- GENERATED from knowledge/domains/plugins/roles/zsh-plugin-reviewer.md. Do not edit this delivery copy.
 Regenerate: python3 automation/knowledge/knowledge-delivery.py
 Check: python3 automation/knowledge/knowledge-delivery.py --check -->
 

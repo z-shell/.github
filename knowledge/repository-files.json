@@ -184,10 +184,10 @@
       "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
     },
     {
-      "path": ".github/agents/plugins-plugin-reviewer.agent.md",
+      "path": ".github/agents/zsh-plugin-reviewer.agent.md",
       "domain": "plugins",
       "disposition": "imported",
-      "knowledge": "knowledge/domains/plugins/roles/plugins-plugin-reviewer.md",
+      "knowledge": "knowledge/domains/plugins/roles/zsh-plugin-reviewer.md",
       "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
     },
     {

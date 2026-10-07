@@ -2041,7 +2041,7 @@ class PublicRepositoryTests(unittest.TestCase):
                     "**/*.plugin.zsh,**/init.zsh,"
                     "knowledge/domains/documentation/templates/zsh-plugin.md,"
                     ".github/skills/zsh-plugin/**,"
-                    ".github/agents/plugins-plugin-reviewer.agent.md"
+                    ".github/agents/zsh-plugin-reviewer.agent.md"
                 ],
                 "required": True,
                 "review_owner": "z-shell maintainers",

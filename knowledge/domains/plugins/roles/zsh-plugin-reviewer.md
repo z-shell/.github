@@ -1,5 +1,5 @@
 ---
-name: zsh-plugin-standard-reviewer
+name: zsh-plugin-reviewer
 description: Use when a .plugin.zsh or .zsh plugin entry file changes, or when a user asks for a read-only Zsh plugin compliance review.
 ---
 
