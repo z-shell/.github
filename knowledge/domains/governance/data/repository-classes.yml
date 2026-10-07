@@ -23,6 +23,7 @@ repositories:
   z-shell/wiki: 1
   z-shell/src: 1
   z-shell/zd: 1
+  z-shell/agent-skills: 2
   z-shell/zunit: 2
   z-shell/zsh-lint: 2
   z-shell/zpmod: 2
