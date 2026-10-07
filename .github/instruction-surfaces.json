@@ -490,18 +490,6 @@
       "canonical_for": []
     },
     {
-      "id": "skill-zunit-test",
-      "path": ".github/skills/zunit-test/SKILL.md",
-      "kind": "skill",
-      "authority": "advisory",
-      "consumers": ["agent"],
-      "tasks": ["zunit-testing"],
-      "file_patterns": ["**"],
-      "required": false,
-      "review_owner": "z-shell maintainers",
-      "canonical_for": []
-    },
-    {
       "id": "skill-review-project-learning",
       "path": ".github/skills/review-project-learning/SKILL.md",
       "kind": "skill",
