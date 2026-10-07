@@ -112,6 +112,17 @@ jobs:
             automation/agents/org-routing.py
           sparse-checkout-cone-mode: false
 
+      # Decision 0037: an approved skill may come from z-shell/agent-skills.
+      # verify-approved reads it from a full-history checkout of that source.
+      - name: Check out approved external skill sources
+        if: ${{ steps.workflow-source.outputs.self == 'true' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: z-shell/agent-skills
+          path: .z-shell-agent-skills
+          fetch-depth: 0
+          persist-credentials: false
+
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
@@ -119,13 +130,16 @@ jobs:
 
       - name: Test routing generator
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
+        env:
+          Z_SHELL_AGENT_SKILLS_ROOT: .z-shell-agent-skills
         run: python3 -m unittest automation/agents/test_org_routing.py automation/agents/test_org_policy_report.py automation/knowledge/test_knowledge_delivery.py -v
 
       - name: Validate inventory and approved revisions
         if: ${{ steps.workflow-source.outputs.self == 'true' }}
         run: |
           python3 automation/agents/org-routing.py validate
-          python3 automation/agents/org-routing.py verify-approved
+          python3 automation/agents/org-routing.py verify-approved \
+            --source-root z-shell/agent-skills=.z-shell-agent-skills
 
       - name: Check caller routing, vendored skills and complete instructions
         if: ${{ steps.workflow-source.outputs.self != 'true' }}

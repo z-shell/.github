@@ -7,6 +7,7 @@ import importlib.util
 import io
 import hashlib
 import json
+import os
 import shutil
 
 # Tests invoke only fixed git commands against a temporary repository.
@@ -1194,7 +1195,34 @@ class RepositoryInventoryTests(unittest.TestCase):
         if shallow == "true":
             self.skipTest("shallow clone; verify-approved runs in CI with full history")
         org = routing.load_org(PUBLIC_ROOT)
-        self.assertEqual(routing.verify_approved(PUBLIC_ROOT, org.approved), [])
+        # CI checks out each external source and names it here; locally an
+        # unset variable verifies the canonical records and requires the
+        # missing-checkout refusal for every external one.
+        agent_skills = os.environ.get("Z_SHELL_AGENT_SKILLS_ROOT")
+        source_roots = (
+            {"z-shell/agent-skills": Path(agent_skills)} if agent_skills else {}
+        )
+        external = sorted(
+            name
+            for name, record in org.approved["skills"].items()
+            if routing.skill_source(record) not in source_roots
+            and routing.skill_source(record) != routing.CANONICAL_REPOSITORY
+        )
+        errors = routing.verify_approved(PUBLIC_ROOT, org.approved, source_roots)
+        self.assertEqual(
+            errors,
+            [
+                routing.error(
+                    routing.APPROVED_PATH,
+                    f"skill {name} comes from "
+                    f"{routing.skill_source(org.approved['skills'][name])}, "
+                    "and no checkout of it was given",
+                    f"pass --source-root {routing.skill_source(org.approved['skills'][name])}"
+                    "=PATH with full history",
+                )
+                for name in external
+            ],
+        )
 
 
 if __name__ == "__main__":
