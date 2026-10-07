@@ -436,13 +436,6 @@
       "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
     },
     {
-      "path": ".github/skills/zd-test/SKILL.md",
-      "domain": "quality",
-      "disposition": "referenced",
-      "knowledge": "knowledge/domains/quality/repository-resources.md",
-      "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
-    },
-    {
       "path": ".github/skills/zi-install/SKILL.md",
       "domain": "zi",
       "disposition": "referenced",
