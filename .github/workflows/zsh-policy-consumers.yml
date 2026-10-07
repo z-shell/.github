@@ -5,7 +5,9 @@ name: Zsh Policy Consumers
 # Repositories listed in EXTERNAL_CONSUMER_PATHS in
 # automation/ci/validate-zsh-standard-policy.py call this workflow; it checks
 # the listed files in the caller's checkout against the policy at the called
-# workflow's own commit, and reports drift without writing anything.
+# workflow's own commit, requires each copy listed in EXTERNAL_CANONICAL_COPIES
+# to match its canonical file byte for byte, and reports drift without writing
+# anything.
 #
 # Caller:
 #
@@ -68,6 +70,7 @@ jobs:
           sparse-checkout: |
             .github/instruction-surfaces.json
             knowledge/domains/zsh/data/zsh-standard-policy.json
+            knowledge/domains/plugins/templates/template.plugin.zsh
             automation/ci/validate-zsh-standard-policy.py
           sparse-checkout-cone-mode: false
 

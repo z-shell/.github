@@ -28,7 +28,7 @@ CORE_CONTRACT_PATHS = (
 CONSUMER_PATHS = (
     ".github/agents/plugins-plugin-reviewer.agent.md",
     ".github/skills/zsh-plugin/SKILL.md",
-    ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
+    "knowledge/domains/plugins/templates/template.plugin.zsh",
     "PATTERNS.md",
     ".github/README.md",
 )
@@ -1959,7 +1959,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ".github/instructions/zsh/scripting.instructions.md",
             ".github/agents/plugins-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
-            ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
+            "knowledge/domains/plugins/templates/template.plugin.zsh",
             "PATTERNS.md",
             ".github/README.md",
         )
@@ -1995,7 +1995,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "fcbec288e234de8db300ea5be34f6fcce087a887f21312931ef43b4f9b9b9bc3",
+            "9f832a343f7d7ac3d2e1529e18a1594d18fecb2715d7d4a6f3481f1621db966d",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "
@@ -2675,7 +2675,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_nonconforming_plugin_template(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
+        relative_path = "knowledge/domains/plugins/templates/template.plugin.zsh"
         path = root / relative_path
         path.write_text(
             path.read_text(encoding="utf-8")
@@ -2892,8 +2892,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     ),
                     (
                         "template-route",
-                        ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
-                        ".github/skills/zsh-plugin/templates/missing.plugin.zsh",
+                        "knowledge/domains/plugins/templates/template.plugin.zsh",
+                        "knowledge/domains/plugins/templates/missing.plugin.zsh",
                     ),
                     (
                         "instruction-route-suffix",
@@ -2902,8 +2902,8 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     ),
                     (
                         "template-route-suffix",
-                        ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
-                        ".github/skills/zsh-plugin/templates/plugin.plugin.zsh.bak",
+                        "knowledge/domains/plugins/templates/template.plugin.zsh",
+                        "knowledge/domains/plugins/templates/template.plugin.zsh.bak",
                     ),
                 )
                 + tuple(
@@ -3475,7 +3475,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         if zsh_path is None:
             self.fail("zsh is required for lifecycle tests")
         template_path = (
-            PUBLIC_ROOT / ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
+            PUBLIC_ROOT / "knowledge/domains/plugins/templates/template.plugin.zsh"
         )
         with tempfile.TemporaryDirectory() as temporary_directory:
             plugin_root = Path(temporary_directory) / "plugin [literal]*? space"
@@ -3700,7 +3700,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
                 self.assertIn(fragment, new_plugin_skill)
 
         template = (
-            PUBLIC_ROOT / ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
+            PUBLIC_ROOT / "knowledge/domains/plugins/templates/template.plugin.zsh"
         ).read_text(encoding="utf-8")
         self.assertNotIn("TODO", template)
         self.assertNotIn("#funtions-directory", template)
@@ -3763,7 +3763,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         retired_lifecycle = "\n".join(blocks)
         for fragment in (
             ".github/instructions/zsh/scripting.instructions.md",
-            ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
+            "knowledge/domains/plugins/templates/template.plugin.zsh",
             "not publish a replacement",
             "zsh/sourced/preserve-caller-state",
             "zsh/plugin/exact-lifecycle",
@@ -3822,6 +3822,12 @@ class ExternalConsumerTests(unittest.TestCase):
 
     REPOSITORY = "z-shell/agent-skills"
     CONSUMER = "plugins/z-shell/skills/zunit/SKILL.md"
+    CONSUMERS = (
+        "plugins/z-shell/skills/zsh-plugin/SKILL.md",
+        "plugins/z-shell/skills/zunit/SKILL.md",
+    )
+    COPY = "plugins/z-shell/skills/zsh-plugin/templates/template.plugin.zsh"
+    TEMPLATE = "knowledge/domains/plugins/templates/template.plugin.zsh"
 
     def setUp(self) -> None:
         self.validator = load_validator()
@@ -3832,25 +3838,38 @@ class ExternalConsumerTests(unittest.TestCase):
             "# ZUnit\n\nRead `.github/instructions/zsh/scripting.instructions.md` and\n"
             "`knowledge/domains/zsh/data/zsh-standard-policy.json`.\n"
         )
+        for relative_path in self.CONSUMERS:
+            self.write(relative_path, self.source)
+        self.write_bytes(self.COPY, (PUBLIC_ROOT / self.TEMPLATE).read_bytes())
+
+    def write(self, relative_path: str, text: str) -> None:
+        self.write_bytes(relative_path, text.encode("utf-8"))
+
+    def write_bytes(self, relative_path: str, data: bytes) -> None:
+        path = self.consumer_root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
 
     def write_consumer(self, text: str) -> None:
-        path = self.consumer_root / self.CONSUMER
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        self.write(self.CONSUMER, text)
 
     def check(self, repository: str | None = None) -> list[str]:
         return self.validator.validate_external_consumers(
             PUBLIC_ROOT, self.consumer_root, repository or self.REPOSITORY
         )
 
-    def test_declared_consumer_list_is_owned_here(self) -> None:
+    def test_declared_lists_are_owned_here(self) -> None:
         self.assertEqual(
             self.validator.EXTERNAL_CONSUMER_PATHS,
-            {self.REPOSITORY: (self.CONSUMER,)},
+            {self.REPOSITORY: self.CONSUMERS},
         )
+        self.assertEqual(
+            self.validator.EXTERNAL_CANONICAL_COPIES,
+            {self.REPOSITORY: {self.COPY: self.TEMPLATE}},
+        )
+        self.assertEqual(self.validator.PLUGIN_TEMPLATE_PATH, self.TEMPLATE)
 
-    def test_conforming_consumer_passes(self) -> None:
-        self.write_consumer(self.source)
+    def test_conforming_consumers_pass(self) -> None:
         self.assertEqual(self.check(), [])
         self.assertEqual(self.check("Z-Shell/Agent-Skills"), [])
 
@@ -3868,9 +3887,17 @@ class ExternalConsumerTests(unittest.TestCase):
         self.assertEqual(self.check(), [])
 
     def test_missing_consumer_is_reported(self) -> None:
-        errors = self.check()
-        self.assertEqual(len(errors), 1)
-        self.assertTrue(errors[0].startswith(f"{self.REPOSITORY}:{self.CONSUMER}"))
+        for relative_path in self.CONSUMERS:
+            with self.subTest(relative_path=relative_path):
+                path = self.consumer_root / relative_path
+                saved = path.read_bytes()
+                path.unlink()
+                errors = self.check()
+                self.assertEqual(len(errors), 1, errors)
+                self.assertTrue(
+                    errors[0].startswith(f"{self.REPOSITORY}:{relative_path}")
+                )
+                path.write_bytes(saved)
 
     def test_missing_canonical_reference_is_reported(self) -> None:
         self.write_consumer(
@@ -3903,13 +3930,32 @@ class ExternalConsumerTests(unittest.TestCase):
         self.write_consumer(self.source + "\n" + catalog + "\n")
         self.assertIn("complete catalog duplication", " ".join(self.check()))
 
+    def test_template_copy_must_match_byte_for_byte(self) -> None:
+        canonical = (PUBLIC_ROOT / self.TEMPLATE).read_bytes()
+        for label, data in (
+            ("edited", canonical + b"# local\n"),
+            ("crlf", canonical.replace(b"\n", b"\r\n")),
+        ):
+            with self.subTest(label=label):
+                self.write_bytes(self.COPY, data)
+                errors = self.check()
+                self.assertEqual(len(errors), 1, errors)
+                self.assertIn(f"{self.REPOSITORY}:{self.COPY}", errors[0])
+                self.assertIn(f"differs from the canonical {self.TEMPLATE}", errors[0])
+
+    def test_missing_template_copy_is_reported(self) -> None:
+        (self.consumer_root / self.COPY).unlink()
+        errors = self.check()
+        self.assertEqual(len(errors), 1, errors)
+        self.assertTrue(errors[0].startswith(f"{self.REPOSITORY}:{self.COPY}"))
+
     def test_consumer_outside_the_checkout_is_rejected(self) -> None:
         outside = tempfile.TemporaryDirectory()
         self.addCleanup(outside.cleanup)
         target = Path(outside.name) / "SKILL.md"
         target.write_text(self.source, encoding="utf-8")
         link = self.consumer_root / self.CONSUMER
-        link.parent.mkdir(parents=True)
+        link.unlink()
         link.symlink_to(target)
         errors = self.check()
         self.assertTrue(errors)
@@ -3921,7 +3967,6 @@ class ExternalConsumerTests(unittest.TestCase):
         self.assertIn("no external Zsh policy consumers are declared", errors[0])
 
     def test_command_line(self) -> None:
-        self.write_consumer(self.source)
         base = [sys.executable, str(SCRIPT_PATH), "--root", str(PUBLIC_ROOT)]
         completed = subprocess.run(  # nosec B603
             base

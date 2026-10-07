@@ -30,7 +30,7 @@ function name instead of the source file.
 
 New work must follow
 `.github/instructions/zsh/scripting.instructions.md` and start from
-`.github/skills/zsh-plugin/templates/plugin.plugin.zsh`. No replacement is
+`knowledge/domains/plugins/templates/template.plugin.zsh`. No replacement is
 published here because a safe replacement has not yet been observed in at least
 two listed repositories.
 
@@ -53,7 +53,7 @@ exact pre-load value, so an unload function cannot restore that state.
 
 New work must follow
 `.github/instructions/zsh/scripting.instructions.md` and use
-`.github/skills/zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
+`knowledge/domains/plugins/templates/template.plugin.zsh`. This catalog does
 not publish a replacement until the complete snapshot and restoration shape is
 observed in at least two listed repositories.
 
@@ -78,7 +78,7 @@ derivation or lifecycle ownership safe.
 
 New work must follow
 `.github/instructions/zsh/scripting.instructions.md` and use
-`.github/skills/zsh-plugin/templates/plugin.plugin.zsh`. This catalog does
+`knowledge/domains/plugins/templates/template.plugin.zsh`. This catalog does
 not publish a replacement because the complete first-source ownership and
 unload-restoration shape has not been observed in at least two listed
 repositories.
