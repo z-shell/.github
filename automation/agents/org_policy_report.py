@@ -197,9 +197,17 @@ def published(name: str, entry: dict, org, api=github) -> dict:
                 state["resources"] = (
                     "current" if resources == sorted(record["files"]) else "modified"
                 )
-                # Multi-file approved skills need the full verifier, not a body-only claim.
+                # A multi-file skill is verified only when the record pins every
+                # resource by blob id; a body-only digest cannot vouch for it.
                 if record["files"] != ["SKILL.md"]:
-                    state["content"] = "unverified"
+                    pinned = record.get("resources")
+                    if not pinned:
+                        state["content"] = "unverified"
+                    elif any(
+                        paths.get(f"{directory}/{path}", {}).get("sha") != blob
+                        for path, blob in pinned.items()
+                    ):
+                        state["content"] = "modified"
             except ValueError:
                 state["content"] = "invalid"
         skills[skill] = state
@@ -323,15 +331,19 @@ def impact(org_root: Path, changed: list[str]) -> dict:
     org = routing.load_org(org_root)
     manifest = routing.load_json(org_root / routing.MANIFEST_PATH)
     declared_paths = {surface["path"] for surface in manifest["surfaces"]}
-    targets = {
-        entry["source"]: entry["target"]
-        for entry in delivery.load_entries(org_root)
-    } if (org_root / delivery.MANIFEST).exists() else {}
-    rows = []
-    for path in sorted(set(changed)):
-        if not routing._safe_relative(path):
-            raise ValueError("changed paths must be safe repository-relative paths")
-        consumer = targets.get(path, path)
+    targets: dict[str, list[str]] = {}
+    if (org_root / delivery.MANIFEST).exists():
+        for entry in delivery.load_entries(org_root):
+            targets.setdefault(entry["source"], []).append(entry["target"])
+    precedence = [
+        "shared-policy-review",
+        "vendors-approved-skill",
+        "delivers-approved-project-knowledge",
+        "caller-inventory-required",
+        "unmapped-review-required",
+    ]
+
+    def classify(path: str, consumer: str) -> tuple[str, set[str]]:
         skill = next(
             (
                 name
@@ -370,37 +382,54 @@ def impact(org_root: Path, changed: list[str]) -> dict:
                 ]
             )
         )
-        rows.append(
-            {
-                "path": path,
-                "relationship": (
-                    "vendors-approved-skill"
-                    if skill
-                    else (
-                        "shared-policy-review"
-                        if shared
-                        else (
-                            "delivers-approved-project-knowledge"
-                            if project_consumers
-                            else "caller-inventory-required"
-                            if consumer.startswith(
-                                (
-                                    ".github/workflows/",
-                                    "actions/",
-                                    "templates/",
-                                    "knowledge/domains/documentation/templates/",
-                                    "workflow-templates/",
-                                )
-                            )
-                            else "unmapped-review-required"
+        relationship = (
+            "vendors-approved-skill"
+            if skill
+            else (
+                "shared-policy-review"
+                if shared
+                else (
+                    "delivers-approved-project-knowledge"
+                    if project_consumers
+                    else "caller-inventory-required"
+                    if consumer.startswith(
+                        (
+                            ".github/workflows/",
+                            "actions/",
+                            "templates/",
+                            "knowledge/domains/documentation/templates/",
+                            "workflow-templates/",
                         )
                     )
-                ),
-                "candidate_repositories": sorted(
-                    entry["repository"] for entry in candidates
-                ),
-            }
+                    else "unmapped-review-required"
+                )
+            )
         )
+        return relationship, {entry["repository"] for entry in candidates}
+
+    rows = []
+    for path in sorted(set(changed)):
+        if not routing._safe_relative(path):
+            raise ValueError("changed paths must be safe repository-relative paths")
+        consumers = targets.get(path, [path])
+        results = [(consumer, *classify(path, consumer)) for consumer in consumers]
+        row = {
+            "path": path,
+            # A source with several consumers takes the broadest relationship
+            # and the union of every consumer's candidates.
+            "relationship": min(
+                (relationship for _, relationship, _ in results), key=precedence.index
+            ),
+            "candidate_repositories": sorted(
+                set().union(*(candidates for _, _, candidates in results))
+            ),
+        }
+        if len(results) > 1:
+            row["consumers"] = [
+                {"path": consumer, "relationship": relationship}
+                for consumer, relationship, _ in results
+            ]
+        rows.append(row)
     return {
         "version": 1,
         "kind": "impact",

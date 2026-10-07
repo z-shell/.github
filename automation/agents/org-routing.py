@@ -62,7 +62,7 @@ DOWNSTREAM_FIELDS = {"repository", "surfaces", "vendored_skills"}
 SURFACE_FIELDS = {"path", "tasks", "file_patterns"}
 APPROVED_FIELDS = {"version", "source", "skills"}
 APPROVED_SKILL_FIELDS = {"path", "revision", "digest", "files"}
-APPROVED_SKILL_OPTIONAL_FIELDS = {"source", "tasks"}
+APPROVED_SKILL_OPTIONAL_FIELDS = {"source", "tasks", "resources"}
 # Repositories an approved skill may come from (decisions/0037), with the shape
 # of a skill path in each. A skill without its own source comes from the
 # top-level source, which stays the canonical repository.
@@ -375,6 +375,36 @@ def validate_downstream(downstream: object) -> list[str]:
     return errors
 
 
+def git_blob_id(data: bytes) -> str:
+    """Git's object id for a blob, so a file can be compared with a tree entry."""
+    return hashlib.sha1(  # nosec B324 - Git object identity, not a security digest
+        b"blob %d\0" % len(data) + data
+    ).hexdigest()
+
+
+def _validate_resources(name: str, files: list[str], resources: object) -> list[str]:
+    """Require a multi-file skill to pin every file besides SKILL.md by its Git blob id."""
+    expected = [path for path in files if path != "SKILL.md"]
+    if resources is None and not expected:
+        return []
+    if (
+        not isinstance(resources, dict)
+        or sorted(resources) != expected
+        or not all(
+            isinstance(value, str) and SHA_PATTERN.fullmatch(value)
+            for value in resources.values()
+        )
+    ):
+        return [
+            error(
+                APPROVED_PATH,
+                f"skill {name} resources must map each file other than SKILL.md to its 40-hex Git blob id",
+                "run verify-approved and record the blob ids it reports",
+            )
+        ]
+    return []
+
+
 def validate_approved(
     approved: object, org_root: Path, downstream: object, org_surfaces: object = None
 ) -> list[str]:
@@ -512,6 +542,8 @@ def validate_approved(
             errors.append(
                 error(APPROVED_PATH, f"skill {name} files must be sorted", "sort files")
             )
+        else:
+            errors.extend(_validate_resources(name, files, record.get("resources")))
         if source != CANONICAL_REPOSITORY:
             tasks = record.get("tasks")
             if not _string_list(tasks):
@@ -1126,6 +1158,17 @@ def _check_skill(root: Path, name: str, record: dict) -> list[str]:
                 reinstall,
             )
         )
+    for path, blob in sorted(record.get("resources", {}).items()):
+        if path not in files:
+            continue  # The file comparison above already reports it.
+        if git_blob_id((root / local / path).read_bytes()) != blob:
+            errors.append(
+                error(
+                    f"{local}/{path}",
+                    "content differs from the approved skill resource",
+                    reinstall,
+                )
+            )
     return errors
 
 
@@ -1181,7 +1224,7 @@ def verify_approved(
                     str(source_root),
                     "ls-tree",
                     "-r",
-                    "--name-only",
+                    "-z",
                     revision,
                     "--",
                     record["path"] + "/",
@@ -1228,15 +1271,28 @@ def verify_approved(
                     "recompute the digest",
                 )
             )
-        files = sorted(
-            line[len(record["path"]) + 1 :] for line in listing.splitlines() if line
-        )
+        blobs = {}
+        for line in listing.split("\0"):
+            if not line:
+                continue
+            meta, _, entry = line.partition("\t")
+            blobs[entry[len(record["path"]) + 1 :]] = meta.split()[-1]
+        files = sorted(blobs)
         if files != record["files"]:
             errors.append(
                 error(
                     APPROVED_PATH,
                     f"skill {name} files {record['files']} differ from {files} at {revision}",
                     "fix files",
+                )
+            )
+        actual = {path: blob for path, blob in blobs.items() if path != "SKILL.md"}
+        if actual != record.get("resources", {}):
+            errors.append(
+                error(
+                    APPROVED_PATH,
+                    f"skill {name} resources {record.get('resources', {})} differ from {actual} at {revision}",
+                    "record the Git blob ids of the approved revision",
                 )
             )
     return errors

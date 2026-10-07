@@ -38,6 +38,10 @@
       "target": ".github/instructions/quality/code-review.instructions.md"
     },
     {
+      "source": "knowledge/domains/quality/code-review.md",
+      "target": ".github/skills/code-review/references/criteria.md"
+    },
+    {
       "source": "knowledge/domains/quality/controlled-validation.md",
       "target": ".github/instructions/quality/controlled-validation.instructions.md"
     },

@@ -68,6 +68,47 @@ class KnowledgeDeliveryTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.run_delivery(False)
 
+    def test_skill_resource_strips_frontmatter_and_keeps_links_resolvable(self):
+        resource = {"source": self.entry["source"], "target": ".github/skills/review/references/criteria.md"}
+        self.source.write_text(
+            '---\napplyTo: "**"\nexcludeAgent: "cloud-agent"\n---\n\n# Contract\n\n'
+            '[policy](../../../AGENTS.md#policy)\n'
+            '[sibling](../../../.github/skills/review/references/other.md)\n'
+            '[web](https://example.com/x)\n'
+            '`[code](../../../AGENTS.md)`\n'
+            '[def]: ../zsh/data.json\n'
+        )
+        self.write_manifest([self.entry, resource])
+        self.assertEqual(self.run_delivery(False), 0)
+        text = (self.root / resource["target"]).read_text()
+        self.assertTrue(text.startswith("<!-- GENERATED from knowledge/domains/ci/contract.md."))
+        self.assertNotIn("applyTo", text)
+        self.assertNotIn("excludeAgent", text)
+        self.assertIn("[policy](https://github.com/z-shell/.github/blob/main/AGENTS.md#policy)", text)
+        self.assertIn("[sibling](other.md)", text)
+        self.assertIn("[web](https://example.com/x)", text)
+        self.assertIn("`[code](../../../AGENTS.md)`", text)
+        self.assertIn("[def]: https://github.com/z-shell/.github/blob/main/knowledge/domains/zsh/data.json", text)
+        # The instruction consumer of the same source keeps its native form.
+        instruction = (self.root / self.entry["target"]).read_text()
+        self.assertTrue(instruction.startswith('---\napplyTo: "**"\n'))
+        self.assertEqual(self.run_delivery(True), 0)
+        (self.root / resource["target"]).write_text(text + "Local rule.\n")
+        self.assertEqual(self.run_delivery(True), 1)
+
+    def test_skill_resource_rejects_escaping_links(self):
+        resource = {"source": self.entry["source"], "target": ".github/skills/review/references/criteria.md"}
+        self.source.write_text("# Contract\n\n[out](../../../../outside.md)\n")
+        self.write_manifest([resource])
+        with self.assertRaises(ValueError):
+            delivery.render(self.root, resource)
+
+    def test_only_non_entry_skill_files_are_resources(self):
+        self.assertEqual(delivery.skill_directory(".github/skills/review/references/a.md"), ".github/skills/review")
+        self.assertEqual(delivery.skill_directory(".github/skills/review/notes.md"), ".github/skills/review")
+        self.assertIsNone(delivery.skill_directory(".github/skills/review/SKILL.md"))
+        self.assertIsNone(delivery.skill_directory(".github/instructions/review.instructions.md"))
+
     def test_symlinked_source_and_consumer_ancestors_are_rejected(self):
         self.source.unlink()
         external = self.root / 'external.md'

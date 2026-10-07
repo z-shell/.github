@@ -16,6 +16,8 @@ MANIFEST = "knowledge/delivery.json"
 PROJECT_MANIFEST = "knowledge/project-delivery.json"
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 DEFINITION = re.compile(r"^(?P<prefix> {0,3}\[[^\]]+\]:\s*)(?P<url>\S+)", re.MULTILINE)
+SKILL_RESOURCE = re.compile(r"(?P<skill>\.github/skills/[a-z0-9]+(?:-[a-z0-9]+)*)/(?!SKILL\.md$)[^/]+(?:/[^/]+)*\.md")
+CANONICAL_BLOB = "https://github.com/z-shell/.github/blob/main"
 
 
 def unique_object(pairs):
@@ -94,7 +96,7 @@ def load_entries(root):
     entries = manifest["entries"]
     if not isinstance(entries, list) or not entries:
         raise ValueError("knowledge delivery entries must be a nonempty list")
-    sources, targets = set(), set()
+    targets = set()
     for entry in entries:
         if not isinstance(entry, dict) or set(entry) != {"source", "target"}:
             raise ValueError("each delivery entry needs exactly source and target")
@@ -105,24 +107,82 @@ def load_entries(root):
             raise ValueError(f"source is outside the domain knowledge store: {source}")
         if target.startswith("knowledge/") or not target.endswith(".md"):
             raise ValueError(f"target must be a Markdown consumer outside knowledge/: {target}")
-        if source in sources or target in targets:
-            raise ValueError(f"duplicate knowledge source or target: {source}, {target}")
+        # A source may feed several consumers, such as a scoped instruction and
+        # the reference bundled with a skill; each consumer has one source.
+        if target in targets:
+            raise ValueError(f"duplicate knowledge target: {target}")
         local_path(root, source)
         local_path(root, target)
-        sources.add(source)
         targets.add(target)
     return entries
+
+
+def skill_directory(target):
+    """Return the skill directory owning a bundled resource target, if any."""
+    match = SKILL_RESOURCE.fullmatch(target)
+    return match.group("skill") if match else None
+
+
+def strip_frontmatter(text, source):
+    if not text.startswith("---\n"):
+        return text
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        raise ValueError(f"unterminated frontmatter: {source}")
+    return text[end + len("\n---\n"):].lstrip("\n")
+
+
+def render_skill_resource(text, origin, destination, skill):
+    """Rebase links for a skill resource that is vendored without this repository.
+
+    Links that stay inside the skill directory remain relative, because the
+    installer copies the whole directory. Links that leave it become absolute
+    links to the canonical default branch, so no vendored link breaks.
+    """
+    masked, unmask = _mask_code(text)
+
+    def replace(match):
+        raw = match.group("url")
+        angled = raw.startswith("<") and raw.endswith(">")
+        url = raw[1:-1] if angled else raw
+        parts = urlsplit(url)
+        if parts.scheme or parts.netloc or not parts.path or parts.path.startswith("/"):
+            return match.group(0)
+        resolved = posixpath.normpath(str(PurePosixPath(origin).parent / parts.path))
+        if resolved == ".." or resolved.startswith("../"):
+            raise ValueError(f"knowledge link escapes the repository: {url}")
+        if resolved == skill or resolved.startswith(skill + "/"):
+            moved = posixpath.relpath(resolved, str(PurePosixPath(destination).parent))
+        else:
+            moved = f"{CANONICAL_BLOB}/{resolved}"
+        if parts.path.endswith("/"):
+            moved = moved.rstrip("/") + "/"
+        if parts.query:
+            moved += "?" + parts.query
+        if parts.fragment:
+            moved += "#" + parts.fragment
+        if angled:
+            moved = "<" + moved + ">"
+        return match.group("prefix") + moved + match.groupdict().get("suffix", "")
+
+    return unmask(DEFINITION.sub(replace, LINK.sub(replace, masked)))
 
 
 def render(root, entry):
     source = local_path(root, entry["source"])
     target = local_path(root, entry["target"])
-    text = rebase_links(source.read_text(encoding="utf-8"), source, target)
     header = (
         f"<!-- GENERATED from {entry['source']}. Do not edit this delivery copy.\n"
         "Regenerate: python3 automation/knowledge/knowledge-delivery.py\n"
         "Check: python3 automation/knowledge/knowledge-delivery.py --check -->\n\n"
     )
+    skill = skill_directory(entry["target"])
+    if skill:
+        # Native instruction frontmatter (applyTo, excludeAgent) has no meaning
+        # inside a skill, and a reference must resolve without this repository.
+        text = strip_frontmatter(source.read_text(encoding="utf-8"), entry["source"])
+        return header + render_skill_resource(text, entry["source"], entry["target"], skill)
+    text = rebase_links(source.read_text(encoding="utf-8"), source, target)
     return with_provenance(text, header, entry["source"])
 
 
