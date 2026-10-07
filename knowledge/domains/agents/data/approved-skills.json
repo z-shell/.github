@@ -4,9 +4,12 @@
   "skills": {
     "code-review": {
       "path": ".github/skills/code-review",
-      "revision": "5593b7d284304ea711de72d128a8ff8f9611205d",
-      "digest": "3a22608567e74047822e00cbc70ea098bdf5e9466d32305c13fa033383e5001d",
-      "files": ["SKILL.md"]
+      "revision": "ede9ed985dd228d1a9b066284015074f71a2b5aa",
+      "digest": "f5cfb686ddcab53b06cc5827c086673a1e169b30c82d154ef10ef94a31578f26",
+      "files": ["SKILL.md", "references/criteria.md"],
+      "resources": {
+        "references/criteria.md": "cb2520c539e82adddc572392eeee722b80ef9aa7"
+      }
     },
     "zi-install": {
       "path": ".github/skills/zi-install",
