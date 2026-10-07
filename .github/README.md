@@ -78,6 +78,9 @@ The organization uses a portable, manifest-backed instruction architecture:
 - [`automation/ci/validate-zsh-standard-policy.py`](../automation/ci/validate-zsh-standard-policy.py)
   validates Phase 1 ownership and drift across the instruction, policy,
   manifest, dispatcher, and public consumers.
+- [`zsh-policy-consumers.yml`](workflows/zsh-policy-consumers.yml)
+  runs the same consumer checks on skills published from another approved
+  source, such as `z-shell/agent-skills`, against the policy at its own commit.
 - [`validate-agent-policy.py`](../automation/agents/validate-agent-policy.py) and
   [`agent-instructions.yml`](workflows/agent-instructions.yml) enforce the public
   instruction contract.

@@ -31,6 +31,13 @@ REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
     ".github/README.md",
 )
 PLUGIN_TEMPLATE_PATH = ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
+# Advisory consumers published from another approved skill source (decision
+# 0037). The organization owns this list: a caller's checkout supplies only the
+# files named here, checked by the reusable zsh-policy-consumers workflow
+# against the policy at that workflow's own commit.
+EXTERNAL_CONSUMER_PATHS: dict[str, tuple[str, ...]] = {
+    "z-shell/agent-skills": ("plugins/z-shell/skills/zunit/SKILL.md",),
+}
 RETIRED_PATTERN_SECTIONS = {
     "Plugin entry-point skeleton": {
         "evidence": (
@@ -2896,6 +2903,75 @@ def validate_shell_dispatcher(root: Path) -> list[str]:
     return errors
 
 
+def _policy_rule_ids(policy: dict[str, object]) -> tuple[str, ...]:
+    """Return the canonical rule IDs, or nothing when the catalog is malformed."""
+
+    rule_values = policy.get("normative_rules")
+    rule_ids: tuple[str, ...] = ()
+    if isinstance(rule_values, list):
+        candidate_ids = tuple(
+            item.get("id")
+            for item in rule_values
+            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        )
+        if (
+            len(candidate_ids) == len(rule_values)
+            and candidate_ids == NORMATIVE_RULE_IDS
+        ):
+            rule_ids = cast(tuple[str, ...], candidate_ids)
+
+    return rule_ids
+
+
+def _reference_consumer_errors(
+    display_path: str,
+    text: str,
+    visible_text: str,
+    positive_contexts: list[_MarkdownLineContext],
+    rule_ids: tuple[str, ...],
+) -> list[str]:
+    """Check one consumer links the canonical sources and copies no catalog."""
+
+    errors: list[str] = []
+    for canonical_path in (INSTRUCTION_PATH, POLICY_PATH):
+        if canonical_path not in visible_text:
+            errors.append(
+                error(
+                    display_path,
+                    f"missing visible canonical Zsh reference {canonical_path!r}",
+                    f"link to {canonical_path} without copying its rule catalog",
+                )
+            )
+    if not rule_ids:
+        return errors
+    rule_id_set = set(rule_ids)
+    for context in positive_contexts:
+        heading = _consumer_h3_content(context.content)
+        if heading is None:
+            continue
+        normalized_heading = _single_code_span_content(heading)
+        if normalized_heading in rule_id_set:
+            errors.append(
+                error(
+                    display_path,
+                    "normative rule heading "
+                    f"{normalized_heading!r} at line "
+                    f"{context.line_number}; "
+                    "rules belong in canonical instruction",
+                    "replace the heading with an inline rule-ID citation",
+                )
+            )
+    if all(rule_id in text for rule_id in rule_ids):
+        errors.append(
+            error(
+                display_path,
+                "complete catalog duplication of all canonical Zsh rule IDs",
+                "keep only the small rule-ID subset relevant to this consumer",
+            )
+        )
+    return errors
+
+
 def validate_consumer_contract(
     root: Path,
     policy: dict[str, object],
@@ -2931,65 +3007,20 @@ def validate_consumer_contract(
         for relative_path, lines in visible_lines.items()
     }
 
+    rule_ids = _policy_rule_ids(policy)
     for relative_path in REFERENCE_CONSUMER_PATHS:
-        visible_text = visible_texts.get(relative_path)
-        if visible_text is None:
+        text = texts.get(relative_path)
+        if text is None:
             continue
-        for canonical_path in (INSTRUCTION_PATH, POLICY_PATH):
-            if canonical_path not in visible_text:
-                errors.append(
-                    error(
-                        relative_path,
-                        "missing visible canonical Zsh reference "
-                        f"{canonical_path!r}",
-                        f"link to {canonical_path} without copying its rule catalog",
-                    )
-                )
-
-    rule_values = policy.get("normative_rules")
-    rule_ids: tuple[str, ...] = ()
-    if isinstance(rule_values, list):
-        candidate_ids = tuple(
-            item.get("id")
-            for item in rule_values
-            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        errors.extend(
+            _reference_consumer_errors(
+                relative_path,
+                text,
+                visible_texts[relative_path],
+                positive_contexts[relative_path],
+                rule_ids,
+            )
         )
-        if (
-            len(candidate_ids) == len(rule_values)
-            and candidate_ids == NORMATIVE_RULE_IDS
-        ):
-            rule_ids = cast(tuple[str, ...], candidate_ids)
-
-    if rule_ids:
-        rule_id_set = set(rule_ids)
-        for relative_path in REFERENCE_CONSUMER_PATHS:
-            text = texts.get(relative_path)
-            if text is None:
-                continue
-            for context in positive_contexts[relative_path]:
-                heading = _consumer_h3_content(context.content)
-                if heading is None:
-                    continue
-                normalized_heading = _single_code_span_content(heading)
-                if normalized_heading in rule_id_set:
-                    errors.append(
-                        error(
-                            relative_path,
-                            "normative rule heading "
-                            f"{normalized_heading!r} at line "
-                            f"{context.line_number}; "
-                            "rules belong in canonical instruction",
-                            "replace the heading with an inline rule-ID citation",
-                        )
-                    )
-            if all(rule_id in text for rule_id in rule_ids):
-                errors.append(
-                    error(
-                        relative_path,
-                        "complete catalog duplication of all canonical Zsh rule IDs",
-                        "keep only the small rule-ID subset relevant to this consumer",
-                    )
-                )
 
     patterns_text = texts.get("PATTERNS.md")
     if patterns_text is not None:
@@ -3151,6 +3182,75 @@ def validate_consumer_contract(
     return errors
 
 
+def validate_external_consumers(
+    root: Path,
+    consumer_root: Path,
+    repository: str,
+) -> list[str]:
+    """Check another repository's advisory consumers against this policy."""
+
+    paths = EXTERNAL_CONSUMER_PATHS.get(repository.lower())
+    if paths is None:
+        return [
+            error(
+                repository,
+                "no external Zsh policy consumers are declared for this repository",
+                "add its consumer paths to EXTERNAL_CONSUMER_PATHS or stop calling "
+                "the zsh-policy-consumers workflow",
+            )
+        ]
+    errors: list[str] = []
+    try:
+        policy_path, path_errors = _contained_regular_path(Path(root), POLICY_PATH)
+        errors.extend(path_errors)
+        if policy_path is None:
+            return sorted(set(errors))
+        try:
+            policy = load_json_strict(policy_path)
+        except PolicyValidationError as exc:
+            return [
+                error(
+                    POLICY_PATH,
+                    str(exc),
+                    "restore a unique-key UTF-8 JSON policy object",
+                )
+            ]
+        rule_ids = _policy_rule_ids(policy)
+        if not rule_ids:
+            errors.append(
+                error(
+                    POLICY_PATH,
+                    "normative rule catalog is malformed",
+                    "restore the canonical policy before checking consumers",
+                )
+            )
+        for relative_path in paths:
+            display_path = f"{repository}:{relative_path}"
+            text, read_errors = _read_text(Path(consumer_root), relative_path)
+            errors.extend(f"{repository}:{message}" for message in read_errors)
+            if text is None:
+                continue
+            lines, contexts = _scan_visible_markdown(text)
+            errors.extend(
+                _reference_consumer_errors(
+                    display_path,
+                    text,
+                    _positive_visible_text(lines, contexts),
+                    _positive_markdown_contexts(lines, contexts),
+                    rule_ids,
+                )
+            )
+    except Exception as exc:  # Defensive boundary for caller-controlled files.
+        errors.append(
+            error(
+                repository,
+                f"validation could not inspect consumer input: {_safe_value(exc)}",
+                "restore readable contained consumer files and retry",
+            )
+        )
+    return sorted(set(errors))
+
+
 def validate(root: Path) -> list[str]:
     """Compose active validators, sort diagnostics, and never raise on input."""
 
@@ -3200,16 +3300,39 @@ def main() -> int:
     parser.add_argument(
         "--root",
         type=Path,
-        default=next(parent for parent in Path(__file__).resolve().parents if (parent / ".github/instruction-surfaces.json").is_file()),
+        default=next(
+            parent
+            for parent in Path(__file__).resolve().parents
+            if (parent / ".github/instruction-surfaces.json").is_file()
+        ),
         help="repository root to validate",
     )
+    parser.add_argument(
+        "--consumer-root",
+        type=Path,
+        help="checkout of another repository whose declared advisory consumers to check "
+        "against the policy in --root; requires --repository",
+    )
+    parser.add_argument(
+        "--repository",
+        help="OWNER/REPO of the --consumer-root checkout",
+    )
     arguments = parser.parse_args()
-    errors = validate(arguments.root)
+    if (arguments.consumer_root is None) != (arguments.repository is None):
+        parser.error("--consumer-root and --repository must be given together")
+    if arguments.consumer_root is not None:
+        errors = validate_external_consumers(
+            arguments.root, arguments.consumer_root, arguments.repository
+        )
+        success = f"zsh policy consumers in {arguments.repository} passed"
+    else:
+        errors = validate(arguments.root)
+        success = "zsh standard policy validation passed"
     if errors:
         for message in errors:
             print(f"ERROR: {message}")
         return 1
-    print("zsh standard policy validation passed")
+    print(success)
     return 0
 
 

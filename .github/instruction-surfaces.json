@@ -1330,6 +1330,22 @@
       "canonical_for": ["downstream-routing-ci"]
     },
     {
+      "id": "zsh-policy-consumers-workflow",
+      "path": ".github/workflows/zsh-policy-consumers.yml",
+      "kind": "enforcement",
+      "authority": "canonical-detail",
+      "consumers": ["ci"],
+      "tasks": [
+        "instruction-change",
+        "github-actions",
+        "zsh-standard-validation"
+      ],
+      "file_patterns": ["**"],
+      "required": true,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": ["external-zsh-consumer-ci"]
+    },
+    {
       "id": "approved-skill-revisions",
       "path": "knowledge/domains/agents/data/approved-skills.json",
       "kind": "enforcement",
