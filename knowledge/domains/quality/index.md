@@ -7,7 +7,7 @@ Select this domain for testing, code review, controlled reproduction or benchmar
 | Choose tests by repository class | [Testing contract](testing.md) |
 | Review changes | [Review criteria](code-review.md), [review skill](../../../.github/skills/code-review/SKILL.md) and [review readiness](org-review.md) |
 | Select independent verification | [Verification escalation](independent-verification.md) |
-| Reproduce in a controlled environment | [Controlled validation](controlled-validation.md), [zd runbook](zd-validation.md) and [zd skill](../../../.github/skills/zd-test/SKILL.md) |
+| Reproduce in a controlled environment | [Controlled validation](controlled-validation.md), [zd runbook](zd-validation.md) and [`zi-docker` skill](https://github.com/z-shell/agent-skills/blob/main/plugins/z-shell/skills/zi-docker/SKILL.md) |
 | Report benchmark evidence | [Benchmark runbook](benchmark-report.md) and [ADR-0024](../../../decisions/0024-benchmarks-observed-not-gated.md) |
 
 Distinguish syntax, functional behavior, platform coverage and timing. Review evidence is tied to the assessed revision; [PR review requirements](../governance/pull-requests.md) govern delivery.

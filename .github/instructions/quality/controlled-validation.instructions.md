@@ -17,4 +17,4 @@ Prepare dependencies and fixture checkouts before execution. Use zd's named inpu
 
 Benchmarks follow ADR-0024: same-run baseline/candidate plus A/A noise evidence, balanced order, warmups and raw samples. Functional failure invalidates timing; percentage flags request review without failing on timing alone. Keep container and native results separate. CPU affinity does not reserve the host CPU or clear filesystem caches.
 
-Use [the runbook](../../../runbooks/zd-validation.md) for local/CI integration and the optional `zd-test` skill for execution procedure. Existing publication and repository authorization boundaries still apply.
+Use [the runbook](../../../runbooks/zd-validation.md) for local/CI integration and the optional [`zi-docker`](https://github.com/z-shell/agent-skills/blob/main/plugins/z-shell/skills/zi-docker/SKILL.md) skill in `z-shell/agent-skills` for execution procedure. Existing publication and repository authorization boundaries still apply.

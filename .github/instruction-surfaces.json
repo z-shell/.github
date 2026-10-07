@@ -1404,23 +1404,6 @@
       "canonical_for": ["controlled-validation-selection"]
     },
     {
-      "id": "skill-zd-test",
-      "path": ".github/skills/zd-test/SKILL.md",
-      "kind": "skill",
-      "authority": "advisory",
-      "consumers": ["agent", "human"],
-      "tasks": [
-        "container-validation",
-        "benchmark",
-        "compatibility-validation",
-        "zd-integration"
-      ],
-      "file_patterns": ["**"],
-      "required": false,
-      "review_owner": "z-shell maintainers",
-      "canonical_for": []
-    },
-    {
       "id": "runbook-zd-validation",
       "path": "runbooks/zd-validation.md",
       "kind": "runbook",
