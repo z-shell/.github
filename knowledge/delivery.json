@@ -66,8 +66,8 @@
       "target": ".github/agents/ci-workflow-reviewer.agent.md"
     },
     {
-      "source": "knowledge/domains/plugins/roles/plugins-plugin-reviewer.md",
-      "target": ".github/agents/plugins-plugin-reviewer.agent.md"
+      "source": "knowledge/domains/plugins/roles/zsh-plugin-reviewer.md",
+      "target": ".github/agents/zsh-plugin-reviewer.agent.md"
     },
     {
       "source": "knowledge/domains/governance/adr.md",

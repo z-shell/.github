@@ -26,7 +26,7 @@ CORE_CONTRACT_PATHS = (
     ".github/instructions/zsh/dialect-selection.instructions.md",
 )
 CONSUMER_PATHS = (
-    ".github/agents/plugins-plugin-reviewer.agent.md",
+    ".github/agents/zsh-plugin-reviewer.agent.md",
     ".github/skills/zsh-plugin/SKILL.md",
     "knowledge/domains/plugins/templates/template.plugin.zsh",
     "PATTERNS.md",
@@ -1540,7 +1540,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_missing_consumer_canonical_link(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/agents/plugins-plugin-reviewer.agent.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         path = root / relative_path
         changed = path.read_text(encoding="utf-8").replace(
             ".github/instructions/zsh/scripting.instructions.md",
@@ -1565,7 +1565,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             "knowledge/domains/zsh/data/zsh-standard-policy.json",
         )
         reference_consumers = (
-            ".github/agents/plugins-plugin-reviewer.agent.md",
+            ".github/agents/zsh-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
@@ -1675,7 +1675,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 surface = next(
                     item
                     for item in manifest["surfaces"]
-                    if item["path"] == ".github/agents/plugins-plugin-reviewer.agent.md"
+                    if item["path"] == ".github/agents/zsh-plugin-reviewer.agent.md"
                 )
                 surface[field] = value
                 path.write_text(
@@ -1688,14 +1688,14 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 expected = "advisory" if field == "authority" else "canonical_for"
                 self.assert_error_contains(
                     errors,
-                    ".github/agents/plugins-plugin-reviewer.agent.md",
+                    ".github/agents/zsh-plugin-reviewer.agent.md",
                     expected,
                     "fix:",
                 )
 
     def test_rejects_coordinated_consumer_manifest_path_drift(self) -> None:
         root = self.make_fixture()
-        original_path = ".github/agents/plugins-plugin-reviewer.agent.md"
+        original_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         drifted_path = ".github/agents/drifted-zsh-reviewer.agent.md"
         (root / original_path).rename(root / drifted_path)
         manifest_path = root / ".github/instruction-surfaces.json"
@@ -1957,7 +1957,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         validator = load_validator()
         paths = (
             ".github/instructions/zsh/scripting.instructions.md",
-            ".github/agents/plugins-plugin-reviewer.agent.md",
+            ".github/agents/zsh-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
             "knowledge/domains/plugins/templates/template.plugin.zsh",
             "PATTERNS.md",
@@ -1995,7 +1995,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "9f832a343f7d7ac3d2e1529e18a1594d18fecb2715d7d4a6f3481f1621db966d",
+            "70aa94949897d8135f8d100d8be8aab529b356830ac94bf9446dfc8e1ef08047",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "
@@ -2322,7 +2322,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_block_boundaries_do_not_make_indented_references_visible(
         self,
     ) -> None:
-        relative_path = ".github/agents/plugins-plugin-reviewer.agent.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         canonical_path = ".github/instructions/zsh/scripting.instructions.md"
         hidden_references = (
             (
@@ -2462,7 +2462,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_list_owned_fence_preserves_visible_reference_continuations(
         self,
     ) -> None:
-        relative_path = ".github/agents/plugins-plugin-reviewer.agent.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         canonical_path = ".github/instructions/zsh/scripting.instructions.md"
         for indentation in range(2, 6):
             with self.subTest(indentation=indentation):
@@ -2582,7 +2582,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_malformed_blocks_do_not_hide_visible_canonical_references(
         self,
     ) -> None:
-        relative_path = ".github/agents/plugins-plugin-reviewer.agent.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         canonical_path = ".github/instructions/zsh/scripting.instructions.md"
         visible_references = (
             (
@@ -3662,7 +3662,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         canonical_path = ".github/instructions/zsh/scripting.instructions.md"
         policy_path = "knowledge/domains/zsh/data/zsh-standard-policy.json"
         consumers = (
-            ".github/agents/plugins-plugin-reviewer.agent.md",
+            ".github/agents/zsh-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
@@ -3673,7 +3673,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
             self.assertIn(policy_path, text, relative_path)
 
         reviewer = (
-            PUBLIC_ROOT / ".github/agents/plugins-plugin-reviewer.agent.md"
+            PUBLIC_ROOT / ".github/agents/zsh-plugin-reviewer.agent.md"
         ).read_text(encoding="utf-8")
         for fragment in (
             "severity",
@@ -3728,7 +3728,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         )
 
     def test_consumers_define_plugins_restoration_as_preload_state(self) -> None:
-        consumers = (".github/agents/plugins-plugin-reviewer.agent.md",)
+        consumers = (".github/agents/zsh-plugin-reviewer.agent.md",)
         for relative_path in consumers:
             with self.subTest(relative_path=relative_path):
                 text = (PUBLIC_ROOT / relative_path).read_text(encoding="utf-8")

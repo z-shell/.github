@@ -22,7 +22,7 @@ SHELL_DISPATCHER_SHA256 = (
 )
 VALIDATOR_PATH = "automation/ci/validate-zsh-standard-policy.py"
 ADVISORY_CONSUMER_PATHS = (
-    ".github/agents/plugins-plugin-reviewer.agent.md",
+    ".github/agents/zsh-plugin-reviewer.agent.md",
     ".github/skills/zsh-plugin/SKILL.md",
 )
 REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
