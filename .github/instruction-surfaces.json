@@ -1448,6 +1448,10 @@
   ],
   "downstream": [
     {
+      "repository": "z-shell/agent-skills",
+      "vendored_skills": ["code-review"]
+    },
+    {
       "repository": "z-shell/F-Sy-H",
       "vendored_skills": ["code-review"]
     },
