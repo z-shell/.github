@@ -168,7 +168,7 @@ commit and verify the resulting content and metadata. An unchanged repeated
 installation should leave no diff. See the
 [GitHub CLI update manual](https://cli.github.com/manual/gh_skill_update).
 
-Advancing the approved revision is a reviewed change to `knowledge/domains/agents/data/approved-skills.json` in this repository: set the new commit and, for a skill with files besides `SKILL.md`, record each of them under `resources` with its Git blob id at that commit. Run `python3 automation/agents/org-routing.py verify-approved` to confirm the digest, file list and resource blob ids, and merge it before any downstream repository re-pins. `verify-approved` requires the approved commit to be on the default branch already, so a skill change and its approval land in separate pull requests. Each downstream re-pin is then a separately authorized change in that repository.
+Advancing the approved revision is a reviewed change to `knowledge/domains/agents/data/approved-skills.json` in this repository: set the new commit and, for a skill with files besides `SKILL.md`, record each of them under `resources` with its Git blob id at that commit. Run `python3 automation/agents/org-routing.py verify-approved` to confirm the digest, file list and resource blob ids, and merge it before any downstream repository re-pins. `verify-approved` requires the approved commit to be an ancestor of the checked-out `HEAD`, and a squash merge rewrites a pull request's commits, so a skill change and its approval land in separate pull requests. Each downstream re-pin is then a separately authorized change in that repository.
 
 Pilot changes in the canonical owner, a standard plugin, and a documentation
 repository before wider delivery. Exercise representative review requests

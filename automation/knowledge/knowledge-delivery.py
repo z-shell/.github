@@ -16,7 +16,7 @@ MANIFEST = "knowledge/delivery.json"
 PROJECT_MANIFEST = "knowledge/project-delivery.json"
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 DEFINITION = re.compile(r"^(?P<prefix> {0,3}\[[^\]]+\]:\s*)(?P<url>\S+)", re.MULTILINE)
-SKILL_RESOURCE = re.compile(r"(?P<skill>\.github/skills/[a-z0-9]+(?:-[a-z0-9]+)*)/(?!SKILL\.md$)[^/]+(?:/[^/]+)*\.md")
+SKILL_RESOURCE = re.compile(r"(?P<skill>\.github/skills/[a-z0-9][a-z0-9-]*)/(?!SKILL\.md$)[^/]+(?:/[^/]+)*\.md")
 CANONICAL_BLOB = "https://github.com/z-shell/.github/blob/main"
 
 
