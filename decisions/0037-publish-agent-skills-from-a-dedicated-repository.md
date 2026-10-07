@@ -1,8 +1,8 @@
 # 37. Publish User and Developer Agent Skills From z-shell/agent-skills
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-10-06
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -26,6 +26,10 @@ Some of the five names also do not explain themselves. `zd-test` names a test, a
 6. **Approved skills name their source per skill.** `approved-skills.json` keeps `z-shell/.github` as the default source and lets a skill record a different approved repository and path. `org-routing.py` accepts only sources on its allowlist, checks vendored copies against their own source's installer metadata, and verifies an external revision only against a checkout of that source. This change lands before any project pin names the new repository.
 7. **Two install routes, never both for one skill in one project.** Projects that need a skill for hosted agents keep a pinned vendored copy under `.github/skills/`, approved and checked as today. Individuals install the plugin from the marketplace. A project using both routes would install the same skill twice.
 8. **Skills move one at a time.** For each skill: add it to `z-shell/agent-skills`, approve its revision, re-pin each vendoring project (`z-shell/src` vendors `zi-install`), then remove the old copy and its instruction surfaces here. The previous approved revision stays recorded for rollback until the re-pin is verified.
+
+## Acceptance
+
+Accepted by ss-o on 2026-10-06, after plan steps 1 and 2 of issue 741 landed: this record as PROPOSED in #743, and per-skill approved sources in #744. Creating `z-shell/agent-skills` and moving the skills (decisions 1 to 5, 7 and 8) follow as the remaining steps of issue 741.
 
 ## Consequences
 

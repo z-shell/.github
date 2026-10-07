@@ -47,4 +47,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0034](0034-portable-consumer-audiences.md)                          | Use portable audiences for shared instruction surfaces                                             | ACCEPTED | 2026-09-27 | ss-o     |
 | [0035](0035-sole-maintainer-class-1-review-exception.md)             | Allow a bounded Class 1 review exception for a sole maintainer                                     | ACCEPTED | 2026-09-27 | ss-o     |
 | [0036](0036-central-editable-knowledge-and-generated-consumers.md)   | Central Editable Knowledge With Complete Generated Consumers                                       | ACCEPTED | 2026-10-04 | ss-o     |
-| [0037](0037-publish-agent-skills-from-a-dedicated-repository.md)     | Publish User and Developer Agent Skills From z-shell/agent-skills                                  | PROPOSED | 2026-10-06 | TBD      |
+| [0037](0037-publish-agent-skills-from-a-dedicated-repository.md)     | Publish User and Developer Agent Skills From z-shell/agent-skills                                  | ACCEPTED | 2026-10-06 | ss-o     |
