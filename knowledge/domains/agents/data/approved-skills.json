@@ -12,10 +12,15 @@
       }
     },
     "zi-install": {
-      "path": ".github/skills/zi-install",
-      "revision": "1bfbf33a545c4d521b60d535559005f0953b4af4",
-      "digest": "ec10708bab341727abccd89e58b39e72d5f832decf7274161fa63a1f3a4ceffe",
-      "files": ["SKILL.md"]
+      "source": "z-shell/agent-skills",
+      "path": "plugins/z-shell/skills/zi-install",
+      "revision": "01aa715a124a5db8775e1b62b6b778c2c89cd6a0",
+      "digest": "30782cae9d8febdf050ce27f8aa744cdb7be2ccdfad28fe04b1cb3b8a51cb3c9",
+      "files": ["SKILL.md", "agents/openai.yaml"],
+      "resources": {
+        "agents/openai.yaml": "cca9851cacc7870990ed607c1df1498c63e9b03f"
+      },
+      "tasks": ["zi-installation", "zi-setup"]
     }
   }
 }
