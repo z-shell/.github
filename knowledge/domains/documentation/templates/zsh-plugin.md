@@ -8,7 +8,7 @@ Use this template for a maintained Z-Shell repository README and for a substanti
 2. Replace every `<angle-bracket>` placeholder with repository-specific content, including path placeholders such as `<license-path>`.
 3. Update relative links for the chosen README location, such as `../LICENSE` from `docs/` or `.github/`.
 4. Delete every `<!-- ... -->` comment. Comments are guidance for the author, never README content.
-5. Drop a section marked optional when it would not help a user understand or operate the repository. Keep every required information category, but rename and adapt plugin-specific headings for the repository archetype.
+5. Drop a section marked optional when it would not help a user understand or operate the repository. Required categories mean information coverage, not mandatory full sections: combine related material or link to maintained references. Keep prerequisites, installation, and first use visible. Adapt plugin-specific headings for the repository archetype; a plugin manager documents installation and shell configuration, with links to command and integrator references instead of a plugin contract.
 6. Work through the [maintainer checklist](#maintainer-checklist) before publishing.
 
 ## Section map
@@ -36,7 +36,7 @@ Sections run from what an evaluator needs first to what a contributor returns to
 - The header is a centered HTML block: logo, title, one-sentence tagline, and a badge row of maintained signals only.
 - For plugin-shaped repositories, secondary plugin managers live in `<details>` blocks so Zi stays the visible path.
 - GitHub alerts carry operational notes: `[!NOTE]` for compatibility floors and optional dependencies, `[!TIP]` for optional optimizations, `[!IMPORTANT]` for mandatory prerequisites and breaking configuration changes, `[!WARNING]` for terminal constraints and known conflicts. Use at most one per section, keep the marker and body on separate quoted lines, and rely on Prettier's default Markdown `preserve` behavior so formatting does not collapse the alert into plain blockquote text.
-- Reference data (styles, aliases, commands) goes in a table with explicit column alignment, surrounded by blank lines.
+- Use tables for short mappings, preferably two columns and at most three when values stay concise. State shared context once above the table; put long commands in fenced blocks and complex settings under headings. Use explicit column alignment and blank lines around tables.
 - Code blocks carry a language tag (`zsh`, `bash`, `console`).
 - Prose is one paragraph per line with no hard wrapping.
 
@@ -128,9 +128,9 @@ The plugin follows the [Zsh Plugin Standard](https://wiki.zshell.dev/community/z
 <smallest useful example>
 ```
 
-| Alias or command | Effective command      | Purpose             |
-| :--------------- | :--------------------- | :------------------ |
-| `<name>`         | `<what it expands to>` | <Observable effect> |
+| Alias or command | Behavior            |
+| :--------------- | :------------------ |
+| `<name>`         | <Observable effect> |
 
 ## Configuration
 
@@ -138,9 +138,13 @@ The plugin follows the [Zsh Plugin Standard](https://wiki.zshell.dev/community/z
 
 Set styles in the `:<portable_ascii_identifier>:config` context before the plugin loads.
 
-| Style              | Type     | Default     | Effect              |
-| :----------------- | :------- | :---------- | :------------------ |
-| `<style-property>` | `<type>` | `<default>` | <Observable effect> |
+### <Setting name>
+
+<Effect, accepted values, and default. Show one copyable example; repeat this short subsection only for settings users need during setup. Link to a reference for a larger configuration surface.>
+
+```zsh
+zstyle ':<portable_ascii_identifier>:config' <style-property> <value>
+```
 
 <!-- Optional: keep the alert only for a breaking configuration change, such as a removed global parameter, and name the replacement. -->
 
@@ -239,6 +243,10 @@ Presentation:
 - [ ] Images use useful alt text and durable repository-owned URLs.
 - [ ] Screenshots or demos are included only when they explain behavior.
 - [ ] Long-form guidance links to the wiki instead of being duplicated.
+- [ ] Installation and first use remain visible before detailed reference material.
+- [ ] Formatting preserves separate alert marker/body lines and Markdown boundaries inside disclosures.
+- [ ] Relative links resolve from the final README location.
+- [ ] A rendered desktop and narrow-width review confirms readable tables and no page-wide horizontal scrolling; preview limitations are recorded.
 
 Policy:
 
