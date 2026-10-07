@@ -863,6 +863,99 @@ class InventoryValidationTests(unittest.TestCase):
         self.assertTrue(any("not an ancestor of HEAD" in item for item in errors))
 
 
+RESOURCE_PATH = "references/criteria.md"
+RESOURCE_TEXT = "# Criteria\n\nCRITICAL blocks merge.\n"
+
+
+class MultiFileSkillTests(unittest.TestCase):
+    """A bundled resource is pinned by its Git blob id, like SKILL.md by digest."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        base = Path(self.directory.name)
+        self.fixture = OrgFixture(base)
+        resource = self.fixture.root / ".github/skills/code-review" / RESOURCE_PATH
+        resource.parent.mkdir(parents=True)
+        resource.write_text(RESOURCE_TEXT, encoding="utf-8")
+        self.fixture.revision = commit_all(self.fixture.root, "resource")
+        self.blob = routing.git_blob_id(RESOURCE_TEXT.encode("utf-8"))
+        self.fixture.approved["skills"]["code-review"].update(
+            revision=self.fixture.revision,
+            files=["SKILL.md", RESOURCE_PATH],
+            resources={RESOURCE_PATH: self.blob},
+        )
+        self.fixture.write()
+        self.root = make_downstream(base, self.fixture.revision)
+        vendored = self.root / ".github/skills/code-review" / RESOURCE_PATH
+        vendored.parent.mkdir(parents=True)
+        vendored.write_text(RESOURCE_TEXT, encoding="utf-8")
+        status, _ = run_main(
+            "--org-root", str(self.fixture.root),
+            "apply", "--repository", "z-shell/tool", "--root", str(self.root),
+        )
+        self.assertEqual(status, 0)
+
+    def tearDown(self) -> None:
+        self.directory.cleanup()
+
+    def errors(self) -> list[str]:
+        self.fixture.write()
+        try:
+            self.fixture.load()
+        except routing.RoutingError as exc:
+            return str(exc).splitlines()
+        return []
+
+    def test_blob_id_matches_git(self) -> None:
+        listed = git(
+            self.fixture.root, "rev-parse",
+            f"HEAD:.github/skills/code-review/{RESOURCE_PATH}",
+        )
+        self.assertEqual(self.blob, listed)
+
+    def test_pinned_resources_verify_and_check(self) -> None:
+        org = self.fixture.load()
+        self.assertEqual(routing.verify_approved(self.fixture.root, org.approved), [])
+        self.assertEqual(routing.check(self.root, "z-shell/tool", org), [])
+
+    def test_edited_resource_fails_check(self) -> None:
+        vendored = self.root / ".github/skills/code-review" / RESOURCE_PATH
+        vendored.write_text(RESOURCE_TEXT + "Local rule.\n", encoding="utf-8")
+        errors = routing.check(self.root, "z-shell/tool", self.fixture.load())
+        self.assertTrue(
+            any(
+                item.startswith(f".github/skills/code-review/{RESOURCE_PATH}: ")
+                and "content differs from the approved skill resource" in item
+                for item in errors
+            ),
+            errors,
+        )
+
+    def test_wrong_recorded_blob_fails_verify_approved(self) -> None:
+        org = self.fixture.load()
+        org.approved["skills"]["code-review"]["resources"] = {RESOURCE_PATH: "0" * 40}
+        errors = routing.verify_approved(self.fixture.root, org.approved)
+        self.assertTrue(any("resources" in item and self.blob in item for item in errors), errors)
+
+    def test_multi_file_record_needs_every_resource_pinned(self) -> None:
+        record = self.fixture.approved["skills"]["code-review"]
+        for resources in (None, {}, {RESOURCE_PATH: "main"}, {RESOURCE_PATH: self.blob, "x.md": self.blob}):
+            with self.subTest(resources=resources):
+                if resources is None:
+                    record.pop("resources", None)
+                else:
+                    record["resources"] = resources
+                self.assertTrue(
+                    any("resources must map each file" in item for item in self.errors()),
+                    self.errors(),
+                )
+
+    def test_single_file_record_may_not_pin_resources(self) -> None:
+        record = self.fixture.approved["skills"]["code-review"]
+        record.update(files=["SKILL.md"], resources={RESOURCE_PATH: self.blob})
+        self.assertTrue(any("resources must map each file" in item for item in self.errors()))
+
+
 EXTERNAL_SKILL = "---\ndescription: Install Zi.\nname: zi-install\n---\n\n# Zi install\n\nRun the installer.\n"
 EXTERNAL_PATH = "plugins/z-shell/skills/zi-install"
 

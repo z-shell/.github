@@ -60,12 +60,7 @@ classes, and these results for each repository:
   Any bundled references must resolve within the skill; repository guidance
   must be discovered conditionally or linked to an accessible canonical source.
   Reject broken links, missing required resources, and host-specific paths.
-- **Provenance and currency:** identify the approved canonical source revision
-  in `z-shell/.github`, the installed revision, and any difference from the
-  approved source. Compare the actual skill content and resource inventory,
-  accounting only for installer-added source metadata. Metadata alone does
-  not prove unmodified content. The canonical owner's own source file needs
-  no installer metadata, but its assessed revision must still be identified.
+- **Provenance and currency:** identify the approved canonical source revision in `z-shell/.github`, the installed revision, and any difference from the approved source. Compare the actual skill content and resource inventory, accounting only for installer-added source metadata; `org-routing.py check` compares `SKILL.md` by its approved digest and every other skill file by its approved Git blob id. Metadata alone does not prove unmodified content. The canonical owner's own source file needs no installer metadata, but its assessed revision must still be identified.
 - **Suitability:** compare the skill's workflow with local instructions,
   compatibility floors, component classes, build manifests, and CI. Confirm
   relevant checks for Zsh plugins/annexes, Go, compiled modules, documentation,
@@ -142,12 +137,7 @@ or new hosted reviews.
 
 ### Install or update after authorization
 
-The canonical source is this repository's
-[code-review skill](../../../.github/skills/code-review/SKILL.md). Keep shared review
-criteria in
-[code-review.instructions.md](../../../.github/instructions/quality/code-review.instructions.md).
-The portable skill discovers local contracts and links to canonical criteria;
-it does not require this repository to be a sibling checkout.
+The canonical source is this repository's [code-review skill](../../../.github/skills/code-review/SKILL.md). Shared review criteria are authored once in [the code-review knowledge source](code-review.md) and generated into both [code-review.instructions.md](../../../.github/instructions/quality/code-review.instructions.md) and the skill's bundled [criteria reference](../../../.github/skills/code-review/references/criteria.md), so a vendored skill carries the criteria at its pinned revision. The portable skill discovers local contracts; it does not require this repository to be a sibling checkout.
 
 Verify `gh version` and `gh skill install --help`. After the canonical skill is
 published at an approved immutable commit, run from the target repository:
@@ -174,11 +164,7 @@ commit and verify the resulting content and metadata. An unchanged repeated
 installation should leave no diff. See the
 [GitHub CLI update manual](https://cli.github.com/manual/gh_skill_update).
 
-Advancing the approved revision is a reviewed change to
-`knowledge/domains/agents/data/approved-skills.json` in this repository: set the new commit, run
-`python3 automation/agents/org-routing.py verify-approved` to confirm the digest and
-file list, and merge it before any downstream repository re-pins. Each
-downstream re-pin is then a separately authorized change in that repository.
+Advancing the approved revision is a reviewed change to `knowledge/domains/agents/data/approved-skills.json` in this repository: set the new commit and, for a skill with files besides `SKILL.md`, record each of them under `resources` with its Git blob id at that commit. Run `python3 automation/agents/org-routing.py verify-approved` to confirm the digest, file list and resource blob ids, and merge it before any downstream repository re-pins. `verify-approved` requires the approved commit to be an ancestor of the checked-out `HEAD`, and a squash merge rewrites a pull request's commits, so a skill change and its approval land in separate pull requests. Each downstream re-pin is then a separately authorized change in that repository.
 
 Pilot changes in the canonical owner, a standard plugin, and a documentation
 repository before wider delivery. Exercise representative review requests
@@ -195,7 +181,7 @@ For an offline report, save the REST repository inventory as a JSON array (or th
 
 Read findings and evidence gaps even when the command exits zero: zero means the report was produced, not that organization compliance passed. Archived repositories are listed as excluded; undeclared repositories, maintained forks and declared repositories missing from the inventory remain explicit coverage gaps. Only declared active consumers receive detailed file observations. A truncated tree or failed API request produces unavailable evidence, never a passing result. Inventory visibility depends on the caller's access.
 
-Caller references do not prove trigger eligibility or successful CI. Ruleset-required checks describe the observed default branch. Classic branch protection, bypass settings and other integration branches require separate checks; assess Zi's `next` separately. Runtime discovery, skill invocation and repository-specific semantic suitability remain unverified or unassessed until the earlier review-readiness procedure supplies evidence. For multi-file skills, use the full routing verifier to establish content integrity. Compare observed workflow pins with the intended approved tooling revision independently.
+Caller references do not prove trigger eligibility or successful CI. Ruleset-required checks describe the observed default branch. Classic branch protection, bypass settings and other integration branches require separate checks; assess Zi's `next` separately. Runtime discovery, skill invocation and repository-specific semantic suitability remain unverified or unassessed until the earlier review-readiness procedure supplies evidence. A multi-file skill's content is reported current only when its approved record pins every resource by Git blob id and each published blob matches; without those pins it remains unverified. Compare observed workflow pins with the intended approved tooling revision independently.
 
 Use this report as input to the existing weekly-review pilot (#412) and recurring-operations coordination (#485). A schedule is optional and needs its own authorization; evaluate the first three drafts before expanding cadence or scope. Deterministic PR checks remain the immediate change gate. New settings enforcement follows #478 after a caller has a verified successful run; #665 remains the adoption owner.
 

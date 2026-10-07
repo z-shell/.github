@@ -331,6 +331,13 @@
       "reason": "Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures."
     },
     {
+      "path": ".github/skills/code-review/references/criteria.md",
+      "domain": "quality",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/quality/code-review.md",
+      "reason": "Edit the declared knowledge source; the skill bundles this generated copy so vendored reviews carry the criteria at the pinned revision."
+    },
+    {
       "path": ".github/skills/create-readme/SKILL.md",
       "domain": "documentation",
       "disposition": "referenced",

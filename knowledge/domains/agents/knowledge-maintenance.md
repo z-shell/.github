@@ -1,6 +1,6 @@
 # Maintain central knowledge
 
-Shared migrated organization content has one editable source under knowledge/domains/ in z-shell/.github. Domain indexes select relevant sources. knowledge/delivery.json maps each source to its complete generated consumer. Publication locations and native runtime entrypoints remain usable without depending on optional skills or link-following behavior.
+Shared migrated organization content has one editable source under knowledge/domains/ in z-shell/.github. Domain indexes select relevant sources. knowledge/delivery.json maps each source to one or more complete generated consumers. A consumer inside a skill directory, such as a bundled `references/` file, drops the source's native instruction frontmatter and turns links that leave the skill into absolute links on the canonical default branch, because the skill is vendored without this repository. Publication locations and native runtime entrypoints remain usable without depending on optional skills or link-following behavior.
 
 ## Change an existing source
 
