@@ -72,7 +72,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def read_policy(self, root: Path) -> dict[str, object]:
         return json.loads(
-            (root / "knowledge/domains/zsh/data/zsh-standard-policy.json").read_text(encoding="utf-8")
+            (root / "knowledge/domains/zsh/data/zsh-standard-policy.json").read_text(
+                encoding="utf-8"
+            )
         )
 
     def write_policy(self, root: Path, policy: dict[str, object]) -> None:
@@ -880,7 +882,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                     self.assertIsInstance(globs, list)
                     globs.append(extra_glob)
                     self.write_policy(root, policy)
-                    expected_path = "knowledge/domains/zsh/data/zsh-standard-policy.json"
+                    expected_path = (
+                        "knowledge/domains/zsh/data/zsh-standard-policy.json"
+                    )
                 elif surface == "frontmatter":
                     path = root / ".github/instructions/zsh/scripting.instructions.md"
                     path.write_text(
@@ -1389,7 +1393,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         for name, mutation in cases:
             with self.subTest(name=name):
                 root = self.make_fixture()
-                path = root / ".github/instructions/zsh/dialect-selection.instructions.md"
+                path = (
+                    root / ".github/instructions/zsh/dialect-selection.instructions.md"
+                )
                 original = path.read_text(encoding="utf-8")
                 changed = mutation(original)
                 self.assertNotEqual(changed, original)
@@ -1425,7 +1431,9 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         for name, probe in cases:
             with self.subTest(name=name):
                 root = self.make_fixture()
-                path = root / ".github/instructions/zsh/dialect-selection.instructions.md"
+                path = (
+                    root / ".github/instructions/zsh/dialect-selection.instructions.md"
+                )
                 changed = path.read_text(encoding="utf-8") + f"\n{probe}\n"
                 path.write_text(changed, encoding="utf-8")
                 actual_digest = hashlib.sha256(changed.encode("utf-8")).hexdigest()
@@ -1669,8 +1677,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 surface = next(
                     item
                     for item in manifest["surfaces"]
-                    if item["path"]
-                    == ".github/agents/plugins-plugin-reviewer.agent.md"
+                    if item["path"] == ".github/agents/plugins-plugin-reviewer.agent.md"
                 )
                 surface[field] = value
                 path.write_text(
@@ -1991,7 +1998,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "30e2df22b640e2b76b6fdfa6a1c60cac39f90d7f7ad098720af569eab2979aed",
+            "1a6424dfa32d5230c6659797d1acc5d8eac44b20ddd37cf2f754afc7325a5595",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "
@@ -3857,6 +3864,137 @@ class PublicRepositoryTests(unittest.TestCase):
             "create automation/ci/validate-zsh-standard-policy.py",
         )
         self.assertEqual(load_validator().validate(PUBLIC_ROOT), [])
+
+
+class ExternalConsumerTests(unittest.TestCase):
+    """Decision 0037: consumers in another approved skill source."""
+
+    REPOSITORY = "z-shell/agent-skills"
+    CONSUMER = "plugins/z-shell/skills/zunit/SKILL.md"
+
+    def setUp(self) -> None:
+        self.validator = load_validator()
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.consumer_root = Path(directory.name)
+        self.source = (PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+
+    def write_consumer(self, text: str) -> None:
+        path = self.consumer_root / self.CONSUMER
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def check(self, repository: str | None = None) -> list[str]:
+        return self.validator.validate_external_consumers(
+            PUBLIC_ROOT, self.consumer_root, repository or self.REPOSITORY
+        )
+
+    def test_declared_consumer_list_is_owned_here(self) -> None:
+        self.assertEqual(
+            self.validator.EXTERNAL_CONSUMER_PATHS,
+            {self.REPOSITORY: (self.CONSUMER,)},
+        )
+
+    def test_conforming_consumer_passes(self) -> None:
+        self.write_consumer(self.source)
+        self.assertEqual(self.check(), [])
+        self.assertEqual(self.check("Z-Shell/Agent-Skills"), [])
+
+    def test_absolute_links_satisfy_the_canonical_references(self) -> None:
+        base = "https://github.com/z-shell/.github/blob/main/"
+        text = self.source.replace(
+            "`.github/instructions/zsh/scripting.instructions.md`",
+            f"[the Zsh standard]({base}.github/instructions/zsh/scripting.instructions.md)",
+        ).replace(
+            "`knowledge/domains/zsh/data/zsh-standard-policy.json`",
+            f"[the policy]({base}knowledge/domains/zsh/data/zsh-standard-policy.json)",
+        )
+        self.assertNotEqual(text, self.source)
+        self.write_consumer(text)
+        self.assertEqual(self.check(), [])
+
+    def test_missing_consumer_is_reported(self) -> None:
+        errors = self.check()
+        self.assertEqual(len(errors), 1)
+        self.assertTrue(errors[0].startswith(f"{self.REPOSITORY}:{self.CONSUMER}"))
+
+    def test_missing_canonical_reference_is_reported(self) -> None:
+        self.write_consumer(
+            self.source.replace(
+                ".github/instructions/zsh/scripting.instructions.md", "the standard"
+            )
+        )
+        errors = self.check()
+        self.assertEqual(len(errors), 1)
+        self.assertIn(f"{self.REPOSITORY}:{self.CONSUMER}", errors[0])
+        self.assertIn("missing visible canonical Zsh reference", errors[0])
+
+    def test_hidden_reference_does_not_count(self) -> None:
+        text = self.source.replace(
+            "`knowledge/domains/zsh/data/zsh-standard-policy.json`", "the policy"
+        )
+        self.write_consumer(
+            text + "\n<!-- knowledge/domains/zsh/data/zsh-standard-policy.json -->\n"
+        )
+        self.assertIn("missing visible canonical Zsh reference", " ".join(self.check()))
+
+    def test_rule_heading_is_reported(self) -> None:
+        self.write_consumer(
+            self.source + "\n### `zsh/test/isolate-environment`\n\nText.\n"
+        )
+        self.assertIn("normative rule heading", " ".join(self.check()))
+
+    def test_catalog_duplication_is_reported(self) -> None:
+        catalog = "\n".join(f"- `{rule}`" for rule in self.validator.NORMATIVE_RULE_IDS)
+        self.write_consumer(self.source + "\n" + catalog + "\n")
+        self.assertIn("complete catalog duplication", " ".join(self.check()))
+
+    def test_consumer_outside_the_checkout_is_rejected(self) -> None:
+        outside = tempfile.TemporaryDirectory()
+        self.addCleanup(outside.cleanup)
+        target = Path(outside.name) / "SKILL.md"
+        target.write_text(self.source, encoding="utf-8")
+        link = self.consumer_root / self.CONSUMER
+        link.parent.mkdir(parents=True)
+        link.symlink_to(target)
+        errors = self.check()
+        self.assertTrue(errors)
+        self.assertTrue(all(item.startswith(self.REPOSITORY) for item in errors))
+
+    def test_undeclared_repository_is_refused(self) -> None:
+        errors = self.check("z-shell/zunit")
+        self.assertEqual(len(errors), 1)
+        self.assertIn("no external Zsh policy consumers are declared", errors[0])
+
+    def test_command_line(self) -> None:
+        self.write_consumer(self.source)
+        base = [sys.executable, str(SCRIPT_PATH), "--root", str(PUBLIC_ROOT)]
+        completed = subprocess.run(  # nosec B603
+            base
+            + [
+                "--consumer-root",
+                str(self.consumer_root),
+                "--repository",
+                self.REPOSITORY,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertIn(
+            f"zsh policy consumers in {self.REPOSITORY} passed", completed.stdout
+        )
+        half = subprocess.run(  # nosec B603
+            base + ["--consumer-root", str(self.consumer_root)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(half.returncode, 2)
+        self.assertIn("must be given together", half.stderr)
 
 
 if __name__ == "__main__":

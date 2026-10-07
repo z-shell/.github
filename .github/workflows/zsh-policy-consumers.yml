@@ -1,0 +1,87 @@
+name: Zsh Policy Consumers
+
+# Decision 0037: skills published from another approved source, such as
+# z-shell/agent-skills, stay advisory consumers of the canonical Zsh standard.
+# Repositories listed in EXTERNAL_CONSUMER_PATHS in
+# automation/ci/validate-zsh-standard-policy.py call this workflow; it checks
+# the listed files in the caller's checkout against the policy at the called
+# workflow's own commit, and reports drift without writing anything.
+#
+# Caller:
+#
+#   jobs:
+#     zsh-policy-consumers:
+#       uses: z-shell/.github/.github/workflows/zsh-policy-consumers.yml@<sha> # main
+#       permissions:
+#         contents: read
+#
+# Do not set a workflow-level `concurrency:` in the caller: this workflow sets
+# its own group, and a matching caller group deadlocks the called run.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-zsh-policy-consumers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Zsh Policy Consumers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      # GitHub exposes the called workflow identity through job.workflow_*.
+      # Serialize the context because actionlint does not model those
+      # properties yet, then validate the values. There is no fallback: a
+      # caller's own checkout must never supply the tooling or the policy that
+      # checks it.
+      - name: Resolve called workflow source
+        id: workflow-source
+        shell: bash
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: |
+          repository=$(jq -r '.workflow_repository // empty' <<<"$JOB_CONTEXT")
+          sha=$(jq -r '.workflow_sha // empty' <<<"$JOB_CONTEXT")
+          [[ $repository =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ $sha =~ ^[0-9a-f]{40}$ ]]
+          printf 'repository=%s\nsha=%s\n' "$repository" "$sha" >>"$GITHUB_OUTPUT"
+
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Check out policy tooling
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ steps.workflow-source.outputs.repository }}
+          ref: ${{ steps.workflow-source.outputs.sha }}
+          path: .z-shell-zsh-policy
+          persist-credentials: false
+          sparse-checkout: |
+            .github/instruction-surfaces.json
+            knowledge/domains/zsh/data/zsh-standard-policy.json
+            automation/ci/validate-zsh-standard-policy.py
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.10"
+
+      - name: Check the caller's Zsh policy consumers
+        shell: bash
+        env:
+          CALLER: ${{ github.repository }}
+        run: |
+          tooling="$RUNNER_TEMP/z-shell-zsh-policy"
+          mv -- .z-shell-zsh-policy "$tooling"
+          python3 "$tooling/automation/ci/validate-zsh-standard-policy.py" --root "$tooling" \
+            --consumer-root "$GITHUB_WORKSPACE" --repository "$CALLER"
