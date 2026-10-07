@@ -6,7 +6,6 @@ Select a file for the task described below. Imported files have an editable know
 
 | File | Disposition | Purpose and reading context |
 | --- | --- | --- |
-| [.github/skills/zi-install/SKILL.md](../../../.github/skills/zi-install/SKILL.md) | referenced | Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures. |
 | [decisions/0002-zi-as-canonical-plugin-manager.md](../../../decisions/0002-zi-as-canonical-plugin-manager.md) | referenced | Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history. |
 | [decisions/0025-guided-setup-planner-first.md](../../../decisions/0025-guided-setup-planner-first.md) | referenced | Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history. |
 | [decisions/0028-zi-promotion-is-release-authorization.md](../../../decisions/0028-zi-promotion-is-release-authorization.md) | referenced | Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history. |
