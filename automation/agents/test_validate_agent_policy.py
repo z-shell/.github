@@ -2040,7 +2040,6 @@ class PublicRepositoryTests(unittest.TestCase):
                 "file_patterns": [
                     "**/*.plugin.zsh,**/init.zsh,"
                     "knowledge/domains/documentation/templates/zsh-plugin.md,"
-                    ".github/skills/zsh-plugin/**,"
                     ".github/agents/zsh-plugin-reviewer.agent.md"
                 ],
                 "required": True,
