@@ -168,6 +168,18 @@ commit and verify the resulting content and metadata. An unchanged repeated
 installation should leave no diff. See the
 [GitHub CLI update manual](https://cli.github.com/manual/gh_skill_update).
 
+A downstream re-pin is one change: reinstall at the new approved commit, move the `org-routing.yml` caller to a z-shell/.github commit whose approved record names that revision, and regenerate the routing block with `org-routing.py apply`. The caller pin supplies both the checking tooling and the approved record, so moving the caller without re-pinning the skill fails `check`, and so does re-pinning without moving the caller.
+
+`check` compares vendored resource files with their approved Git blob ids byte for byte, so a consumer's formatter must not rewrite them. Prettier, for example, realigns the tables in `references/criteria.md`. Where the consumer runs Trunk, exclude the vendored skill from Prettier and markdownlint in `.trunk/trunk.yaml` before committing the reinstall, scoped to the vendored skill so locally authored skills stay formatted:
+
+```yaml
+lint:
+  ignore:
+    - linters: [prettier, markdownlint]
+      paths:
+        - .github/skills/code-review/**
+```
+
 Advancing the approved revision is a reviewed change to `knowledge/domains/agents/data/approved-skills.json` in this repository: set the new commit and, for a skill with files besides `SKILL.md`, record each of them under `resources` with its Git blob id at that commit. Run `python3 automation/agents/org-routing.py verify-approved` to confirm the digest, file list and resource blob ids, and merge it before any downstream repository re-pins. `verify-approved` requires the approved commit to be an ancestor of the checked-out `HEAD`, and a squash merge rewrites a pull request's commits, so a skill change and its approval land in separate pull requests. Each downstream re-pin is then a separately authorized change in that repository.
 
 Pilot changes in the canonical owner, a standard plugin, and a documentation
