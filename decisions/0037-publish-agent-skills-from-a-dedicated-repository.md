@@ -18,11 +18,11 @@ Some of the five names also do not explain themselves. `zd-test` names a test, a
 
 ## Decision
 
-1. **A public repository, `z-shell/agent-skills`, owns the user and developer skills.** It starts with one plugin, `z-shell`, containing the five skills above. Organization process skills stay in `z-shell/.github` beside their runbooks. A separate user plugin waits until the user side has at least two maintained skills.
+1. **A public repository, `z-shell/agent-skills`, owns the user and developer skills.** It starts with one plugin, `z-shell`, containing four of the five skills above; `zsh-manual-research` stays here (see Amendments). Organization process skills stay in `z-shell/.github` beside their runbooks. A separate user plugin waits until the user side has at least two maintained skills.
 2. **One hand-edited catalog generates every manifest.** `catalog.json` holds plugin names, versions, descriptions and skill membership. A generator writes the Agent Skills `plugin.json`, the Claude `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, and its `--check` mode runs in CI with `claude plugin validate . --strict` and a link check. Every release bumps the catalog version, because Claude refreshes an installed plugin only when its version changes.
 3. **Each skill belongs to exactly one plugin**, as real files under `plugins/<plugin>/skills/<name>/`. Codex reads one skills directory per plugin and does not keep symbolic links. Drafts live under `in-progress/`, outside every manifest.
 4. **Every skill declares one invocation mode.** A user-invoked skill sets `disable-model-invocation: true` and `policy.allow_implicit_invocation: false` in `agents/openai.yaml`; a model-invoked skill sets neither. A skill reaches another skill by name, never by a `../` path.
-5. **Skills move under names that follow the naming rules**: `zunit-test` becomes `zunit`, `zd-test` becomes `zd`, and `zsh-plugin` keeps its name but covers maintaining plugins as well as creating them, becoming model-invoked. `zi-install` and `zsh-manual-research` keep their names. The generator check enforces the name format and the paired invocation flags.
+5. **Skills move under names that follow the naming rules**: `zunit-test` becomes `zunit`, `zd-test` becomes `zi-docker`, and `zsh-plugin` keeps its name but covers maintaining plugins as well as creating them, becoming model-invoked. `zi-install` keeps its name. The generator check enforces the name format and the paired invocation flags.
 6. **Approved skills name their source per skill.** `approved-skills.json` keeps `z-shell/.github` as the default source and lets a skill record a different approved repository and path. `org-routing.py` accepts only sources on its allowlist, checks vendored copies against their own source's installer metadata, and verifies an external revision only against a checkout of that source. This change lands before any project pin names the new repository.
 7. **Two install routes, never both for one skill in one project.** Projects that need a skill for hosted agents keep a pinned vendored copy under `.github/skills/`, approved and checked as today. Individuals install the plugin from the marketplace. A project using both routes would install the same skill twice.
 8. **Skills move one at a time.** For each skill: add it to `z-shell/agent-skills`, approve its revision, re-pin each vendoring project (`z-shell/src` vendors `zi-install`), then remove the old copy and its instruction surfaces here. The previous approved revision stays recorded for rollback until the re-pin is verified.
@@ -30,6 +30,13 @@ Some of the five names also do not explain themselves. `zd-test` names a test, a
 ## Acceptance
 
 Accepted by ss-o on 2026-10-06, after plan steps 1 and 2 of issue 741 landed: this record as PROPOSED in #743, and per-skill approved sources in #744. Creating `z-shell/agent-skills` and moving the skills (decisions 1 to 5, 7 and 8) follow as the remaining steps of issue 741.
+
+## Amendments
+
+Amended by ss-o on 2026-10-07, during step 4 of issue 741, after `zunit` and `zsh-plugin` had moved:
+
+- **`zd-test` becomes `zi-docker`, not `zd`.** The skill covers the whole zd environment (controlled test runs, Zi commands, an interactive shell, module builds and benchmarks), so the name is about the subject, not the testing action. A runtime may show only skill names under a listing budget, and the two-letter `zd` does not identify Zi's Docker environment there. `zi-docker` does, and sits beside `zi-install`.
+- **`zsh-manual-research` stays in `z-shell/.github`.** No project vendors it and nothing installs it. It is reached by the manifest route for `zsh-semantics-research`, `zsh-lint-parser-gap` and `zsh-lint-rule-proposal` and by a link from `z-shell/zsh-lint`'s `AGENTS.md`, so its users are zsh-lint and organization contributors. Moving it would only redirect those routes.
 
 ## Consequences
 
