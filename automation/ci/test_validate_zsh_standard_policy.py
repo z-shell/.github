@@ -27,7 +27,6 @@ CORE_CONTRACT_PATHS = (
 )
 CONSUMER_PATHS = (
     ".github/agents/zsh-plugin-reviewer.agent.md",
-    ".github/skills/zsh-plugin/SKILL.md",
     "knowledge/domains/plugins/templates/template.plugin.zsh",
     "PATTERNS.md",
     ".github/README.md",
@@ -1566,7 +1565,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
         reference_consumers = (
             ".github/agents/zsh-plugin-reviewer.agent.md",
-            ".github/skills/zsh-plugin/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
         )
@@ -1617,7 +1615,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_rejects_container_fenced_or_indented_canonical_references(
         self,
     ) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         canonical_paths = (
             ".github/instructions/zsh/scripting.instructions.md",
             "knowledge/domains/zsh/data/zsh-standard-policy.json",
@@ -1719,7 +1717,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
 
     def test_rejects_consumer_rule_definition_heading(self) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         cases = (
             ("plain", "### zsh/options/localize"),
             ("backticked", "### `zsh/options/localize`"),
@@ -1761,7 +1759,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 self.assertEqual(errors, [])
 
     def test_rejects_valid_atx_h3_rule_heading_variants(self) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         visible_headings = (
             "   ### zsh/options/localize",
             "### zsh/options/localize ###",
@@ -1840,7 +1838,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_container_fences_hide_only_their_normative_h3_content(
         self,
     ) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         container_fences = (
             (
                 "list",
@@ -1927,7 +1925,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
                 )
 
                 root = self.make_fixture()
-                relative_path = ".github/skills/zsh-plugin/SKILL.md"
+                relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
                 path = root / relative_path
                 path.write_text(
                     path.read_text(encoding="utf-8") + "\n" + source + "\n",
@@ -1958,7 +1956,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         paths = (
             ".github/instructions/zsh/scripting.instructions.md",
             ".github/agents/zsh-plugin-reviewer.agent.md",
-            ".github/skills/zsh-plugin/SKILL.md",
             "knowledge/domains/plugins/templates/template.plugin.zsh",
             "PATTERNS.md",
             ".github/README.md",
@@ -1995,7 +1992,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "70aa94949897d8135f8d100d8be8aab529b356830ac94bf9446dfc8e1ef08047",
+            "22d100ff52340a22fe20c855b936327adfbcd6963828eed2a670a2147daead28",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "
@@ -2007,7 +2004,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         )
 
     def test_rejects_list_and_nested_container_rule_headings(self) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         additions = (
             "- ### zsh/options/localize",
             "- ### `zsh/options/localize`",
@@ -2187,7 +2184,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_visible_paragraph_and_blank_list_continuations_satisfy_references(
         self,
     ) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         cases = (
             (
                 ".github/instructions/zsh/scripting.instructions.md",
@@ -2281,7 +2278,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
     def test_rejects_blockquoted_h3_and_invalid_backtick_fence_opener(
         self,
     ) -> None:
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         additions = (
             "> ### zsh/options/localize",
             "> ### `zsh/options/localize`",
@@ -2308,7 +2305,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_code_span_normalization_keeps_doubled_edge_spaces(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         path = root / relative_path
         path.write_text(
             path.read_text(encoding="utf-8") + "\n### `  zsh/options/localize  `\n",
@@ -2492,7 +2489,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_leaf_blocks_cannot_supply_structural_headings(self) -> None:
         rule_id = "zsh/options/localize"
-        consumer_path = ".github/skills/zsh-plugin/SKILL.md"
+        consumer_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         hidden_h3_blocks = (
             f"<div>\n### `{rule_id}`\n</div>",
             f"<script>\n### `{rule_id}`\n</script>",
@@ -2648,7 +2645,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_copied_normative_rule_inventory(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         path = root / relative_path
         policy = self.read_policy(root)
         rules = policy["normative_rules"]
@@ -3625,7 +3622,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_consumer_contract_uses_safe_text_reads(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/skills/zsh-plugin/SKILL.md"
+        relative_path = ".github/agents/zsh-plugin-reviewer.agent.md"
         path = root / relative_path
         outside_directory = tempfile.TemporaryDirectory()
         self.addCleanup(outside_directory.cleanup)
@@ -3663,7 +3660,6 @@ class PublicZshStandardContractTests(unittest.TestCase):
         policy_path = "knowledge/domains/zsh/data/zsh-standard-policy.json"
         consumers = (
             ".github/agents/zsh-plugin-reviewer.agent.md",
-            ".github/skills/zsh-plugin/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
         )
@@ -3685,19 +3681,6 @@ class PublicZshStandardContractTests(unittest.TestCase):
         ):
             with self.subTest(reviewer_finding_field=fragment):
                 self.assertIn(fragment, reviewer)
-
-        new_plugin_skill = (
-            PUBLIC_ROOT / ".github/skills/zsh-plugin/SKILL.md"
-        ).read_text(encoding="utf-8")
-        for fragment in (
-            "sourced-library",
-            "autoload-function",
-            "isolated",
-            "Invoke\n     `<identifier>_plugin_unload`",
-            "assert ownership-aware restoration",
-        ):
-            with self.subTest(new_plugin_contract=fragment):
-                self.assertIn(fragment, new_plugin_skill)
 
         template = (
             PUBLIC_ROOT / "knowledge/domains/plugins/templates/template.plugin.zsh"
