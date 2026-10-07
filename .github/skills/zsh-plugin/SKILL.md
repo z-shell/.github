@@ -42,7 +42,7 @@ semantics.
      bin/          # optional user-invoked executables
    ```
 
-4. **Write the entry file** from `templates/plugin.plugin.zsh`, replacing
+4. **Write the entry file** from `knowledge/domains/plugins/templates/template.plugin.zsh`, replacing
    `__IDENTIFIER__` with the ASCII project identifier. Keep the modelines as the
    first two lines verbatim. Do not create shared `Plugins` state, scattered
    public configuration parameters, or a second legacy namespace. Add

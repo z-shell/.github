@@ -29,13 +29,23 @@ REFERENCE_CONSUMER_PATHS = ADVISORY_CONSUMER_PATHS + (
     "PATTERNS.md",
     ".github/README.md",
 )
-PLUGIN_TEMPLATE_PATH = ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
+PLUGIN_TEMPLATE_PATH = "knowledge/domains/plugins/templates/template.plugin.zsh"
 # Advisory consumers published from another approved skill source (decision
 # 0037). The organization owns this list: a caller's checkout supplies only the
 # files named here, checked by the reusable zsh-policy-consumers workflow
 # against the policy at that workflow's own commit.
 EXTERNAL_CONSUMER_PATHS: dict[str, tuple[str, ...]] = {
-    "z-shell/agent-skills": ("plugins/z-shell/skills/zunit/SKILL.md",),
+    "z-shell/agent-skills": (
+        "plugins/z-shell/skills/zsh-plugin/SKILL.md",
+        "plugins/z-shell/skills/zunit/SKILL.md",
+    ),
+}
+# Files another repository ships as byte-identical copies of a canonical file
+# here, mapped from the copy's path in that repository to the canonical path.
+EXTERNAL_CANONICAL_COPIES: dict[str, dict[str, str]] = {
+    "z-shell/agent-skills": {
+        "plugins/z-shell/skills/zsh-plugin/templates/template.plugin.zsh": PLUGIN_TEMPLATE_PATH,
+    },
 }
 RETIRED_PATTERN_SECTIONS = {
     "Plugin entry-point skeleton": {
@@ -3239,6 +3249,28 @@ def validate_external_consumers(
                     rule_ids,
                 )
             )
+        for copy_path, canonical_path in sorted(
+            EXTERNAL_CANONICAL_COPIES.get(repository.lower(), {}).items()
+        ):
+            display_path = f"{repository}:{copy_path}"
+            canonical_file, canonical_errors = _contained_regular_path(
+                Path(root), canonical_path
+            )
+            errors.extend(canonical_errors)
+            copy_file, copy_errors = _contained_regular_path(
+                Path(consumer_root), copy_path
+            )
+            errors.extend(f"{repository}:{message}" for message in copy_errors)
+            if canonical_file is None or copy_file is None:
+                continue
+            if copy_file.read_bytes() != canonical_file.read_bytes():
+                errors.append(
+                    error(
+                        display_path,
+                        f"differs from the canonical {canonical_path}",
+                        f"copy {canonical_path} from z-shell/.github byte for byte",
+                    )
+                )
     except Exception as exc:  # Defensive boundary for caller-controlled files.
         errors.append(
             error(
