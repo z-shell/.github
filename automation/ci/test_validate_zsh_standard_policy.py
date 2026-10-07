@@ -29,7 +29,6 @@ CONSUMER_PATHS = (
     ".github/agents/plugins-plugin-reviewer.agent.md",
     ".github/skills/zsh-plugin/SKILL.md",
     ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
-    ".github/skills/zunit-test/SKILL.md",
     "PATTERNS.md",
     ".github/README.md",
 )
@@ -1568,7 +1567,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
         reference_consumers = (
             ".github/agents/plugins-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
-            ".github/skills/zunit-test/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
         )
@@ -1962,7 +1960,6 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
             ".github/agents/plugins-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
             ".github/skills/zsh-plugin/templates/plugin.plugin.zsh",
-            ".github/skills/zunit-test/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
         )
@@ -1998,7 +1995,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
         self.assertEqual(
             digest,
-            "1a6424dfa32d5230c6659797d1acc5d8eac44b20ddd37cf2f754afc7325a5595",
+            "fcbec288e234de8db300ea5be34f6fcce087a887f21312931ef43b4f9b9b9bc3",
             msg=(
                 "The frozen golden covers the parsed output of every path in "
                 f"{paths}. Editing any of them changes this digest, which is "
@@ -2651,7 +2648,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_rejects_copied_normative_rule_inventory(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/skills/zunit-test/SKILL.md"
+        relative_path = ".github/skills/zsh-plugin/SKILL.md"
         path = root / relative_path
         policy = self.read_policy(root)
         rules = policy["normative_rules"]
@@ -3628,7 +3625,7 @@ class ZshStandardPolicyValidatorTests(unittest.TestCase):
 
     def test_consumer_contract_uses_safe_text_reads(self) -> None:
         root = self.make_fixture()
-        relative_path = ".github/skills/zunit-test/SKILL.md"
+        relative_path = ".github/skills/zsh-plugin/SKILL.md"
         path = root / relative_path
         outside_directory = tempfile.TemporaryDirectory()
         self.addCleanup(outside_directory.cleanup)
@@ -3667,7 +3664,6 @@ class PublicZshStandardContractTests(unittest.TestCase):
         consumers = (
             ".github/agents/plugins-plugin-reviewer.agent.md",
             ".github/skills/zsh-plugin/SKILL.md",
-            ".github/skills/zunit-test/SKILL.md",
             "PATTERNS.md",
             ".github/README.md",
         )
@@ -3703,19 +3699,6 @@ class PublicZshStandardContractTests(unittest.TestCase):
             with self.subTest(new_plugin_contract=fragment):
                 self.assertIn(fragment, new_plugin_skill)
 
-        zunit_skill = (PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md").read_text(
-            encoding="utf-8"
-        )
-        for fragment in (
-            "test-fixture",
-            "zsh/test/isolate-environment",
-            "zsh/test/match-production-profile",
-            "zsh/plugin/exact-lifecycle",
-            "Declare each intentional negative fixture",
-        ):
-            with self.subTest(zunit_contract=fragment):
-                self.assertIn(fragment, zunit_skill)
-
         template = (
             PUBLIC_ROOT / ".github/skills/zsh-plugin/templates/plugin.plugin.zsh"
         ).read_text(encoding="utf-8")
@@ -3745,10 +3728,7 @@ class PublicZshStandardContractTests(unittest.TestCase):
         )
 
     def test_consumers_define_plugins_restoration_as_preload_state(self) -> None:
-        consumers = (
-            ".github/agents/plugins-plugin-reviewer.agent.md",
-            ".github/skills/zunit-test/SKILL.md",
-        )
+        consumers = (".github/agents/plugins-plugin-reviewer.agent.md",)
         for relative_path in consumers:
             with self.subTest(relative_path=relative_path):
                 text = (PUBLIC_ROOT / relative_path).read_text(encoding="utf-8")
@@ -3827,35 +3807,6 @@ class PublicZshStandardContractTests(unittest.TestCase):
                     block,
                 )
 
-    def test_zunit_example_guards_and_demonstrates_unload_lifecycle(
-        self,
-    ) -> None:
-        text = (PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md").read_text(
-            encoding="utf-8"
-        )
-
-        self.assertIn(
-            "if (( ${+functions[my_plugin_plugin_unload]} )); then",
-            text,
-        )
-        self.assertIn(
-            "@test 'unload restores owned state and self-destructs'",
-            text,
-        )
-        self.assertIn(
-            "assert before plugin_load_surface loaded",
-            text,
-        )
-        self.assertIn(
-            "assert before plugin_unloaded loaded user_state after",
-            text,
-        )
-        self.assertNotIn("typeset -gA Plugins", text)
-        self.assertIn(
-            "one `@setup` and one `@teardown`, each running around every test",
-            text,
-        )
-
 
 class PublicRepositoryTests(unittest.TestCase):
     def test_public_repository_zsh_standard_contract(self) -> None:
@@ -3877,8 +3828,9 @@ class ExternalConsumerTests(unittest.TestCase):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.consumer_root = Path(directory.name)
-        self.source = (PUBLIC_ROOT / ".github/skills/zunit-test/SKILL.md").read_text(
-            encoding="utf-8"
+        self.source = (
+            "# ZUnit\n\nRead `.github/instructions/zsh/scripting.instructions.md` and\n"
+            "`knowledge/domains/zsh/data/zsh-standard-policy.json`.\n"
         )
 
     def write_consumer(self, text: str) -> None:
