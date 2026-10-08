@@ -21,7 +21,7 @@ repositories:
     exceptions:
       - path: .github/ISSUE_TEMPLATE/01_bug_report.yml
         blob: 434728851e5021e1c9b6046b7af501a23b5742da
-        reason: The plugin bug report asks for a summary, a minimal reproduction and the actual behavior, and applies the area:plugin label; the organization bug report has none of these.
+        reason: The plugin bug report asks for a summary and applies the area:plugin label, which the organization bug report does not.
       - path: .github/ISSUE_TEMPLATE/02_feature_request.yml
         blob: f004e5185ac38290d2e5d66ea0d05c1ce80fdfda
         reason: The plugin feature request asks for the problem or use case, the proposed behavior, the alternatives considered and the compatibility considerations, and applies the area:plugin label.
@@ -45,7 +45,7 @@ repositories:
     exceptions:
       - path: .github/ISSUE_TEMPLATE/01_bug_report.yml
         blob: a35e694bbaa8e043be5c8fb471264e6cbca93846
-        reason: The zi bug report asks for the Zi commit and a minimal reproduction as Zsh commands, and requires only what a Zi bug needs; the organization bug report also requires a code snippet and additional information.
+        reason: The zi bug report asks for the Zi commit and a minimal reproduction as Zsh commands; the organization bug report asks for a generic affected version and loading method.
       - path: .github/ISSUE_TEMPLATE/02_feature_request.yml
         blob: aeca2c63228e4a76ee6225d38295f6acd8e79502
         reason: The zi feature request asks for the problem, the proposed solution and the alternatives considered, and applies status:triage with type:feature; the organization form asks for a one-line description and applies type:feature only.
