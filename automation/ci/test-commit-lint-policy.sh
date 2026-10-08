@@ -182,11 +182,51 @@ check_trailer_cases() {
   assert_match trailer "$p" 'Co-authored-by: Copilot <copilot@github.com>' match
   assert_match trailer "$p" '  Co-authored-by: renovate[bot] <x@y>' match
 
-  # A human co-author is explicitly allowed; only bot and agent identities are
-  # banned. Getting this wrong bans legitimate credit.
+  # Accurate human credit must not receive an automatic-tool-credit warning.
   assert_match trailer "$p" 'Co-authored-by: Jane Doe <jane@example.com>' no-match
   assert_match trailer "$p" 'fix(ci): an ordinary subject' no-match
   assert_match trailer "$p" 'Signed-off-by: dependabot[bot] <x@y>' no-match
+}
+
+check_trailer_is_advisory() {
+  local script output result subject
+  script=$(mktemp)
+  # Execute the actual workflow step, with a Git fixture rather than a second
+  # implementation of its error accounting. The message exceeds a pipe buffer
+  # so the historical grep -q failure is exercised too.
+  awk '
+    /^          set -euo pipefail$/ { started = 1 }
+    started && /^  pr-title:/ { exit }
+    started { sub(/^          /, ""); print }
+  ' "$WORKFLOW" >"$script"
+  for subject in 'fix: valid subject' 'invalid subject'; do
+    checks=$((checks + 1))
+    if output=$(BASE_SHA=base HEAD_SHA=head FIXTURE_SUBJECT="$subject" bash -c '
+      git() {
+        case "$1" in
+          log) printf "abcdef0123456789\n" ;;
+          show)
+            if [ "$3" = "--format=%B" ]; then
+              printf "Co-authored-by: Claude <noreply@anthropic.com>\n%070000d\n" 0
+            else
+              printf "%s\n" "$FIXTURE_SUBJECT"
+            fi ;;
+          cat-file) printf "parent base\n" ;;
+          *) return 2 ;;
+        esac
+      }
+      source "$1"
+    ' bash "$script" 2>&1); then result=0; else result=$?; fi
+    printf '%s\n' "$output" | grep -q '^::warning::Automatic tool-credit trailer' ||
+      fail "tool credit did not produce an advisory warning"
+    case "$subject" in
+      'fix: valid subject')
+        [ "$result" -eq 0 ] || fail "tool credit alone failed commit validation"
+        ;;
+      *) [ "$result" -ne 0 ] || fail "an invalid subject passed commit validation" ;;
+    esac
+  done
+  rm -f "$script"
 }
 
 check_conventional_cases() {
@@ -235,6 +275,7 @@ check_exempt_label_is_canonical
 check_prefixes_not_duplicated
 check_branch_cases
 check_trailer_cases
+check_trailer_is_advisory
 check_conventional_cases
 check_issue_reference_cases
 check_empty_pattern_is_never_harmless

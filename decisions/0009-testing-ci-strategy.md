@@ -44,8 +44,7 @@ rollout status per repository is tracked in issue #454, not restated here.
 - Dependency-update and vulnerability-remediation ownership follows accepted
   ADR-0012. ADR-0012 does **not** establish organization-wide secret-scanning
   coverage; that requires separately configured and verified controls.
-- Conventional Commits (ADR-0003), PR-title validation, and the
-  disallowed-trailer rule are target CI gates. Live enforcement is
+- Conventional Commits (ADR-0003) and PR-title validation are target CI gates. Automatic tool-credit trailers produce advisory warnings under the [contribution preference](../.github/CONTRIBUTING.md#tool-attribution); agents retain the firm output rule in `AGENTS.md`. See [ADR-0038](0038-tool-attribution-preference-and-agent-output-controls.md) for the attribution-policy revision. Live enforcement is
   repository-scoped and must be verified from the owning repository's caller,
   required checks, and rulesets. A workflow file alone is not proof that the
   gate is required or effective.

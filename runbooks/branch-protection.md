@@ -184,9 +184,7 @@ reviewed recovery decision using the recorded SHAs.
 
 Squash merges remain suitable for short-lived topic branches. Pass explicit
 `--subject` and `--body` values when merging with `gh` if any source commit may
-carry an unwanted trailer. Verify the resulting message. A `Co-authored-by`
-trailer may credit a real human, but must never credit a bot, AI agent, or
-automation.
+carry an unwanted trailer. Verify the resulting message against the [tool-attribution preference](../.github/CONTRIBUTING.md#tool-attribution). Agents must omit automatic tool credits under `AGENTS.md`; accurate contributor credit and required third-party notices remain intact. A missing tool credit does not establish exclusively human authorship. Attribution checks are advisory for contributors, and an older pinned caller may retain the former blocking behavior until updated.
 
 This section does not apply to `next` to `main` promotion, which must use a
 merge commit.
