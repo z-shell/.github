@@ -1,5 +1,7 @@
 # Issue Templates
 
+When the target repository has issue forms (its own `.github/ISSUE_TEMPLATE/`, or the organization forms it falls back to), do not use these templates: follow "Filing a new issue" in [the triage runbook](../../../../runbooks/triage.md), which mirrors the effective form field by field. Use the templates below only for a repository without forms.
+
 Copy and customize these templates for issue bodies.
 
 ## Bug Report Template
@@ -25,7 +27,7 @@ Copy and customize these templates for issue bodies.
 
 ## Environment
 
-- Browser: [e.g., Chrome 120]
+- Zsh: [output of `zsh --version`]
 - OS: [e.g., macOS 14.0]
 - Version: [e.g., v1.2.3]
 
