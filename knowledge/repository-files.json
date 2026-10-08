@@ -1101,6 +1101,13 @@
       "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
     },
     {
+      "path": "decisions/0038-tool-attribution-preference-and-agent-output-controls.md",
+      "domain": "agents",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/agents/repository-resources.md",
+      "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
+    },
+    {
       "path": "decisions/README.md",
       "domain": "governance",
       "disposition": "referenced",
