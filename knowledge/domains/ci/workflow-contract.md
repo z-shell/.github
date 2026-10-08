@@ -73,6 +73,7 @@ This is an interim compatibility measure for [#663](https://github.com/z-shell/.
 ## 3. Concurrency & Execution Control
 
 - **Branch / PR Workflows**: Declare a `concurrency` block with `cancel-in-progress: true` to prevent resource waste and race conditions on rapid pushes.
+- **Required checks with overlapping events**: When push and PR metadata events can produce checks for the same head, do not cancel or supersede those short runs. GitHub retains cancelled check results; even `cancel-in-progress: false` can replace a pending run. Omit concurrency for this documented case (z-shell/zi#597), and verify the effective required checks. A reusable workflow that owns concurrency must use a group distinct from its caller, or the caller must omit its own group.
 - **Release / Deployment Workflows**: Set `cancel-in-progress: false` to ensure in-flight deployments complete deterministically.
 
 ---
@@ -84,6 +85,23 @@ This is an interim compatibility measure for [#663](https://github.com/z-shell/.
 - When a workflow is **also** triggered directly (`push`, `pull_request`, `schedule`), put the operative fallback in the job step, for example `: "${VAR:=...}"`. The `inputs` context holds "the inputs of a reusable or manually triggered workflow", so on a direct trigger it is empty and `workflow_call` defaults are never applied. A default declared on the input is then dead text on the path the workflow actually takes, and an empty pattern reaching `grep -E` matches every line.
 - Reference called workflows using pinned immutable refs.
 - Expose job `outputs` cleanly for downstream dependent jobs (`needs:`).
+
+The shared `zsh-ci.yml` owns native syntax and optional compilation. Callers
+declare extensionless Zsh sources through newline-delimited `extra-files`,
+set `require-sources: true` when an empty inventory is an error, and enable
+`run-zcompile` for the organization baseline. Existing `*.zsh` discovery is
+retained. Compilation uses disposable output outside the checkout. Consumers
+own source classification, supported versions and functional tests.
+
+The shared `commit-lint.yml` accepts `policy-baseline-sha` for repositories
+adopting Conventional Commits after existing history. The baseline must be a
+full commit SHA ancestral to the PR base; it exempts older subjects only and
+never skips trailer checks. Keep that input in the reviewed caller, not PR
+metadata. The shared `codeql.yml` also supports `workflow_call` for Actions
+analysis; it does not analyze Zsh semantics. Both native Zsh and CodeQL accept
+`checkout-ref` for an exact candidate SHA and use distinct concurrency groups
+when called from the same parent workflow. Preserve required-check names and
+prove caller coverage before changing repository rulesets.
 
 ---
 
@@ -106,7 +124,7 @@ new uses; migrate existing uses through their owning rollout and runbook.
 - [ ] Filename is `kebab-case.yml` with appropriate category prefix.
 - [ ] Workflow `name:` and Job `name:` contain NO emojis.
 - [ ] Top-level `permissions:` is declared with minimum necessary scope.
-- [ ] `concurrency:` block is present with `cancel-in-progress` set appropriately.
+- [ ] Concurrency follows the execution-control rules above, including documented required-check exceptions and distinct caller/callee groups.
 - [ ] All remote actions and reusable workflows are pinned to 40-character commit SHAs with associated release comments, or the documented interim `# main` comment for organization reusable workflows.
 - [ ] Any interim pinact exception uses the shared template's exact repository/workflow and full-SHA match; the selected workflow and commit are verified separately.
 - [ ] Actionlint and YAML syntax checks pass.

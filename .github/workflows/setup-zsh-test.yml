@@ -7,12 +7,16 @@ on:
     paths:
       - "actions/setup-zsh/**"
       - "automation/ci/test_setup_zsh.py"
+      - "automation/ci/test_zsh_ci.py"
+      - ".github/workflows/zsh-ci.yml"
       - "automation/ci/verify_zsh_signals.py"
       - ".github/workflows/setup-zsh-test.yml"
   pull_request:
     paths:
       - "actions/setup-zsh/**"
       - "automation/ci/test_setup_zsh.py"
+      - "automation/ci/test_zsh_ci.py"
+      - ".github/workflows/zsh-ci.yml"
       - "automation/ci/verify_zsh_signals.py"
       - ".github/workflows/setup-zsh-test.yml"
   workflow_dispatch: {}
@@ -99,6 +103,9 @@ jobs:
             autoload -Uz compinit
             compinit -D
           ' zsh "$EXPECTED_VERSION" "$SOURCE_EXECUTABLE"
+      - name: Test native workflow inventory and failures
+        if: matrix.os == 'ubuntu-latest' && matrix.version == 'latest'
+        run: python3 -m unittest automation/ci/test_zsh_ci.py -v
       - name: Verify explicit patch profile
         if: matrix.patch != 'none'
         env:
