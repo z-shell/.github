@@ -26,6 +26,16 @@ Unattended reviews, weekly sweeps, bulk backfills and stale/lock dispositions re
 
 If a quick queue pass cannot establish the facts, record the unknowns and next investigation under the owning item. Propose `status:triage` when appropriate rather than inventing a label or treating an unverified issue as ready for implementation. A quick pass does not replace the investigation gate below.
 
+## Filing a new issue
+
+An issue filed through the API, including `gh issue create --body-file`, bypasses the repository's issue forms: their required fields, labels and assignees never apply. When creating an issue is authorized, follow the form by hand:
+
+1. Find the effective form. If the owning repository has a `.github/ISSUE_TEMPLATE/` directory, its forms apply; otherwise this repository's `.github/ISSUE_TEMPLATE/` forms apply. Any file in the repository directory, `config.yml` alone included, replaces every organization form. Pick the form that matches the work type.
+2. Write one `### <label>` heading per `input`, `textarea` and `dropdown` field, in form order, using the field's `label` text exactly, as GitHub renders a submitted form. Fill every required field; write `Not applicable` and the reason rather than dropping a heading. Leave out `markdown` blocks and policy `checkboxes`.
+3. In reproduction and environment fields, give the exact revision (branch and commit), the Zsh version, the OS, the shortest isolated reproduction (`zsh -f`, with an isolated `HOME` when configuration matters), and the actual and expected output.
+4. Apply the form's `labels` and `assignees` together with the canonical `type:*` and `area:*` labels from step 3 below. Use the form's title prefix unless the owning repository's instructions set another title style.
+5. Read the issue back and compare its headings and labels with the form before reporting it filed.
+
 ## 1. Inspect context and ownership
 
 1. Resolve the exact repository, item, visibility, current state, acceptance criteria and intended target branch. Read the complete issue discussion and relevant PR feedback.
