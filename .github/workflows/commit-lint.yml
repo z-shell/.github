@@ -23,13 +23,6 @@ on:
     branches: [main]
   workflow_call:
     inputs:
-      policy-baseline-sha:
-        description: >
-          Optional full commit SHA predating Conventional Commits adoption.
-          Must be an ancestor of the PR base. Older subjects are exempt;
-          commit trailers are still checked throughout the PR range.
-        required: false
-        type: string
       disallowed-trailer-pattern:
         description: >
           Case-insensitive grep -E pattern for a banned commit trailer. A
@@ -82,7 +75,6 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          POLICY_BASELINE_SHA: ${{ inputs.policy-baseline-sha }}
           DISALLOWED_TRAILER_PATTERN: ${{ inputs.disallowed-trailer-pattern }}
         run: |
           set -euo pipefail
@@ -95,14 +87,6 @@ jobs:
 
           errors=0
           checked=0
-
-          if [[ -n ${POLICY_BASELINE_SHA:-} ]]; then
-            [[ $POLICY_BASELINE_SHA =~ ^[0-9a-f]{40}$ ]] &&
-              git merge-base --is-ancestor "$POLICY_BASELINE_SHA" "$BASE_SHA" || {
-                echo '::error::Policy baseline must be a full SHA ancestral to the PR base'
-                exit 1
-              }
-          fi
 
           while IFS= read -r sha; do
             # grep -c, not grep -q. Under pipefail, grep -q exits on its first
@@ -117,11 +101,6 @@ jobs:
 
             parent_count=$(git cat-file -p "$sha" | grep -c '^parent' || true)
             [ "$parent_count" -gt 1 ] && continue
-
-            if [[ -n ${POLICY_BASELINE_SHA:-} ]] &&
-              git merge-base --is-ancestor "$sha" "$POLICY_BASELINE_SHA"; then
-              continue
-            fi
 
             subject=$(git show -s --format='%s' "$sha")
             checked=$((checked + 1))

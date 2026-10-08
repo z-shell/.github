@@ -93,11 +93,7 @@ set `require-sources: true` when an empty inventory is an error, and enable
 retained. Compilation uses disposable output outside the checkout. Consumers
 own source classification, supported versions and functional tests.
 
-The shared `commit-lint.yml` accepts `policy-baseline-sha` for repositories
-adopting Conventional Commits after existing history. The baseline must be a
-full commit SHA ancestral to the PR base; it exempts older subjects only and
-never skips trailer checks. Keep that input in the reviewed caller, not PR
-metadata. The shared `codeql.yml` also supports `workflow_call` for Actions
+The shared `codeql.yml` supports `workflow_call` for Actions
 analysis; it does not analyze Zsh semantics. Both native Zsh and CodeQL accept
 `checkout-ref` for an exact candidate SHA and use distinct concurrency groups
 when called from the same parent workflow. Preserve required-check names and
