@@ -47,9 +47,8 @@ on:
         required: false
         type: string
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# Required checks must not cancel another run for the same head when an edit
+# and a push arrive together (z-shell/zi#597). These short jobs finish normally.
 
 permissions:
   contents: read

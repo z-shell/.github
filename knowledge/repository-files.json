@@ -1717,6 +1717,13 @@
       "reason": "CI maintenance programs, adjacent tests and offline fixtures; preserve workflow inputs, runtime targets and sparse-checkout contracts."
     },
     {
+      "path": "automation/ci/test_zsh_ci.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Executes the shared native Zsh workflow against isolated valid, invalid and extensionless sources."
+    },
+    {
       "path": "automation/ci/test_setup_zsh.py",
       "domain": "ci",
       "disposition": "referenced",

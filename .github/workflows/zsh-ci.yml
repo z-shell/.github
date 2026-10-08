@@ -4,13 +4,28 @@ name: Zsh CI
 on:
   workflow_call:
     inputs:
+      checkout-ref:
+        description: Optional exact candidate commit; otherwise check the triggering SHA.
+        required: false
+        type: string
+        default: ""
+      extra-files:
+        description: Newline-delimited repository-relative Zsh files in addition to *.zsh (for example extensionless completions). No globs or symlinks.
+        required: false
+        type: string
+        default: ""
+      require-sources:
+        description: Fail when the selected source inventory is empty.
+        required: false
+        type: boolean
+        default: false
       zsh-version:
         description: Zsh version to install (latest package, or exact Linux 5.9 or 5.9.2).
         required: false
         type: string
         default: latest
       run-zcompile:
-        description: Run zcompile on all .zsh files in addition to zsh -n.
+        description: Run zcompile on all selected sources in addition to zsh -n.
         required: false
         type: boolean
         default: false
@@ -18,7 +33,7 @@ on:
 permissions: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-native-zsh-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,6 +45,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ inputs.checkout-ref || github.sha }}
+          persist-credentials: false
 
       - name: Set up Zsh
         uses: z-shell/.github/actions/setup-zsh@6c7972d4f682c29cdd0e86df2cffce6aa5d23c89 # main
@@ -38,29 +56,44 @@ jobs:
 
       - name: Run zsh -n
         shell: bash
+        env:
+          EXTRA_FILES: ${{ inputs.extra-files }}
+          REQUIRE_SOURCES: ${{ inputs.require-sources }}
+          RUN_ZCOMPILE: ${{ inputs.run-zcompile }}
         run: |
+          set -euo pipefail
           mapfile -d '' files < <(find . -type d -name '.git' -prune -o -type f -name '*.zsh' -print0)
+          while IFS= read -r file || [[ -n $file ]]; do
+            [[ -n $file ]] || continue
+            if [[ $file == /* || /$file/ == */../* || ! -f $file || -L $file ]]; then
+              echo '::error::Extra Zsh sources must be existing repository-relative regular files'
+              exit 1
+            fi
+            # Reject symlink ancestors as well as a symlink at the leaf.
+            parent=$(dirname -- "$file")
+            while [[ $parent != . ]]; do
+              [[ ! -L $parent ]] || { echo '::error::Symlink source directory'; exit 1; }
+              parent=$(dirname -- "$parent")
+            done
+            files+=("$file")
+          done <<< "$EXTRA_FILES"
           if [[ ${#files[@]} -eq 0 ]]; then
-            echo "No .zsh files found — nothing to check."
+            if [[ $REQUIRE_SOURCES == true ]]; then
+              echo '::error::No Zsh sources selected'
+              exit 1
+            fi
+            echo 'No Zsh sources selected.'
             exit 0
           fi
+          compiled=$(mktemp -d)
+          trap 'rm -rf -- "$compiled"' EXIT
           failed=0
           for f in "${files[@]}"; do
-            if ! zsh -n "$f" 2>&1; then
+            if ! zsh -f -n -- "$f" 2>&1; then
               echo "::error file=$f::zsh -n syntax check failed"
               failed=1
             fi
-          done
-          exit "$failed"
-
-      - name: Run zcompile
-        if: inputs.run-zcompile
-        shell: bash
-        run: |
-          mapfile -d '' files < <(find . -type d -name '.git' -prune -o -type f -name '*.zsh' -print0)
-          failed=0
-          for f in "${files[@]}"; do
-            if ! zsh -fc 'zcompile -- "$1"' zsh "$f" 2>&1; then
+            if [[ $RUN_ZCOMPILE == true ]] && ! zsh -fc 'zcompile "$1" "$2"' zsh "$compiled/source.zwc" "$f" 2>&1; then
               echo "::error file=$f::zcompile failed"
               failed=1
             fi

@@ -25,7 +25,8 @@ definitions come from `decisions/0007-release-publication-flow.md`.
 ## Baseline (every repo)
 
 - Workflows follow org conventions: SHA-pinned actions, top-level
-  least-privilege `permissions:`, `concurrency:` on push/PR, no-emoji workflow/
+  least-privilege `permissions:`, push/PR concurrency with the workflow
+  contract's documented required-check exceptions, no-emoji workflow/
   job `name:` (ADR-0005), kebab-case filenames.
 - Zsh sources pass `zsh -n` and `zcompile`.
 - Conventional Commits, PR-title validation, and the disallowed-trailer rule

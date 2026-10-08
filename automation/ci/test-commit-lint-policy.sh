@@ -95,7 +95,7 @@ check_fallbacks_present() {
 # input is a second source of truth that the pull_request path never reads.
 check_no_input_defaults() {
   checks=$((checks + 1))
-  if sed -n '/workflow_call:/,/^concurrency:/p' "$WORKFLOW" | grep -q '^ *default:'; then
+  if sed -n '/workflow_call:/,/^permissions:/p' "$WORKFLOW" | grep -q '^ *default:'; then
     fail "workflow_call input carries a default that a pull_request run ignores (#586)"
   fi
 }
@@ -279,6 +279,12 @@ check_trailer_is_advisory
 check_conventional_cases
 check_issue_reference_cases
 check_empty_pattern_is_never_harmless
+
+# Metadata edits and pushes for one head must not cancel required results.
+checks=$((checks + 1))
+if grep -q '^concurrency:' "$WORKFLOW"; then
+  fail 'commit lint must let overlapping required-check runs finish (zi#597)'
+fi
 
 if [ "$failures" -gt 0 ]; then
   printf '\n%d of %d checks failed\n' "$failures" "$checks" >&2
