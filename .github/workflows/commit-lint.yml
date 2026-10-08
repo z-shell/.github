@@ -3,12 +3,11 @@ name: Commit Lint
 
 # Org-wide commit-message, PR-title, and branch-naming policy, promoted from
 # z-shell/zi's next-branch-only commit-lint.yml (z-shell/.github#464). Enforces
-# the AGENTS.md rules that were previously "author-enforced" only: the
-# disallowed bot/AI-agent Co-authored-by trailer -- a human co-author is
-# allowed, only a bot/agent identity is banned (AGENTS.md) -- Conventional
-# Commits (decisions/0003), and topic-branch naming against the documented
+# Conventional Commits (decisions/0003) and topic-branch naming against the documented
 # pattern (decisions/0019). Issue traceability is checked on the pull request,
 # not the branch name (decisions/0022).
+# Recognized automatic tool-credit trailers produce advisory warnings under
+# .github/CONTRIBUTING.md; agents retain the firm output rule in AGENTS.md.
 #
 # This workflow triggers directly on pull_request and is also callable by other
 # repositories. It was previously reached only through a thin `lint-commits.yml`
@@ -25,11 +24,10 @@ on:
     inputs:
       disallowed-trailer-pattern:
         description: >
-          Case-insensitive grep -E pattern for a banned commit trailer. A
-          Co-authored-by trailer crediting a real human is allowed; only a
-          bot/AI-agent/automation identity is disallowed (AGENTS.md), so the
-          fallback matches known bot/agent trailer shapes rather than every
-          Co-authored-by line. Extend as new agent identities show up. The
+          Case-insensitive grep -E pattern for an advisory tool-credit warning.
+          The legacy input name is retained for caller compatibility. Accurate
+          contributor credit is preserved; the fallback matches known bot/agent
+          trailer shapes rather than every Co-authored-by line. The
           fallback lives in the job step, because workflow_call input defaults
           do not apply to a pull_request run.
         required: false
@@ -95,8 +93,7 @@ jobs:
             # any message larger than the pipe buffer. grep -c reads to the end,
             # so the writer always finishes (z-shell/.github#587).
             if [ "$(git show -s --format='%B' "$sha" | grep -ciE "$DISALLOWED_TRAILER_PATTERN")" -gt 0 ]; then
-              echo "::error::Bot/agent Co-authored-by trailer found (${sha:0:7}): remove before merging. A human co-author is fine; only bot/AI-agent identities are banned (AGENTS.md). A squash merge without an explicit --subject/--body can also reintroduce one — see runbooks/branch-protection.md."
-              errors=$((errors + 1))
+              echo "::warning::Automatic tool-credit trailer found (${sha:0:7}). Prefer omitting automatic credits; this warning does not block a contribution or imply exclusively human authorship. See .github/CONTRIBUTING.md#tool-attribution. Agents must follow the output rule in AGENTS.md."
             fi
 
             parent_count=$(git cat-file -p "$sha" | grep -c '^parent' || true)

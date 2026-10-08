@@ -125,9 +125,7 @@ Rationale for the differences:
   rows, because it isn't a class-scaled risk: it is a plain repository API
   setting (`squash_merge_commit_title`/`squash_merge_commit_message`), not a
   ruleset rule, and it fails the same way regardless of class. `AGENTS.md`
-  bans a `Co-authored-by` trailer crediting a bot, AI agent, or automation;
-  a trailer crediting a real human (including the PR's own author) is
-  allowed. When `squash_merge_commit_message` is `COMMIT_MESSAGES` (GitHub's
+  requires agents to omit automatic tool credits, while contributor attribution is advisory under [ADR-0038](0038-tool-attribution-preference-and-agent-output-controls.md). Accurate contributor credit and required third-party notices remain intact. When `squash_merge_commit_message` is `COMMIT_MESSAGES` (GitHub's
   default), squashing a PR without an explicit `--body` aggregates every
   squashed commit's full message into the merge commit, which can carry a
   bot/agent trailer forward from an individual commit

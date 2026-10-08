@@ -46,15 +46,8 @@ Grant only what the role requires; record the grant:
 
 - Clone the owning repository directly. Separate multi-repository tooling is
   optional and outside this public runbook.
-- Configure commit signing: commits are signed (`gpg.format=ssh`); set a
-  `user.signingkey`. A `Co-authored-by` trailer crediting a real human is
-  fine — never credit a bot, AI agent, or automation as a co-author; that is
-  org policy. `z-shell/.github` and `z-shell/zi` currently enforce it in CI.
-  Verify every other repository's live caller and required-check configuration;
-  where no verified gate exists, it remains the author's responsibility,
-  including watching for a
-  squash merge silently promoting a bot/agent trailer from an individual
-  commit into the merge commit (`runbooks/branch-protection.md`).
+- Configure commit signing: commits are signed (`gpg.format=ssh`); set a `user.signingkey`.
+- Follow the [tool-attribution preference](../../../.github/CONTRIBUTING.md#tool-attribution). Agent operators must disable automatic credits where supported and verify outgoing text under `AGENTS.md`. Check the resulting squash-merge message as well (`runbooks/branch-protection.md`). Attribution warnings do not block contributors; older pinned workflow callers may still enforce the former ban until their own reviewed update.
 - Follow Conventional Commits and the repository model in ADR-0019. Branch
   from `main` unless contributing to the named `zi` integration exception.
 

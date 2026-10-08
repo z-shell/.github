@@ -15,6 +15,14 @@ roles and responsibilities are defined in [GOVERNANCE.md](GOVERNANCE.md) and
 
 The Project abides by the Organization's [code of conduct](CODE_OF_CONDUCT.md) and [trademark policy](TRADEMARKS.md).
 
+## Tool attribution
+
+We prefer commit messages and PR descriptions without automatic tool-credit trailers or generated-with footers. Credit actual contributors accurately. This preference does not imply that contributions were produced without AI assistance; describe tool use when relevant to review. Preserve required license notices and third-party attribution, and do not change contributor identities to disguise tool use.
+
+This is a contribution preference, not a merge requirement. Coding agents operating under [organization instructions](../AGENTS.md) must omit automatic tool credits and check their outgoing text. CI may report recognized tool-credit trailers as warnings while continuing to enforce commit formatting.
+
+The preference limits unnecessary disclosure of development tooling. [Research on detecting coding agents](https://arxiv.org/html/2606.24429v1) demonstrates that commit signatures and attribution text can identify tool usage at scale. [GitHub security research](https://github.blog/security/vulnerability-research/safeguarding-vs-code-against-prompt-injections/) demonstrates attacks through content that coding agents read. These findings support reducing an avoidable reconnaissance signal; they do not establish that attribution causes attacks or reveals the number of agents involved. Public configuration and workflows remain other signals, so this preference does not replace access controls, tool approvals, or code review.
+
 ## Community membership
 
 ### New contributors
