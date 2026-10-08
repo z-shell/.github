@@ -93,11 +93,11 @@ Fallback review under ADR-0026: maintainer elected, no Copilot request on [full 
 - Short-lived topic branches usually squash-merge. Persistent-branch promotion, every zi pull request into `main` (a `hotfix-*` included, since zi's `main` ruleset allows only merge commits), and a zi hotfix synchronization branch that carries a merge commit of `main` into `next` use a merge commit, so the ancestry survives ([`branch-protection.md`](../../../runbooks/branch-protection.md)). Pass `--match-head-commit <sha>` so a push between checking and merging fails the merge.
 - For a squash merge, pass the message explicitly and check it, as [`branch-protection.md`](../../../runbooks/branch-protection.md) describes for trailers.
 - When the body says `Closes #N`, re-check the criteria against the merged diff. If one is not met, reopen #N or open a follow-up at once.
-- In zi, a pull request merged into `next` leaves its issue open, because GitHub closes issues only from the default branch. Close those issues by hand when `next` is promoted to `main`, not earlier (zi's `AGENTS.md`).
+- In zi, a pull request merged into `next` leaves its issue open, because GitHub closes issues only from the default branch. When the promotion reaches `main`, zi's `Promotion Issue Closure` workflow closes each issue a promoted pull request names in an unqualified closing clause in its body, and lists `Refs`, qualified and cross-repository references in its run summary for a manual check. A body edited after the merge and an issue linked only in the Development sidebar are listed there too, never closed, so put the closing clause in the body before merging (zi's `AGENTS.md`). Do not close those issues before promotion.
 
 ## 5. After merge
 
-- When the merge closed the issue, confirm that Project 28's built-in workflow moved its item to `Done` ([`project-tracker.md`](../../../runbooks/project-tracker.md)). In zi the issue item stays open until promotion.
+- When the merge closed the issue, confirm that Project 28's built-in workflow moved its item to `Done` ([`project-tracker.md`](../../../runbooks/project-tracker.md)). In zi the issue item stays open until promotion, when the workflow closes it or lists it in its run summary for you to close by hand.
 - File the follow-ups promised in the body or in review replies, and link them.
 - Delete the branch and any local worktree only with the maintainer's authorization.
 
