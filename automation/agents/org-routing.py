@@ -3,8 +3,10 @@
 
 The canonical inventory is the ``downstream`` section of
 ``.github/instruction-surfaces.json``; approved vendored-skill revisions live in
-``knowledge/domains/agents/data/approved-skills.json``. This script is the only generator of the
-``org-routing`` block. Complete project instruction records live in
+``knowledge/domains/agents/data/approved-skills.json``; project profiles, whose
+issue-reporting facts the block carries, live in
+``knowledge/domains/governance/data/project-profiles.json``. This script is the
+only generator of the ``org-routing`` block. Complete project instruction records live in
 ``knowledge/project-delivery.json``. ``apply`` edits only the explicit target
 checkout's block and declared complete consumers; ``check`` only reports.
 
@@ -34,6 +36,7 @@ from pathlib import Path, PurePosixPath
 ORG_ROOT = next(parent for parent in Path(__file__).resolve().parents if (parent / ".github/instruction-surfaces.json").is_file())
 MANIFEST_PATH = ".github/instruction-surfaces.json"
 APPROVED_PATH = "knowledge/domains/agents/data/approved-skills.json"
+PROFILES_PATH = "knowledge/domains/governance/data/project-profiles.json"
 DELIVERY_SPEC = importlib.util.spec_from_file_location(
     "knowledge_delivery", Path(__file__).parents[1] / "knowledge/knowledge-delivery.py"
 )
@@ -49,6 +52,9 @@ MANIFEST_URL = (
 DECISION_URL = (
     "https://github.com/z-shell/.github/blob/main/decisions/"
     "0031-per-repository-instruction-routing-delivery.md"
+)
+TRIAGE_URL = (
+    "https://github.com/z-shell/.github/blob/main/runbooks/triage.md#filing-a-new-issue"
 )
 BEGIN_MARKER = "<!-- BEGIN org-routing -->"
 END_MARKER = "<!-- END org-routing -->"
@@ -76,6 +82,22 @@ APPROVED_SOURCE_PATHS = {
     CANONICAL_REPOSITORY: SKILLS_DIR + "/{name}",
     "z-shell/agent-skills": "plugins/<plugin>/skills/{name}",
 }
+PROFILE_FIELDS = {
+    "component",
+    "verified",
+    "version",
+    "branch",
+    "zsh",
+    "install",
+    "verification",
+    "report_fields",
+}
+PROFILE_VERIFIED_FIELDS = {"revision", "date"}
+PROFILE_VERSION_FIELDS = {"command", "note"}
+PROFILE_ZSH_FIELDS = {"minimum", "tested", "platforms"}
+PROFILE_REPORT_FIELDS = {"label", "description"}
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+ZSH_VERSION_PATTERN = re.compile(r"^\d+\.\d+(?:\.\d+)?$")
 METADATA_KEYS = {
     "github-path",
     "github-pinned",
@@ -375,6 +397,182 @@ def validate_downstream(downstream: object) -> list[str]:
     return errors
 
 
+def _profile_text(value: object) -> bool:
+    """One printable line that cannot close a marker or an HTML comment."""
+    return (
+        isinstance(value, str)
+        and bool(value)
+        and value.strip() == value
+        and value.isprintable()
+        and "<!--" not in value
+        and "-->" not in value
+    )
+
+
+def _text_list(value: object) -> bool:
+    """Non-empty list of unique profile lines without backticks."""
+    return (
+        isinstance(value, list)
+        and bool(value)
+        and all(_profile_text(item) and "`" not in item for item in value)
+        and len(set(value)) == len(value)
+    )
+
+
+def _closed(value: object, fields: set[str]) -> bool:
+    return isinstance(value, dict) and set(value) == fields
+
+
+def _profile_errors(repository: str, record: dict) -> list[str]:
+    """Return the field errors of one complete project profile."""
+    invalid: list[tuple[str, str]] = []
+    if (
+        not _profile_text(record["component"])
+        or not _profile_text(record["branch"])
+        or "`" in record["branch"]
+    ):
+        invalid.append(
+            ("component or branch", "set a one-line name; a branch has no backticks")
+        )
+    verified = record["verified"]
+    if (
+        not _closed(verified, PROFILE_VERIFIED_FIELDS)
+        or not isinstance(verified["revision"], str)
+        or not SHA_PATTERN.fullmatch(verified["revision"])
+        or not isinstance(verified["date"], str)
+        or not DATE_PATTERN.fullmatch(verified["date"])
+    ):
+        invalid.append(
+            (
+                "verified",
+                "record the 40-hex commit and YYYY-MM-DD date the facts were read at",
+            )
+        )
+    version = record["version"]
+    if not _closed(version, PROFILE_VERSION_FIELDS):
+        invalid.append(("version", "set command and note"))
+    else:
+        command, note = version["command"], version["note"]
+        if command is None and note is None:
+            invalid.append(("version", "give a command, a note, or both"))
+        if command is not None and (not _profile_text(command) or "`" in command):
+            invalid.append(
+                ("version command", "set a command without backticks, or null")
+            )
+        if note is not None and not _profile_text(note):
+            invalid.append(("version note", "set a one-line note, or null"))
+    zsh = record["zsh"]
+    if (
+        not _closed(zsh, PROFILE_ZSH_FIELDS)
+        or not (
+            zsh["minimum"] is None
+            or (
+                isinstance(zsh["minimum"], str)
+                and ZSH_VERSION_PATTERN.fullmatch(zsh["minimum"])
+            )
+        )
+        or not _text_list(zsh["tested"])
+        or not all(ZSH_VERSION_PATTERN.fullmatch(item) for item in zsh["tested"])
+        or not _text_list(zsh["platforms"])
+    ):
+        invalid.append(
+            ("zsh", "set minimum (a version or null), tested versions and platforms")
+        )
+    for field in ("install", "verification"):
+        if not _text_list(record[field]):
+            invalid.append(
+                (field, "set a non-empty unique list of commands without backticks")
+            )
+    fields = record["report_fields"]
+    labels: set[str] = set()
+    for item in fields if isinstance(fields, list) else [None]:
+        if (
+            not _closed(item, PROFILE_REPORT_FIELDS)
+            or not _profile_text(item["label"])  # type: ignore[index]
+            or "`" in item["label"]  # type: ignore[index]
+            or not _profile_text(item["description"])  # type: ignore[index]
+        ):
+            invalid.append(
+                (
+                    "report_fields",
+                    "give each field a plain label and a one-line description",
+                )
+            )
+            continue
+        if item["label"] in labels:
+            invalid.append(("report_fields", f"keep one {item['label']!r} field"))
+        labels.add(item["label"])
+    return [
+        error(PROFILES_PATH, f"{repository} {field} is invalid", fix)
+        for field, fix in invalid
+    ]
+
+
+def validate_profiles(profiles: object, downstream: list[dict]) -> list[str]:
+    """Validate project profiles (decisions/0040) against the downstream inventory."""
+    where = PROFILES_PATH
+    if (
+        not _closed(profiles, {"version", "profiles"})
+        or type(profiles["version"]) is not int  # type: ignore[index]
+        or profiles["version"] != 1  # type: ignore[index]
+    ):
+        return [
+            error(where, "must hold exactly version 1 and profiles", "fix the header")
+        ]
+    records = profiles["profiles"]  # type: ignore[index]
+    if not isinstance(records, dict):
+        return [
+            error(where, "profiles must be an object keyed by repository", "fix it")
+        ]
+    declared = {
+        entry["repository"]
+        for entry in downstream
+        if isinstance(entry, dict) and isinstance(entry.get("repository"), str)
+    }
+    errors: list[str] = []
+    if list(records) != sorted(records, key=str.lower):
+        errors.append(
+            error(where, "profiles are out of order", "sort profiles by repository")
+        )
+    for repository, record in records.items():
+        if repository not in declared:
+            errors.append(
+                error(
+                    where,
+                    f"{repository} is not declared downstream",
+                    f"declare it in {MANIFEST_PATH} or remove its profile",
+                )
+            )
+        if not isinstance(record, dict):
+            errors.append(
+                error(where, f"{repository} profile must be an object", "fix it")
+            )
+            continue
+        for field in sorted(set(record) ^ PROFILE_FIELDS):
+            state = "unknown" if field in record else "missing"
+            errors.append(
+                error(
+                    where,
+                    f"{repository} has {state} field {field!r}",
+                    "use exactly the profile fields",
+                )
+            )
+        if set(record) == PROFILE_FIELDS:
+            errors.extend(_profile_errors(repository, record))
+    return errors
+
+
+def load_profiles(org_root: Path, downstream: list[dict]) -> dict[str, dict]:
+    path = org_root / PROFILES_PATH
+    if not path.exists():
+        return {}  # Older organization revisions have no project profiles.
+    profiles = load_json(path)
+    errors = validate_profiles(profiles, downstream)
+    if errors:
+        raise RoutingError("\n".join(errors))
+    return profiles["profiles"]  # type: ignore[index]
+
+
 def git_blob_id(data: bytes) -> str:
     """Git's object id for a blob, so a file can be compared with a tree entry."""
     return hashlib.sha1(  # nosec B324 - Git object identity, not a security digest
@@ -601,9 +799,15 @@ class Org:
     """The loaded, validated canonical inventory."""
 
     def __init__(
-        self, downstream: list[dict], approved: dict, org_surfaces: list[dict], project_entries: list[dict] | None = None
+        self,
+        downstream: list[dict],
+        approved: dict,
+        org_surfaces: list[dict],
+        project_entries: list[dict] | None = None,
+        profiles: dict[str, dict] | None = None,
     ) -> None:
         self.downstream = downstream
+        self.profiles = profiles or {}
         self.approved = approved
         self.project_entries = project_entries or []
         self.skill_tasks = {
@@ -633,7 +837,8 @@ def load_org(org_root: Path) -> Org:
     if errors:
         raise RoutingError("\n".join(errors))
     project_entries = delivery.load_project_entries(org_root, downstream)
-    return Org(downstream, approved, org_surfaces or [], project_entries)  # type: ignore[arg-type]
+    profiles = load_profiles(org_root, downstream)  # type: ignore[arg-type]
+    return Org(downstream, approved, org_surfaces or [], project_entries, profiles)  # type: ignore[arg-type]
 
 
 def downstream_entry(downstream: list[dict], repository: str) -> dict:
@@ -706,8 +911,44 @@ def render(entry: dict, org: Org) -> str:
             f"- `{SKILLS_DIR}/{name}/SKILL.md`: tasks {_code_list(org.tasks_for_skill(name))}; "
             + f"files `**`; {origin} vendored at approved revision `{revision[:12]}`"
         )
+    profile = org.profiles.get(entry["repository"])
+    if profile:
+        lines += ["", *render_reporting(profile)]
     lines += ["", footer, "", END_MARKER]
     return "\n".join(lines) + "\n"
+
+
+def render_reporting(profile: dict) -> list[str]:
+    """Render the intake facts no repository-owned text states (decisions/0040).
+
+    Branch, Zsh versions, install and verification commands stay in the
+    profile: repositories state them in their own text already.
+    """
+    version = profile["version"]
+    intake = (
+        f"File an issue as [Filing a new issue]({TRIAGE_URL}) describes: one "
+        + "`### ` heading per field of the effective issue form, in form order."
+    )
+    if version["command"] is not None:
+        intake += (
+            " In the version or environment field, give the output of "
+            + f"`{version['command']}`."
+        )
+    if version["note"] is not None:
+        intake += f" {version['note']}"
+    lines = ["## Reporting issues", "", intake]
+    if profile["report_fields"]:
+        lines += [
+            "",
+            "After the form's fields, add these headings, writing `Not applicable` "
+            + "and the reason when one does not apply:",
+            "",
+        ]
+        lines += [
+            f"- `### {item['label']}`: {item['description']}"
+            for item in profile["report_fields"]
+        ]
+    return lines
 
 
 def splice(text: str | None, block: str, repository: str) -> str:

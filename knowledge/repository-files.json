@@ -1115,6 +1115,13 @@
       "reason": "Zi integration and milestone migration proposal; inspect acceptance and verified cutover before applying it."
     },
     {
+      "path": "decisions/0040-central-project-profiles-for-issue-intake.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Project profile and issue-intake proposal; inspect acceptance before treating the profile contract as decided."
+    },
+    {
       "path": "decisions/README.md",
       "domain": "governance",
       "disposition": "referenced",

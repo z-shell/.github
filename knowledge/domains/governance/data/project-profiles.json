@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "profiles": {
+    "z-shell/F-Sy-H": {
+      "component": "F-Sy-H",
+      "verified": {
+        "revision": "c215a0ef028af78ce77d69e6297aaf5de1533a51",
+        "date": "2026-10-09"
+      },
+      "version": {
+        "command": "git -C <plugin directory> describe --tags",
+        "note": "`$_fsh_version` can lag the checked-out commit."
+      },
+      "branch": "main",
+      "zsh": {
+        "minimum": "5.8",
+        "tested": ["5.8", "5.9.2"],
+        "platforms": ["Linux", "macOS"]
+      },
+      "install": [
+        "zi light z-shell/F-Sy-H",
+        "source <plugin directory>/F-Sy-H.plugin.zsh"
+      ],
+      "verification": [
+        "zsh -f -n F-Sy-H.plugin.zsh lib/*.zsh functions/* completions/* chroma/*",
+        "PATH=\"$PWD/bin:$PATH\" zunit",
+        "tools/validate-themes.zsh"
+      ],
+      "report_fields": [
+        {
+          "label": "Theme and configuration",
+          "description": "The output of `fsh_theme --show` and every `zstyle ':fsh:config'` setting in effect."
+        },
+        {
+          "label": "Chroma diagnostics",
+          "description": "When a command's highlighting is wrong, the output of `fsh_chroma doctor`."
+        },
+        {
+          "label": "Terminal and other plugins",
+          "description": "`$TERM`, the terminal emulator, and every other ZLE plugin in load order, such as zsh-autosuggestions or zsh-history-substring-search."
+        }
+      ]
+    },
+    "z-shell/zi": {
+      "component": "Zi",
+      "verified": {
+        "revision": "22b6da908579e6e8143a0abe02e6da14e7b4d5b8",
+        "date": "2026-10-09"
+      },
+      "version": {
+        "command": "zi version",
+        "note": null
+      },
+      "branch": "main",
+      "zsh": {
+        "minimum": null,
+        "tested": ["5.8.1", "5.9", "5.9.2"],
+        "platforms": ["Linux", "macOS"]
+      },
+      "install": ["sh -c \"$(curl -fsSL get.zshell.dev)\" --"],
+      "verification": [
+        "zsh -f -n zi.zsh",
+        "zsh -f tests/<name>.zsh",
+        "zsh -f tests/ci-registration.zsh",
+        "zsh -f tests/manual.zsh"
+      ],
+      "report_fields": [
+        {
+          "label": "Zi diagnostics",
+          "description": "The output of `zi analytics` and `zi zstatus`."
+        },
+        {
+          "label": "Ices and annexes",
+          "description": "Every `zi` command involved, with all of its ice modifiers, and the annexes loaded."
+        },
+        {
+          "label": "When it fails",
+          "description": "At load, at unload, only with turbo (`wait`) loading, or during install, update or `zi self-update`; for the last three, the paths and URLs involved."
+        }
+      ]
+    },
+    "z-shell/zpmod": {
+      "component": "zpmod",
+      "verified": {
+        "revision": "e171cbe4fc82f5e484f0ff458610e06a4f1f9b56",
+        "date": "2026-10-09"
+      },
+      "version": {
+        "command": "zpmod -V",
+        "note": null
+      },
+      "branch": "main",
+      "zsh": {
+        "minimum": "5.8.1",
+        "tested": ["5.8.1", "5.9.2"],
+        "platforms": ["Linux", "macOS"]
+      },
+      "install": [
+        "module_path+=(<module directory>); zmodload -i zpmod",
+        "a system package, or the CMake helper with --install-zi"
+      ],
+      "verification": [
+        "cmake -B build -S .",
+        "cmake --build build",
+        "ctest --test-dir build --output-on-failure"
+      ],
+      "report_fields": [
+        {
+          "label": "Build environment",
+          "description": "Compiler and version, CMake version and generator, OS and architecture, and the vendored Zsh header revision (`git -C vendor/zsh rev-parse HEAD`)."
+        },
+        {
+          "label": "Module loading",
+          "description": "How the module was installed, the exact `zmodload` error if any, and whether it was rebuilt for the running Zsh after a Zsh upgrade."
+        }
+      ]
+    },
+    "z-shell/zsh-lint": {
+      "component": "zsh-lint",
+      "verified": {
+        "revision": "7716f7cb7dac80ab2b80cb16e8042bdc4bbb0403",
+        "date": "2026-10-09"
+      },
+      "version": {
+        "command": null,
+        "note": "zsh-lint has no `--version` flag: in the version field, give the release tag or commit you built, such as the `@` version passed to `go install`."
+      },
+      "branch": "main",
+      "zsh": {
+        "minimum": null,
+        "tested": ["5.9.2"],
+        "platforms": ["Linux"]
+      },
+      "install": [
+        "go install github.com/z-shell/zsh-lint/cmd/zsh-lint@latest",
+        "go build ./cmd/zsh-lint"
+      ],
+      "verification": [
+        "go build ./...",
+        "go vet ./...",
+        "go test ./...",
+        "golangci-lint run ./..."
+      ],
+      "report_fields": [
+        {
+          "label": "Invocation",
+          "description": "The exact command line, including `--config`, `--no-config` or `--format`, and its exit code."
+        },
+        {
+          "label": "Configuration",
+          "description": "The `zsh-lint.json` in effect (zsh-lint searches upward from each input)."
+        },
+        {
+          "label": "Report kind",
+          "description": "A false positive or missed finding (name the `[rule]` id), or a crash. Valid Zsh that fails to parse goes to the Parser gap form instead."
+        }
+      ]
+    }
+  }
+}
