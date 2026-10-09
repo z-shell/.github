@@ -841,6 +841,117 @@ class RepoSettingsAuditTest
     assert_equal(1, result.fetch("errors").length)
     refute(result.fetch("settings").empty?, "expected the settings verdicts to remain")
   end
+
+  # --- WorkflowPins ------------------------------------------------------
+
+  ON_MAIN_PIN = "6fac3d47a61b27db54e50a0519c1e79b2935eda4"
+  OFF_MAIN_PIN = "64a427d8ac33c9ef1dc89af35920eb0d3de9fa9c"
+
+  def caller_workflow(sha, quote: "")
+    <<~YAML
+      jobs:
+        policy:
+          uses: #{quote}z-shell/.github/.github/workflows/commit-lint.yml@#{sha}#{quote} # main
+        build:
+          steps:
+            - uses: actions/checkout@#{"b" * 40} # v6
+            - uses: ./.github/actions/local
+        other:
+          uses: someone/else/.github/workflows/x.yml@#{"c" * 40}
+    YAML
+  end
+
+  # Workflow files of z-shell/p as path => text; compare answers map a pinned
+  # SHA to the compare API status, or to a GitHubErrorResponse.
+  def workflow_pin_routes(files, compare)
+    routes = {
+      "/repos/z-shell/.github" => { "default_branch" => "main" },
+      "/repos/z-shell/p" => { "default_branch" => "main" },
+      "/repos/z-shell/p/git/trees/main?recursive=1" => {
+        "truncated" => false,
+        "tree" => files.each_with_index.map { |(path, _text), index| { "path" => path, "type" => "blob", "sha" => index.to_s * 40 } } +
+          [{ "path" => "README.md", "type" => "blob", "sha" => "e" * 40 }]
+      }
+    }
+    files.each_with_index do |(_path, text), index|
+      routes["/repos/z-shell/p/git/blobs/#{index.to_s * 40}"] = { "encoding" => "base64", "content" => [text].pack("m") }
+    end
+    compare.each do |sha, answer|
+      routes["/repos/z-shell/.github/compare/main...#{sha}"] = answer.is_a?(String) ? { "status" => answer } : answer
+    end
+    routes
+  end
+
+  def test_workflow_pins_extract_only_organization_reusable_workflow_pins
+    pins = RepoSettingsAudit::WorkflowPins.extract(caller_workflow(ON_MAIN_PIN, quote: '"'), "z-shell")
+
+    assert_equal([{ "workflow" => "z-shell/.github/.github/workflows/commit-lint.yml", "sha" => ON_MAIN_PIN }], pins)
+  end
+
+  def test_workflow_pins_report_a_pin_that_is_not_on_the_source_main_branch
+    routes = workflow_pin_routes(
+      { ".github/workflows/commit-lint.yml" => caller_workflow(OFF_MAIN_PIN), ".github/workflows/ci.yaml" => caller_workflow(ON_MAIN_PIN) },
+      { OFF_MAIN_PIN => "diverged", ON_MAIN_PIN => "behind" }
+    )
+    checker = RepoSettingsAudit::WorkflowPins.context(FixtureClient.new(routes), "z-shell")
+
+    result = checker.evaluate("z-shell/p", "main")
+
+    assert_equal(1, result.fetch("drift"))
+    assert_equal(
+      [[".github/workflows/ci.yaml", ON_MAIN_PIN, "on_main"], [".github/workflows/commit-lint.yml", OFF_MAIN_PIN, "off_main"]],
+      result.fetch("pins").map { |row| [row.fetch("path"), row.fetch("sha"), row.fetch("status")] }
+    )
+  end
+
+  def test_workflow_pins_report_a_pin_the_source_repository_does_not_have
+    routes = workflow_pin_routes({ ".github/workflows/commit-lint.yml" => caller_workflow(OFF_MAIN_PIN) },
+                                 { OFF_MAIN_PIN => GitHubErrorResponse.new(status: 404) })
+
+    result = RepoSettingsAudit::WorkflowPins.context(FixtureClient.new(routes), "z-shell").evaluate("z-shell/p", "main")
+
+    assert_equal("missing", result.fetch("pins").first.fetch("status"))
+    assert_equal(1, result.fetch("drift"))
+  end
+
+  def test_workflow_pins_accept_an_identical_pin_and_ignore_nested_workflow_paths
+    routes = workflow_pin_routes(
+      { ".github/workflows/commit-lint.yml" => caller_workflow(ON_MAIN_PIN), ".github/workflows/fixtures/old.yml" => caller_workflow(OFF_MAIN_PIN) },
+      { ON_MAIN_PIN => "identical" }
+    )
+
+    result = RepoSettingsAudit::WorkflowPins.context(FixtureClient.new(routes), "z-shell").evaluate("z-shell/p", "main")
+
+    assert_equal(0, result.fetch("drift"))
+    assert_equal([".github/workflows/commit-lint.yml"], result.fetch("pins").map { |row| row.fetch("path") })
+  end
+
+  def workflow_pin_args(*extra)
+    ["--repo", "z-shell/p", "--classes-file", CLASSES_FILE, "--workflow-pins", "--skip-settings", *extra]
+  end
+
+  def test_cli_workflow_pins_fail_on_drift_exits_1_on_an_off_main_pin_and_0_when_on_main
+    off = workflow_pin_routes({ ".github/workflows/commit-lint.yml" => caller_workflow(OFF_MAIN_PIN) }, { OFF_MAIN_PIN => "diverged" })
+    on = workflow_pin_routes({ ".github/workflows/commit-lint.yml" => caller_workflow(ON_MAIN_PIN) }, { ON_MAIN_PIN => "behind" })
+    report = StringIO.new
+    drift = RepoSettingsAudit::CLI.run(workflow_pin_args("--fail-on-drift"), client: FixtureClient.new(off), stdout: report, stderr: StringIO.new)
+    json = StringIO.new
+    clean = RepoSettingsAudit::CLI.run(workflow_pin_args("--fail-on-drift", "--json"), client: FixtureClient.new(on), stdout: json, stderr: StringIO.new)
+
+    assert_equal(1, drift)
+    assert_equal(0, clean)
+    assert(report.string.include?("`.github/workflows/commit-lint.yml`: z-shell/.github/.github/workflows/commit-lint.yml@64a427d off_main"),
+           "expected the off-main pin in the Markdown report, got: #{report.string}")
+    assert_equal(0, JSON.parse(json.string).fetch("repos_with_workflow_pin_drift"))
+  end
+
+  def test_cli_workflow_pins_alone_satisfy_skip_settings_and_fail_on_drift
+    status = RepoSettingsAudit::CLI.run(
+      workflow_pin_args("--fail-on-drift"),
+      client: FixtureClient.new(workflow_pin_routes({}, {})), stdout: StringIO.new, stderr: StringIO.new
+    )
+    assert_equal(0, status)
+  end
 end
 
 GitHubErrorResponse = Struct.new(:status, :message) do
