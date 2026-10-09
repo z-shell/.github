@@ -36,7 +36,7 @@ The decision was re-evaluated in
 
 ## Decision
 
-> Proposed Zi amendment: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) moves qualification before ordinary `main` merges and separates milestone authorization. The exception below remains operative until maintainer acceptance and verified cutover; retain this record as migration history.
+> Accepted Zi amendment, cutover pending: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) moves qualification before ordinary `main` merges and separates milestone authorization. The exception below remains operative until verified cutover; retain this record as migration history.
 
 ### Organization default
 

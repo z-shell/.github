@@ -1,8 +1,8 @@
 # 39. Zi Main Integration and Signed Milestones
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-10-08
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** The Zi integration exception in `decisions/0019-trunk-on-main-default.md` and `decisions/0028-zi-promotion-is-release-authorization.md`, upon acceptance and verified cutover
 - **Superseded by:** None
 

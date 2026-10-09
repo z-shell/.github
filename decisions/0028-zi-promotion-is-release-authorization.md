@@ -14,7 +14,7 @@ GitHub Actions also does not start a new workflow for most events created with t
 
 ## Decision
 
-> Proposed replacement: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) uses protected `main` integration and separately reviewed signed milestones. This promotion contract remains operative until maintainer acceptance and verified cutover; retain this record as release history.
+> Accepted replacement, cutover pending: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) uses protected `main` integration and separately reviewed signed milestones. This promotion contract remains operative until verified cutover; retain this record as release history.
 
 For Zi, an eligible `next` to `main` promotion pull request is the review and authorization boundary for a milestone release:
 
