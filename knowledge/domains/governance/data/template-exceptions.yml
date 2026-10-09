@@ -59,14 +59,11 @@ repositories:
         blob: 37d8e92dc567492699acf51ecdcd73d08f370371
         reason: Blank issues are turned off, so every zi issue starts from a form; the contact links are the organization's.
       - path: .github/PULL_REQUEST_TEMPLATE.md
-        blob: 57f2c49985b6237de6c8ac3aad1c9b624e5077f0
-        reason: The zi pull-request template states the next and main branch model (ADR-0019) and carries the migration plan lines that the required Public contract impact check reads from the pull request body.
-      - path: .github/PULL_REQUEST_TEMPLATE/promotion.md
-        blob: 043c7b569e3f3173e0394bcb877c1bf49cede224
-        reason: The next-to-main promotion pull request (ADR-0019) records the candidate identity, required validation, readiness review, merge contract and rollback readiness.
+        blob: 3c4dc44bddfcdccfd5075dc1b8c7289be700730d
+        reason: The zi pull-request template states the protected main branch model (ADR-0039) and carries the migration plan lines that the required Public contract impact check reads from the pull request body.
       - path: docs/CONTRIBUTING.md
-        blob: 9f3d30151a43451c120050f7d188df931e2dda3d
-        reason: The zi contributing guide documents the next and main branch model, hotfix branches, promotion by merge commit and the release and tagging process, none of which the organization contributing guide covers.
+        blob: 5b318bffaa1077da5f02aa9245d4d73575bec457
+        reason: The zi contributing guide documents the protected main branch model (ADR-0039), Zsh verification and the signed milestone tag and release process, none of which the organization contributing guide covers.
   z-shell/zsh-lint:
     vendor_org_forms: true
     exceptions:
