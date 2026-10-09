@@ -107,7 +107,7 @@ ZSH_KEYS = {"zsh", "zsh-version", "zsh_version", "ZSH_VERSION"}
 # of a setup-zsh step; other actions use it for their own tools.
 SETUP_ZSH_USES = re.compile(r"(?:^|/)setup-zsh@")
 WORKFLOW_LINE = re.compile(
-    r"^(?P<indent> *)(?P<dash>- +)?(?:(?P<key>[A-Za-z0-9_.-]+) *:(?:\s+|$))?(?P<value>.*)$"
+    r"^(?P<indent> *)(?P<dash>- +)?(?:(?P<key>[A-Za-z0-9_.-]+) *:(?!\S)\s*)?(?P<value>.*)$"
 )
 BLOCK_SCALAR = re.compile(r"^[|>][0-9+-]*$")
 METADATA_KEYS = {
