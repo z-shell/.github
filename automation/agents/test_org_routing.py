@@ -1261,6 +1261,9 @@ class ProjectProfileTests(unittest.TestCase):
         self.assertIn(routing.TRIAGE_URL, block)
         self.assertIn("give the output of `tool --version`.", block)
         self.assertIn("- `### Configuration`: The `tool.json` in effect.", block)
+        # markdownlint MD038: a code span neither starts nor ends with a space.
+        spans = block.split("`")[1::2]
+        self.assertEqual([span for span in spans if span != span.strip()], [])
         self.assertNotIn("\u2014", block)
 
     def test_only_intake_facts_are_rendered(self) -> None:
