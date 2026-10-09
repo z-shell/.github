@@ -1119,7 +1119,7 @@
       "domain": "governance",
       "disposition": "referenced",
       "knowledge": "knowledge/domains/governance/repository-resources.md",
-      "reason": "Project profile and issue-intake proposal; inspect acceptance before treating the profile contract as decided."
+      "reason": "Accepted project profile and issue-intake decision; read with ADR-0031 for the routing block it extends."
     },
     {
       "path": "decisions/README.md",

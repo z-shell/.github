@@ -50,4 +50,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0037](0037-publish-agent-skills-from-a-dedicated-repository.md)      | Publish User and Developer Agent Skills From z-shell/agent-skills                                  | ACCEPTED   | 2026-10-06 | ss-o     |
 | [0038](0038-tool-attribution-preference-and-agent-output-controls.md) | Prefer minimal tool attribution and control agent output                                           | PROPOSED   | 2026-10-08 | TBD      |
 | [0039](0039-zi-main-integration-and-signed-milestones.md)             | Zi Main Integration and Signed Milestones                                                          | ACCEPTED   | 2026-10-08 | ss-o     |
-| [0040](0040-central-project-profiles-for-issue-intake.md)             | Central Project Profiles for Issue Intake                                                          | PROPOSED   | 2026-10-09 | TBD      |
+| [0040](0040-central-project-profiles-for-issue-intake.md)             | Central Project Profiles for Issue Intake                                                          | ACCEPTED   | 2026-10-09 | ss-o     |
