@@ -1,8 +1,8 @@
 # 40. Central Project Profiles for Issue Intake
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-10-09
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -26,6 +26,10 @@ GitHub issue forms cannot be conditional, and any file in a repository's `.githu
 - Agent filings carry the form's headings plus the profile's fields, and the project facts gain one editable home. Web filings keep the repository's effective form, without the profile's fields.
 - Profiles go stale unless someone rereads them. The recorded revision and date show their age. Once a repository pins an Org Routing revision that carries the check, each run compares the tested versions with its CI; the other facts are not checked.
 - Every block regeneration for a profiled repository now includes the section, so editing a profile changes generated text in that repository after its next repin.
+
+## Acceptance
+
+Accepted by ss-o on 2026-10-10, after the profiles, the Zsh version check and the delivery to z-shell/zi, z-shell/zsh-lint, z-shell/zpmod and z-shell/F-Sy-H landed under #779 and #780. Acceptance extends the `org-routing` block contract of ADR-0031 as point 2 states. ADR-0031's recorded status and supersession metadata do not change, and its manifest, approved pins and delivery workflow keep their ownership.
 
 ## Alternatives considered
 
