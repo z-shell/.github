@@ -36,6 +36,8 @@ The decision was re-evaluated in
 
 ## Decision
 
+> Accepted Zi amendment, cutover pending: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) moves qualification before ordinary `main` merges and separates milestone authorization. The exception below remains operative until verified cutover; retain this record as migration history.
+
 ### Organization default
 
 Use trunk-based development on `main` as the organization default:

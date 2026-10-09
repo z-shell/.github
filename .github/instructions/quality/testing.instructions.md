@@ -87,8 +87,7 @@ Mark the class-appropriate checks as required on the integration branch
 require the baseline; class-2 repositories additionally re-run the functional
 suite against the exact commit before a release tag is published.
 
-For `zi`, ordinary pull requests validate against `next`; the promotion pull
-request into `main` runs the full stable-branch check set on its exact head SHA.
+For Zi, ordinary pull requests validate against `next` and promotion validates its exact head until the maintainer accepts ADR-0039 and verifies cutover. After cutover, ordinary `main` pull requests must pass the full stable qualification before merge; post-merge checks also qualify the exact SHA for any separately authorized milestone.
 
 Organization templates must pin zsh-lint and ZUnit to exact commits belonging
 to published releases. Do not use mutable branches, tags, or unreleased pull

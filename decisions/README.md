@@ -49,3 +49,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0036](0036-central-editable-knowledge-and-generated-consumers.md)    | Central Editable Knowledge With Complete Generated Consumers                                       | ACCEPTED | 2026-10-04 | ss-o     |
 | [0037](0037-publish-agent-skills-from-a-dedicated-repository.md)      | Publish User and Developer Agent Skills From z-shell/agent-skills                                  | ACCEPTED | 2026-10-06 | ss-o     |
 | [0038](0038-tool-attribution-preference-and-agent-output-controls.md) | Prefer minimal tool attribution and control agent output                                           | PROPOSED | 2026-10-08 | TBD      |
+| [0039](0039-zi-main-integration-and-signed-milestones.md)             | Zi Main Integration and Signed Milestones                                                          | ACCEPTED | 2026-10-08 | ss-o     |

@@ -1108,6 +1108,13 @@
       "reason": "Historical decision record or generated decision index; inspect recorded status and supersession before applying it. Preserve numbering and accepted history."
     },
     {
+      "path": "decisions/0039-zi-main-integration-and-signed-milestones.md",
+      "domain": "governance",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/governance/repository-resources.md",
+      "reason": "Zi integration and milestone migration proposal; inspect acceptance and verified cutover before applying it."
+    },
+    {
       "path": "decisions/README.md",
       "domain": "governance",
       "disposition": "referenced",

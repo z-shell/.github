@@ -164,6 +164,14 @@ Merging that reviewed promotion is the human publication authorization. A privil
 
 A promotion with no releasable Conventional Commits is a successful no-op. The signed manual-tag verifier remains available for recovery. Tag rules prevent deletion, update, and unauthorized creation of `v*` refs. See [ADR-0028](../decisions/0028-zi-promotion-is-release-authorization.md).
 
+## Zi protected-main migration
+
+[ADR-0039](../decisions/0039-zi-main-integration-and-signed-milestones.md) accepts replacing the Zi promotion exception after verified cutover. Before admitting ordinary `main` PRs, preserve the full Zsh matrix, ZD compatibility, full Trunk and CodeQL checks, clean startup and real-object lifecycle qualification in a required pre-merge gate. Keep installers and self-update on `main`; every merge is immediately consumable.
+
+After cutover, ordinary merges do not publish milestones. Review `scripts/release-plan.zsh` output for the exact full SHA on current protected `main`, including version and deterministic notes, then separately authorize and push a signed annotated tag for that SHA. Reuse the existing tag verifier and publisher, including signer, target and complete exact-SHA workflow verification, idempotency and tag-conflict rejection. A no-op plan creates no tag. Do not create a release proposal for every merge or keep promotion-only publication active after the guard admits ordinary PRs.
+
+The promotion procedure above remains operative before cutover and historical afterward. Verify replacement checks on a real `main` PR, installation and self-update, retained commits, open PR targets and historical issue closure before retiring `next`. Follow the ordered cutover and rollback requirements in ADR-0039.
+
 ## Release-automation decision checklist
 
 Before proposing `release-please` for a repository, confirm:
