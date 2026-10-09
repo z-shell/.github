@@ -10,9 +10,10 @@ on:
       - "knowledge/domains/governance/data/template-exceptions.yml"
       - ".github/workflows/community-health-audit.yml"
 
-# Report-only audit of shadow community health files (#720). It reads public
-# repository trees with the workflow token and fails only on community health
-# drift or a failed read of those trees: --skip-settings keeps rulesets, branch
+# Report-only audit of shadow community health files (#720) and of
+# reusable-workflow pins to this repository that are not on its default branch
+# (#774). It reads public repository trees with the workflow token and fails
+# only on that drift or a failed read: --skip-settings keeps rulesets, branch
 # protection and settings out of the run. It is not a required status check.
 permissions:
   contents: read
@@ -38,7 +39,7 @@ jobs:
         run: |
           set -o pipefail
           ruby automation/governance/repo-settings-audit.rb --all-repos \
-            --community-health --skip-settings --fail-on-drift | tee -a "$GITHUB_STEP_SUMMARY"
+            --community-health --workflow-pins --skip-settings --fail-on-drift | tee -a "$GITHUB_STEP_SUMMARY"
 
       # --all-repos leaves out forks, so each public fork is named here.
       - name: "🔎 Audit public forks"
@@ -51,4 +52,4 @@ jobs:
             --repo z-shell/z-a-linkbin \
             --repo z-shell/zsh-web-artwork \
             --repo z-shell/zunit \
-            --community-health --skip-settings --fail-on-drift | tee -a "$GITHUB_STEP_SUMMARY"
+            --community-health --workflow-pins --skip-settings --fail-on-drift | tee -a "$GITHUB_STEP_SUMMARY"
