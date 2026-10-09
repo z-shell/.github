@@ -1259,6 +1259,9 @@ class ProjectProfileTests(unittest.TestCase):
         self.assertLess(section, block.index(routing.END_MARKER))
         self.assertGreater(section, block.index("`AGENTS.md` (this file)"))
         self.assertIn(routing.TRIAGE_URL, block)
+        self.assertIn(f"[project profile]({routing.PROFILES_URL})", block)
+        self.assertIn(f"[decision 0040]({routing.PROFILES_DECISION_URL})", block)
+        self.assertLess(block.index(routing.PROFILES_DECISION_URL), block.index("Organization-wide surfaces"))
         self.assertIn("give the output of `tool --version`.", block)
         self.assertIn("- `### Configuration`: The `tool.json` in effect.", block)
         # markdownlint MD038: a code span neither starts nor ends with a space.
