@@ -7,9 +7,12 @@ Check: python3 automation/knowledge/knowledge-delivery.py --check -->
 Use this runbook for a repository explicitly approved to retain a persistent
 integration branch under
 [`decisions/0019-trunk-on-main-default.md`](../decisions/0019-trunk-on-main-default.md).
-The current and only approved repository is `z-shell/zi`, with `next` as the
-integration branch and `main` as the stable consumable branch. Trunk-on-`main`
-repositories do not use this runbook.
+The former Zi exception was replaced by protected-main integration under
+[ADR-0039](../decisions/0039-zi-main-integration-and-signed-milestones.md).
+The procedures below preserve that historical promotion contract; they are not
+the current Zi contribution workflow. Reintroducing a persistent integration
+branch requires a separately accepted ADR. Trunk-on-`main` repositories use
+their class-appropriate protected-main rules and do not use this runbook.
 
 ## Required repository settings
 

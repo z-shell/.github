@@ -5,7 +5,7 @@
 - **Deciders:** ss-o
 - **Supersedes:** `decisions/0008-branching-model.md`,
   `decisions/0016-promotion-trigger-criteria.md`
-- **Superseded by:** None
+- **Superseded by:** `decisions/0039-zi-main-integration-and-signed-milestones.md` (Zi exception only)
 
 ## Context
 
@@ -36,7 +36,7 @@ The decision was re-evaluated in
 
 ## Decision
 
-> Accepted Zi amendment, cutover pending: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) moves qualification before ordinary `main` merges and separates milestone authorization. The exception below remains operative until verified cutover; retain this record as migration history.
+> [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) supersedes the Zi exception after verified cutover. The organization default remains accepted; the exception below records the historical model. Keep promotion ancestry and migration evidence.
 
 ### Organization default
 
@@ -78,7 +78,7 @@ after workflow, dependency automation, documentation, open pull request, and
 ruleset references have been moved to `main` and the retained history has been
 verified.
 
-### Approved persistent integration exception
+### Historical Zi persistent integration exception
 
 `zi` retains `next` as its integration branch and `main` as its stable
 consumable ref. This is a named exception, not a class-wide rule.

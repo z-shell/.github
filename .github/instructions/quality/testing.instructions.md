@@ -83,11 +83,11 @@ Do not add an org-wide coverage number.
 ## Required checks
 
 Mark the class-appropriate checks as required on the integration branch
-(`main`, or `zi`'s named `next` exception per ADR-0019). Class-3 repositories
+(`main`, including Zi under ADR-0039). Class-3 repositories
 require the baseline; class-2 repositories additionally re-run the functional
 suite against the exact commit before a release tag is published.
 
-For Zi, ordinary pull requests validate against `next` and promotion validates its exact head until the maintainer accepts ADR-0039 and verifies cutover. After cutover, ordinary `main` pull requests must pass the full stable qualification before merge; post-merge checks also qualify the exact SHA for any separately authorized milestone.
+For Zi, ordinary `main` pull requests must pass the full stable qualification before merge under ADR-0039: the full Linux/macOS Zsh matrix, ZD native and compatibility, full Trunk, CodeQL, clean startup and real-object lifecycle checks. The aggregate fails when any constituent fails, is cancelled or is skipped. Revalidate against a changed base; post-merge checks also qualify the exact SHA for any separately authorized signed milestone.
 
 Organization templates must pin zsh-lint and ZUnit to exact commits belonging
 to published releases. Do not use mutable branches, tags, or unreleased pull

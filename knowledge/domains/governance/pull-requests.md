@@ -9,7 +9,7 @@ Use this runbook for every pull request to a z-shell repository, whoever opens i
   - `feature-<issue>`, `bug-<issue>` or `hotfix-<issue>`, optionally followed by a lowercase `-<slug>` (for example `bug-480` or `feature-668-pull-requests`);
   - or `<type>/<lowercase-slug>` with a slash after a Conventional Commits type, or `feature`, `bug` or `hotfix` (for example `docs/pull-requests-runbook`). `docs-488` matches neither and fails the required check.
 - A repository may be stricter through the `branch-pattern` input of its commit-lint caller (z-shell/F-Sy-H accepts only `feature|bug|hotfix-<issue>`, with no slug).
-- Branch from the repository's base: `main`, except `next` for z-shell/zi ([ADR-0019](../../../decisions/0019-trunk-on-main-default.md), [`branch-protection.md`](../../../runbooks/branch-protection.md)). In zi a `hotfix-*` branch may start from and target `main`, must pass zi's main-branch source guard, and is then synchronized into `next` as [`branch-protection.md`](../../../runbooks/branch-protection.md) describes.
+- Branch from current `main` and target protected `main`, including Zi and fork contributions ([ADR-0019](../../../decisions/0019-trunk-on-main-default.md), [ADR-0039](../../../decisions/0039-zi-main-integration-and-signed-milestones.md)). Zi requires full stable qualification before every ordinary merge; its historical promotion model is retained only as migration history.
 
 ## 2. Opening
 
@@ -90,14 +90,14 @@ Fallback review under ADR-0026: maintainer elected, no Copilot request on [full 
 ## 4. Merge
 
 - All required checks pass on the head, a review of record has posted (unless the whole diff is a declared automation-only class, section 3), and no thread is unresolved. A fallback review of record must be on that same head (section 3, step 7).
-- Short-lived topic branches usually squash-merge. Persistent-branch promotion, every zi pull request into `main` (a `hotfix-*` included, since zi's `main` ruleset allows only merge commits), and a zi hotfix synchronization branch that carries a merge commit of `main` into `next` use a merge commit, so the ancestry survives ([`branch-protection.md`](../../../runbooks/branch-protection.md)). Pass `--match-head-commit <sha>` so a push between checking and merging fails the merge.
+- Short-lived topic branches, including ordinary Zi topics, usually squash-merge. Preserve separate commits when their ancestry is needed; never rewrite historical Zi promotion merges. Check the live allowed merge methods and pass `--match-head-commit <sha>` so a push between checking and merging fails the merge.
 - For a squash merge, pass the message explicitly and check it, as [`branch-protection.md`](../../../runbooks/branch-protection.md) describes for trailers.
 - When the body says `Closes #N`, re-check the criteria against the merged diff. If one is not met, reopen #N or open a follow-up at once.
-- In zi, a pull request merged into `next` leaves its issue open, because GitHub closes issues only from the default branch. When the promotion reaches `main`, zi's `Promotion Issue Closure` workflow closes each issue a promoted pull request names in an unqualified closing clause in its body, and lists `Refs`, qualified and cross-repository references in its run summary for a manual check. A body edited after the merge and an issue linked only in the Development sidebar are listed there too, never closed, so put the closing clause in the body before merging (zi's `AGENTS.md`). Do not close those issues before promotion.
+- Zi now uses native default-branch issue closure. Put `Closes #N` in the PR body only when every acceptance criterion is met, and `Refs #N` for partial work. Retain the historical reconciliation evidence in [Zi's migration record](https://github.com/z-shell/zi/blob/main/docs/MAIN_MIGRATION.md); promotion-only issue closure is retired.
 
 ## 5. After merge
 
-- When the merge closed the issue, confirm that Project 28's built-in workflow moved its item to `Done` ([`project-tracker.md`](../../../runbooks/project-tracker.md)). In zi the issue item stays open until promotion, when the workflow closes it or lists it in its run summary for you to close by hand.
+- When the merge closed the issue, confirm that Project 28's built-in workflow moved its item to `Done` ([`project-tracker.md`](../../../runbooks/project-tracker.md)). For Zi, ordinary main PRs follow the same native closure contract; integration does not authorize a milestone release.
 - File the follow-ups promised in the body or in review replies, and link them.
 - Delete the branch and any local worktree only with the maintainer's authorization.
 

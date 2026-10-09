@@ -89,8 +89,9 @@ that needs them.
 For a repository with an explicitly approved persistent integration branch
 under `decisions/0019-trunk-on-main-default.md`, this override is mandatory.
 Without it Renovate opens routine update pull requests against default `main`,
-bypassing the integration branch. The current exception is `zi`; trunk-on-main
-repositories must omit the override unless they have another documented need.
+bypassing the integration branch. Zi uses protected main under ADR-0039 and
+targets main for routine updates. Trunk-on-main repositories must omit a next
+override unless they have another documented need.
 See `runbooks/branch-protection.md` for the full audit checklist.
 
 ## Migrating a repository

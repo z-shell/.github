@@ -1,10 +1,10 @@
 # 28. Zi Promotion Is Release Authorization
 
-- **Status:** ACCEPTED
+- **Status:** SUPERSEDED
 - **Date:** 2026-09-20
 - **Deciders:** ss-o
 - **Supersedes:** The Zi milestone-release exception in `decisions/0007-release-publication-flow.md`
-- **Superseded by:** None
+- **Superseded by:** `decisions/0039-zi-main-integration-and-signed-milestones.md`
 
 ## Context
 
@@ -14,7 +14,7 @@ GitHub Actions also does not start a new workflow for most events created with t
 
 ## Decision
 
-> Accepted replacement, cutover pending: [ADR-0039](0039-zi-main-integration-and-signed-milestones.md) uses protected `main` integration and separately reviewed signed milestones. This promotion contract remains operative until verified cutover; retain this record as release history.
+> Superseded by [ADR-0039](0039-zi-main-integration-and-signed-milestones.md): Zi uses protected `main` integration and separately reviewed signed milestones. The promotion contract below is historical; preserve its tags, ancestry and migration evidence.
 
 For Zi, an eligible `next` to `main` promotion pull request is the review and authorization boundary for a milestone release:
 
