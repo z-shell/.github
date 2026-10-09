@@ -60,10 +60,10 @@ repositories:
         reason: Blank issues are turned off, so every zi issue starts from a form; the contact links are the organization's.
       - path: .github/PULL_REQUEST_TEMPLATE.md
         blob: 3c4dc44bddfcdccfd5075dc1b8c7289be700730d
-        reason: The zi pull-request template states protected-main qualification and separate milestone authorization (ADR-0039), and carries the migration-plan lines read by Public contract impact.
+        reason: The zi pull-request template states the protected main branch model (ADR-0039) and carries the migration plan lines that the required Public contract impact check reads from the pull request body.
       - path: docs/CONTRIBUTING.md
         blob: 5b318bffaa1077da5f02aa9245d4d73575bec457
-        reason: The zi contributing guide documents its full stable qualification, protected-main contribution flow and exact-SHA signed milestone tooling under ADR-0039, beyond the organization baseline.
+        reason: The zi contributing guide documents the protected main branch model (ADR-0039), Zsh verification and the signed milestone tag and release process, none of which the organization contributing guide covers.
   z-shell/zsh-lint:
     vendor_org_forms: true
     exceptions:

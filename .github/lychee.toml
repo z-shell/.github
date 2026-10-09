@@ -93,6 +93,8 @@ exclude = [
   '/tondrejk',
   'github\.com/z-shell/%3Crepository%3E',
   'knowledge/domains/documentation/templates/(?:LICENSE|repository-owned-asset-path|%3Clicense-path%3E|%3Clogo-path-or-url%3E)$',
+  # opensource.org answers 403 to automated clients, so its links cannot be checked.
+  '^https://opensource\.org/',
 ]
 
 # Exclude these filesystem paths from getting checked.
