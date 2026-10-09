@@ -18,13 +18,13 @@ GitHub issue forms cannot be conditional, and any file in a repository's `.githu
 2. `automation/agents/org-routing.py` validates the profiles with the inventory and renders a `Reporting issues` section inside the repository's `org-routing` block. This extends the block contract of ADR-0031 points 1 and 2: besides routing, the block carries project intake facts that no repository-owned text states. It still restates no organization policy, which it links to.
 3. The block renders only intake facts: the version command or note, a pointer to "Filing a new issue", and the extra `### ` headings. Branch, Zsh versions, install and test commands stay in the profile for later consumers, because the repositories already state them in their own text and a second copy would compete with it.
 4. Delivery follows ADR-0031. A repository receives the section when it repins the Org Routing workflow to a revision carrying its profile and regenerates its block in a reviewed change of its own. Nothing here writes to another repository.
-5. `org-routing.py check` compares a profile's tested Zsh versions with the literal versions the repository's workflows install under the `zsh`, `version`, `zsh-version` and `ZSH_VERSION` keys, and fails on a difference in either direction. A runner's own Zsh and a version chosen by an expression have nothing to compare.
+5. `org-routing.py check` compares a profile's tested Zsh versions with the literal Zsh versions in the repository's workflows, and fails on a difference in either direction. It reads the `zsh`, `zsh-version`, `zsh_version` and `ZSH_VERSION` keys anywhere, and `version` only inside a matrix or in a setup-zsh step's `with:`. It skips block scalars such as `run: |` bodies, and it does not read multi-line flow lists or flow maps. A runner's own Zsh and a version chosen by an expression have nothing to compare.
 6. Profiles generate no issue forms. A local form hides every organization form, so a profiled form would make each repository own and audit the whole form set; agents, the dominant filing path, already receive the extra headings from the block.
 
 ## Consequences
 
 - Agent filings carry the form's headings plus the profile's fields, and the project facts gain one editable home. Web filings keep the repository's effective form, without the profile's fields.
-- Profiles go stale unless someone rereads them. The recorded revision and date show their age. The tested versions are checked against CI on each Org Routing run in the repository; the other facts are not.
+- Profiles go stale unless someone rereads them. The recorded revision and date show their age. Once a repository pins an Org Routing revision that carries the check, each run compares the tested versions with its CI; the other facts are not checked.
 - Every block regeneration for a profiled repository now includes the section, so editing a profile changes generated text in that repository after its next repin.
 
 ## Alternatives considered

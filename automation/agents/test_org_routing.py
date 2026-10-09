@@ -1307,7 +1307,8 @@ class ProjectProfileTests(unittest.TestCase):
             "        os: [ubuntu-latest]\n",
         )
         write_workflow(root, "notes.txt", "zsh: 9.9\n")
-        found = routing.workflow_zsh_versions(root)
+        found, unreadable = routing.workflow_zsh_versions(root)
+        self.assertEqual(unreadable, [])
         self.assertEqual(
             {version: sorted(files) for version, files in found.items()},
             {
@@ -1317,6 +1318,53 @@ class ProjectProfileTests(unittest.TestCase):
                 "5.9.2": [".github/workflows/source.yaml", ".github/workflows/zsh.yml"],
             },
         )
+
+    def test_workflow_reader_skips_scripts_comments_and_other_tools(self) -> None:
+        text = """name: CI
+jobs:
+  test:
+    strategy:
+      matrix:
+        zsh:
+          # 5.8 builds are slow; keep them first.
+          - 5.8
+
+          - "5.9.2"
+        include:
+          - { version: "9.9" }
+    steps:
+      - name: Script
+        run: |
+          version: 7.7
+          zsh: 6.6
+      - uses: astral-sh/setup-uv@0000000000000000000000000000000000000000 # v6
+        with:
+          version: "0.5.4"
+      - uses: pnpm/action-setup@0000000000000000000000000000000000000000 # v4
+        with:
+          version: 9.0
+      - uses: z-shell/.github/actions/setup-zsh@0000000000000000000000000000000000000000 # main
+        with:
+          version: "5.9" # exact build
+  zd:
+    with:
+      zsh_version: 5.8.1
+"""
+        self.assertEqual(routing._workflow_versions(text), {"5.8", "5.8.1", "5.9", "5.9.2"})
+        self.assertEqual(
+            routing._workflow_versions(text.replace("\n", "\r\n")),
+            {"5.8", "5.8.1", "5.9", "5.9.2"},
+        )
+
+    def test_unreadable_workflow_is_an_error_not_a_crash(self) -> None:
+        self.fixture.write()
+        org = self.fixture.load()
+        root = make_downstream(Path(self.directory.name), self.fixture.revision)
+        run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(root))
+        write_workflow(root, "zsh.yml", TOOL_WORKFLOW)
+        (root / ".github/workflows/latin1.yml").write_bytes(b"name: caf\xe9\n")
+        errors = routing.check(root, "z-shell/tool", org)
+        self.assertEqual(errors, [routing.error(".github/workflows/latin1.yml", "workflow is not UTF-8 text", "re-encode it as UTF-8")])
 
     def test_profile_and_workflow_versions_must_agree(self) -> None:
         self.fixture.write()
