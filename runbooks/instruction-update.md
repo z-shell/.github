@@ -104,6 +104,12 @@ answers is not an impact review.
       the repository's block with
       `python3 automation/agents/org-routing.py apply --repository z-shell/<name> --root <checkout>`
       and verify with `check`.
+- [ ] A repository's issue-intake facts (version command, extra bug-report
+      fields) live in its project profile in
+      `knowledge/domains/governance/data/project-profiles.json` (decisions/0040)
+      and render into the block's `Reporting issues` section. Change them
+      there, record the commit and date you read them at, and regenerate the
+      block after the repository repins Org Routing.
 - [ ] Prefer linking to canonical organization or wiki guidance over duplicating
       it.
 

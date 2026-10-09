@@ -130,6 +130,8 @@ class OrgFixture:
                 }
             },
         }
+        # Project profiles are optional: older organization revisions have none.
+        self.profiles: dict | None = None
         self.write()
 
     def write(self) -> None:
@@ -142,6 +144,14 @@ class OrgFixture:
         approved.write_text(
             json.dumps(self.approved, indent=2) + "\n", encoding="utf-8"
         )
+        profiles = self.root / routing.PROFILES_PATH
+        if self.profiles is None:
+            profiles.unlink(missing_ok=True)
+        else:
+            profiles.parent.mkdir(parents=True, exist_ok=True)
+            profiles.write_text(
+                json.dumps(self.profiles, indent=2) + "\n", encoding="utf-8"
+            )
 
     def load(self):
         return routing.load_org(self.root)
@@ -1177,12 +1187,132 @@ class ApprovedSourceTests(unittest.TestCase):
         )
 
 
+def tool_profile() -> dict:
+    return {
+        "component": "Tool",
+        "verified": {"revision": "a" * 40, "date": "2026-10-09"},
+        "version": {"command": "tool --version", "note": None},
+        "branch": "main",
+        "zsh": {"minimum": "5.8.1", "tested": ["5.8.1", "5.9.2"], "platforms": ["Linux"]},
+        "install": ["zi light z-shell/tool"],
+        "verification": ["make test"],
+        "report_fields": [
+            {"label": "Configuration", "description": "The `tool.json` in effect."}
+        ],
+    }
+
+
+class ProjectProfileTests(unittest.TestCase):
+    """Project profiles feed the block's issue-reporting section (decisions/0040)."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.fixture = OrgFixture(Path(self.directory.name))
+        self.fixture.profiles = {"version": 1, "profiles": {"z-shell/tool": tool_profile()}}
+
+    def tearDown(self) -> None:
+        self.directory.cleanup()
+
+    def errors(self) -> list[str]:
+        self.fixture.write()
+        try:
+            self.fixture.load()
+        except routing.RoutingError as exc:
+            return str(exc).splitlines()
+        return []
+
+    def block(self, repository: str = "z-shell/tool") -> str:
+        self.fixture.write()
+        org = self.fixture.load()
+        return routing.render(routing.downstream_entry(org.downstream, repository), org)
+
+    def test_profile_renders_reporting_section_inside_the_block(self) -> None:
+        block = self.block()
+        section = block.index("## Reporting issues")
+        self.assertLess(section, block.index(routing.END_MARKER))
+        self.assertGreater(section, block.index("`AGENTS.md` (this file)"))
+        self.assertIn(routing.TRIAGE_URL, block)
+        self.assertIn("give the output of `tool --version`.", block)
+        self.assertIn("- `### Configuration`: The `tool.json` in effect.", block)
+        self.assertNotIn("\u2014", block)
+
+    def test_only_intake_facts_are_rendered(self) -> None:
+        # Branch, versions, install and test commands stay repository-owned text.
+        block = self.block()
+        for unrendered in ("make test", "zi light z-shell/tool", "5.8.1", "Linux"):
+            self.assertNotIn(unrendered, block)
+
+    def test_note_without_command_and_no_extra_fields(self) -> None:
+        profile = self.fixture.profiles["profiles"]["z-shell/tool"]
+        profile["version"] = {"command": None, "note": "Give the release tag."}
+        profile["report_fields"] = []
+        block = self.block()
+        self.assertIn("in form order. Give the release tag.", block)
+        self.assertNotIn("add these headings", block)
+
+    def test_repository_without_profile_and_missing_file_render_unchanged(self) -> None:
+        with_profiles = self.block("z-shell/plain")
+        self.fixture.profiles = None
+        self.assertEqual(with_profiles, self.block("z-shell/plain"))
+        self.assertNotIn("## Reporting issues", self.block())
+
+    def test_applied_block_checks_current(self) -> None:
+        self.fixture.write()
+        org = self.fixture.load()
+        root = make_downstream(Path(self.directory.name), self.fixture.revision)
+        status, _ = run_main(
+            "--org-root", str(self.fixture.root), "apply",
+            "--repository", "z-shell/tool", "--root", str(root),
+        )
+        self.assertEqual(status, 0)
+        self.assertIn("## Reporting issues", (root / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertEqual(routing.check(root, "z-shell/tool", org), [])
+
+    def test_profile_schema_violations(self) -> None:
+        original = copy.deepcopy(self.fixture.profiles)
+        cases = {
+            "must hold exactly version 1": lambda p: p.update(version=2),
+            "is not declared downstream": lambda p: p["profiles"].update({"z-shell/zz-absent": tool_profile()}),
+            "out of order": lambda p: p.update(profiles={"z-shell/tool": tool_profile(), "z-shell/plain": tool_profile()}),
+            "unknown field 'extra'": lambda p: p["profiles"]["z-shell/tool"].update(extra=1),
+            "missing field 'branch'": lambda p: p["profiles"]["z-shell/tool"].pop("branch"),
+            "verified is invalid": lambda p: p["profiles"]["z-shell/tool"]["verified"].update(revision="main"),
+            "tool verified is invalid": lambda p: p["profiles"]["z-shell/tool"]["verified"].update(date="2026-13-45"),
+            "must hold exactly version 1 and profiles": lambda p: p.update(version=True),
+            "tool profile must be an object": lambda p: p["profiles"].update({"z-shell/tool": []}),
+            "tool version note is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(note="opens <!-- here"),
+            "z-shell/tool version note is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(note="unclosed ` span"),
+            "tool report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"]["report_fields"][0].update(label="`code`"),
+            "tool component or branch is invalid": lambda p: p["profiles"]["z-shell/tool"].update(component="bell\a"),
+            "give a command, a note, or both": lambda p: p["profiles"]["z-shell/tool"].update(version={"command": None, "note": None}),
+            "version command is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(command="`x`"),
+            "zsh is invalid": lambda p: p["profiles"]["z-shell/tool"]["zsh"].update(tested=["latest"]),
+            "verification is invalid": lambda p: p["profiles"]["z-shell/tool"].update(verification=[]),
+            "report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"]["report_fields"][0].update(description="ends -->"),
+            "keep one 'Configuration' field": lambda p: p["profiles"]["z-shell/tool"]["report_fields"].append(
+                {"label": "Configuration", "description": "Again."}
+            ),
+        }
+        for expected, mutate in cases.items():
+            with self.subTest(expected):
+                self.fixture.profiles = copy.deepcopy(original)
+                mutate(self.fixture.profiles)
+                errors = self.errors()
+                self.assertTrue(any(expected in message for message in errors), errors)
+                if mutate is not cases["out of order"] and "downstream" not in expected:
+                    self.assertEqual(len(errors), 1, errors)
+
+
 class RepositoryInventoryTests(unittest.TestCase):
     """The committed inventory is valid and its approved revisions are real."""
 
     def test_committed_inventory_is_valid(self) -> None:
         org = routing.load_org(PUBLIC_ROOT)
         self.assertTrue(org.downstream)
+        self.assertTrue(org.profiles)
+        for repository in org.profiles:
+            entry = routing.downstream_entry(org.downstream, repository)
+            self.assertIn("## Reporting issues", routing.render(entry, org))
 
     def test_committed_approved_revisions_verify(self) -> None:
         try:

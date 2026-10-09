@@ -1536,6 +1536,13 @@ def validate_downstream_routing(root: Path, manifest: dict[str, object]) -> list
             routing.delivery.load_project_entries(root, manifest["downstream"])  # type: ignore[attr-defined]
         except (OSError, UnicodeError, ValueError) as exc:
             errors.append(error("knowledge/project-delivery.json", str(exc), "repair the declared project delivery records"))
+    if not errors:
+        try:
+            routing.load_profiles(root, manifest["downstream"])  # type: ignore[attr-defined]
+        except routing.RoutingError as exc:  # type: ignore[attr-defined]
+            errors.extend(str(exc).splitlines())
+        except (OSError, UnicodeError, ValueError) as exc:
+            errors.append(error(routing.PROFILES_PATH, str(exc), "restore a valid JSON file"))  # type: ignore[attr-defined]
     return errors
 
 

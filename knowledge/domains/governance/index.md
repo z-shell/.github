@@ -22,5 +22,6 @@ For native packages, historical records, implementation and supporting files in 
 Structured policy owned by this domain:
 
 - [labels.yml](data/labels.yml)
+- [project-profiles.json](data/project-profiles.json): per-repository issue-intake facts rendered into each repository's `org-routing` block ([ADR-0040](../../../decisions/0040-central-project-profiles-for-issue-intake.md))
 - [repository-classes.yml](data/repository-classes.yml)
 - [template-exceptions.yml](data/template-exceptions.yml)

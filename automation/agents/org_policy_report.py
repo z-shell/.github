@@ -92,6 +92,8 @@ def canonical_inputs(root: Path) -> dict[str, str]:
         paths.append(delivery.MANIFEST)
     if (root / delivery.PROJECT_MANIFEST).exists():
         paths.append(delivery.PROJECT_MANIFEST)
+    if (root / routing.PROFILES_PATH).exists():
+        paths.append(routing.PROFILES_PATH)
     return {
         path: hashlib.sha256((root / path).read_bytes()).hexdigest()
         for path in paths
@@ -366,6 +368,9 @@ def impact(org_root: Path, changed: list[str]) -> dict:
             record["repository"] for record in org.project_entries
             if record["source"] == path
         }
+        if path == routing.PROFILES_PATH:
+            # A profile renders into its repository's block (decisions/0040).
+            project_consumers |= set(org.profiles)
         candidates = (
             org.downstream
             if shared and skill is None
