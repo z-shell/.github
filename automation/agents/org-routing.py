@@ -948,7 +948,7 @@ def render_reporting(profile: dict) -> list[str]:
     version = profile["version"]
     intake = (
         f"File an issue as [Filing a new issue]({TRIAGE_URL}) describes: one "
-        + "`### ` heading per field of the effective issue form, in form order."
+        + "`###` heading per field of the effective issue form, in form order."
     )
     if version["command"] is not None:
         intake += (
