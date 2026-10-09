@@ -83,6 +83,24 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(result["changes"][0]["candidate_repositories"], ["z-shell/tool"])
         self.assertIn(report.delivery.PROJECT_MANIFEST, result["canonical_inputs"])
 
+    def test_profile_change_selects_profiled_repositories(self):
+        profile = {
+            "component": "Tool",
+            "verified": {"revision": "a" * 40, "date": "2026-10-09"},
+            "version": {"command": "tool --version", "note": None},
+            "branch": "main",
+            "zsh": {"minimum": None, "tested": ["5.9.2"], "platforms": ["Linux"]},
+            "install": ["zi light z-shell/tool"],
+            "verification": ["make test"],
+            "report_fields": [],
+        }
+        self.fixture.profiles = {"version": 1, "profiles": {"z-shell/tool": profile}}
+        self.fixture.write()
+        result = report.impact(self.fixture.root, [report.routing.PROFILES_PATH])
+        self.assertEqual(result["changes"][0]["relationship"], "delivers-approved-project-knowledge")
+        self.assertEqual(result["changes"][0]["candidate_repositories"], ["z-shell/tool"])
+        self.assertIn(report.routing.PROFILES_PATH, result["canonical_inputs"])
+
     def test_local_pass_does_not_imply_published_adoption(self):
         checkout = make_downstream(self.root, self.fixture.revision)
         org = self.fixture.load()

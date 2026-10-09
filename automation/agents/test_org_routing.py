@@ -1277,6 +1277,13 @@ class ProjectProfileTests(unittest.TestCase):
             "unknown field 'extra'": lambda p: p["profiles"]["z-shell/tool"].update(extra=1),
             "missing field 'branch'": lambda p: p["profiles"]["z-shell/tool"].pop("branch"),
             "verified is invalid": lambda p: p["profiles"]["z-shell/tool"]["verified"].update(revision="main"),
+            "tool verified is invalid": lambda p: p["profiles"]["z-shell/tool"]["verified"].update(date="2026-13-45"),
+            "must hold exactly version 1": lambda p: p.update(version=True),
+            "tool profile must be an object": lambda p: p["profiles"].update({"z-shell/tool": []}),
+            "tool version note is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(note="opens <!-- here"),
+            "tool version note is invalid ": lambda p: p["profiles"]["z-shell/tool"]["version"].update(note="unclosed ` span"),
+            "tool report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"]["report_fields"][0].update(label="`code`"),
+            "tool component or branch is invalid": lambda p: p["profiles"]["z-shell/tool"].update(component="bell\a"),
             "give a command, a note, or both": lambda p: p["profiles"]["z-shell/tool"].update(version={"command": None, "note": None}),
             "version command is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(command="`x`"),
             "zsh is invalid": lambda p: p["profiles"]["z-shell/tool"]["zsh"].update(tested=["latest"]),
@@ -1291,7 +1298,9 @@ class ProjectProfileTests(unittest.TestCase):
                 self.fixture.profiles = copy.deepcopy(original)
                 mutate(self.fixture.profiles)
                 errors = self.errors()
-                self.assertTrue(any(expected in message for message in errors), errors)
+                self.assertTrue(any(expected.strip() in message for message in errors), errors)
+                if mutate is not cases["out of order"] and "downstream" not in expected:
+                    self.assertEqual(len(errors), 1, errors)
 
 
 class RepositoryInventoryTests(unittest.TestCase):
@@ -1301,6 +1310,9 @@ class RepositoryInventoryTests(unittest.TestCase):
         org = routing.load_org(PUBLIC_ROOT)
         self.assertTrue(org.downstream)
         self.assertTrue(org.profiles)
+        for repository in org.profiles:
+            entry = routing.downstream_entry(org.downstream, repository)
+            self.assertIn("## Reporting issues", routing.render(entry, org))
 
     def test_committed_approved_revisions_verify(self) -> None:
         try:

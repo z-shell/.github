@@ -22,7 +22,7 @@
         "source <plugin directory>/F-Sy-H.plugin.zsh"
       ],
       "verification": [
-        "zsh -f -n F-Sy-H.plugin.zsh lib/*.zsh functions/* completions/* chroma/*",
+        "for file in F-Sy-H.plugin.zsh lib/*.zsh functions/* completions/* chroma/*; do zsh -f -n \"$file\"; done",
         "PATH=\"$PWD/bin:$PATH\" zunit",
         "tools/validate-themes.zsh"
       ],

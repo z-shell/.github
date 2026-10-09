@@ -22,6 +22,7 @@ Commands:
 from __future__ import annotations
 
 import argparse
+import datetime
 import fnmatch
 import hashlib
 import importlib.util
@@ -96,7 +97,6 @@ PROFILE_VERIFIED_FIELDS = {"revision", "date"}
 PROFILE_VERSION_FIELDS = {"command", "note"}
 PROFILE_ZSH_FIELDS = {"minimum", "tested", "platforms"}
 PROFILE_REPORT_FIELDS = {"label", "description"}
-DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ZSH_VERSION_PATTERN = re.compile(r"^\d+\.\d+(?:\.\d+)?$")
 METADATA_KEYS = {
     "github-path",
@@ -398,7 +398,7 @@ def validate_downstream(downstream: object) -> list[str]:
 
 
 def _profile_text(value: object) -> bool:
-    """One printable line that cannot close a marker or an HTML comment."""
+    """One printable line with balanced code spans that cannot open or close a comment."""
     return (
         isinstance(value, str)
         and bool(value)
@@ -406,7 +406,17 @@ def _profile_text(value: object) -> bool:
         and value.isprintable()
         and "<!--" not in value
         and "-->" not in value
+        and value.count("`") % 2 == 0
     )
+
+
+def _iso_date(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        return datetime.date.fromisoformat(value).isoformat() == value
+    except ValueError:
+        return False
 
 
 def _text_list(value: object) -> bool:
@@ -439,8 +449,7 @@ def _profile_errors(repository: str, record: dict) -> list[str]:
         not _closed(verified, PROFILE_VERIFIED_FIELDS)
         or not isinstance(verified["revision"], str)
         or not SHA_PATTERN.fullmatch(verified["revision"])
-        or not isinstance(verified["date"], str)
-        or not DATE_PATTERN.fullmatch(verified["date"])
+        or not _iso_date(verified["date"])
     ):
         invalid.append(
             (
