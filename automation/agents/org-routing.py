@@ -57,6 +57,13 @@ DECISION_URL = (
 TRIAGE_URL = (
     "https://github.com/z-shell/.github/blob/main/runbooks/triage.md#filing-a-new-issue"
 )
+PROFILES_URL = (
+    "https://github.com/z-shell/.github/blob/main/" + PROFILES_PATH
+)
+PROFILES_DECISION_URL = (
+    "https://github.com/z-shell/.github/blob/main/decisions/"
+    "0040-central-project-profiles-for-issue-intake.md"
+)
 BEGIN_MARKER = "<!-- BEGIN org-routing -->"
 END_MARKER = "<!-- END org-routing -->"
 AGENTS_PATH = "AGENTS.md"
@@ -969,6 +976,11 @@ def render_reporting(profile: dict) -> list[str]:
             f"- `### {item['label']}`: {item['description']}"
             for item in profile["report_fields"]
         ]
+    lines += [
+        "",
+        f"These facts come from this repository's [project profile]({PROFILES_URL}) "
+        + f"under [decision 0040]({PROFILES_DECISION_URL}); change them there, not here.",
+    ]
     return lines
 
 
