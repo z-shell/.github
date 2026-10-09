@@ -98,6 +98,18 @@ PROFILE_VERSION_FIELDS = {"command", "note"}
 PROFILE_ZSH_FIELDS = {"minimum", "tested", "platforms"}
 PROFILE_REPORT_FIELDS = {"label", "description"}
 ZSH_VERSION_PATTERN = re.compile(r"^\d+\.\d+(?:\.\d+)?$")
+WORKFLOWS_DIR = ".github/workflows"
+# Keys that select the Zsh a workflow installs wherever they appear: zi's
+# matrix `zsh`, the Zsh CI `zsh-version` input, zd's and zunit's
+# `zsh_version`, and F-Sy-H's source-build `ZSH_VERSION`.
+ZSH_KEYS = {"zsh", "zsh-version", "zsh_version", "ZSH_VERSION"}
+# The bare `version` key counts only inside a matrix (zpmod) or in the `with:`
+# of a setup-zsh step; other actions use it for their own tools.
+SETUP_ZSH_USES = re.compile(r"(?:^|/)setup-zsh@")
+WORKFLOW_LINE = re.compile(
+    r"^(?P<indent> *)(?P<dash>- +)?(?:(?P<key>[A-Za-z0-9_.-]+) *:(?!\S)\s*)?(?P<value>.*)$"
+)
+BLOCK_SCALAR = re.compile(r"^[|>][0-9+-]*$")
 METADATA_KEYS = {
     "github-path",
     "github-pinned",
@@ -1120,6 +1132,155 @@ def _read_regular(root: Path, relative: str) -> str | None:
     return path.read_text(encoding="utf-8")
 
 
+def _yaml_scalar(value: str) -> str:
+    """Return a plain or quoted scalar without its trailing comment."""
+    value = value.strip()
+    if value[:1] in ("'", '"'):
+        closing = value.find(value[0], 1)
+        return value[1:closing] if closing > 0 else value[1:]
+    return re.sub(r"\s+#.*$", "", value).strip()
+
+
+def _zsh_literals(value: str) -> list[str]:
+    """Return the literal Zsh versions in one YAML scalar or one-line flow list."""
+    value = re.sub(r"\s+#[^\]'\"]*$", "", value.strip())
+    if value.startswith("[") and value.endswith("]"):
+        items = value[1:-1].split(",")
+    else:
+        items = [value]
+    return [
+        literal
+        for literal in (_yaml_scalar(item) for item in items)
+        if ZSH_VERSION_PATTERN.fullmatch(literal)
+    ]
+
+
+def _workflow_versions(text: str) -> set[str]:
+    """Read the literal Zsh versions of one workflow from its indentation.
+
+    This is a line reader for the shapes the organization's workflows use,
+    not a YAML parser: block scalars (``run: |``) are skipped, comments and
+    blank lines never end a list, and the bare ``version`` key counts only in
+    a matrix or a setup-zsh step's ``with:``. Multi-line flow lists and flow
+    maps are not read (decisions/0040).
+    """
+    found: set[str] = set()
+    path: list[tuple[int, str]] = []  # (key indent, key) of the open mappings
+    uses: dict[int, str] = {}  # step-level indent -> that step's `uses`
+    scalar_indent: int | None = None  # indent of a key holding a block scalar
+    list_key: tuple[int, str, bool] | None = None  # open block list of versions
+    for raw in text.splitlines():
+        line = raw.rstrip("\r")
+        stripped = line.strip()
+        indent = len(line) - len(line.lstrip(" "))
+        if scalar_indent is not None:
+            if not stripped or indent > scalar_indent:
+                continue
+            scalar_indent = None
+        if not stripped or stripped.startswith("#") or stripped in ("---", "..."):
+            continue
+        match = WORKFLOW_LINE.match(line)
+        if not match:
+            continue
+        dash, key, value = match.group("dash"), match.group("key"), match.group("value")
+        key_indent = indent + (len(dash) if dash else 0)
+        if list_key is not None:
+            list_indent, _name, counted = list_key
+            if dash and not key and indent >= list_indent:
+                if counted:
+                    found.update(_zsh_literals(value))
+                continue
+            list_key = None
+        if dash:
+            # A new list item starts a new step: forget the last one's `uses`.
+            for level in [level for level in uses if level >= key_indent]:
+                del uses[level]
+        while path and path[-1][0] >= key_indent:
+            path.pop()
+        if not key:
+            continue
+        parents = [name for _level, name in path]
+        if key == "uses":
+            uses[key_indent] = _yaml_scalar(value)
+        counted = key in ZSH_KEYS or (
+            key == "version"
+            and (
+                "matrix" in parents
+                or (
+                    parents[-1:] == ["with"]
+                    and bool(SETUP_ZSH_USES.search(uses.get(path[-1][0], "")))
+                )
+            )
+        )
+        if BLOCK_SCALAR.fullmatch(_yaml_scalar(value) if value else ""):
+            scalar_indent = key_indent
+        elif not value.strip() or value.strip().startswith("#"):
+            path.append((key_indent, key))
+            list_key = (key_indent, key, counted)
+        elif counted:
+            found.update(_zsh_literals(value))
+    return found
+
+
+def workflow_zsh_versions(root: Path) -> tuple[dict[str, set[str]], list[str]]:
+    """Map each literal Zsh version a checkout's workflows install to its files.
+
+    Returns the map and the workflow files that could not be read. A value
+    chosen by an expression such as ``${{ matrix.zsh }}`` names a list found
+    elsewhere, and a runner's own Zsh has no version to compare.
+    """
+    directory = root / WORKFLOWS_DIR
+    if directory.is_symlink() or not directory.is_dir():
+        return {}, []
+    found: dict[str, set[str]] = {}
+    unreadable: list[str] = []
+    for path in sorted(directory.iterdir()):
+        if path.suffix not in (".yml", ".yaml"):
+            continue
+        relative = f"{WORKFLOWS_DIR}/{path.name}"
+        try:
+            text = _read_regular(root, relative)
+        except UnicodeDecodeError:
+            unreadable.append(relative)
+            continue
+        if text is None:
+            continue
+        for version in _workflow_versions(text):
+            found.setdefault(version, set()).add(relative)
+    return found, unreadable
+
+
+def check_profile_versions(root: Path, repository: str, profile: dict) -> list[str]:
+    """Compare a profile's tested Zsh versions with the checkout's workflows."""
+    found, unreadable = workflow_zsh_versions(root)
+    stated = set(profile["zsh"]["tested"])
+    errors = [
+        error(relative, "workflow is not UTF-8 text", "re-encode it as UTF-8")
+        for relative in unreadable
+    ]
+    fix = (
+        f"make zsh.tested for {repository} in the {CANONICAL_REPOSITORY} "
+        + f"{PROFILES_PATH} match the versions CI installs"
+    )
+    for version in sorted(stated - set(found)):
+        errors.append(
+            error(
+                WORKFLOWS_DIR,
+                f"project profile states Zsh {version} as tested, but no workflow installs it",
+                fix,
+            )
+        )
+    for version in sorted(set(found) - stated):
+        errors.append(
+            error(
+                ", ".join(sorted(found[version])),
+                f"workflow installs Zsh {version}, which the project profile does not state as tested",
+                fix,
+            )
+        )
+    return errors
+
+
 def _skill_entries(directory: Path) -> list[str]:
     """Every non-directory entry below a skill directory, symlinks included.
 
@@ -1332,6 +1493,9 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
             )
     for name in vendored:
         errors.extend(_check_skill(root, name, org.approved["skills"][name]))
+    profile = org.profiles.get(entry["repository"])
+    if profile:
+        errors.extend(check_profile_versions(root, entry["repository"], profile))
     errors.extend(delivery.check_project(root, repository, org.project_entries))
     for record in org.project_entries:
         if record["repository"] != repository:

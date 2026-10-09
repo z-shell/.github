@@ -105,7 +105,10 @@ answers is not an impact review.
       `knowledge/domains/governance/data/project-profiles.json` (decisions/0040)
       and render into the block's `Reporting issues` section. Change them
       there, record the commit and date you read them at, and regenerate the
-      block after the repository repins Org Routing.
+      block after the repository repins Org Routing. `check` fails when the
+      profile's `zsh.tested` differs from the literal Zsh versions in the
+      repository's workflows (decisions/0040 names the keys it reads), so
+      change both together.
 - [ ] Prefer linking to canonical organization or wiki guidance over duplicating
       it.
 
