@@ -3,7 +3,7 @@
 - **Status:** ACCEPTED
 - **Date:** 2026-10-08
 - **Deciders:** ss-o
-- **Supersedes:** The Zi integration exception in `decisions/0019-trunk-on-main-default.md` and `decisions/0028-zi-promotion-is-release-authorization.md`, upon acceptance and verified cutover
+- **Supersedes:** The Zi integration exception in `decisions/0019-trunk-on-main-default.md` and `decisions/0028-zi-promotion-is-release-authorization.md`, after verified cutover
 - **Superseded by:** None
 
 ## Context
@@ -35,6 +35,14 @@ After maintainer acceptance on `main` and the verified cutover below, Zi follows
 ## Consequences
 
 Ready fixes reach stable consumers independently and ordinary contributions use GitHub's default-branch issue closure. Qualification moves earlier instead of disappearing. Each merge has direct user exposure, making small changes, base revalidation and rollback discipline essential. Milestone publication has one separate human authorization through an existing signed-tag path; it does not require a new release system or signing key in Actions.
+
+## Cutover evidence: 2026-10-09
+
+- [Zi #629](https://github.com/z-shell/zi/pull/629) staged qualification under the old branch contract. [Promotion #630](https://github.com/z-shell/zi/pull/630) retained the reviewed next tree and both historical parents. [Hotfix #632](https://github.com/z-shell/zi/pull/632) repaired caller/reusable concurrency; [full main-push qualification](https://github.com/z-shell/zi/actions/runs/37962770980) passed on `07743c2399ccce9fb1faeec1c598e149986edb9d` before replacement protection was applied.
+- The real fork [cutover PR #631](https://github.com/z-shell/zi/pull/631) passed [all 21 stable-qualification jobs](https://github.com/z-shell/zi/actions/runs/37964278844) on reviewed head `fbd1da4e222ad81b8515abcdcf887a28a27dc846`. All eleven replacement required contexts passed. After its elected [review of record](https://github.com/z-shell/zi/pull/631#pullrequestreview-5474210766), the normal protected squash merge delivered signed main `22b6da908579e6e8143a0abe02e6da14e7b4d5b8`, with the reviewed tree unchanged and prior main as its parent.
+- Live main rules were read back with eleven strict checks, signed commits, resolved threads, deletion/force-push protection, merge/squash methods and no bypass actors. Release-tag creation was restricted to the existing administrator role, retaining update/deletion protection and adding no actor or signing key. No milestone tag or release was created.
+- Fresh installation/startup and an existing clone's public-main self-update from `07743c23` to `22b6da90` passed in isolated Linux Zsh 5.9.2 state. A failed fetch preserved the checkout and loaded revision; retry succeeded. Hosted macOS qualification is separate evidence.
+- [Historical issue reconciliation](https://github.com/z-shell/zi/actions/runs/37948678641) and a read-only replay found no outstanding unqualified closing clause. Retained next has no commits absent from main; remote next and its protection remain until downstream synchronization and separately authorized retirement. Existing topic work and its owners are preserved.
 
 ## Alternatives considered
 

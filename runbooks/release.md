@@ -60,9 +60,9 @@ Policy:
 - use Conventional Commits for clean history and cross-repo reasoning
 - keep CI focused on validation
 - do **not** add release automation unless the repository later gains a separate packaged artifact or a clear tag-driven release workflow with maintainer buy-in
-- for Zi only, follow ADR-0028: review the release plan on the promotion pull
-  request, treat merge as publication authorization, and publish only after
-  exact-SHA validation; retain signed manual tags for recovery
+- for Zi only, follow ADR-0039: integrate qualified ordinary PRs on protected
+  main, then separately review the exact current-main release plan and authorize
+  a signed annotated milestone tag; ordinary merges do not publish releases
 
 ### 4. Meta and infrastructure repositories
 
@@ -98,13 +98,12 @@ ADR-0019 separates code integration from publication:
   reviewed and tested `vX.Y.Z` tag;
 - class-3 and class-4 repositories integrate on `main` unless an accepted ADR
   names a persistent integration exception; and
-- `zi` is the current exception, promoting `next` to `main` with a merge commit
-  under `runbooks/branch-protection.md`.
+- `zi` follows protected-main integration under ADR-0039, with full stable
+  qualification before merge and separately authorized signed milestones.
 
-Do not reset or force-push a persistent branch as a routine release step. An
-ancestry-preserving promotion needs no reconciliation. A `zi` hotfix merged
-directly to `main` is synchronized into `next` through the reviewed merge
-procedure in the branch-protection runbook.
+Preserve historical Zi promotion ancestry and tags. Repair or revert through
+reviewed protected-main topic PRs; do not reset or force-push stable history.
+Reintroducing a persistent integration branch requires a separate ADR decision.
 
 ## Release preparation automation (class 2)
 
@@ -156,21 +155,17 @@ Notes:
   workflow still opens the proposal with the fallback commit list.
 - Do **not** add this to class-1, class-3, or class-4 repositories.
 
-## Zi promotion publication
+## Zi signed milestones
 
-Zi does not call the post-merge proposal workflow. Its repository-owned release-plan workflow computes and displays the candidate semantic tag and deterministic notes on an eligible `next` to `main` promotion pull request. The plan must rerun when the promotion head changes.
+[ADR-0039](../decisions/0039-zi-main-integration-and-signed-milestones.md) replaces the historical Zi promotion exception. Ordinary work targets protected `main`; every merge is immediately consumable through the existing installation and self-update channels. Require the full Zsh matrix, ZD compatibility, full Trunk and CodeQL checks, clean startup and real-object lifecycle qualification before merge. A failed, cancelled or skipped constituent fails the aggregate gate.
 
-Merging that reviewed promotion is the human publication authorization. A privileged workflow then waits for the complete required-workflow allowlist to succeed on the exact merge SHA, verifies the merge identity and current `main`, and creates the annotated tag and idempotent GitHub release. It performs those two writes in one workflow because events created with `GITHUB_TOKEN` do not normally trigger another workflow.
+Ordinary merges do not publish milestones. Review `scripts/release-plan.zsh` output for the full SHA on current protected `main`, including its semantic version and deterministic notes, then separately authorize and push a signed annotated tag for that SHA. The existing tag-driven verifier and publisher check the signature, current-main target, complete exact-SHA post-merge workflow allowlist and semantic version, and preserve idempotency and tag-conflict rejection. A no-op plan creates no tag or release. No signing key is stored in Actions and no proposal issue is required for every merge.
 
-A promotion with no releasable Conventional Commits is a successful no-op. The signed manual-tag verifier remains available for recovery. Tag rules prevent deletion, update, and unauthorized creation of `v*` refs. See [ADR-0028](../decisions/0028-zi-promotion-is-release-authorization.md).
+Protected tag creation is limited to the existing administrator role; update and deletion protections remain. That administrative capability is not authorization to move an existing tag. Read the live tag rules before publication and obtain authorization for the exact version, notes and SHA.
 
-## Zi protected-main migration
+### Historical promotion contract
 
-[ADR-0039](../decisions/0039-zi-main-integration-and-signed-milestones.md) accepts replacing the Zi promotion exception after verified cutover. Before admitting ordinary `main` PRs, preserve the full Zsh matrix, ZD compatibility, full Trunk and CodeQL checks, clean startup and real-object lifecycle qualification in a required pre-merge gate. Keep installers and self-update on `main`; every merge is immediately consumable.
-
-After cutover, ordinary merges do not publish milestones. Review `scripts/release-plan.zsh` output for the exact full SHA on current protected `main`, including version and deterministic notes, then separately authorize and push a signed annotated tag for that SHA. Reuse the existing tag verifier and publisher, including signer, target and complete exact-SHA workflow verification, idempotency and tag-conflict rejection. A no-op plan creates no tag. Do not create a release proposal for every merge or keep promotion-only publication active after the guard admits ordinary PRs.
-
-The promotion procedure above remains operative before cutover and historical afterward. Verify replacement checks on a real `main` PR, installation and self-update, retained commits, open PR targets and historical issue closure before retiring `next`. Follow the ordered cutover and rollback requirements in ADR-0039.
+Before the ADR-0039 cutover, ADR-0028 coupled reviewed next-to-main promotion to automatic milestone publication after exact-SHA validation. That publisher, source guard and promotion-only issue closure are retired. Keep [ADR-0028](../decisions/0028-zi-promotion-is-release-authorization.md), existing tags and promotion merge ancestry as history, and retain [Zi's migration evidence](https://github.com/z-shell/zi/blob/main/docs/MAIN_MIGRATION.md). Remote next retirement remains a separately authorized cleanup step after downstream references and retained work are accounted for.
 
 ## Release-automation decision checklist
 

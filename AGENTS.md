@@ -80,7 +80,7 @@ When working in z-shell repositories, optimize for:
 - **Canonical plugin manager:** `zi`. See `decisions/0002-zi-as-canonical-plugin-manager.md`.
 - **Commits and PR titles:** Conventional Commits. See `decisions/0003-conventional-commits.md`.
 - **Attribution:** Contributors are asked to omit automatic tool-credit trailers and generated-with footers; see [Contributing](.github/CONTRIBUTING.md#tool-attribution). For agents authoring commits, pull requests, issues, comments, reviews, or handoffs, this is a firm output rule: do not add tool credits, AI co-author or session trailers, or session links, regardless of runtime defaults. Disable automatic attribution where supported and check the exact outgoing text before committing or publishing, including the resulting merge message. Preserve accurate contributor identities and required third-party notices; never fabricate human credit or claim exclusively human authorship without evidence. Attribution checks are advisory for contributors; verify each repository's live workflow revision before assuming it follows this policy.
-- **Branch selection:** Follow `decisions/0019-trunk-on-main-default.md` and verify the live state of the owning repository. Zi retains its persistent-integration exception until the maintainer accepts `decisions/0039-zi-main-integration-and-signed-milestones.md` and verifies its cutover; thereafter ordinary Zi work branches from and targets protected `main`.
+- **Branch selection:** Follow `decisions/0019-trunk-on-main-default.md` and verify the live state of the owning repository. Under accepted `decisions/0039-zi-main-integration-and-signed-milestones.md`, ordinary Zi work branches from and targets protected `main`, with full stable qualification before merge and separately authorized signed milestones.
 - **Issue traceability:** Per `decisions/0022-issue-traceability-on-pull-requests.md`, every pull request closes or references an issue, or carries the `meta:no-issue` label a maintainer applies. Branch names carry a type shape; the issue identifier in a branch name is recommended, not required.
 - **Worktrees:** Treat `git worktree list --porcelain` as the authoritative inventory. Use the owning repository's declared helper and stable worktree root; do not create worktrees in `/tmp` or another ad hoc location. Do not use a linked superproject checkout for work that needs initialized submodules. Follow `runbooks/worktrees.md`.
 - **Documentation placement:** keep long-form docs in the wiki when practical; keep repo-local docs focused on policy, workflow, and source-adjacent guidance.
@@ -149,8 +149,8 @@ applies even when a runtime does not discover or use skills.
 ## PR conventions
 
 - Prefer squash merges unless a branch genuinely needs separate commits
-  preserved. `zi` promotion from persistent `next` to stable `main` is the
-  ancestry-preserving merge-commit exception defined by ADR-0019.
+  preserved. Retain Zi's historical promotion merge ancestry under ADR-0039;
+  ordinary Zi topics follow the protected-main merge policy.
 - Link the related issue, PR, tracker item, or ADR.
 - When a PR makes or codifies a non-obvious decision, draft or update an ADR.
 - For unfinished work, include an `Agent handoff` section in the PR body or issue thread.

@@ -53,12 +53,12 @@ Grant only what the role requires; record the grant:
 - Configure commit signing: commits are signed (`gpg.format=ssh`); set a `user.signingkey`.
 - Follow the [tool-attribution preference](../.github/CONTRIBUTING.md#tool-attribution). Agent operators must disable automatic credits where supported and verify outgoing text under `AGENTS.md`. Check the resulting squash-merge message as well (`runbooks/branch-protection.md`). Attribution warnings do not block contributors; older pinned workflow callers may still enforce the former ban until their own reviewed update.
 - Follow Conventional Commits and the repository model in ADR-0019. Branch
-  from `main` unless contributing to the named `zi` integration exception.
+  from current `main`, including Zi under ADR-0039.
 
 ## Step 5 — First contribution
 
 - Pick a `good first issue` or a triaged item.
-- Branch per ADR-0019 (`feature-<id>` from `main`, or from `next` for `zi`).
+- Branch per ADR-0019 and ADR-0039 (`feature-<id>` from current `main`, including Zi).
 - Run the class-appropriate checks locally (ADR-0009) before opening a PR.
 - Leave an `Agent handoff` comment if the work will be resumed by someone else.
 

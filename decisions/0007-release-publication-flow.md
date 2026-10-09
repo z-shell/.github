@@ -4,7 +4,7 @@
 - **Date:** 2026-05-26
 - **Deciders:** ss-o
 - **Supersedes:** None
-- **Superseded by:** `decisions/0028-zi-promotion-is-release-authorization.md` (Zi milestone exception only)
+- **Superseded by:** `decisions/0028-zi-promotion-is-release-authorization.md`, then `decisions/0039-zi-main-integration-and-signed-milestones.md` (Zi milestone exception only)
 
 ## Context
 
@@ -78,7 +78,7 @@ Per-repo application:
 
 ### Zi milestone-release exception
 
-ADR-0028 supersedes this exception. A reviewed `next` to `main` promotion is now Zi's human publication boundary when the promoted range contains releasable commits. Zi displays the version and release-note plan before merge, then creates the annotated tag and GitHub release only after every required workflow succeeds on the exact merge SHA. The maintainer-signed tag path remains available for recovery.
+ADR-0028 first superseded this exception with promotion-authorized automatic milestones. ADR-0039 now replaces that historical contract with protected-main integration and separately reviewed signed milestones on an exact current-main SHA. Ordinary merges do not publish tags or releases; preserve earlier milestone history.
 
 ## Consequences
 
@@ -88,7 +88,7 @@ ADR-0028 supersedes this exception. A reviewed `next` to `main` promotion is now
 - `release-please` is not adopted org-wide; it remains available to revisit per
   repo if a maintainer wants automated changelog/version PRs.
 - Class-3 repositories remain validation-only by default. Zi is the named
-  exception governed by ADR-0028.
+  milestone exception now governed by ADR-0039.
 
 ## Alternatives considered
 

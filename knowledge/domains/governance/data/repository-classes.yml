@@ -15,8 +15,8 @@
 # addition in the owning ADR change, not only here.
 default_class: 3
 settings_overrides:
-  # ADR-0019 requires merge commits for persistent next-to-main promotion.
-  # Linear history on main would make that ancestry-preserving merge illegal.
+  # ADR-0039 preserves historical promotion merge ancestry on Zi main.
+  # Do not rewrite that history to impose a linear-history requirement.
   z-shell/zi:
     linear_history: "-"
 repositories:
