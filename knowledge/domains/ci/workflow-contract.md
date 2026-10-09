@@ -40,6 +40,7 @@ permissions:
 
 - **Immutable Commit SHAs**: Every remote action and reusable workflow `uses:` reference, including organization references, MUST be pinned to a full 40-character commit SHA.
 - **Version Comments**: Append the associated release version after the SHA for auditability (e.g., `# v4.3.1`). For organization reusable workflows from `z-shell/.github/.github/workflows/` without an adopted workflow release, retain the established interim `# main` comment. The comment identifies the source branch; the full SHA selects the code.
+- **On the source branch**: Pin an organization reusable workflow only to a commit on the default branch of `z-shell/.github`, never to a pull request's branch commit. A squash merge leaves that commit on no branch, and callers pinned to it end every run in a startup failure with no jobs ([#774](https://github.com/z-shell/.github/issues/774)). Before pinning, `gh api repos/z-shell/.github/compare/main...SHA --jq .status` must print `behind` or `identical`. The daily Community Health Audit reports any other pin (`repo-settings-audit.rb --workflow-pins`).
 - **Prohibited**: Never use mutable tags (e.g., `@v4`, `@main`, `@latest`).
 
 ```yaml

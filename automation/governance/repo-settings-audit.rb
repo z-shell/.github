@@ -16,6 +16,9 @@ require "yaml"
 # --skip-settings narrows a --community-health run to the community health
 # files: it reads no settings, rulesets or branch protection, so a token that
 # cannot read them still produces a complete community health report.
+# --workflow-pins reports reusable-workflow pins to the organization repository
+# that are not on its default branch (z-shell/.github#774); --skip-settings
+# narrows such a run the same way.
 #
 # Read-only by design: this script has no --apply/--confirm-apply mode. The
 # settings changes recorded in #478 were hand-judged, per-repository ruleset
@@ -434,6 +437,78 @@ module RepoSettingsAudit
     end
   end
 
+  # Reusable-workflow pins to the organization repository (z-shell/.github#774).
+  # A caller pinned to a commit that is not on the source repository's default
+  # branch, such as the pre-squash commit of a merged pull request, can stop
+  # resolving and end every run in a startup failure with no jobs. Each
+  # `uses: ORG/.github/.github/workflows/NAME@SHA` in a top-level workflow file
+  # is checked with the compare API: `identical` or `behind` means the SHA is on
+  # the default branch; anything else is drift.
+  class WorkflowPins
+    PIN_PATTERN = %r{uses:\s*["']?(?<repo>[\w.-]+/[\w.-]+)/(?<path>\.github/workflows/[\w.-]+\.ya?ml)@(?<sha>[0-9a-f]{40})\b}
+    WORKFLOW_FILE = %r{\A\.github/workflows/[^/]+\.ya?ml\z}
+    ON_MAIN = %w[identical behind].freeze
+    DRIFT_STATUSES = %w[off_main missing].freeze
+
+    def self.extract(text, org)
+      source = "#{org}/.github"
+      text.to_enum(:scan, PIN_PATTERN).map { Regexp.last_match }.select { |match| match[:repo] == source }.map do |match|
+        { "workflow" => "#{match[:repo]}/#{match[:path]}", "sha" => match[:sha] }
+      end
+    end
+
+    def self.context(client, org)
+      branch = client.json("/repos/#{org}/.github").fetch("default_branch", "main")
+      new(client: client, org: org, branch: branch)
+    end
+
+    # Identical workflow files recur across repositories, so blob contents and
+    # compare verdicts are cached for the whole run.
+    def initialize(client:, org:, branch:)
+      @client = client
+      @org = org
+      @branch = branch
+      @blobs = {}
+      @statuses = {}
+    end
+
+    def evaluate(repo, default_branch)
+      tree = @client.json("/repos/#{repo}/git/trees/#{default_branch}?recursive=1")
+      raise GitHubError, "#{repo} tree response is truncated" if tree["truncated"]
+
+      files = Array(tree["tree"]).select { |entry| entry["type"] == "blob" && WORKFLOW_FILE.match?(entry["path"]) }
+      rows = files.sort_by { |entry| entry.fetch("path") }.flat_map do |entry|
+        self.class.extract(blob_text(repo, entry.fetch("sha")), @org).map do |pin|
+          { "path" => entry.fetch("path"), "workflow" => pin.fetch("workflow"), "sha" => pin.fetch("sha"),
+            "status" => status_for(pin.fetch("sha")) }
+        end
+      end
+      { "pins" => rows, "drift" => rows.count { |row| DRIFT_STATUSES.include?(row.fetch("status")) } }
+    end
+
+    private
+
+    def blob_text(repo, sha)
+      @blobs[sha] ||= begin
+        blob = @client.json("/repos/#{repo}/git/blobs/#{sha}")
+        raise GitHubError, "#{repo} blob #{sha} is not base64" unless blob["encoding"] == "base64"
+
+        blob.fetch("content").unpack1("m").force_encoding(Encoding::UTF_8)
+      end
+    end
+
+    def status_for(sha)
+      @statuses[sha] ||= begin
+        compare = @client.json("/repos/#{@org}/.github/compare/#{@branch}...#{sha}")
+        ON_MAIN.include?(compare["status"]) ? "on_main" : "off_main"
+      rescue GitHubError => error
+        raise unless [404, 422].include?(error.status)
+
+        "missing"
+      end
+    end
+  end
+
   # Fetches one repository's live rulesets and classic protection, extracts
   # its settings, and evaluates them against its Baseline row.
   class RepoAuditor
@@ -442,12 +517,13 @@ module RepoSettingsAudit
     # community_health section to the result. skip_settings reads only the
     # repository and its community health files: no rulesets, branch
     # protection or workflows, and no settings verdicts.
-    def self.audit(client:, repo:, class_resolver:, community_health: nil, skip_settings: false)
+    def self.audit(client:, repo:, class_resolver:, community_health: nil, skip_settings: false, workflow_pins: nil)
       repository = client.json("/repos/#{repo}")
       default_branch = repository.fetch("default_branch", "main")
       if skip_settings
         result = settings_skipped_result(repo, class_resolver, default_branch)
         add_community_health(result, client, repo, default_branch, community_health) if community_health
+        add_workflow_pins(result, repo, default_branch, workflow_pins) if workflow_pins
         return result
       end
 
@@ -478,6 +554,7 @@ module RepoSettingsAudit
         "errors" => []
       }
       add_community_health(result, client, repo, default_branch, community_health) if community_health
+      add_workflow_pins(result, repo, default_branch, workflow_pins) if workflow_pins
       result
     end
 
@@ -515,6 +592,14 @@ module RepoSettingsAudit
       result["errors"] << { "status" => error.status, "message" => error.message }
     end
 
+    # A failed read is recorded as an error on this repository, like a failed
+    # community health read.
+    def self.add_workflow_pins(result, repo, default_branch, workflow_pins)
+      result["workflow_pins"] = workflow_pins.evaluate(repo, default_branch)
+    rescue GitHubError => error
+      result["errors"] << { "status" => error.status, "message" => error.message }
+    end
+
     def self.branch_ruleset_details(client, repo)
       summaries = client.json("/repos/#{repo}/rulesets")
       raise GitHubError, "rulesets response must be an array" unless summaries.is_a?(Array)
@@ -536,7 +621,7 @@ module RepoSettingsAudit
       client.json("/repos/#{repo}/actions/workflows").fetch("total_count", 0)
     end
 
-    private_class_method :settings_skipped_result, :add_community_health, :branch_ruleset_details, :fetch_classic_protection, :fetch_workflow_count
+    private_class_method :settings_skipped_result, :add_community_health, :add_workflow_pins, :branch_ruleset_details, :fetch_classic_protection, :fetch_workflow_count
   end
 
   # Enumerates target repositories -- an explicit list, or every active,
@@ -545,8 +630,9 @@ module RepoSettingsAudit
   # A single repository's failure becomes an error record, not a crash: one
   # broken `gh api` call must not blank out the rest of the org's results.
   class Inventory
-    def initialize(client:, org:, class_resolver:, repos: nil, community_health: nil, skip_settings: false)
+    def initialize(client:, org:, class_resolver:, repos: nil, community_health: nil, skip_settings: false, workflow_pins: nil)
       @client = client
+      @workflow_pins = workflow_pins
       @org = org
       @class_resolver = class_resolver
       @repos = repos
@@ -557,7 +643,7 @@ module RepoSettingsAudit
     def run
       target_repos.map do |repo|
         RepoAuditor.audit(client: @client, repo: repo, class_resolver: @class_resolver, community_health: @community_health,
-                          skip_settings: @skip_settings)
+                          skip_settings: @skip_settings, workflow_pins: @workflow_pins)
       rescue GitHubError => error
         error_record(repo, error)
       end
@@ -621,12 +707,19 @@ module RepoSettingsAudit
       if results.any? { |result| result.key?("community_health") }
         payload["repos_with_community_health_drift"] = results.count { |result| community_health_drift(result).positive? }
       end
+      if results.any? { |result| result.key?("workflow_pins") }
+        payload["repos_with_workflow_pin_drift"] = results.count { |result| workflow_pin_drift(result).positive? }
+      end
       payload["results"] = results
       JSON.pretty_generate(payload) + "\n"
     end
 
     def self.community_health_drift(result)
       result.dig("community_health", "drift").to_i
+    end
+
+    def self.workflow_pin_drift(result)
+      result.dig("workflow_pins", "drift").to_i
     end
 
     def markdown(results, include_clean:)
@@ -648,9 +741,13 @@ module RepoSettingsAudit
       self.class.community_health_drift(result)
     end
 
+    def workflow_pin_drift(result)
+      self.class.workflow_pin_drift(result)
+    end
+
     def clean?(result)
       result.fetch("errors").empty? && result.fetch("summary").fetch("fail").zero? && result.fetch("summary").fetch("warn").zero? &&
-        community_health_drift(result).zero?
+        community_health_drift(result).zero? && workflow_pin_drift(result).zero?
     end
 
     def repo_section(result)
@@ -695,6 +792,16 @@ module RepoSettingsAudit
         lines << ""
       end
 
+      if workflow_pin_drift(result).positive?
+        lines << "**Reusable-workflow pins not on the organization default branch (z-shell/.github#774):**"
+        result.fetch("workflow_pins").fetch("pins").each do |row|
+          next unless WorkflowPins::DRIFT_STATUSES.include?(row.fetch("status"))
+
+          lines << "- `#{row.fetch("path")}`: #{row.fetch("workflow")}@#{row.fetch("sha")[0, 7]} #{row.fetch("status")}"
+        end
+        lines << ""
+      end
+
       notes = []
       notes << "default branch is `#{result.fetch("default_branch")}`, not `main` (audit-only)" unless result.fetch("default_branch_is_main")
       notes << "both a ruleset and classic branch protection are active" if result.fetch("flags")["dual_protection_systems"]
@@ -712,7 +819,7 @@ module RepoSettingsAudit
   class CLI
     def self.run(argv, client: GitHubClient.new, stdout: $stdout, stderr: $stderr)
       options = { org: "z-shell", repos: [], all_repos: false, json: false, include_clean: false,
-                  community_health: false, fail_on_drift: false, skip_settings: false,
+                  community_health: false, workflow_pins: false, fail_on_drift: false, skip_settings: false,
                   classes_file: File.expand_path("../../knowledge/domains/governance/data/repository-classes.yml", __dir__),
                   exceptions_file: File.expand_path("../../knowledge/domains/governance/data/template-exceptions.yml", __dir__) }
       parser = build_parser(options)
@@ -722,10 +829,11 @@ module RepoSettingsAudit
 
       class_resolver = ClassResolver.load(options[:classes_file])
       community_health = community_health_context(client, options) if options[:community_health]
+      workflow_pins = WorkflowPins.context(client, options[:org]) if options[:workflow_pins]
       inventory = Inventory.new(
         client: client, org: options[:org], class_resolver: class_resolver,
         repos: options[:all_repos] ? nil : options[:repos], community_health: community_health,
-        skip_settings: options[:skip_settings]
+        skip_settings: options[:skip_settings], workflow_pins: workflow_pins
       )
       results = inventory.run
 
@@ -735,13 +843,14 @@ module RepoSettingsAudit
 
       return 1 if results.any? { |result| !result.fetch("errors").empty? }
       return 1 if options[:fail_on_drift] && results.any? { |result| Renderer.community_health_drift(result).positive? }
+      return 1 if options[:fail_on_drift] && results.any? { |result| Renderer.workflow_pin_drift(result).positive? }
 
       0
     rescue OptionParser::ParseError, ArgumentError => error
       stderr.puts error.message
       2
     rescue GitHubError => error
-      stderr.puts "organization community health defaults: #{error.message}"
+      stderr.puts "organization defaults: #{error.message}"
       1
     end
 
@@ -765,8 +874,13 @@ module RepoSettingsAudit
         option.on("--exceptions-file PATH", "Approved local files (default: knowledge/domains/governance/data/template-exceptions.yml)") do |value|
           options[:exceptions_file] = value
         end
-        option.on("--fail-on-drift", "Exit 1 when --community-health finds drift (default: report only)") { options[:fail_on_drift] = true }
-        option.on("--skip-settings", "With --community-health, read no settings, rulesets or branch protection") do
+        option.on("--workflow-pins", "Also report reusable-workflow pins to ORG/.github that are not on its default branch (#774)") do
+          options[:workflow_pins] = true
+        end
+        option.on("--fail-on-drift", "Exit 1 when --community-health or --workflow-pins finds drift (default: report only)") do
+          options[:fail_on_drift] = true
+        end
+        option.on("--skip-settings", "With --community-health or --workflow-pins, read no settings, rulesets or branch protection") do
           options[:skip_settings] = true
         end
       end
@@ -777,8 +891,9 @@ module RepoSettingsAudit
         raise OptionParser::InvalidOption, "use either --all-repos or one or more --repo values, not both"
       end
       raise OptionParser::MissingArgument, "pass at least one --repo OWNER/REPO or --all-repos" if !options[:all_repos] && options[:repos].empty?
-      raise OptionParser::InvalidOption, "--fail-on-drift needs --community-health" if options[:fail_on_drift] && !options[:community_health]
-      raise OptionParser::InvalidOption, "--skip-settings needs --community-health" if options[:skip_settings] && !options[:community_health]
+      drift_check = options[:community_health] || options[:workflow_pins]
+      raise OptionParser::InvalidOption, "--fail-on-drift needs --community-health or --workflow-pins" if options[:fail_on_drift] && !drift_check
+      raise OptionParser::InvalidOption, "--skip-settings needs --community-health or --workflow-pins" if options[:skip_settings] && !drift_check
 
       options[:repos].each do |repo|
         raise OptionParser::InvalidArgument, "--repo must be OWNER/REPO: #{repo}" unless repo.match?(%r{\A[^/]+/[^/]+\z})
