@@ -18,12 +18,13 @@ GitHub issue forms cannot be conditional, and any file in a repository's `.githu
 2. `automation/agents/org-routing.py` validates the profiles with the inventory and renders a `Reporting issues` section inside the repository's `org-routing` block. This extends the block contract of ADR-0031 points 1 and 2: besides routing, the block carries project intake facts that no repository-owned text states. It still restates no organization policy, which it links to.
 3. The block renders only intake facts: the version command or note, a pointer to "Filing a new issue", and the extra `### ` headings. Branch, Zsh versions, install and test commands stay in the profile for later consumers, because the repositories already state them in their own text and a second copy would compete with it.
 4. Delivery follows ADR-0031. A repository receives the section when it repins the Org Routing workflow to a revision carrying its profile and regenerates its block in a reviewed change of its own. Nothing here writes to another repository.
-5. Generated issue forms, and a check that compares a profile's tested versions with the repository's CI, are later steps that need their own change.
+5. `org-routing.py check` compares a profile's tested Zsh versions with the literal versions the repository's workflows install under the `zsh`, `version`, `zsh-version` and `ZSH_VERSION` keys, and fails on a difference in either direction. A runner's own Zsh and a version chosen by an expression have nothing to compare.
+6. Profiles generate no issue forms. A local form hides every organization form, so a profiled form would make each repository own and audit the whole form set; agents, the dominant filing path, already receive the extra headings from the block.
 
 ## Consequences
 
-- Web and agent filings converge on the form's headings plus the profile's fields, and the project facts gain one editable home.
-- Profiles go stale unless someone rereads them. The recorded revision and date show their age, and the stated versions are not yet compared with CI.
+- Agent filings carry the form's headings plus the profile's fields, and the project facts gain one editable home. Web filings keep the repository's effective form, without the profile's fields.
+- Profiles go stale unless someone rereads them. The recorded revision and date show their age. The tested versions are checked against CI on each Org Routing run in the repository; the other facts are not.
 - Every block regeneration for a profiled repository now includes the section, so editing a profile changes generated text in that repository after its next repin.
 
 ## Alternatives considered
@@ -31,6 +32,7 @@ GitHub issue forms cannot be conditional, and any file in a repository's `.githu
 1. Profiles in each repository: closer to the code, but would need a collector and does not match the central knowledge model of [ADR-0036](0036-central-editable-knowledge-and-generated-consumers.md).
 2. Hand-maintained repository forms: uneven coverage, facts duplicated across contributing guides and forms, and nothing reaches the 76 repositories without forms.
 3. Render every profile field into `AGENTS.md`: duplicates the branch, version and test text the repositories already own.
+4. Generate each profiled repository's bug form from the profile: gives web reporters the extra fields, but a repository without local forms must then vendor the whole organization set and record an exception for each file.
 
 ## References
 

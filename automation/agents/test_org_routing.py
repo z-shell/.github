@@ -1187,6 +1187,33 @@ class ApprovedSourceTests(unittest.TestCase):
         )
 
 
+# Matrix, flow-list, block-list and environment forms of the Zsh selection.
+TOOL_WORKFLOW = """jobs:
+  tests:
+    strategy:
+      matrix:
+        zsh: ["5.8.1", '5.9.2']  # exact builds
+        include:
+          - version: 5.8.1
+    steps:
+      - uses: z-shell/.github/actions/setup-zsh@0000000000000000000000000000000000000000 # main
+        with:
+          version: ${{ matrix.zsh }}
+  lint:
+    steps:
+      - uses: example/setup-go@0000000000000000000000000000000000000000 # v1
+        with:
+          version: v2.12.2
+          go-version: "1.26"
+"""
+
+
+def write_workflow(root: Path, name: str, text: str) -> None:
+    path = root / ".github/workflows" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
 def tool_profile() -> dict:
     return {
         "component": "Tool",
@@ -1260,12 +1287,57 @@ class ProjectProfileTests(unittest.TestCase):
         self.fixture.write()
         org = self.fixture.load()
         root = make_downstream(Path(self.directory.name), self.fixture.revision)
+        write_workflow(root, "zsh.yml", TOOL_WORKFLOW)
         status, _ = run_main(
             "--org-root", str(self.fixture.root), "apply",
             "--repository", "z-shell/tool", "--root", str(root),
         )
         self.assertEqual(status, 0)
         self.assertIn("## Reporting issues", (root / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertEqual(routing.check(root, "z-shell/tool", org), [])
+
+    def test_workflow_versions_cover_every_selection_form(self) -> None:
+        root = Path(self.directory.name) / "versions"
+        write_workflow(root, "zsh.yml", TOOL_WORKFLOW)
+        write_workflow(
+            root,
+            "source.yaml",
+            "jobs:\n  build:\n    env:\n      ZSH_VERSION: \"5.9\"\n    strategy:\n"
+            "      matrix:\n        zsh:\n          - 5.8\n          - \"5.9.2\"\n"
+            "        os: [ubuntu-latest]\n",
+        )
+        write_workflow(root, "notes.txt", "zsh: 9.9\n")
+        found = routing.workflow_zsh_versions(root)
+        self.assertEqual(
+            {version: sorted(files) for version, files in found.items()},
+            {
+                "5.8": [".github/workflows/source.yaml"],
+                "5.8.1": [".github/workflows/zsh.yml"],
+                "5.9": [".github/workflows/source.yaml"],
+                "5.9.2": [".github/workflows/source.yaml", ".github/workflows/zsh.yml"],
+            },
+        )
+
+    def test_profile_and_workflow_versions_must_agree(self) -> None:
+        self.fixture.write()
+        org = self.fixture.load()
+        root = make_downstream(Path(self.directory.name), self.fixture.revision)
+        run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(root))
+        stated_only = routing.check(root, "z-shell/tool", org)
+        self.assertEqual(len(stated_only), 2, stated_only)
+        self.assertTrue(all("no workflow installs it" in message for message in stated_only))
+        write_workflow(root, "zsh.yml", TOOL_WORKFLOW.replace("'5.9.2'", "'5.9.2', 5.9"))
+        unstated = routing.check(root, "z-shell/tool", org)
+        self.assertEqual(len(unstated), 1, unstated)
+        self.assertIn("installs Zsh 5.9, which the project profile does not state", unstated[0])
+        self.assertTrue(unstated[0].startswith(".github/workflows/zsh.yml: "))
+
+    def test_repository_without_profile_skips_the_version_check(self) -> None:
+        self.fixture.profiles = None
+        self.fixture.write()
+        org = self.fixture.load()
+        root = make_downstream(Path(self.directory.name), self.fixture.revision)
+        run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(root))
         self.assertEqual(routing.check(root, "z-shell/tool", org), [])
 
     def test_profile_schema_violations(self) -> None:

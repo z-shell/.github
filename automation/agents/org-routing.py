@@ -98,6 +98,14 @@ PROFILE_VERSION_FIELDS = {"command", "note"}
 PROFILE_ZSH_FIELDS = {"minimum", "tested", "platforms"}
 PROFILE_REPORT_FIELDS = {"label", "description"}
 ZSH_VERSION_PATTERN = re.compile(r"^\d+\.\d+(?:\.\d+)?$")
+WORKFLOWS_DIR = ".github/workflows"
+# Keys through which a workflow selects the Zsh it installs: a matrix list
+# (zi `zsh`, zpmod `version`), the setup-zsh `version` and Zsh CI
+# `zsh-version` inputs, and the source-build `ZSH_VERSION` (F-Sy-H).
+ZSH_KEY_LINE = re.compile(
+    r"^(?P<indent>\s*)(?:-\s+)?(?P<key>zsh|version|zsh-version|ZSH_VERSION)\s*:\s*(?P<value>.*?)\s*(?:#.*)?$"
+)
+LIST_ITEM_LINE = re.compile(r"^(?P<indent>\s*)-\s+(?P<value>.*?)\s*(?:#.*)?$")
 METADATA_KEYS = {
     "github-path",
     "github-pinned",
@@ -1120,6 +1128,87 @@ def _read_regular(root: Path, relative: str) -> str | None:
     return path.read_text(encoding="utf-8")
 
 
+def _zsh_literals(value: str) -> list[str]:
+    """Return the literal Zsh versions in one YAML scalar or flow list."""
+    if value.startswith("[") and value.endswith("]"):
+        items = value[1:-1].split(",")
+    else:
+        items = [value]
+    versions = []
+    for item in items:
+        item = item.strip().strip("'\"")
+        if ZSH_VERSION_PATTERN.fullmatch(item):
+            versions.append(item)
+    return versions
+
+
+def workflow_zsh_versions(root: Path) -> dict[str, set[str]]:
+    """Map each literal Zsh version a checkout's workflows install to its files.
+
+    Only literal values under the keys in ``ZSH_KEY_LINE`` count; an
+    expression such as ``${{ matrix.zsh }}`` names a list found elsewhere,
+    and a runner's own Zsh has no version to compare (decisions/0040).
+    """
+    directory = root / WORKFLOWS_DIR
+    if directory.is_symlink() or not directory.is_dir():
+        return {}
+    found: dict[str, set[str]] = {}
+    for path in sorted(directory.iterdir()):
+        if path.suffix not in (".yml", ".yaml"):
+            continue
+        relative = f"{WORKFLOWS_DIR}/{path.name}"
+        text = _read_regular(root, relative)
+        if text is None:
+            continue
+        block_indent: int | None = None
+        for line in text.splitlines():
+            if block_indent is not None:
+                item = LIST_ITEM_LINE.match(line)
+                if item and len(item.group("indent")) >= block_indent:
+                    for version in _zsh_literals(item.group("value")):
+                        found.setdefault(version, set()).add(relative)
+                    continue
+                if line.strip():
+                    block_indent = None
+            match = ZSH_KEY_LINE.match(line)
+            if not match:
+                continue
+            if match.group("value"):
+                for version in _zsh_literals(match.group("value")):
+                    found.setdefault(version, set()).add(relative)
+            else:
+                block_indent = len(match.group("indent"))
+    return found
+
+
+def check_profile_versions(root: Path, repository: str, profile: dict) -> list[str]:
+    """Compare a profile's tested Zsh versions with the checkout's workflows."""
+    found = workflow_zsh_versions(root)
+    stated = set(profile["zsh"]["tested"])
+    errors = []
+    fix = (
+        f"make zsh.tested for {repository} in the {CANONICAL_REPOSITORY} "
+        + f"{PROFILES_PATH} match the versions CI installs"
+    )
+    for version in sorted(stated - set(found)):
+        errors.append(
+            error(
+                WORKFLOWS_DIR,
+                f"project profile states Zsh {version} as tested, but no workflow installs it",
+                fix,
+            )
+        )
+    for version in sorted(set(found) - stated):
+        errors.append(
+            error(
+                ", ".join(sorted(found[version])),
+                f"workflow installs Zsh {version}, which the project profile does not state as tested",
+                fix,
+            )
+        )
+    return errors
+
+
 def _skill_entries(directory: Path) -> list[str]:
     """Every non-directory entry below a skill directory, symlinks included.
 
@@ -1332,6 +1421,9 @@ def check(root: Path, repository: str, org: Org) -> list[str]:
             )
     for name in vendored:
         errors.extend(_check_skill(root, name, org.approved["skills"][name]))
+    profile = org.profiles.get(entry["repository"])
+    if profile:
+        errors.extend(check_profile_versions(root, entry["repository"], profile))
     errors.extend(delivery.check_project(root, repository, org.project_entries))
     for record in org.project_entries:
         if record["repository"] != repository:
