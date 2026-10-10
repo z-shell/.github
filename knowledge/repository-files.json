@@ -191,6 +191,13 @@
       "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
     },
     {
+      "path": ".github/agents/zsh-syntax-reviewer.agent.md",
+      "domain": "zsh",
+      "disposition": "imported",
+      "knowledge": "knowledge/domains/zsh/roles/zsh-syntax-reviewer.md",
+      "reason": "Edit the declared knowledge source; preserve the complete native consumer through checked generation."
+    },
+    {
       "path": ".github/copilot-instructions.md",
       "domain": "agents",
       "disposition": "referenced",
