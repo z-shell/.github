@@ -17,10 +17,7 @@ Before reviewing code, parser rules, or AST patterns:
    authority (`zsh/authority/released-manual`), and released `zsh` as the syntax
    authority (`zsh/validation/native-authority`). Follow the manual research
    procedure in `.github/skills/zsh-manual-research/SKILL.md`.
-3. Read `.github/instructions/zsh/dialect-selection.instructions.md` to classify
-   the source's actual dialect (`zsh`, `bash`, or POSIX `sh`) and execution
-   profile (`standalone-script`, `sourced-library`, `autoload-function`,
-   `eval-string`, `interactive-hook`) before evaluating constructs.
+3. Read `.github/instructions/zsh/dialect-selection.instructions.md` to classify the source's actual dialect (`zsh`, `bash`, or POSIX `sh`) and select one canonical execution profile (`standalone-executable`, `startup-file`, `sourced-library`, `autoload-function`, `test-fixture`) before evaluating constructs.
 4. Establish the repository compatibility floor (for example, Zsh 5.8 or 5.9).
    Verify behavior across supported versions rather than assuming newer syntax is
    universally available.
@@ -48,6 +45,7 @@ Check affected shell sources, parser implementations, AST definitions, or lint r
    `zsh -f -n` validates syntax only, not runtime expansions, arithmetic
    evaluation, or option side effects. Distinguish native syntax validity from
    tool-specific parser limitations.
+
 3. **Parser rules and grammar conformance**: when reviewing parser front-ends or
    grammars (such as `internal/parse` in `zsh-lint`):
    - Compare tokenization and grammar productions against the released Zsh
@@ -76,9 +74,7 @@ Check affected shell sources, parser implementations, AST definitions, or lint r
      boundaries according to Zsh rules.
    - Audit parameter expansion flags and modifiers for correct syntax and order.
 6. **Option isolation and state preservation**:
-   - Verify that scripts and functions changing shell options use
-     `setopt local_options` (and `local_traps` where appropriate) to avoid
-     polluting caller or interactive shell state.
+   - For option-sensitive reusable work, apply `zsh/options/localize`: use a function beginning with `builtin emulate -L zsh`. Enforce `zsh/options/no-top-level-leak` for sourced libraries; `setopt local_options` at sourced top level does not restore caller state.
    - Avoid universal or unreviewed option bundles (such as unexamined `errexit`
      or `nounset`) that break idiomatic Zsh patterns.
 7. **Safe evaluation and command execution**:
