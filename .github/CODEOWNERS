@@ -14,3 +14,4 @@
 # Configuration
 /.trunk/                        @z-shell/tsc
 /renovate-config.json           @z-shell/tsc
+/renovate-zsh-lint.json         @z-shell/tsc

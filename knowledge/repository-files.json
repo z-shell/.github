@@ -1255,6 +1255,13 @@
       "reason": "Executable Renovate configuration; inspect with dependency-management guidance. This inventory does not change bot ownership or update policy."
     },
     {
+      "path": "renovate-zsh-lint.json",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Opt-in Renovate preset for pinned zsh-lint releases; inspect with dependency-management guidance. This inventory does not change bot ownership or update policy."
+    },
+    {
       "path": "runbooks/adr.md",
       "domain": "governance",
       "disposition": "imported",
