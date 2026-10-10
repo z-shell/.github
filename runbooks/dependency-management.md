@@ -90,6 +90,15 @@ real exception, such as a non-default target branch:
 Custom managers and specialized package grouping also belong in the repository
 that needs them.
 
+A custom manager that several repositories need lives in an opt-in preset
+beside `renovate-config.json`, and each repository that needs it extends that
+preset by name. `renovate-zsh-lint.json` is one: it updates zsh-lint releases
+pinned as `zsh-lint-ref: <commit> # vX.Y.Z` or as a `repository:
+z-shell/zsh-lint` checkout with `ref: <commit> # vX.Y.Z`, grouped as one
+`zsh-lint analyzer` update. A consumer opts in with
+`"extends": ["local>z-shell/.github:renovate-config",
+"local>z-shell/.github:renovate-zsh-lint"]`.
+
 For a repository with an explicitly approved persistent integration branch
 under `decisions/0019-trunk-on-main-default.md`, this override is mandatory.
 Without it Renovate opens routine update pull requests against default `main`,
@@ -155,5 +164,6 @@ If Renovate cannot access or process a repository:
 - `decisions/0004-dependabot-unification.md`
 - `decisions/0012-hybrid-dependency-management.md`
 - `renovate-config.json`
+- `renovate-zsh-lint.json`
 - `runbooks/new-repository.md`
 - `runbooks/branch-protection.md`
