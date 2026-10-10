@@ -39,4 +39,4 @@ jobs:
     uses: ./.github/workflows/zsh-lint.yml
     with:
       paths: automation/ci/fixtures/zsh-lint/clean.txt
-      zsh-lint-ref: 999cb76cc65ef6af56c0ae65ab0f3622eb527944 # v1.3.0
+      zsh-lint-ref: aff60185cddb4b829f39f2db82aae9fc7bce3e7d # v1.4.0
