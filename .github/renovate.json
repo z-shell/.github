@@ -1,4 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>z-shell/.github:renovate-config"]
+  "extends": ["local>z-shell/.github:renovate-config", "local>z-shell/.github:renovate-zsh-lint"]
 }
