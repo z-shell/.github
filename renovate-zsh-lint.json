@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in preset: update pinned zsh-lint analyzer releases in Zsh lint workflows",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "zsh-lint release pinned by commit with its tag in a trailing comment",
+      "managerFilePatterns": ["/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "matchStrings": [
+        "zsh-lint-ref:\\s*(?<currentDigest>[0-9a-f]{40})\\s*#\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)",
+        "repository:\\s*z-shell/zsh-lint\\s*\\n\\s*ref:\\s*(?<currentDigest>[0-9a-f]{40})\\s*#\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "z-shell/zsh-lint",
+      "datasourceTemplate": "github-tags"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Repin every zsh-lint reference in a repository together",
+      "matchDepNames": ["z-shell/zsh-lint"],
+      "groupName": "zsh-lint analyzer",
+      "groupSlug": "zsh-lint-analyzer"
+    }
+  ]
+}
