@@ -6,6 +6,7 @@ Select a file for the task described below. Imported files have an editable know
 
 | File | Disposition | Purpose and reading context |
 | --- | --- | --- |
+| [.github/agents/zsh-syntax-reviewer.agent.md](../../../.github/agents/zsh-syntax-reviewer.agent.md) | [Imported source](roles/zsh-syntax-reviewer.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
 | [.github/instructions/zsh/dialect-selection.instructions.md](../../../.github/instructions/zsh/dialect-selection.instructions.md) | [Imported source](dialect-selection.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
 | [.github/instructions/zsh/scripting.instructions.md](../../../.github/instructions/zsh/scripting.instructions.md) | [Imported source](scripting.md) | Edit the declared knowledge source; preserve the complete native consumer through checked generation. |
 | [.github/skills/zsh-manual-research/SKILL.md](../../../.github/skills/zsh-manual-research/SKILL.md) | referenced | Native skill package or supporting resource; read for its declared task. Keep capability mechanics with the skill and follow linked public procedures. |

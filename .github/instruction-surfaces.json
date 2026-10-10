@@ -434,6 +434,25 @@
       "canonical_for": []
     },
     {
+      "id": "agent-zsh-syntax-reviewer",
+      "path": ".github/agents/zsh-syntax-reviewer.agent.md",
+      "kind": "agent",
+      "authority": "advisory",
+      "consumers": ["copilot"],
+      "tasks": [
+        "zsh-syntax-review",
+        "zsh-ast-review",
+        "zsh-dialect-review",
+        "zsh-lint-parser-gap",
+        "zsh-lint-rule-proposal",
+        "code-review"
+      ],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "skill-code-review",
       "path": ".github/skills/code-review/SKILL.md",
       "kind": "skill",

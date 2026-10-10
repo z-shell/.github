@@ -74,6 +74,10 @@
       "target": ".github/agents/zsh-plugin-reviewer.agent.md"
     },
     {
+      "source": "knowledge/domains/zsh/roles/zsh-syntax-reviewer.md",
+      "target": ".github/agents/zsh-syntax-reviewer.agent.md"
+    },
+    {
       "source": "knowledge/domains/governance/adr.md",
       "target": "runbooks/adr.md"
     },
