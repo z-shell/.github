@@ -33,4 +33,4 @@ Annotations escape workflow-command metacharacters; summaries avoid interpreting
 
 ## Verification
 
-Run `python3 -m unittest automation/ci/test_zsh_lint_ci.py -v`. `Zsh Lint Tests` also calls the real reusable workflow with the pinned v1.3.0 analyzer, exercising workflow-source resolution, toolchain selection, JSON interpretation and artifact upload. Consumer qualification remains a separate rollout step under initiative #673.
+Run `python3 -m unittest automation/ci/test_zsh_lint_ci.py -v`. `Zsh Lint Tests` also calls the real reusable workflow with the pinned v1.4.0 analyzer, exercising workflow-source resolution, toolchain selection, JSON interpretation and artifact upload. Consumer qualification remains a separate rollout step under initiative #673.
