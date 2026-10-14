@@ -44,6 +44,11 @@ def assert_disabled(test, text, name):
 
 
 class CanarySafetyTests(unittest.TestCase):
+    def test_native_trial_uses_the_fixed_setup_revision(self):
+        self.assertIn(
+            "setup-zsh@15d8e2e1c05d81e2e3c5ac6830c533c6a114a416", read("zsh-ci")
+        )
+
     def test_release_has_no_publication_or_inference(self):
         text = read("release-prepare")
         assert_disabled(self, text, "Draft changelog with GitHub Models")
