@@ -25,15 +25,14 @@ on:
 permissions: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-canary-lychee-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   links-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
-      issues: write
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: "📤 Restore cache"
@@ -58,13 +57,13 @@ jobs:
 
       - name: "📥 Save cache"
         uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        if: always()
+        if: ${{ false }}
         with:
           path: .lycheecache
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: "🔖 Create Issue From File"
-        if: steps.lychee.outputs.exit_code != '0'
+        if: ${{ false }}
         uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
         with:
           title: " 📢 Link Checker Report"
