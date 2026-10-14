@@ -73,7 +73,15 @@ jobs:
       runs-on: ubuntu-26.04
       check-mode: all
 
+  trunk-control:
+    needs: safety
+    uses: ./.github/workflows/trunk.yml
+    with:
+      runs-on: ubuntu-24.04
+      check-mode: all
+
   zsh-latest:
+    # Native trials are sequential because the reusable workflow owns one group.
     needs: safety
     uses: ./.github/workflows/zsh-ci.yml
     with:
@@ -83,6 +91,7 @@ jobs:
 
   zsh-59:
     needs: [safety, zsh-latest]
+    if: ${{ !cancelled() && needs.safety.result == 'success' }}
     uses: ./.github/workflows/zsh-ci.yml
     with:
       zsh-version: "5.9"
@@ -91,9 +100,20 @@ jobs:
 
   zsh-592:
     needs: [safety, zsh-59]
+    if: ${{ !cancelled() && needs.safety.result == 'success' }}
     uses: ./.github/workflows/zsh-ci.yml
     with:
       zsh-version: "5.9.2"
+      require-sources: true
+      run-zcompile: true
+
+  zsh-control-59:
+    needs: [safety, zsh-592]
+    if: ${{ !cancelled() && needs.safety.result == 'success' }}
+    uses: ./.github/workflows/zsh-ci.yml
+    with:
+      canary-runner: ubuntu-24.04
+      zsh-version: "5.9"
       require-sources: true
       run-zcompile: true
 

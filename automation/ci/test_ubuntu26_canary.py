@@ -77,7 +77,11 @@ class CanarySafetyTests(unittest.TestCase):
                 runners = re.findall(r"(?m)^\s+runs-on: (.+)$", read(name))
                 self.assertTrue(runners)
                 for runner in runners:
-                    self.assertIn("ubuntu-26.04", runner)
+                    if name == "zsh-ci":
+                        self.assertEqual(runner, "${{ inputs.canary-runner }}")
+                        self.assertIn("default: ubuntu-26.04", read(name))
+                    else:
+                        self.assertIn("ubuntu-26.04", runner)
                     self.assertNotIn("ubuntu-latest", runner)
 
     def test_concurrency_groups_do_not_cancel_sibling_calls(self):
@@ -111,14 +115,37 @@ class CanarySafetyTests(unittest.TestCase):
                 self.assertRegex(job, r"needs: (?:safety|\[safety, zsh-[a-z0-9-]+\])")
                 self.assertNotIn("write", job)
         self.assertEqual(set(names), REUSABLE)
-        self.assertEqual(names.count("zsh-ci"), 3)
+        self.assertEqual(names.count("trunk"), 2)
+        self.assertEqual(names.count("zsh-ci"), 4)
         for version in ["latest", "5.9", "5.9.2"]:
             self.assertIn(f'zsh-version: "{version}"', text)
-        self.assertEqual(text.count("require-sources: true"), 3)
-        self.assertEqual(text.count("run-zcompile: true"), 3)
+        self.assertEqual(text.count("require-sources: true"), 4)
+        self.assertEqual(text.count("run-zcompile: true"), 4)
         self.assertIn("runs-on: ubuntu-26.04", text)
         self.assertIn("check-mode: all", text)
         self.assertIn("aff60185cddb4b829f39f2db82aae9fc7bce3e7d", text)
+
+    def test_native_trials_continue_after_a_failed_predecessor(self):
+        text = read("ubuntu26-canary")
+        for job in ["zsh-59", "zsh-592", "zsh-control-59"]:
+            with self.subTest(job=job):
+                block = re.split(
+                    r"(?m)^  [a-z0-9-]+:", text.split(f"  {job}:\n", 1)[1]
+                )[0]
+                self.assertIn(
+                    "if: ${{ !cancelled() && needs.safety.result == 'success' }}", block
+                )
+        control = text.split("  zsh-control-59:\n", 1)[1].split(
+            "\n  zsh-lint:", 1
+        )[0]
+        self.assertIn("canary-runner: ubuntu-24.04", control)
+        self.assertIn('zsh-version: "5.9"', control)
+
+    def test_trunk_control_uses_same_full_scan_on_previous_image(self):
+        text = read("ubuntu26-canary")
+        control = text.split("  trunk-control:\n", 1)[1].split("\n  zsh-latest:", 1)[0]
+        self.assertIn("runs-on: ubuntu-24.04", control)
+        self.assertIn("check-mode: all", control)
 
 
 if __name__ == "__main__":
