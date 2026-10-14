@@ -13,6 +13,16 @@ WORKFLOW = ROOT / ".github/workflows/zsh-ci.yml"
 
 
 class NativeWorkflowTests(unittest.TestCase):
+    def test_setup_action_does_not_restore_known_broken_ubuntu26_pin(self):
+        # #712: this revision builds Zsh 5.9 without the C89 configure fix
+        # from #703. The Ubuntu 26 canary fails; the same Ubuntu 24 build passes.
+        # Guard this known regression without locking future upgrades to one SHA.
+        self.assertNotIn(
+            "z-shell/.github/actions/setup-zsh@"
+            "6c7972d4f682c29cdd0e86df2cffce6aa5d23c89",
+            WORKFLOW.read_text(),
+        )
+
     def run_check(
         self,
         files,
