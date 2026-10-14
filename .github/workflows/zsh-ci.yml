@@ -50,7 +50,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Zsh
-        uses: z-shell/.github/actions/setup-zsh@6c7972d4f682c29cdd0e86df2cffce6aa5d23c89 # main
+        uses: z-shell/.github/actions/setup-zsh@15d8e2e1c05d81e2e3c5ac6830c533c6a114a416 # main
         with:
           version: ${{ inputs.zsh-version }}
 
