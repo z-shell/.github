@@ -1136,6 +1136,13 @@
       "reason": "Accepted project profile and issue-intake decision; read with ADR-0031 for the routing block it extends."
     },
     {
+      "path": "decisions/0041-zsh-lint-parser-root-module-packaging.md",
+      "domain": "tooling",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/tooling/repository-resources.md",
+      "reason": "Accepted refinement of ADR-0030's parser-fork module packaging. Fork strategy, licensing and behavior gates remain unchanged; implementation and consumer delivery are separate steps."
+    },
+    {
       "path": "decisions/README.md",
       "domain": "governance",
       "disposition": "referenced",
