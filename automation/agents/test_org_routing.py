@@ -3,9 +3,9 @@
 
 import contextlib
 import copy
+import hashlib
 import importlib.util
 import io
-import hashlib
 import json
 import os
 import shutil
@@ -188,16 +188,29 @@ class ProjectDeliveryTests(unittest.TestCase):
         self.source = "knowledge/domains/tooling/rules.md"
         path = self.fixture.root / self.source
         path.parent.mkdir(parents=True)
-        path.write_text('---\napplyTo: "internal/**"\n---\n\n# Project rules\n\n[procedure](../../../runbooks/triage.md)\n')
+        path.write_text(
+            '---\napplyTo: "internal/**"\n---\n\n# Project rules\n\n[procedure](../../../runbooks/triage.md)\n'
+        )
         git(self.fixture.root, "add", self.source)
-        git(self.fixture.root, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "approved source")
+        git(
+            self.fixture.root,
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            "commit",
+            "-qm",
+            "approved source",
+        )
         self.record = {
-            "repository": "z-shell/tool", "source": self.source,
+            "repository": "z-shell/tool",
+            "source": self.source,
             "target": ".github/instructions/go.instructions.md",
             "revision": git(self.fixture.root, "rev-parse", "HEAD"),
             "source_blob": git(self.fixture.root, "rev-parse", "HEAD:" + self.source),
             "content_sha256": "0" * 64,
-            "project_revision": "c" * 40, "project_source_blob": "d" * 40,
+            "project_revision": "c" * 40,
+            "project_source_blob": "d" * 40,
         }
         rendered = routing.delivery.render_project(path.read_text(), self.record)
         self.record["content_sha256"] = hashlib.sha256(rendered.encode()).hexdigest()
@@ -205,10 +218,20 @@ class ProjectDeliveryTests(unittest.TestCase):
         self.checkout = make_downstream(self.directory, self.fixture.revision)
 
     def write_records(self, records):
-        (self.fixture.root / routing.delivery.PROJECT_MANIFEST).write_text(json.dumps({"version": 1, "consumers": records}))
+        (self.fixture.root / routing.delivery.PROJECT_MANIFEST).write_text(
+            json.dumps({"version": 1, "consumers": records})
+        )
 
     def apply(self):
-        return run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(self.checkout))
+        return run_main(
+            "--org-root",
+            str(self.fixture.root),
+            "apply",
+            "--repository",
+            "z-shell/tool",
+            "--root",
+            str(self.checkout),
+        )
 
     def test_apply_and_check_use_approved_blob_even_with_dirty_authoring_source(self):
         (self.fixture.root / self.source).write_text("Unapproved dirty instruction")
@@ -216,69 +239,99 @@ class ProjectDeliveryTests(unittest.TestCase):
         self.assertEqual(self.apply()[0], 0)
         self.assertIn("Local rules.", (self.checkout / "AGENTS.md").read_text())
         self.assertNotEqual(original, (self.checkout / "AGENTS.md").read_text())
-        target = self.checkout / self.record['target']
+        target = self.checkout / self.record["target"]
         self.assertIn("# Project rules", target.read_text())
         self.assertNotIn("Unapproved dirty", target.read_text())
-        self.assertEqual(routing.check(self.checkout, 'z-shell/tool', self.fixture.load()), [])
-        target.write_text(target.read_text() + '\nUnauthorized rule\n')
-        self.assertTrue(routing.check(self.checkout, 'z-shell/tool', self.fixture.load()))
+        self.assertEqual(
+            routing.check(self.checkout, "z-shell/tool", self.fixture.load()), []
+        )
+        target.write_text(target.read_text() + "\nUnauthorized rule\n")
+        self.assertTrue(
+            routing.check(self.checkout, "z-shell/tool", self.fixture.load())
+        )
 
     def test_wrong_source_blob_or_digest_cannot_modify_project(self):
         original = (self.checkout / "AGENTS.md").read_bytes()
-        consumer = (self.checkout / self.record['target']).read_bytes()
-        for field, value in [('revision', 'f' * 40), ('source_blob', 'e' * 40), ('content_sha256', 'f' * 64)]:
+        consumer = (self.checkout / self.record["target"]).read_bytes()
+        for field, value in [
+            ("revision", "f" * 40),
+            ("source_blob", "e" * 40),
+            ("content_sha256", "f" * 64),
+        ]:
             with self.subTest(field=field):
                 self.write_records([{**self.record, field: value}])
                 self.assertEqual(self.apply()[0], 1)
                 self.assertEqual((self.checkout / "AGENTS.md").read_bytes(), original)
-                self.assertEqual((self.checkout / self.record['target']).read_bytes(), consumer)
+                self.assertEqual(
+                    (self.checkout / self.record["target"]).read_bytes(), consumer
+                )
 
     def test_invalid_later_consumer_preserves_every_project_file(self):
-        second = {**self.record, 'source': 'knowledge/domains/tooling/missing.md', 'target': '.github/instructions/second.instructions.md'}
-        self.fixture.manifest['downstream'][1]['surfaces'].append({'path': second['target'], 'tasks': ['implementation'], 'file_patterns': ['internal/**']})
+        second = {
+            **self.record,
+            "source": "knowledge/domains/tooling/missing.md",
+            "target": ".github/instructions/second.instructions.md",
+        }
+        self.fixture.manifest["downstream"][1]["surfaces"].append(
+            {
+                "path": second["target"],
+                "tasks": ["implementation"],
+                "file_patterns": ["internal/**"],
+            }
+        )
         self.fixture.write()
         self.write_records([self.record, second])
-        original = (self.checkout / 'AGENTS.md').read_bytes()
-        consumer = (self.checkout / self.record['target']).read_bytes()
+        original = (self.checkout / "AGENTS.md").read_bytes()
+        consumer = (self.checkout / self.record["target"]).read_bytes()
         self.assertEqual(self.apply()[0], 1)
-        self.assertEqual((self.checkout / 'AGENTS.md').read_bytes(), original)
-        self.assertEqual((self.checkout / self.record['target']).read_bytes(), consumer)
-        self.assertFalse((self.checkout / second['target']).exists())
+        self.assertEqual((self.checkout / "AGENTS.md").read_bytes(), original)
+        self.assertEqual((self.checkout / self.record["target"]).read_bytes(), consumer)
+        self.assertFalse((self.checkout / second["target"]).exists())
 
     def test_verify_approved_checks_project_records(self):
-        self.assertEqual(run_main('--org-root', str(self.fixture.root), 'verify-approved')[0], 0)
-        self.write_records([{**self.record, 'source_blob': 'f' * 40}])
-        self.assertEqual(run_main('--org-root', str(self.fixture.root), 'verify-approved')[0], 1)
+        self.assertEqual(
+            run_main("--org-root", str(self.fixture.root), "verify-approved")[0], 0
+        )
+        self.write_records([{**self.record, "source_blob": "f" * 40}])
+        self.assertEqual(
+            run_main("--org-root", str(self.fixture.root), "verify-approved")[0], 1
+        )
 
     def test_selector_mismatch_fails_before_writes(self):
-        self.fixture.manifest['downstream'][1]['surfaces'][0]['file_patterns'] = ['other/**']
+        self.fixture.manifest["downstream"][1]["surfaces"][0]["file_patterns"] = [
+            "other/**"
+        ]
         self.fixture.write()
-        original = (self.checkout / 'AGENTS.md').read_bytes()
-        consumer = (self.checkout / self.record['target']).read_bytes()
+        original = (self.checkout / "AGENTS.md").read_bytes()
+        consumer = (self.checkout / self.record["target"]).read_bytes()
         self.assertEqual(self.apply()[0], 1)
-        self.assertEqual((self.checkout / 'AGENTS.md').read_bytes(), original)
-        self.assertEqual((self.checkout / self.record['target']).read_bytes(), consumer)
-        self.assertEqual(run_main('--org-root', str(self.fixture.root), 'verify-approved')[0], 1)
+        self.assertEqual((self.checkout / "AGENTS.md").read_bytes(), original)
+        self.assertEqual((self.checkout / self.record["target"]).read_bytes(), consumer)
+        self.assertEqual(
+            run_main("--org-root", str(self.fixture.root), "verify-approved")[0], 1
+        )
 
     def test_broken_agents_symlink_cannot_write_outside_project(self):
-        agents = self.checkout / 'AGENTS.md'
+        agents = self.checkout / "AGENTS.md"
         agents.unlink()
-        outside = self.directory / 'outside.md'
+        outside = self.directory / "outside.md"
         agents.symlink_to(outside)
         self.assertEqual(self.apply()[0], 1)
         self.assertFalse(outside.exists())
 
     def test_caller_sparse_inputs_run_without_source_history(self):
         self.assertEqual(self.apply()[0], 0)
-        sparse = self.directory / 'sparse'
-        workflow = (PUBLIC_ROOT / '.github/workflows/org-routing.yml').read_text()
-        block = workflow.split('sparse-checkout: |\n', 1)[1].split('sparse-checkout-cone-mode:', 1)[0]
+        sparse = self.directory / "sparse"
+        workflow = (PUBLIC_ROOT / ".github/workflows/org-routing.yml").read_text()
+        block = workflow.split("sparse-checkout: |\n", 1)[1].split(
+            "sparse-checkout-cone-mode:", 1
+        )[0]
         for name in block.splitlines():
             relative = name.strip()
             if not relative:
                 continue
             source = self.fixture.root / relative
-            if relative.startswith('automation/'):
+            if relative.startswith("automation/"):
                 source = PUBLIC_ROOT / relative
             target = sparse / relative
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -287,9 +340,20 @@ class ProjectDeliveryTests(unittest.TestCase):
             else:
                 shutil.copyfile(source, target)
         result = subprocess.run(
-            ['python3', str(sparse / 'automation/agents/org-routing.py'), '--org-root', str(sparse),
-             'check', '--repository', 'z-shell/tool', '--root', str(self.checkout)],
-            capture_output=True, text=True, check=False,
+            [
+                "python3",
+                str(sparse / "automation/agents/org-routing.py"),
+                "--org-root",
+                str(sparse),
+                "check",
+                "--repository",
+                "z-shell/tool",
+                "--root",
+                str(self.checkout),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
@@ -765,7 +829,9 @@ class InventoryValidationTests(unittest.TestCase):
                     "file_patterns": ["**"],
                 }
             ),
-            "which project repositories do not carry": lambda d: d[1]["surfaces"].insert(
+            "which project repositories do not carry": lambda d: d[1][
+                "surfaces"
+            ].insert(
                 0,
                 {
                     "path": ".github/copilot-instructions.md",
@@ -901,8 +967,13 @@ class MultiFileSkillTests(unittest.TestCase):
         vendored.parent.mkdir(parents=True)
         vendored.write_text(RESOURCE_TEXT, encoding="utf-8")
         status, _ = run_main(
-            "--org-root", str(self.fixture.root),
-            "apply", "--repository", "z-shell/tool", "--root", str(self.root),
+            "--org-root",
+            str(self.fixture.root),
+            "apply",
+            "--repository",
+            "z-shell/tool",
+            "--root",
+            str(self.root),
         )
         self.assertEqual(status, 0)
 
@@ -919,7 +990,8 @@ class MultiFileSkillTests(unittest.TestCase):
 
     def test_blob_id_matches_git(self) -> None:
         listed = git(
-            self.fixture.root, "rev-parse",
+            self.fixture.root,
+            "rev-parse",
             f"HEAD:.github/skills/code-review/{RESOURCE_PATH}",
         )
         self.assertEqual(self.blob, listed)
@@ -946,25 +1018,36 @@ class MultiFileSkillTests(unittest.TestCase):
         org = self.fixture.load()
         org.approved["skills"]["code-review"]["resources"] = {RESOURCE_PATH: "0" * 40}
         errors = routing.verify_approved(self.fixture.root, org.approved)
-        self.assertTrue(any("resources" in item and self.blob in item for item in errors), errors)
+        self.assertTrue(
+            any("resources" in item and self.blob in item for item in errors), errors
+        )
 
     def test_multi_file_record_needs_every_resource_pinned(self) -> None:
         record = self.fixture.approved["skills"]["code-review"]
-        for resources in (None, {}, {RESOURCE_PATH: "main"}, {RESOURCE_PATH: self.blob, "x.md": self.blob}):
+        for resources in (
+            None,
+            {},
+            {RESOURCE_PATH: "main"},
+            {RESOURCE_PATH: self.blob, "x.md": self.blob},
+        ):
             with self.subTest(resources=resources):
                 if resources is None:
                     record.pop("resources", None)
                 else:
                     record["resources"] = resources
                 self.assertTrue(
-                    any("resources must map each file" in item for item in self.errors()),
+                    any(
+                        "resources must map each file" in item for item in self.errors()
+                    ),
                     self.errors(),
                 )
 
     def test_single_file_record_may_not_pin_resources(self) -> None:
         record = self.fixture.approved["skills"]["code-review"]
         record.update(files=["SKILL.md"], resources={RESOURCE_PATH: self.blob})
-        self.assertTrue(any("resources must map each file" in item for item in self.errors()))
+        self.assertTrue(
+            any("resources must map each file" in item for item in self.errors())
+        )
 
 
 EXTERNAL_SKILL = "---\ndescription: Install Zi.\nname: zi-install\n---\n\n# Zi install\n\nRun the installer.\n"
@@ -1220,7 +1303,11 @@ def tool_profile() -> dict:
         "verified": {"revision": "a" * 40, "date": "2026-10-09"},
         "version": {"command": "tool --version", "note": None},
         "branch": "main",
-        "zsh": {"minimum": "5.8.1", "tested": ["5.8.1", "5.9.2"], "platforms": ["Linux"]},
+        "zsh": {
+            "minimum": "5.8.1",
+            "tested": ["5.8.1", "5.9.2"],
+            "platforms": ["Linux"],
+        },
         "install": ["zi light z-shell/tool"],
         "verification": ["make test"],
         "report_fields": [
@@ -1235,7 +1322,10 @@ class ProjectProfileTests(unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.fixture = OrgFixture(Path(self.directory.name))
-        self.fixture.profiles = {"version": 1, "profiles": {"z-shell/tool": tool_profile()}}
+        self.fixture.profiles = {
+            "version": 1,
+            "profiles": {"z-shell/tool": tool_profile()},
+        }
 
     def tearDown(self) -> None:
         self.directory.cleanup()
@@ -1261,7 +1351,10 @@ class ProjectProfileTests(unittest.TestCase):
         self.assertIn(routing.TRIAGE_URL, block)
         self.assertIn(f"[project profile]({routing.PROFILES_URL})", block)
         self.assertIn(f"[decision 0040]({routing.PROFILES_DECISION_URL})", block)
-        self.assertLess(block.index(routing.PROFILES_DECISION_URL), block.index("Organization-wide surfaces"))
+        self.assertLess(
+            block.index(routing.PROFILES_DECISION_URL),
+            block.index("Organization-wide surfaces"),
+        )
         self.assertIn("give the output of `tool --version`.", block)
         self.assertIn("- `### Configuration`: The `tool.json` in effect.", block)
         # markdownlint MD038: a code span neither starts nor ends with a space.
@@ -1295,11 +1388,18 @@ class ProjectProfileTests(unittest.TestCase):
         root = make_downstream(Path(self.directory.name), self.fixture.revision)
         write_workflow(root, "zsh.yml", TOOL_WORKFLOW)
         status, _ = run_main(
-            "--org-root", str(self.fixture.root), "apply",
-            "--repository", "z-shell/tool", "--root", str(root),
+            "--org-root",
+            str(self.fixture.root),
+            "apply",
+            "--repository",
+            "z-shell/tool",
+            "--root",
+            str(root),
         )
         self.assertEqual(status, 0)
-        self.assertIn("## Reporting issues", (root / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertIn(
+            "## Reporting issues", (root / "AGENTS.md").read_text(encoding="utf-8")
+        )
         self.assertEqual(routing.check(root, "z-shell/tool", org), [])
 
     def test_workflow_versions_cover_every_selection_form(self) -> None:
@@ -1308,8 +1408,8 @@ class ProjectProfileTests(unittest.TestCase):
         write_workflow(
             root,
             "source.yaml",
-            "jobs:\n  build:\n    env:\n      ZSH_VERSION: \"5.9\"\n    strategy:\n"
-            "      matrix:\n        zsh:\n          - 5.8\n          - \"5.9.2\"\n"
+            'jobs:\n  build:\n    env:\n      ZSH_VERSION: "5.9"\n    strategy:\n'
+            '      matrix:\n        zsh:\n          - 5.8\n          - "5.9.2"\n'
             "        os: [ubuntu-latest]\n",
         )
         write_workflow(root, "notes.txt", "zsh: 9.9\n")
@@ -1356,7 +1456,9 @@ jobs:
     with:
       zsh_version: 5.8.1
 """
-        self.assertEqual(routing._workflow_versions(text), {"5.8", "5.8.1", "5.9", "5.9.2"})
+        self.assertEqual(
+            routing._workflow_versions(text), {"5.8", "5.8.1", "5.9", "5.9.2"}
+        )
         self.assertEqual(
             routing._workflow_versions(text.replace("\n", "\r\n")),
             {"5.8", "5.8.1", "5.9", "5.9.2"},
@@ -1366,24 +1468,55 @@ jobs:
         self.fixture.write()
         org = self.fixture.load()
         root = make_downstream(Path(self.directory.name), self.fixture.revision)
-        run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(root))
+        run_main(
+            "--org-root",
+            str(self.fixture.root),
+            "apply",
+            "--repository",
+            "z-shell/tool",
+            "--root",
+            str(root),
+        )
         write_workflow(root, "zsh.yml", TOOL_WORKFLOW)
         (root / ".github/workflows/latin1.yml").write_bytes(b"name: caf\xe9\n")
         errors = routing.check(root, "z-shell/tool", org)
-        self.assertEqual(errors, [routing.error(".github/workflows/latin1.yml", "workflow is not UTF-8 text", "re-encode it as UTF-8")])
+        self.assertEqual(
+            errors,
+            [
+                routing.error(
+                    ".github/workflows/latin1.yml",
+                    "workflow is not UTF-8 text",
+                    "re-encode it as UTF-8",
+                )
+            ],
+        )
 
     def test_profile_and_workflow_versions_must_agree(self) -> None:
         self.fixture.write()
         org = self.fixture.load()
         root = make_downstream(Path(self.directory.name), self.fixture.revision)
-        run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(root))
+        run_main(
+            "--org-root",
+            str(self.fixture.root),
+            "apply",
+            "--repository",
+            "z-shell/tool",
+            "--root",
+            str(root),
+        )
         stated_only = routing.check(root, "z-shell/tool", org)
         self.assertEqual(len(stated_only), 2, stated_only)
-        self.assertTrue(all("no workflow installs it" in message for message in stated_only))
-        write_workflow(root, "zsh.yml", TOOL_WORKFLOW.replace("'5.9.2'", "'5.9.2', 5.9"))
+        self.assertTrue(
+            all("no workflow installs it" in message for message in stated_only)
+        )
+        write_workflow(
+            root, "zsh.yml", TOOL_WORKFLOW.replace("'5.9.2'", "'5.9.2', 5.9")
+        )
         unstated = routing.check(root, "z-shell/tool", org)
         self.assertEqual(len(unstated), 1, unstated)
-        self.assertIn("installs Zsh 5.9, which the project profile does not state", unstated[0])
+        self.assertIn(
+            "installs Zsh 5.9, which the project profile does not state", unstated[0]
+        )
         self.assertTrue(unstated[0].startswith(".github/workflows/zsh.yml: "))
 
     def test_repository_without_profile_skips_the_version_check(self) -> None:
@@ -1391,33 +1524,78 @@ jobs:
         self.fixture.write()
         org = self.fixture.load()
         root = make_downstream(Path(self.directory.name), self.fixture.revision)
-        run_main("--org-root", str(self.fixture.root), "apply", "--repository", "z-shell/tool", "--root", str(root))
+        run_main(
+            "--org-root",
+            str(self.fixture.root),
+            "apply",
+            "--repository",
+            "z-shell/tool",
+            "--root",
+            str(root),
+        )
         self.assertEqual(routing.check(root, "z-shell/tool", org), [])
 
     def test_profile_schema_violations(self) -> None:
         original = copy.deepcopy(self.fixture.profiles)
         cases = {
             "must hold exactly version 1": lambda p: p.update(version=2),
-            "is not declared downstream": lambda p: p["profiles"].update({"z-shell/zz-absent": tool_profile()}),
-            "out of order": lambda p: p.update(profiles={"z-shell/tool": tool_profile(), "z-shell/plain": tool_profile()}),
-            "unknown field 'extra'": lambda p: p["profiles"]["z-shell/tool"].update(extra=1),
-            "missing field 'branch'": lambda p: p["profiles"]["z-shell/tool"].pop("branch"),
-            "verified is invalid": lambda p: p["profiles"]["z-shell/tool"]["verified"].update(revision="main"),
-            "tool verified is invalid": lambda p: p["profiles"]["z-shell/tool"]["verified"].update(date="2026-13-45"),
-            "must hold exactly version 1 and profiles": lambda p: p.update(version=True),
-            "tool profile must be an object": lambda p: p["profiles"].update({"z-shell/tool": []}),
-            "tool version note is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(note="opens <!-- here"),
-            "z-shell/tool version note is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(note="unclosed ` span"),
-            "tool report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"]["report_fields"][0].update(label="`code`"),
-            "tool component or branch is invalid": lambda p: p["profiles"]["z-shell/tool"].update(component="bell\a"),
-            "give a command, a note, or both": lambda p: p["profiles"]["z-shell/tool"].update(version={"command": None, "note": None}),
-            "version command is invalid": lambda p: p["profiles"]["z-shell/tool"]["version"].update(command="`x`"),
-            "zsh is invalid": lambda p: p["profiles"]["z-shell/tool"]["zsh"].update(tested=["latest"]),
-            "verification is invalid": lambda p: p["profiles"]["z-shell/tool"].update(verification=[]),
-            "report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"]["report_fields"][0].update(description="ends -->"),
-            "keep one 'Configuration' field": lambda p: p["profiles"]["z-shell/tool"]["report_fields"].append(
-                {"label": "Configuration", "description": "Again."}
+            "is not declared downstream": lambda p: p["profiles"].update(
+                {"z-shell/zz-absent": tool_profile()}
             ),
+            "out of order": lambda p: p.update(
+                profiles={
+                    "z-shell/tool": tool_profile(),
+                    "z-shell/plain": tool_profile(),
+                }
+            ),
+            "unknown field 'extra'": lambda p: p["profiles"]["z-shell/tool"].update(
+                extra=1
+            ),
+            "missing field 'branch'": lambda p: p["profiles"]["z-shell/tool"].pop(
+                "branch"
+            ),
+            "verified is invalid": lambda p: p["profiles"]["z-shell/tool"][
+                "verified"
+            ].update(revision="main"),
+            "tool verified is invalid": lambda p: p["profiles"]["z-shell/tool"][
+                "verified"
+            ].update(date="2026-13-45"),
+            "must hold exactly version 1 and profiles": lambda p: p.update(
+                version=True
+            ),
+            "tool profile must be an object": lambda p: p["profiles"].update(
+                {"z-shell/tool": []}
+            ),
+            "tool version note is invalid": lambda p: p["profiles"]["z-shell/tool"][
+                "version"
+            ].update(note="opens <!-- here"),
+            "z-shell/tool version note is invalid": lambda p: p["profiles"][
+                "z-shell/tool"
+            ]["version"].update(note="unclosed ` span"),
+            "tool report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"][
+                "report_fields"
+            ][0].update(label="`code`"),
+            "tool component or branch is invalid": lambda p: p["profiles"][
+                "z-shell/tool"
+            ].update(component="bell\a"),
+            "give a command, a note, or both": lambda p: p["profiles"][
+                "z-shell/tool"
+            ].update(version={"command": None, "note": None}),
+            "version command is invalid": lambda p: p["profiles"]["z-shell/tool"][
+                "version"
+            ].update(command="`x`"),
+            "zsh is invalid": lambda p: p["profiles"]["z-shell/tool"]["zsh"].update(
+                tested=["latest"]
+            ),
+            "verification is invalid": lambda p: p["profiles"]["z-shell/tool"].update(
+                verification=[]
+            ),
+            "report_fields is invalid": lambda p: p["profiles"]["z-shell/tool"][
+                "report_fields"
+            ][0].update(description="ends -->"),
+            "keep one 'Configuration' field": lambda p: p["profiles"]["z-shell/tool"][
+                "report_fields"
+            ].append({"label": "Configuration", "description": "Again."}),
         }
         for expected, mutate in cases.items():
             with self.subTest(expected):
