@@ -1,8 +1,8 @@
 # 41. Package the zsh-lint parser fork inside the root Go module
 
-- **Status:** PROPOSED
+- **Status:** ACCEPTED
 - **Date:** 2026-10-15
-- **Deciders:** TBD
+- **Deciders:** ss-o
 - **Supersedes:** None
 - **Superseded by:** None
 
@@ -10,13 +10,13 @@
 
 [ADR-0030](0030-zsh-lint-parser-fork-trigger-fired.md) selected an in-repository mvdan/sh fork so zsh-lint can fix proven Zsh parser gaps locally. Decision 2 places it under `third_party/mvdan-sh` with a local `replace` directive in `go.mod`. The directory and fork strategy remain useful, but that module arrangement prevents the documented versioned CLI installation: Go rejects the target module's replacement, and a nested module is omitted from the root module's downloadable zip.
 
-[zsh-lint issue 653](https://github.com/z-shell/zsh-lint/issues/653) owns the install defect. Both `v1.4.0` and baseline commit `e9d1ea142518e4332999dc1da4ce17928bc04f3d` reproduce it with fresh caches. [Source PR 699](https://github.com/z-shell/zsh-lint/pull/699) retains the directory while making its packages part of the root module. Fresh-cache public installation from commit `f1c43fac9c8eadfc914a4af89a1beea11afca891` succeeds, and its parser and analyzer corpus results are unchanged. That unmerged implementation is evidence for this proposal, not acceptance of it.
+[zsh-lint issue 653](https://github.com/z-shell/zsh-lint/issues/653) owns the install defect. Both `v1.4.0` and baseline commit `e9d1ea142518e4332999dc1da4ce17928bc04f3d` reproduce it with fresh caches. [Source PR 699](https://github.com/z-shell/zsh-lint/pull/699) retains the directory while making its packages part of the root module. Fresh-cache public installation from commit `f1c43fac9c8eadfc914a4af89a1beea11afca891` succeeds, and its parser and analyzer corpus results are unchanged. That unmerged implementation is evidence for this decision, not approval to merge or release it.
 
 A separately published fork module could also make installation work, but would add an independent module version, release lifecycle and source-publication dependency solely for code retained with the CLI.
 
 ## Decision
 
-If accepted, refine only the module-packaging clause of ADR-0030 decision 2:
+Refine only the module-packaging clause of ADR-0030 decision 2:
 
 1. Retain the parser fork under `third_party/mvdan-sh`, compiled as packages of the root `github.com/z-shell/zsh-lint` module. Imports between project and fork packages, and within the fork, use `github.com/z-shell/zsh-lint/third_party/mvdan-sh/...`. Do not ship a nested fork `go.mod` or `go.sum`, or require a local module replacement for the CLI's versioned installation. The root module must satisfy Go's versioned-install constraints without caller-local overrides.
 2. Keep the upstream BSD-3-Clause license, copyright notices and provenance intact under [ADR-0017's L3 rule](0017-licensing-standard-by-provenance.md). Import normalization is a recorded local packaging change, not a relicense or grammar change.
@@ -24,7 +24,7 @@ If accepted, refine only the module-packaging clause of ADR-0030 decision 2:
 4. Retain upstream tests and Zsh-only changes behind `LangZsh`. Root and fork-directory commands must resolve the same module. Preserve [ADR-0023](0023-zsh-lint-parser-front-end-strategy.md) and ADR-0030's tree-shape, native-oracle, corpus and adapter-removal gates. A module move is not evidence of a parser or lint-rule improvement.
 5. Verify the downloadable module includes the parser and license, keep regressions for the module boundary and CLI dependency namespace, and prove fresh-cache versioned installation from the exact published implementation commit. Existing immutable tags remain unchanged. A fix reaches `@latest` only through the class-2 release boundary in [ADR-0007](0007-release-publication-flow.md).
 
-ADR-0030 decisions 1 and 3 to 5 remain unchanged, as do decision 2's fork location and provenance requirements. Keep ADR-0030 as accepted history rather than silently rewriting its original packaging choice. This document remains PROPOSED until a maintainer records acceptance through the ADR procedure; its publication alone does not activate the refinement, merge an implementation, publish a release or advance consumer pins.
+ADR-0030 decisions 1 and 3 to 5 remain unchanged, as do decision 2's fork location and provenance requirements. Keep ADR-0030 as accepted history rather than silently rewriting its original packaging choice. Acceptance takes effect on main through the maintainer-approved ADR procedure; it does not merge an implementation, publish a release or advance consumer pins.
 
 ## Consequences
 

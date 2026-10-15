@@ -51,4 +51,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0038](0038-tool-attribution-preference-and-agent-output-controls.md) | Prefer minimal tool attribution and control agent output                                           | PROPOSED   | 2026-10-08 | TBD      |
 | [0039](0039-zi-main-integration-and-signed-milestones.md)             | Zi Main Integration and Signed Milestones                                                          | ACCEPTED   | 2026-10-08 | ss-o     |
 | [0040](0040-central-project-profiles-for-issue-intake.md)             | Central Project Profiles for Issue Intake                                                          | ACCEPTED   | 2026-10-09 | ss-o     |
-| [0041](0041-zsh-lint-parser-root-module-packaging.md)                 | Package the zsh-lint parser fork inside the root Go module                                         | PROPOSED   | 2026-10-15 | TBD      |
+| [0041](0041-zsh-lint-parser-root-module-packaging.md)                 | Package the zsh-lint parser fork inside the root Go module                                         | ACCEPTED   | 2026-10-15 | ss-o     |

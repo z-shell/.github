@@ -1140,7 +1140,7 @@
       "domain": "tooling",
       "disposition": "referenced",
       "knowledge": "knowledge/domains/tooling/repository-resources.md",
-      "reason": "Proposed refinement of ADR-0030's parser-fork module packaging; inspect maintainer acceptance before applying it. Fork strategy, licensing and behavior gates remain unchanged."
+      "reason": "Accepted refinement of ADR-0030's parser-fork module packaging. Fork strategy, licensing and behavior gates remain unchanged; implementation and consumer delivery are separate steps."
     },
     {
       "path": "decisions/README.md",
