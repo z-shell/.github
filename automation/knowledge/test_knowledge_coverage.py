@@ -2,12 +2,14 @@ import contextlib
 import importlib.util
 import io
 import json
-from pathlib import Path
 import tempfile
 import unittest
 import unittest.mock
+from pathlib import Path
 
-spec = importlib.util.spec_from_file_location("knowledge_coverage", Path(__file__).with_name("knowledge-coverage.py"))
+spec = importlib.util.spec_from_file_location(
+    "knowledge_coverage", Path(__file__).with_name("knowledge-coverage.py")
+)
 coverage = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(coverage)
 
@@ -22,15 +24,36 @@ class KnowledgeCoverageTests(unittest.TestCase):
         (self.root / self.source).write_text("# Policy\n")
         (self.root / "AGENTS.md").write_text("# Delivery\n")
         (self.root / "config.json").write_text("{}\n")
-        (self.root / "knowledge/delivery.json").write_text(json.dumps({"version": 1, "entries": [{"source": self.source, "target": "AGENTS.md"}]}))
+        (self.root / "knowledge/delivery.json").write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "entries": [{"source": self.source, "target": "AGENTS.md"}],
+                }
+            )
+        )
         self.records = [
-            {"path": "AGENTS.md", "domain": "agents", "disposition": "imported", "knowledge": self.source, "reason": "Complete policy delivery."},
-            {"path": "config.json", "domain": "agents", "disposition": "referenced", "knowledge": "knowledge/domains/agents/repository-resources.md", "reason": "Runtime configuration."},
+            {
+                "path": "AGENTS.md",
+                "domain": "agents",
+                "disposition": "imported",
+                "knowledge": self.source,
+                "reason": "Complete policy delivery.",
+            },
+            {
+                "path": "config.json",
+                "domain": "agents",
+                "disposition": "referenced",
+                "knowledge": "knowledge/domains/agents/repository-resources.md",
+                "reason": "Runtime configuration.",
+            },
         ]
         self.write_inventory()
 
     def write_inventory(self):
-        (self.root / coverage.MANIFEST).write_text(json.dumps({"version": 1, "files": self.records}))
+        (self.root / coverage.MANIFEST).write_text(
+            json.dumps({"version": 1, "files": self.records})
+        )
 
     def run_check(self, write=False):
         with contextlib.redirect_stdout(io.StringIO()):
@@ -44,6 +67,23 @@ class KnowledgeCoverageTests(unittest.TestCase):
         page.write_text(page.read_text() + "Unmanaged copy\n")
         with self.assertRaisesRegex(ValueError, "stale domain"):
             self.run_check()
+
+    def test_resource_tables_have_formatter_stable_column_padding(self):
+        self.records[0]["reason"] = "Complete policy | delivery."
+        self.write_inventory()
+        self.assertEqual(self.run_check(True), 0)
+        page = self.root / self.records[1]["knowledge"]
+        table = page.read_text().splitlines()[6:]
+        self.assertEqual(
+            table,
+            [
+                "| File                                | Disposition                  | Purpose and reading context      |",
+                "| ----------------------------------- | ---------------------------- | -------------------------------- |",
+                "| [AGENTS.md](../../../AGENTS.md)     | [Imported source](policy.md) | Complete policy &#124; delivery. |",
+                "| [config.json](../../../config.json) | referenced                   | Runtime configuration.           |",
+            ],
+        )
+        self.assertEqual(self.run_check(), 0)
 
     def test_added_and_removed_files_require_dispositions(self):
         self.run_check(True)
@@ -76,11 +116,29 @@ class KnowledgeCoverageTests(unittest.TestCase):
     def test_git_discovery_keeps_tracked_and_nonignored_files_and_omits_deleted(self):
         (self.root / ".git").write_text("gitdir: registered-worktree\n")
         (self.root / "ignored.txt").write_text("Ignored local state\n")
-        result = unittest.mock.Mock(stdout=b"AGENTS.md\0config.json\0deleted.txt\0knowledge/delivery.json\0")
-        with unittest.mock.patch.object(coverage.subprocess, "run", return_value=result) as command:
-            self.assertEqual(coverage.repository_files(self.root), {"AGENTS.md", "config.json"})
-        self.assertIn("--cached", command.call_args.args[0])
-        self.assertIn("--exclude-standard", command.call_args.args[0])
+        result = unittest.mock.Mock(
+            stdout=b"AGENTS.md\0config.json\0deleted.txt\0knowledge/delivery.json\0"
+        )
+        with unittest.mock.patch.object(
+            coverage.subprocess, "run", return_value=result
+        ) as command:
+            self.assertEqual(
+                coverage.repository_files(self.root), {"AGENTS.md", "config.json"}
+            )
+        self.assertEqual(
+            command.call_args.args[0],
+            [
+                "git",
+                "-C",
+                str(self.root),
+                "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "-z",
+            ],
+        )
+        self.assertFalse(command.call_args.kwargs.get("shell", False))
 
     def test_retired_allocation_directory_cannot_be_approved_in_inventory(self):
         path = self.root / "scripts/new.py"
