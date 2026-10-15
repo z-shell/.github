@@ -15,6 +15,7 @@ import subprocess  # nosec B404
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SCRIPT_PATH = Path(__file__).with_name("org-routing.py")
 PUBLIC_ROOT = SCRIPT_PATH.parents[2]
@@ -51,8 +52,19 @@ def installed_skill(pinned: str, *, indent: str = "  ", body: str = SKILL_BODY) 
 
 
 def git(root: Path, *arguments: str) -> str:
+    # Keep fixture housekeeping in this process tree until the command exits;
+    # a detached pack writer can race TemporaryDirectory.cleanup().
     return subprocess.run(  # nosec B603 B607 - fixed git arguments
-        ["git", "-C", str(root), *arguments],
+        [
+            "git",
+            "-c",
+            "maintenance.autoDetach=false",
+            "-c",
+            "gc.autoDetach=false",
+            "-C",
+            str(root),
+            *arguments,
+        ],
         check=True,
         capture_output=True,
         text=True,
@@ -1069,6 +1081,37 @@ def commit_all(root: Path, message: str) -> str:
         message,
     )
     return git(root, "rev-parse", "HEAD")
+
+
+class GitFixtureMaintenanceTests(unittest.TestCase):
+    def test_auto_maintenance_finishes_before_fixture_cleanup(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            fixture = OrgFixture(base)
+            for key, value in (
+                ("maintenance.autoDetach", "true"),
+                ("gc.autoDetach", "true"),
+                ("maintenance.loose-objects.enabled", "true"),
+                ("maintenance.loose-objects.auto", "1"),
+            ):
+                git(fixture.root, "config", key, value)
+            (fixture.root / "extra.txt").write_text("Maintenance regression\n")
+            trace = base / "trace.jsonl"
+            with mock.patch.dict(os.environ, {"GIT_TRACE2_EVENT": str(trace)}):
+                commit_all(fixture.root, "trigger maintenance")
+            events = [json.loads(line) for line in trace.read_text().splitlines()]
+            self.assertFalse(
+                any(
+                    event.get("event") == "region_enter"
+                    and event.get("label") == "detach"
+                    for event in events
+                ),
+                "automatic maintenance must not detach from a disposable fixture",
+            )
+            self.assertTrue(
+                list((fixture.root / ".git/objects/pack").glob("*.pack")),
+                "maintenance must finish packing before the helper returns",
+            )
 
 
 def installed_external(
