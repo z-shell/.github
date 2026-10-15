@@ -513,6 +513,13 @@
       "reason": "Executable workflow, starter metadata or pinning configuration. Inspect triggers, inputs, permissions and callers at the assessed revision."
     },
     {
+      "path": ".github/workflows/lychee-cache-test.yml",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Tests Lychee cache-key refresh and restoration across runs and reruns without network access."
+    },
+    {
       "path": ".github/workflows/lychee.yml",
       "domain": "ci",
       "disposition": "referenced",
@@ -1736,6 +1743,13 @@
       "disposition": "referenced",
       "knowledge": "knowledge/domains/governance/repository-resources.md",
       "reason": "Organization governance maintenance and adjacent regression tests; preserve read-only modes and explicit authority for remote writes."
+    },
+    {
+      "path": "automation/ci/test_lychee_cache.py",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Tests the workflow cache keys against immutable save semantics for unchanged commits and reruns."
     },
     {
       "path": "automation/ci/test_run_zd.py",

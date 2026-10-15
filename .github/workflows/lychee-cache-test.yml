@@ -1,0 +1,32 @@
+name: Lychee Cache Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/lychee*.yml
+      - automation/ci/test_lychee_cache.py
+  pull_request:
+    paths:
+      - .github/workflows/lychee*.yml
+      - automation/ci/test_lychee_cache.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cache-lifecycle:
+    name: Cache Lifecycle
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Test cache lifecycle
+        run: python3 -m unittest automation/ci/test_lychee_cache.py -v
