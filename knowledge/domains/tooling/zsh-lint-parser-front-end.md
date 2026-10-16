@@ -5,10 +5,10 @@ applyTo: "internal/parse/**,internal/survey/**,cmd/zsh-lint-survey/**"
 
 # Parser Front End
 
-This organization source supplies complete native project guidance through the approved records in `knowledge/project-delivery.json`. Edit the organization source, then publish and approve its revision before regenerating a project consumer; the generated consumer is not independently editable. Project instructions retain their existing authoring ownership until approved source publication, complete delivery and compatibility checks pass. Reconciled against project revision `7ff05091a5489becf32069db1738d38ec23c8fd5`; repository-relative code, command and fixture paths below refer to that project.
+This organization source supplies complete native project guidance through the approved records in `knowledge/project-delivery.json`. Edit the organization source, then publish and approve its revision before regenerating a project consumer; the generated consumer is not independently editable. Project instructions retain their existing authoring ownership until approved source publication, complete delivery and compatibility checks pass. Reconciled against project revision `f1c43fac9c8eadfc914a4af89a1beea11afca891`; repository-relative code, command and fixture paths below refer to that project.
 
-`internal/parse` wraps the in-repository mvdan/sh fork's `syntax` package in its Zsh dialect and closes proven valid-Zsh gaps with local compatibility adapters. Resolve the import prefix from the target project revision's `go.mod` and `third_party/mvdan-sh/FORK.md`, rather than assuming the upstream module namespace.
-The contract is in [`docs/project/parser-gap-workflow.md`](https://github.com/z-shell/zsh-lint/blob/7ff05091a5489becf32069db1738d38ec23c8fd5/docs/project/parser-gap-workflow.md); this file only routes you there and names the invariants that reviews check.
+`internal/parse` wraps the in-repository mvdan/sh fork's `syntax` package in its Zsh dialect and closes proven valid-Zsh gaps with local compatibility adapters. Resolve the import prefix from the target project revision's `go.mod` and `third_party/mvdan-sh/FORK.md`, rather than assuming the upstream module namespace; [ADR-0041](../../../decisions/0041-zsh-lint-parser-root-module-packaging.md) packages the fork inside the root module.
+The contract is in [`docs/project/parser-gap-workflow.md`](https://github.com/z-shell/zsh-lint/blob/f1c43fac9c8eadfc914a4af89a1beea11afca891/docs/project/parser-gap-workflow.md); this file only routes you there and names the invariants that reviews check.
 
 ## Before changing anything
 
