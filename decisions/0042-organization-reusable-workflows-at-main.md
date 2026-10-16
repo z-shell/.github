@@ -19,7 +19,7 @@ The shared workflows live in `z-shell/.github`, whose `main` is protected and ch
 1. Callers reference reusable workflows from `z-shell/.github/.github/workflows/` at `@main`. A change merged to `z-shell/.github` `main` reaches every caller on its next run.
 2. Every other remote reference stays pinned to a full 40-character commit SHA with its release comment: third-party actions, third-party reusable workflows, and organization actions under `z-shell/.github/actions/`.
 3. Existing full-SHA pins of organization reusable workflows remain valid until each caller moves to `@main` in its own reviewed change. Such a pin must still name a commit on the default branch ([#774](https://github.com/z-shell/.github/issues/774)).
-4. The shared pinact template accepts both an exact `main` ref and a full SHA for organization reusable workflows only.
+4. The shared pinact template accepts both an exact `main` ref and a full SHA for organization reusable workflows only, and the organization Renovate preset does not pin `z-shell/.github` references whose ref is `main`.
 
 ## Consequences
 
