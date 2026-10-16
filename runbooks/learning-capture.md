@@ -55,23 +55,28 @@ satisfy the workflow.
 
 ## Destination matrix
 
-| Finding                                                       | Preferred owner                                                                |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| A recurrence that can be detected mechanically                | Code, test, type, schema, lint rule, validator, or script                      |
-| A mandatory rule that applies broadly                         | Root `AGENTS.md`                                                               |
-| Mandatory detail limited by task or path                      | Routed scoped instruction                                                      |
-| A reusable multi-step agent workflow                          | Skill                                                                          |
-| An implementation idiom observed in at least two repositories | `PATTERNS.md`                                                                  |
-| A significant or difficult-to-reverse decision                | Proposed ADR                                                                   |
-| A repeatable operational procedure                            | Runbook                                                                        |
-| Active work, blocker, or deferred work                        | Owning GitHub issue or pull request, plus a linked Linear mirror when required |
-| An unfinished session another agent must resume               | GitHub-native agent handoff                                                    |
-| Durable long-form user or maintainer guidance                 | Appropriate documentation or wiki area                                         |
-| A private maintainer preference or private heuristic          | Private memory, with explicit maintainer request or consent                    |
-| A one-time detail already clear from code or history          | No additional artifact                                                         |
+Resolve a generated destination through [knowledge delivery](../knowledge/delivery.json) before editing: its declared `knowledge/domains/` source is editable, not the generated consumer. For approved project-native instructions, consult [project delivery](../knowledge/project-delivery.json) and follow [knowledge maintenance](../knowledge/domains/agents/knowledge-maintenance.md); a draft source does not replace the project's current owner before publication, approval and delivery checks pass. Unmigrated content retains its existing owner.
+
+| Finding                                                       | Preferred owner                                                                      |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| A recurrence that can be detected mechanically                | Code, test, type, schema, lint rule, validator, or script                            |
+| A mandatory rule that applies broadly                         | `knowledge/domains/agents/organization-policy.md`, which generates `AGENTS.md`       |
+| Mandatory detail limited by task or path                      | The declared source of the routed scoped instruction                                 |
+| A reusable multi-step agent workflow                          | Skill                                                                                |
+| An implementation idiom observed in at least two repositories | `knowledge/domains/agents/implementation-patterns.md`, which generates `PATTERNS.md` |
+| A significant or difficult-to-reverse decision                | Proposed ADR                                                                         |
+| A repeatable operational procedure                            | The declared source of the maintained runbook                                        |
+| Active work, blocker, or deferred work                        | Owning GitHub issue or pull request, plus a linked Linear mirror when required       |
+| An unfinished session another agent must resume               | GitHub-native agent handoff                                                          |
+| Durable long-form user or maintainer guidance                 | Appropriate documentation or wiki area                                               |
+| A private maintainer preference or private heuristic          | Private memory, with explicit maintainer request or consent                          |
+| A candidate awaiting evidence or authority                    | Provisional local finding naming the proposed canonical owner                        |
+| A one-time detail already clear from code or history          | No additional artifact                                                               |
 
 Prefer executable prevention over prose. Extend an existing canonical owner
 instead of creating a second source of truth.
+
+Local workspace notes are provisional capture, not durable promotion. Link a useful finding to its canonical correction or owning issue when authorized, and reconcile the note against that evidence. A note's existence or a session's completion claim does not establish that the underlying problem is fixed; retain unresolved parts of a multi-part finding.
 
 ## Candidate quality gate
 
@@ -88,6 +93,8 @@ A candidate is ready for promotion only when all of these are true:
 7. Verification and an owner exist for any resulting action.
 
 If any item is missing, keep the result as a candidate or discard it.
+
+Give each useful candidate a disposition in the existing task, issue or pull-request evidence: applied locally with paths and checks, promoted with the canonical artifact, tracked with an owning record, proposed with the missing authority, or declined with a reason. An uncommitted edit is applied locally, not published guidance. This does not require a new artifact for `No durable learning`, which remains internal unless an audit trail is requested.
 
 ## Authority and privacy gate
 
@@ -113,7 +120,7 @@ When a candidate matters, include a concise completion note:
 Learning candidate: <finding>
 Evidence: <specific evidence>
 Proposed owner: <canonical artifact>
-Status: promoted | recorded for follow-up | approval required
+Status: applied locally | promoted | recorded for follow-up | approval required | declined
 ```
 
 A final response or handoff is not a durable owner by itself. When authority is
@@ -135,6 +142,8 @@ first. Measure:
 - later tasks that reused a promoted item
 - median review overhead
 - stale or contradictory artifacts introduced
+
+Use retained evidence and state the reviewed scope. A missing evaluation record is an evidence gap, not an observed zero or proof that no review occurred. Keep unreviewed tasks and unknown outcomes distinct from `No durable learning`; record any outstanding evaluation under its owning work item rather than inferring results.
 
 Do not add a command hook merely because one review was missed. Consider a
 runtime reminder only when the measured omission rate exceeds 10 percent and a
