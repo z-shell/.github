@@ -27,6 +27,7 @@ The shared workflows live in `z-shell/.github`, whose `main` is protected and ch
 - A defect merged to a shared workflow reaches every caller at once. Review on `z-shell/.github` is the control for that risk; a caller that must freeze a revision can still pin a default-branch SHA under point 3.
 - Changing a shared workflow's inputs, outputs or required permissions affects every caller on its next run, so such changes need the same care as an interface change: keep them backward compatible or coordinate the callers first.
 - Moving existing callers from SHA pins to `@main` is separate, per-repository work.
+- CodeQL's `actions/unpinned-tag` query reports an `@main` reference in every repository that analyzes Actions, as a pull request review thread when a caller moves. The [workflow contract](../knowledge/domains/ci/workflow-contract.md) sets the handling: reply with this decision as the reason, dismiss the alert as "won't fix" and resolve the thread ([#809](https://github.com/z-shell/.github/issues/809)).
 
 ## Acceptance
 
