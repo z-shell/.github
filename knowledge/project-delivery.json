@@ -15,11 +15,11 @@
       "repository": "z-shell/zsh-lint",
       "source": "knowledge/domains/tooling/zsh-lint-parser-front-end.md",
       "target": ".github/instructions/parser-front-end.instructions.md",
-      "revision": "21693189f16af6810e54f04b47789aef76dc5db3",
-      "source_blob": "610500c13d663476012cf7e7ffd13298d7c1897e",
-      "project_revision": "7ff05091a5489becf32069db1738d38ec23c8fd5",
-      "project_source_blob": "cb36318050d353acd8624f612fb41544635ebcb4",
-      "content_sha256": "0b5ba51f38da7caece1b93457a5b68469edaa73dc4e3c43d5ee75709a2552a5c"
+      "revision": "f7ec572de9874ebd815fc4e49ce1419084348728",
+      "source_blob": "dd238342996c67a36610d9fcf89b81645b225474",
+      "project_revision": "f1c43fac9c8eadfc914a4af89a1beea11afca891",
+      "project_source_blob": "59c28b6a2d0171de0187b04a9dce6de29fe37e8e",
+      "content_sha256": "75b347cd57824b0b99e9f9da62f61f501e328eb0d32da909d405d4b9aff9532f"
     },
     {
       "repository": "z-shell/wiki",
