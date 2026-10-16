@@ -52,3 +52,4 @@ a maintainer moves a record from `PROPOSED` to `ACCEPTED`.
 | [0039](0039-zi-main-integration-and-signed-milestones.md)             | Zi Main Integration and Signed Milestones                                                          | ACCEPTED   | 2026-10-08 | ss-o     |
 | [0040](0040-central-project-profiles-for-issue-intake.md)             | Central Project Profiles for Issue Intake                                                          | ACCEPTED   | 2026-10-09 | ss-o     |
 | [0041](0041-zsh-lint-parser-root-module-packaging.md)                 | Package the zsh-lint parser fork inside the root Go module                                         | ACCEPTED   | 2026-10-15 | ss-o     |
+| [0042](0042-organization-reusable-workflows-at-main.md)               | Reference Organization Reusable Workflows at main                                                  | ACCEPTED   | 2026-10-16 | ss-o     |

@@ -38,10 +38,11 @@ permissions:
 
 ### Action Pinning
 
-- **Immutable Commit SHAs**: Every remote action and reusable workflow `uses:` reference, including organization references, MUST be pinned to a full 40-character commit SHA.
-- **Version Comments**: Append the associated release version after the SHA for auditability (e.g., `# v4.3.1`). For organization reusable workflows from `z-shell/.github/.github/workflows/` without an adopted workflow release, retain the established interim `# main` comment. The comment identifies the source branch; the full SHA selects the code.
-- **On the source branch**: Pin an organization reusable workflow only to a commit on the default branch of `z-shell/.github`, never to a pull request's branch commit. A squash merge leaves that commit on no branch, and callers pinned to it end every run in a startup failure with no jobs ([#774](https://github.com/z-shell/.github/issues/774)). Before pinning, `gh api repos/z-shell/.github/compare/main...SHA --jq .status` must print `behind` or `identical`. The daily Community Health Audit reports any other pin (`repo-settings-audit.rb --workflow-pins`).
-- **Prohibited**: Never use mutable tags (e.g., `@v4`, `@main`, `@latest`).
+- **Organization reusable workflows**: Reference reusable workflows from `z-shell/.github/.github/workflows/` at `@main` ([ADR-0042](../../../decisions/0042-organization-reusable-workflows-at-main.md)). A change merged to the protected `main` of `z-shell/.github` then reaches every caller without a pull request in each repository. This covers only those reusable workflows; organization actions under `z-shell/.github/actions/` are pinned like any other action.
+- **Immutable Commit SHAs**: Every other remote action and reusable workflow `uses:` reference MUST be pinned to a full 40-character commit SHA.
+- **Version Comments**: Append the associated release version after the SHA for auditability (e.g., `# v4.3.1`).
+- **Existing SHA pins**: A caller that pins an organization reusable workflow to a full SHA with the earlier interim `# main` comment remains valid until it moves to `@main` in its own reviewed change. Such a pin must name a commit on the default branch of `z-shell/.github`, never a pull request's branch commit. A squash merge leaves that commit on no branch, and callers pinned to it end every run in a startup failure with no jobs ([#774](https://github.com/z-shell/.github/issues/774)). Before pinning, `gh api repos/z-shell/.github/compare/main...SHA --jq .status` must print `behind` or `identical`. The daily Community Health Audit reports any other pin (`repo-settings-audit.rb --workflow-pins`).
+- **Prohibited**: Never use mutable tags or branches (e.g., `@v4`, `@main`, `@latest`) for anything other than organization reusable workflows.
 
 ```yaml
 # Correct
@@ -51,13 +52,11 @@ permissions:
 - uses: actions/checkout@v4
 ```
 
-### Interim pinact exception for organization reusable workflows
+### pinact exception for organization reusable workflows
 
-pinact 4.1.1 rejects the interim `# main` comment on a SHA pin because it requires a version comment. Reuse [the shared pinact template](../../../templates/pinact/.pinact.yaml), observed in [zunit#27](https://github.com/z-shell/zunit/pull/27) and [zpmod#114](https://github.com/z-shell/zpmod/pull/114). Copy it to the caller repository's `.pinact.yaml` only when no pinact configuration exists. Otherwise merge the `ignore_actions` entry into the existing configuration, preserving its settings and avoiding a second competing config file. The template retains configuration version 3; it does not install or enable pinact.
+pinact 4.1.1 would pin an `@main` reference, and it rejects the `# main` comment on an existing SHA pin because it requires a version comment. Reuse [the shared pinact template](../../../templates/pinact/.pinact.yaml), observed in [zunit#27](https://github.com/z-shell/zunit/pull/27) and [zpmod#114](https://github.com/z-shell/zpmod/pull/114). Copy it to the caller repository's `.pinact.yaml` only when no pinact configuration exists. Otherwise merge its `ignore_actions` entries into the existing configuration, preserving its settings and avoiding a second competing config file. The template retains configuration version 3; it does not install or enable pinact.
 
-The exception matches only `z-shell/.github/.github/workflows/` references with a full lowercase 40-hex SHA. Mutable refs, other organization actions and third-party actions remain subject to pinact's checks. pinact skips all validation and updates for matching entries, not just the comment check: the regex restricts the ref's shape but does not verify the commit exists, belongs to the repository, or has been reviewed. Continue to verify the selected workflow and commit through the repository's checks and PR review. Do not broaden the exception or use a branch or tag as the actual ref.
-
-This is an interim compatibility measure for [#663](https://github.com/z-shell/.github/issues/663). Once [#543](https://github.com/z-shell/.github/issues/543) establishes the applicable immutable workflow releases and a caller adopts them, use the associated workflow release comment and remove its unused exception. Downstream adoption and release changes require their own reviewed rollout. See [pinact 4.1.1 configuration](https://github.com/suzuki-shunsuke/pinact/blob/v4.1.1/docs/config.md#ignore_actions) for exception semantics.
+The exception matches only `z-shell/.github/.github/workflows/` references whose ref is exactly `main` or a full lowercase 40-hex SHA; pinact matches both patterns against the whole name and ref. Other organization actions and third-party actions remain subject to pinact's checks. pinact skips all validation and updates for matching entries: for a SHA pin the regex restricts the ref's shape but does not verify the commit exists, belongs to the repository, or has been reviewed. Do not broaden the exception to other repositories, actions or refs. See [pinact 4.1.1 configuration](https://github.com/suzuki-shunsuke/pinact/blob/v4.1.1/docs/config.md#ignore_actions) for exception semantics.
 
 ### Permissions (Least Privilege)
 
@@ -84,7 +83,7 @@ This is an interim compatibility measure for [#663](https://github.com/z-shell/.
 - Explicitly declare `type` and `required` for every input in `workflow_call`.
 - Declare `default` only for optional inputs. A `required: true` input must not carry one, because the caller always supplies the value and the default is unreachable.
 - When a workflow is **also** triggered directly (`push`, `pull_request`, `schedule`), put the operative fallback in the job step, for example `: "${VAR:=...}"`. The `inputs` context holds "the inputs of a reusable or manually triggered workflow", so on a direct trigger it is empty and `workflow_call` defaults are never applied. A default declared on the input is then dead text on the path the workflow actually takes, and an empty pattern reaching `grep -E` matches every line.
-- Reference called workflows using pinned immutable refs.
+- Reference organization reusable workflows at `@main` and any other called workflow at a pinned immutable ref.
 - Expose job `outputs` cleanly for downstream dependent jobs (`needs:`).
 
 The shared `zsh-ci.yml` owns native syntax and optional compilation. Callers
@@ -122,6 +121,6 @@ new uses; migrate existing uses through their owning rollout and runbook.
 - [ ] Workflow `name:` and Job `name:` contain NO emojis.
 - [ ] Top-level `permissions:` is declared with minimum necessary scope.
 - [ ] Concurrency follows the execution-control rules above, including documented required-check exceptions and distinct caller/callee groups.
-- [ ] All remote actions and reusable workflows are pinned to 40-character commit SHAs with associated release comments, or the documented interim `# main` comment for organization reusable workflows.
-- [ ] Any interim pinact exception uses the shared template's exact repository/workflow and full-SHA match; the selected workflow and commit are verified separately.
+- [ ] Organization reusable workflows from `z-shell/.github/.github/workflows/` are referenced at `@main` (or keep an existing full-SHA pin on the default branch); every other remote action and reusable workflow is pinned to a 40-character commit SHA with its release comment.
+- [ ] Any pinact exception uses the shared template's exact repository/workflow and its `main` or full-SHA ref match.
 - [ ] Actionlint and YAML syntax checks pass.
