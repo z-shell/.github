@@ -138,8 +138,9 @@ Start from the organization workflow templates:
 - `workflow-templates/zsh-ci.yml` for Zsh syntax and smoke validation
 - `workflow-templates/trunk.yml` for Trunk Code Quality
 
-Follow `PATTERNS.md`: pin action and reusable-workflow references to immutable
-commit SHAs with readable version or branch comments. Declare top-level
+Follow `PATTERNS.md`: keep the templates' organization reusable workflows at
+`@main` (ADR-0042), and pin every other action and reusable-workflow reference
+to an immutable commit SHA with a readable version comment. Declare top-level
 permissions and concurrency for push and pull-request workflows.
 
 Add release automation only when the release class requires it. Plugins and

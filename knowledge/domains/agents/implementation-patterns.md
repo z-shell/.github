@@ -98,10 +98,10 @@ Observed in:
 
 Pattern:
 
-- Pin all remote GitHub Action and reusable workflow references, external and organization-owned, to a full 40-character commit SHA.
-- Append the associated release version comment. Organization reusable workflows from `z-shell/.github/.github/workflows/` without an adopted workflow release retain the interim `# main` comment; it does not change the immutable ref.
+- Pin all remote GitHub Action and reusable workflow references to a full 40-character commit SHA, except organization reusable workflows from `z-shell/.github/.github/workflows/`, which are referenced at `@main` (ADR-0042). Organization actions under `z-shell/.github/actions/` are pinned.
+- Append the associated release version comment to each SHA pin. An existing organization reusable workflow SHA pin keeps its interim `# main` comment until it moves to `@main`.
 
-The pinact exception for that interim workflow comment is observed in `z-shell/zunit:.pinact.yaml` and `z-shell/zpmod:.pinact.yaml`. Follow the [canonical CI pinning guidance](../../../.github/instructions/ci/workflow-contract.instructions.md#interim-pinact-exception-for-organization-reusable-workflows) and reuse its linked template rather than creating another exception shape.
+The pinact exception for organization reusable workflows is observed in `z-shell/zunit:.pinact.yaml` and `z-shell/zpmod:.pinact.yaml`. Follow the [canonical CI pinning guidance](../../../.github/instructions/ci/workflow-contract.instructions.md#pinact-exception-for-organization-reusable-workflows) and reuse its linked template rather than creating another exception shape.
 
 ```yaml
 # Good: pinned to SHA with version comment

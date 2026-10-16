@@ -28,6 +28,13 @@
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "groupName": "github actions non-major updates",
       "groupSlug": "github-actions-non-major"
+    },
+    {
+      "description": "Keep organization reusable workflows referenced at main unpinned (ADR-0042)",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["z-shell/.github"],
+      "matchCurrentValue": "main",
+      "pinDigests": false
     }
   ]
 }

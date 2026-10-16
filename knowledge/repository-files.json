@@ -1143,6 +1143,13 @@
       "reason": "Accepted refinement of ADR-0030's parser-fork module packaging. Fork strategy, licensing and behavior gates remain unchanged; implementation and consumer delivery are separate steps."
     },
     {
+      "path": "decisions/0042-organization-reusable-workflows-at-main.md",
+      "domain": "ci",
+      "disposition": "referenced",
+      "knowledge": "knowledge/domains/ci/repository-resources.md",
+      "reason": "Accepted decision to reference organization reusable workflows at main while every other remote reference stays SHA-pinned."
+    },
+    {
       "path": "decisions/README.md",
       "domain": "governance",
       "disposition": "referenced",

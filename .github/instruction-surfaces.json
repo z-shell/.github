@@ -220,6 +220,18 @@
       "canonical_for": []
     },
     {
+      "id": "decision-0042",
+      "path": "decisions/0042-organization-reusable-workflows-at-main.md",
+      "kind": "decision",
+      "authority": "advisory",
+      "consumers": ["agent", "human"],
+      "tasks": ["architecture-decision"],
+      "file_patterns": ["**"],
+      "required": false,
+      "review_owner": "z-shell maintainers",
+      "canonical_for": []
+    },
+    {
       "id": "organization-patterns",
       "path": "PATTERNS.md",
       "kind": "shared-policy",
