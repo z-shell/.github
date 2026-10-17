@@ -55,12 +55,10 @@ on:
 # Callers own concurrency; use cancel-in-progress: false on the release path.
 permissions:
   contents: read
-  issues: write
-  models: read
 
 jobs:
   propose:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       version: ${{ steps.semver.outputs.version }}
       previous-tag: ${{ steps.semver.outputs.previous-tag }}
@@ -210,9 +208,16 @@ jobs:
             cat "$commits"
           } > "${dir}/prompt.txt"
 
+      - name: Verify preparation output
+        env:
+          VERSION: ${{ steps.semver.outputs.version }}
+        run: |
+          test -n "$VERSION"
+          test -s "$RUNNER_TEMP/release-prepare/fallback.md"
+
       - name: 🤖 Draft changelog with GitHub Models
         id: ai
-        if: steps.semver.outputs.version != ''
+        if: ${{ false }}
         continue-on-error: true
         uses: actions/ai-inference@a7805884c80886efc241e94a5351df715968a0ad # v2.1.1
         with:
@@ -229,7 +234,7 @@ jobs:
 
       - name: 📝 Open or update release proposal issue
         id: issue
-        if: steps.semver.outputs.version != ''
+        if: ${{ false }}
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.semver.outputs.version }}
