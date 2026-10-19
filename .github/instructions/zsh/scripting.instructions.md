@@ -469,9 +469,9 @@ fail or change command lookup. Use purpose-specific names such as
 `command_status` and `candidate_paths`. Even `local path` with no assignment
 costs time: restoring the caller's value on return runs the `path` setter
 again, which empties the command hash table, so the next command lookup or
-completion rescans every `PATH` directory. The same applies to `PATH`,
-`cdpath`, `fpath` and `manpath`; use names such as `dir`, `entry` or
-`fpath_entry`.
+completion rescans every `PATH` directory. `local PATH` does the same;
+localizing `fpath`, `cdpath` or `manpath` does not rescan, but still changes
+their lookups. Use names such as `dir`, `entry` or `fpath_entry`.
 
 ### `zsh/parameters/capture-before-localizing`
 
