@@ -17,3 +17,5 @@ For native packages, historical records, implementation and supporting files in 
 Structured policy owned by this domain:
 
 - [zsh-standard-policy.json](data/zsh-standard-policy.json)
+
+Test the policy validator with `cd automation/ci && python3 -m unittest test_validate_zsh_standard_policy` (111 tests, about 45 seconds on 2026-10-19); the `ExternalConsumerTests` class alone takes about a second.
