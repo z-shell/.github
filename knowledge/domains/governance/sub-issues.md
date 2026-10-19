@@ -22,6 +22,8 @@ Add another level only when a separately owned outcome genuinely needs it.
 - Keep a parent and its sub-issues in the owning repository when the outcome is
   repository-local.
 - Keep each implementation sub-issue in the repository that owns its change.
+  File it before naming the implementation branch, and name the branch after
+  that sub-issue, never after the organization parent.
 - Apply `meta:initiative` to the parent only. Never apply it to a sub-issue.
 - Apply the normal work-type and area labels during triage. A cross-repository
   parent also qualifies for `meta:org-tracked` under the tracker policy.

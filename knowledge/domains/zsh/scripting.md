@@ -462,7 +462,12 @@ Do not repurpose a Zsh special parameter name for unrelated local or scratch
 data. Check the Special Parameters inventory before declaring a new name. For
 example, `status` is read-only, and `path` is tied to `PATH`; assignment can
 fail or change command lookup. Use purpose-specific names such as
-`command_status` and `candidate_paths`.
+`command_status` and `candidate_paths`. Even `local path` with no assignment
+costs time: restoring the caller's value on return runs the `path` setter
+again, which empties the command hash table, so the next command lookup or
+completion rescans every `PATH` directory. The same applies to `PATH`,
+`cdpath`, `fpath` and `manpath`; use names such as `dir`, `entry` or
+`fpath_entry`.
 
 ### `zsh/parameters/capture-before-localizing`
 
@@ -743,6 +748,10 @@ value=$(critical_command) || exit
 - Enforcement: `runtime-test`
 
 Declare trap form and scope, and restore caller trap state where required.
+An `EXIT` trap set inside a function, including an anonymous function, runs
+when that function returns, not when the script exits. A cleanup trap meant
+for a whole sourced file belongs at that file's top level; keep the setup
+itself in an anonymous function with `emulate -L zsh`.
 
 ### `zsh/cleanup/use-always`
 
