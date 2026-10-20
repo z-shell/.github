@@ -33,7 +33,7 @@ concurrency:
 jobs:
   check:
     name: Zsh Policy Consumers
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -58,6 +58,8 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          repository: z-shell/agent-skills
+          ref: e18fb0396f2c2a1de9a83e95256530b3d04f020e
           persist-credentials: false
 
       - name: Check out policy tooling
@@ -82,7 +84,7 @@ jobs:
       - name: Check the caller's Zsh policy consumers
         shell: bash
         env:
-          CALLER: ${{ github.repository }}
+          CALLER: z-shell/agent-skills
         run: |
           tooling="$RUNNER_TEMP/z-shell-zsh-policy"
           mv -- .z-shell-zsh-policy "$tooling"

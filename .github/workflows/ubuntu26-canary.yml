@@ -1,0 +1,131 @@
+name: Ubuntu 26 Canary
+
+# Temporary qualification only. This branch must not be merged.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+# Called workflows own distinct concurrency groups.
+jobs:
+  safety:
+    name: Canary Safety
+    if: github.head_ref == 'feature-712-ubuntu26-canary'
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Check canary safety and coverage
+        run: python3 -m unittest automation/ci/test_ubuntu26_canary.py -v
+
+  codeql:
+    needs: safety
+    uses: ./.github/workflows/codeql.yml
+    permissions:
+      contents: read
+      packages: read
+      actions: read
+
+  commit-lint:
+    needs: safety
+    uses: ./.github/workflows/commit-lint.yml
+
+  dependency-review:
+    needs: safety
+    uses: ./.github/workflows/dependency-review.yml
+
+  labeler-config:
+    needs: safety
+    uses: ./.github/workflows/labeler-config-audit-test.yml
+
+  labels-sync:
+    needs: safety
+    uses: ./.github/workflows/labels-sync-test.yml
+    permissions:
+      contents: read
+      issues: read
+
+  lychee:
+    needs: safety
+    uses: ./.github/workflows/lychee.yml
+
+  org-routing:
+    needs: safety
+    uses: ./.github/workflows/org-routing.yml
+
+  release-prepare:
+    needs: safety
+    uses: ./.github/workflows/release-prepare.yml
+
+  repo-settings:
+    needs: safety
+    uses: ./.github/workflows/repo-settings-audit-test.yml
+
+  trunk:
+    needs: safety
+    uses: ./.github/workflows/trunk.yml
+    with:
+      runs-on: ubuntu-26.04
+      check-mode: all
+
+  trunk-control:
+    needs: safety
+    uses: ./.github/workflows/trunk.yml
+    with:
+      runs-on: ubuntu-24.04
+      check-mode: all
+
+  zsh-latest:
+    # Native trials are sequential because the reusable workflow owns one group.
+    needs: safety
+    uses: ./.github/workflows/zsh-ci.yml
+    with:
+      zsh-version: "latest"
+      require-sources: true
+      run-zcompile: true
+
+  zsh-59:
+    needs: [safety, zsh-latest]
+    if: ${{ !cancelled() && needs.safety.result == 'success' }}
+    uses: ./.github/workflows/zsh-ci.yml
+    with:
+      zsh-version: "5.9"
+      require-sources: true
+      run-zcompile: true
+
+  zsh-592:
+    needs: [safety, zsh-59]
+    if: ${{ !cancelled() && needs.safety.result == 'success' }}
+    uses: ./.github/workflows/zsh-ci.yml
+    with:
+      zsh-version: "5.9.2"
+      require-sources: true
+      run-zcompile: true
+
+  zsh-control-59:
+    needs: [safety, zsh-592]
+    if: ${{ !cancelled() && needs.safety.result == 'success' }}
+    uses: ./.github/workflows/zsh-ci.yml
+    with:
+      canary-runner: ubuntu-24.04
+      zsh-version: "5.9"
+      require-sources: true
+      run-zcompile: true
+
+  zsh-lint:
+    needs: safety
+    uses: ./.github/workflows/zsh-lint.yml
+    with:
+      paths: automation/ci/fixtures/zsh-lint/clean.txt
+      zsh-lint-ref: aff60185cddb4b829f39f2db82aae9fc7bce3e7d # v1.4.0
+      mode: strict
+      artifact-name: ubuntu26-zsh-lint-report
+
+  zsh-policy-consumers:
+    needs: safety
+    uses: ./.github/workflows/zsh-policy-consumers.yml

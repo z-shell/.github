@@ -4,6 +4,11 @@ name: Zsh CI
 on:
   workflow_call:
     inputs:
+      canary-runner:
+        description: Temporary image selection for the unmergeable qualification trial.
+        required: false
+        type: string
+        default: ubuntu-26.04
       checkout-ref:
         description: Optional exact candidate commit; otherwise check the triggering SHA.
         required: false
@@ -39,7 +44,7 @@ concurrency:
 jobs:
   zsh-syntax:
     name: Zsh syntax check
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.canary-runner }}
     permissions:
       contents: read
     steps:
